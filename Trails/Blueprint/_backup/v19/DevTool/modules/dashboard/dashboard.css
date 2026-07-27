@@ -1,0 +1,25 @@
+/* Dashboard Module - Specific styles */
+.app-graph-track {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--data-viz-track);
+    overflow: hidden;
+}
+
+.app-graph-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--data-viz-fill);
+    transition: width 0.25s ease;
+}
+
+.perf-metric-toggle .btn {
+    font-size: 0.74rem;
+    padding: 0.2rem 0.5rem;
+}
+
+.service-util-view-toggle .btn,
+.perf-view-toggle .btn {
+    font-size: 0.74rem;
+    padding: 0.2rem 0.5rem;
+}

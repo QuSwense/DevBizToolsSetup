@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Features/">
+    <Project Path="Features/Admin/Admin.csproj" />
+    <Project Path="Features/HealthCheck/HealthCheck.csproj" />
+    <Project Path="Features/PdfViewer/PdfViewer.csproj" />
+    <Project Path="Features/RestApiTest/RestApiTest.csproj" />
+    <Project Path="Features/SoapApiTest/SoapApiTest.csproj" />
+  </Folder>
+  <Project Path="WebApp/WebApp.csproj" />
+</Solution>

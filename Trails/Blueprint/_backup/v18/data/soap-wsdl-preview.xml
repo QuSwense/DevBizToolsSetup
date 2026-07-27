@@ -1,0 +1,6 @@
+<wsdl:definitions name="PaymentService"
+                    targetNamespace="http://tempuri.org/">
+    <wsdl:types>...</wsdl:types>
+    <wsdl:message name="ProcessPayment">...</wsdl:message>
+    <wsdl:portType name="IPaymentService">...</wsdl:portType>
+</wsdl:definitions>

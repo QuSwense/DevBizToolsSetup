@@ -1,0 +1,82 @@
+@page "/soap/request-files"
+
+@{
+    var files = new[]
+    {
+        new { FileName = "invoice_create.xml", AppName = "LegacyBilling", ApiPath = "CreateInvoice", Verb = "POST", Description
+= "SOAP envelope for invoice creation with tax", Type = "xml", Created = "2024-03-20" }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search request files..." aria-label="Search request files" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">1 record</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Upload File
+            </button>
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-download"></i>
+                Export
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">File Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Application</th>
+                    <th>Operation</th>
+                    <th>Verb</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in files)
+                {
+                    var verbColor = "var(--dg-success)";
+                    var verbBg = "var(--dg-success-bg)";
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @file.FileName" /></td>
+                            <td>
+                                <span class="mono-text">@file.FileName</span>
+                            </td>
+                            <td style="color:var(--dg-text-soft)">@file.AppName</td>
+                            <td><span class="cell-id">@file.ApiPath</span></td>
+                            <td>
+                                <span class="verb-badge"
+                                      style="background:@verbBg;color:@verbColor;border-color:currentColor">@file.Verb</span>
+                            </td>
+                            <td class="cell-truncated">
+                                @file.Description</td>
+                                <td>
+                                    <i class="bi bi-file-earmark-code" style="color:var(--dg-warning);font-size:14px"></i>
+                                </td>
+                                <td style="color:var(--dg-text-soft)">@file.Created</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

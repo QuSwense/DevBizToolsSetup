@@ -1,0 +1,91 @@
+@page "/file/library"
+
+@{
+    var files = new[]
+    {
+        new { FileName = "payment_create_001.json", AppName = "PaymentService", Type = "json", Size = "2.4 KB", LinkedTo =
+"PaymentService /payments POST", Actions = "" },
+        new { FileName = "user_list_filter.xml", AppName = "UserManagement", Type = "xml", Size = "1.8 KB", LinkedTo =
+"UserManagement /users GET", Actions = "" },
+        new { FileName = "invoice_create.xml", AppName = "LegacyBilling", Type = "xml", Size = "3.1 KB", LinkedTo =
+"LegacyBilling CreateInvoice POST", Actions = "" },
+        new { FileName = "stock_update_003.json", AppName = "InventoryAPI", Type = "json", Size = "1.2 KB", LinkedTo =
+"InventoryAPI /stock PUT", Actions = "" }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search files..." aria-label="Search files" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">4 files</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Upload
+            </button>
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-download"></i>
+                Export
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">File Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Application</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Linked To</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in files)
+                {
+                    var typeColor = file.Type == "json" ? "var(--dg-success)" : "var(--dg-warning)";
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @file.FileName" /></td>
+                            <td>
+                                <div class="name-stack">
+                                    <i class="bi bi-file-earmark-code file-icon" style="color:@typeColor"></i>
+                                    <span class="file-name">@file.FileName</span>
+                                </div>
+                            </td>
+                            <td style="color:var(--dg-text-soft)">@file.AppName</td>
+                            <td>
+                                <span class="type-badge" style="text-transform:uppercase">@file.Type</span>
+                            </td>
+                            <td style="color:var(--dg-text-soft)">@file.Size</td>
+                            <td
+                                style="color:var(--dg-text-soft);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                                @file.LinkedTo</td>
+                                <td>
+                                    <div class="action-icons">
+                                        <button class="action-icon-btn">View</button>
+                                        <button class="action-icon-btn">Download</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

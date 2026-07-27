@@ -1,0 +1,109 @@
+@page "/rest/applications"
+
+@{
+    var apps = new[]
+    {
+        new { Id = "1", Name = "PaymentService", BaseUrl = "https://api.payments.com/v1", Status = "enabled", UpdatedBy = "Priya Sharma", CreatedDate = "2024-01-15", ApisCount = 4 },
+        new { Id = "2", Name = "UserManagement", BaseUrl = "https://api.users.internal/v2", Status = "enabled", UpdatedBy =
+"Rahul Patel", CreatedDate = "2024-02-20", ApisCount = 3 },
+        new { Id = "3", Name = "InventoryAPI", BaseUrl = "https://inventory.acme.com/api", Status = "disabled", UpdatedBy =
+"Anita Desai", CreatedDate = "2023-11-10", ApisCount = 5 },
+        new { Id = "4", Name = "OrderService", BaseUrl = "https://orders.acme.com/v3", Status = "enabled", UpdatedBy = "Vikram Singh", CreatedDate = "2024-03-05", ApisCount = 2 }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box" id="restAppsSearch">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search applications..." aria-label="Search applications" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">4 records</span>
+                <span class="meta-pill">0 selected</span>
+                <span class="meta-sep"></span>
+                <select class="form-control-dg status-select">
+                    <option>All Status</option>
+                    <option>Enabled</option>
+                    <option>Disabled</option>
+                </select>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Add Application
+            </button>
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-download"></i>
+                CSV
+            </button>
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-download"></i>
+                JSON
+            </button>
+            <button class="btn btn-danger btn-dg-danger">
+                <i class="bi bi-trash3"></i>
+                Delete
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">App Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">Base URL<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Status</th>
+                    <th>Last Updated By</th>
+                    <th>Created Date</th>
+                    <th>APIs</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var app in apps)
+                {
+                    var initials = app.Name.Length >= 2 ? app.Name.Substring(0, 2).ToUpper() : app.Name.ToUpper();
+                    var badgeClass = app.Status == "enabled" ? "status-enabled" : "status-disabled";
+                    var toggleLabel = app.Status == "enabled" ? "Disable" : "Enable";
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @app.Name" /></td>
+                            <td>
+                                <div class="name-stack">
+                                    <span class="avatar-sm">@initials</span>
+                                    <span style="font-weight:500">@app.Name</span>
+                                </div>
+                            </td>
+                            <td><span class="cell-id">@app.BaseUrl</span></td>
+                            <td><span class="status-badge @badgeClass">@(app.Status == "enabled" ? "Enabled" :
+                                                                                                                                                                                                               "Disabled")</span></td>
+                                <td style="color:var(--dg-text-soft)">@app.UpdatedBy</td>
+                                <td style="color:var(--dg-text-soft)">@app.CreatedDate</td>
+                                <td><span style="font-weight:600">@app.ApisCount</span></td>
+                                <td>
+                                    <div class="action-icons">
+                                        <button class="action-icon-btn">Edit</button>
+                                        <button class="action-icon-btn">@toggleLabel</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

@@ -1,0 +1,333 @@
+@page "/soap/applications"
+@using Microsoft.AspNetCore.Components.Web
+
+<ServiceHubGrid TItem="SoapApp"
+                Id="soapAppsGrid"
+                Items="FilteredApps"
+                PageSize="5"
+                EnableSelection="true"
+                EnablePagination="true"
+                EnableSearch="true"
+                EnableExpand="true"
+                EnableContextMenu="true"
+                SearchPlaceholder="Search applications..."
+                EmptyText="No applications found matching the current filters."
+                FilterModalTitle="Filter Applications"
+                @bind-SortColumn="_sortColumn"
+                @bind-SortAscending="_sortAscending"
+                @bind-CurrentPage="_currentPage"
+                @bind-SearchText="_searchText"
+                @bind-ShowFilterModal="_showFilterModal"
+                FilterApplied="OnFilterApplied"
+                RowIdSelector="@(app => app.Id)"
+                Columns="@_columns">
+
+    <ToolbarCenter>
+        <button class="filter-btn" @onclick="() => _showFilterModal = true" type="button">
+            <i class="bi bi-funnel"></i>
+            Filter
+        </button>
+    </ToolbarCenter>
+
+    <ToolbarRight>
+        <button class="btn btn-dark btn-dg-primary" type="button">
+            <i class="bi bi-plus-lg"></i>
+            Add Application
+        </button>
+        <div style="position:relative">
+            <button class="btn btn-outline-secondary btn-dg" @onclick="() => _showDropdown = !_showDropdown" type="button">
+                <i class="bi bi-three-dots-vertical"></i>
+                Actions
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            @if (_showDropdown)
+            {
+                <div style="position:fixed;inset:0;z-index:50" @onclick="() => _showDropdown = false"></div>
+                <div class="dropdown-menu-dg">
+                    <div style="padding:4px 0">
+                        <div class="dropdown-header-dg">Export</div>
+                        <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
+                            <i class="bi bi-download"></i>
+                            Export to CSV
+                        </button>
+                        <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
+                            <i class="bi bi-download"></i>
+                            Export to JSON
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <button class="btn dropdown-item-dg-danger" @onclick="() => _showDropdown = false" type="button">
+                            <i class="bi bi-trash3"></i>
+                            Delete Selected
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <div class="dropdown-header-dg">View</div>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; ResetAdvancedFilters(); }"
+                                type="button">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Reset Filter
+                        </button>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="HandleResetSort"
+                                type="button">
+                            <i class="bi bi-arrow-up-short"></i>
+                            Reset Sort
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; }"
+                                type="button">
+                            <i class="bi bi-arrows-expand"></i>
+                            Expand Selected
+                        </button>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; }"
+                                type="button">
+                            <i class="bi bi-arrows-collapse"></i>
+                            Collapse Selected
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </ToolbarRight>
+
+    <RowActions>
+        <div class="row-actions-wrap">
+            <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions">
+                <i class="bi bi-three-dots" aria-hidden="true"></i>
+            </button>
+            <div class="inline-actions">
+                <button class="ia-btn ia-edit" type="button" aria-label="Edit" data-tooltip="Edit">
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                </button>
+                <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+                <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close">
+                    <i class="bi bi-x-lg" style="font-size: 11px" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </RowActions>
+
+    <DetailRow Context="app">
+        <div class="detail-grid">
+            <div>
+                <div class="detail-label">Application ID</div>
+                <div class="detail-value">@app.Id</div>
+            </div>
+            <div>
+                <div class="detail-label">Full URL</div>
+                <div class="detail-value" style="word-break:break-all">@app.BaseUrl</div>
+            </div>
+            <div>
+                <div class="detail-label">API Endpoints</div>
+                <div class="detail-value">@app.ApisCount endpoints configured</div>
+            </div>
+            <div>
+                <div class="detail-label">Last Modified</div>
+                <div class="detail-value">@app.CreatedDate by @app.UpdatedBy</div>
+            </div>
+        </div>
+    </DetailRow>
+
+    <FilterModalBody>
+        <div class="form-group">
+            <label>App Name</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by name..."
+                   @bind="_filterName" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Base URL</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by URL..."
+                   @bind="_filterUrl" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select class="form-control-dg" @bind="_filterStatus">
+                <option value="">All</option>
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Last Updated By</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by user..."
+                   @bind="_filterUpdatedBy" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Created Date</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by date..."
+                   @bind="_filterCreatedDate" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Operations</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by operations count..."
+                   @bind="_filterOperations" @bind:event="oninput" />
+        </div>
+    </FilterModalBody>
+</ServiceHubGrid>
+
+@code {
+    private record SoapApp(string Id, string Name, string BaseUrl, string Status, string UpdatedBy, string CreatedDate, int ApisCount);
+
+    private List<GridColumn<SoapApp>> _columns = [];
+
+    protected override void OnInitialized()
+    {
+        _columns =
+        [
+            new()
+            {
+                Title = "App Name",
+                Sortable = true,
+                Field = a => a.Name,
+                Template = context => builder =>
+                {
+                    var app = context;
+                    var initials = app.Name.Length >= 2 ? app.Name[..2].ToUpper() : app.Name.ToUpper();
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "name-stack");
+                    builder.OpenElement(2, "span");
+                    builder.AddAttribute(3, "class", "avatar-sm");
+                    builder.AddContent(4, initials);
+                    builder.CloseElement();
+                    builder.OpenElement(5, "span");
+                    builder.AddAttribute(6, "style", "font-weight:500");
+                    builder.AddContent(7, app.Name);
+                    builder.CloseElement();
+                    builder.CloseElement();
+                }
+            },
+            new()
+            {
+                Title = "Base URL",
+                Sortable = true,
+                Field = a => a.BaseUrl,
+                Template = context => builder =>
+                {
+                    builder.OpenElement(0, "span");
+                    builder.AddAttribute(1, "class", "cell-id");
+                    builder.AddContent(2, context.BaseUrl);
+                    builder.CloseElement();
+                }
+            },
+            new()
+            {
+                Title = "Status",
+                Sortable = true,
+                Field = a => a.Status,
+                Template = context => builder =>
+                {
+                    var badgeClass = context.Status == "enabled" ? "status-enabled" : "status-disabled";
+                    var label = context.Status == "enabled" ? "Enabled" : "Disabled";
+                    builder.OpenElement(0, "span");
+                    builder.AddAttribute(1, "class", $"status-badge {badgeClass}");
+                    builder.AddContent(2, label);
+                    builder.CloseElement();
+                }
+            },
+            new() { Title = "Last Updated By", Sortable = true, Field = a => a.UpdatedBy },
+            new() { Title = "Created Date", Sortable = true, Field = a => a.CreatedDate },
+            new() { Title = "Operations", Sortable = true, Field = a => a.ApisCount }
+        ];
+    }
+
+    private static readonly SoapApp[] _allApps =
+    [
+        new("s1", "LegacyBilling", "https://soap.billing.com/BillingService", "enabled", "Suresh Kumar", "2023-08-12", 3),
+        new("s2", "ShippingSOAP", "https://soap.shipping.com/ShipService", "disabled", "Priya Sharma", "2023-09-01", 2),
+        new("s3", "CustomerPortal", "https://soap.customer.com/PortalService", "enabled", "Anita Desai", "2023-07-05", 5),
+        new("s4", "InventorySync", "https://soap.inventory.com/SyncService", "disabled", "Vikram Singh", "2024-01-15", 1),
+        new("s5", "PaymentGateway", "https://soap.payment.com/Gateway", "enabled", "Priya Sharma", "2023-11-20", 4),
+        new("s6", "OrderProcessing", "https://soap.orders.com/OrderService", "enabled", "Rahul Patel", "2024-03-10", 6),
+        new("s7", "NotificationHub", "https://soap.notify.com/NotifyService", "enabled", "Suresh Kumar", "2024-02-28", 3),
+        new("s8", "ReportingEngine", "https://soap.report.com/ReportService", "disabled", "Anita Desai", "2023-10-12", 2)
+    ];
+
+    private string _searchText = "";
+    private string _filterName = "";
+    private string _filterUrl = "";
+    private string _filterStatus = "";
+    private string _filterUpdatedBy = "";
+    private string _filterCreatedDate = "";
+    private string _filterOperations = "";
+    private int _currentPage = 1;
+    private bool _showFilterModal = false;
+    private bool _showDropdown = false;
+    private string _sortColumn = "";
+    private bool _sortAscending = true;
+
+    private SoapApp[] FilteredApps
+    {
+        get
+        {
+            var query = _allApps.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(_searchText))
+            {
+                var q = _searchText.ToLower();
+                query = query.Where(a =>
+                    a.Name.ToLower().Contains(q) ||
+                    a.BaseUrl.ToLower().Contains(q) ||
+                    a.UpdatedBy.ToLower().Contains(q) ||
+                    a.Status.ToLower().Contains(q));
+            }
+
+            if (!string.IsNullOrWhiteSpace(_filterName))
+                query = query.Where(a => a.Name.ToLower().Contains(_filterName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(_filterUrl))
+                query = query.Where(a => a.BaseUrl.ToLower().Contains(_filterUrl.ToLower()));
+            if (!string.IsNullOrWhiteSpace(_filterStatus))
+                query = query.Where(a => a.Status == _filterStatus);
+            if (!string.IsNullOrWhiteSpace(_filterUpdatedBy))
+                query = query.Where(a => a.UpdatedBy.ToLower().Contains(_filterUpdatedBy.ToLower()));
+            if (!string.IsNullOrWhiteSpace(_filterCreatedDate))
+                query = query.Where(a => a.CreatedDate.ToLower().Contains(_filterCreatedDate.ToLower()));
+            if (!string.IsNullOrWhiteSpace(_filterOperations) && int.TryParse(_filterOperations, out var ops))
+                query = query.Where(a => a.ApisCount == ops);
+
+            if (!string.IsNullOrWhiteSpace(_sortColumn))
+            {
+                query = _sortColumn switch
+                {
+                    "Name" => _sortAscending ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name),
+                    "BaseUrl" => _sortAscending ? query.OrderBy(a => a.BaseUrl) : query.OrderByDescending(a => a.BaseUrl),
+                    "Status" => _sortAscending ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
+                    "UpdatedBy" => _sortAscending ? query.OrderBy(a => a.UpdatedBy) : query.OrderByDescending(a => a.UpdatedBy),
+                    "CreatedDate" => _sortAscending ? query.OrderBy(a => a.CreatedDate) : query.OrderByDescending(a => a.CreatedDate),
+                    "ApisCount" => _sortAscending ? query.OrderBy(a => a.ApisCount) : query.OrderByDescending(a => a.ApisCount),
+                    _ => query
+                };
+            }
+
+            return query.ToArray();
+        }
+    }
+
+    private void OnFilterApplied()
+    {
+        _currentPage = 1;
+    }
+
+    private void HandleResetSort()
+    {
+        _showDropdown = false;
+        _sortColumn = "";
+        _sortAscending = true;
+        _currentPage = 1;
+    }
+
+    private void ResetAdvancedFilters()
+    {
+        _searchText = "";
+        _filterName = "";
+        _filterUrl = "";
+        _filterStatus = "";
+        _filterUpdatedBy = "";
+        _filterCreatedDate = "";
+        _filterOperations = "";
+        _currentPage = 1;
+    }
+}

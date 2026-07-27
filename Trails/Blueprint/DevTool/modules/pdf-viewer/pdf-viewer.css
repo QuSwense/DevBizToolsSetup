@@ -1,0 +1,59 @@
+/* PDF Viewer Module - Specific styles */
+
+#pdfArtifactList {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#pdfArtifactList .list-group-item {
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+#pdfArtifactList .list-group-item:first-child {
+    border-top: none;
+}
+
+#pdfArtifactList .list-group-item.active {
+    background-color: var(--ux-active-bg);
+    border-color: var(--ux-border);
+    color: var(--ux-text-primary);
+}
+
+#pdfArtifactList .list-group-item:hover:not(.active) {
+    background-color: var(--ux-bg-tertiary);
+}
+
+#pdfArtifactList .list-group-item .min-width-0 {
+    min-width: 0;
+}
+
+.pdf-viewer-mock {
+    border: 1px solid var(--ux-border);
+}
+
+.pdf-mock-content {
+    text-align: left;
+}
+
+#pdfViewerPlaceholder i {
+    color: var(--ux-border);
+    opacity: 0.6;
+}
+
+#pdfViewerCanvas .btn-group .btn,
+#pdfViewerCanvas .btn {
+    font-size: var(--font-size-xs);
+}
+
+/* Viewer toolbar controls */
+#pdfViewerCanvas .card-header .badge {
+    font-size: var(--font-size-xs);
+    min-width: 48px;
+}
+
+#pdfViewerCanvas .card-header .vr {
+    opacity: 0.3;
+}

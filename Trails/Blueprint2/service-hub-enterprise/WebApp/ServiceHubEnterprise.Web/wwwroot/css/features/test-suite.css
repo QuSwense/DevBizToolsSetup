@@ -1,0 +1,13 @@
+/* Test Suite Feature Styles */
+
+/* Progress bar */
+.progress-bar-dg {
+    height: 6px;
+    background: var(--dg-surface-3);
+    overflow: hidden;
+}
+
+.progress-fill-dg {
+    height: 100%;
+    transition: width .3s;
+}

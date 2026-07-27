@@ -1,0 +1,116 @@
+@page "/health"
+
+@{
+    var services = new[]
+    {
+        new { Name = "Payment Gateway", Status = "ok", ResponseTime = "45ms", Uptime = "99.9%" },
+        new { Name = "User API", Status = "ok", ResponseTime = "32ms", Uptime = "99.8%" },
+        new { Name = "Billing SOAP", Status = "down", ResponseTime = "N/A", Uptime = "87.2%" },
+        new { Name = "Inventory", Status = "ok", ResponseTime = "128ms", Uptime = "99.5%" },
+        new { Name = "Shipping SOAP", Status = "down", ResponseTime = "N/A", Uptime = "92.1%" }
+    };
+}
+
+<div class="dashboard-grid">
+    <!-- Overall Health Summary -->
+    <div class="dash-card">
+        <div class="card-header">
+            <span class="card-title">Overall Health</span>
+        </div>
+        <div class="card-value" style="color:var(--dg-warning)">3 / 5</div>
+        <div class="card-sub">Services operational</div>
+        <div style="margin-top:12px">
+            <div style="display:flex;gap:8px">
+                <span class="status-badge status-enabled">
+                    <i class="bi bi-check-lg"></i>
+                    3 Operational
+                </span>
+                <span class="status-badge status-down">
+                    <i class="bi bi-x-lg"></i>
+                    2 Down
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avg Response Time -->
+    <div class="dash-card">
+        <div class="card-header">
+            <span class="card-title">Avg Response Time</span>
+        </div>
+        <div class="card-value" style="color:var(--dg-accent)">68ms</div>
+        <div class="card-sub">Across all services</div>
+    </div>
+
+    <!-- Uptime -->
+    <div class="dash-card">
+        <div class="card-header">
+            <span class="card-title">Uptime</span>
+        </div>
+        <div class="card-value" style="color:var(--dg-success)">97.7%</div>
+        <div class="card-sub">Last 30 days average</div>
+    </div>
+
+    <!-- Last Checked -->
+    <div class="dash-card">
+        <div class="card-header">
+            <span class="card-title">Last Checked</span>
+        </div>
+        <div class="card-value dash-card-value" style="color:var(--dg-text-soft)">Just now</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-dark btn-dg-primary" style="height:32px;font-size:12px">
+                <i class="bi bi-arrow-repeat"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Service Health Table -->
+<div class="datagrid-card" style="margin-top:16px">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <span class="card-title" style="font-size:12px">Service Details</span>
+        </div>
+        <div class="toolbar-right">
+            <select class="form-control-dg status-select">
+                <option>All Services</option>
+                <option>Operational</option>
+                <option>Down</option>
+            </select>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="sortable">
+                        <span class="th-inner">Service Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Status</th>
+                    <th>Response Time</th>
+                    <th>Uptime</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var svc in services)
+                {
+                    var badgeClass = svc.Status == "ok" ? "status-enabled" : "status-down";
+                    var statusLabel = svc.Status == "ok" ? "Operational" : "Down";
+                    var statusIcon = svc.Status == "ok"
+                        ? "<i class=\"bi bi-check-lg\"></i>"
+                        : "<i class=\"bi bi-x-lg\"></i>";
+                    <tr>
+                        <td style="font-weight:500">@svc.Name</td>
+                        <td><span class="status-badge @badgeClass">@((MarkupString)statusIcon) @statusLabel</span></td>
+                        <td style="color:var(--dg-text-soft);font-family:'JetBrains Mono','Menlo',monospace">
+                            @svc.ResponseTime</td>
+                            <td style="color:var(--dg-text-soft)">@svc.Uptime</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>

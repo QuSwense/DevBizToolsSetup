@@ -1,0 +1,665 @@
+[
+  {
+    "id": 1001,
+    "name": "Jane Doe",
+    "initials": "JD",
+    "role": "Data Scientist",
+    "status": "Active",
+    "email": "jane.doe@example.com",
+    "dept": "Core Platform",
+    "location": "Toronto, CA",
+    "projects": [
+      "K8s Migration"
+    ]
+  },
+  {
+    "id": 1002,
+    "name": "Alex Smith",
+    "initials": "AS",
+    "role": "QA Engineer",
+    "status": "Inactive",
+    "email": "alex.smith@example.com",
+    "dept": "UX & Strategy",
+    "location": "Berlin, DE",
+    "projects": [
+      "Auth Service",
+      "Search Infra",
+      "Test Automation"
+    ]
+  },
+  {
+    "id": 1003,
+    "name": "Robert Chen",
+    "initials": "RC",
+    "role": "Product Designer",
+    "status": "Active",
+    "email": "robert.chen@example.com",
+    "dept": "Core Platform",
+    "location": "Austin, TX",
+    "projects": [
+      "Payments V2"
+    ]
+  },
+  {
+    "id": 1004,
+    "name": "Maria Garcia",
+    "initials": "MG",
+    "role": "Software Engineer",
+    "status": "Inactive",
+    "email": "maria.garcia@example.com",
+    "dept": "Data",
+    "location": "Boston, MA",
+    "projects": [
+      "Observability",
+      "Payments V2",
+      "Test Automation"
+    ]
+  },
+  {
+    "id": 1005,
+    "name": "David Kim",
+    "initials": "DK",
+    "role": "Backend Engineer",
+    "status": "Active",
+    "email": "david.kim@example.com",
+    "dept": "Security",
+    "location": "London, UK",
+    "projects": [
+      "Feature Flags"
+    ]
+  },
+  {
+    "id": 1006,
+    "name": "Sarah Lee",
+    "initials": "SL",
+    "role": "Product Manager",
+    "status": "Active",
+    "email": "sarah.lee@example.com",
+    "dept": "Growth",
+    "location": "New York, NY",
+    "projects": [
+      "K8s Migration"
+    ]
+  },
+  {
+    "id": 1007,
+    "name": "Michael Brown",
+    "initials": "MB",
+    "role": "Site Reliability Engineer",
+    "status": "Active",
+    "email": "michael.brown@example.com",
+    "dept": "UX & Strategy",
+    "location": "Austin, TX",
+    "projects": [
+      "Churn Model"
+    ]
+  },
+  {
+    "id": 1008,
+    "name": "Emily Wilson",
+    "initials": "EW",
+    "role": "Mobile Developer",
+    "status": "Active",
+    "email": "emily.wilson@example.com",
+    "dept": "Mobile",
+    "location": "Denver, CO",
+    "projects": [
+      "Roadmap 2026",
+      "Payments V2",
+      "Auth Service"
+    ]
+  },
+  {
+    "id": 1009,
+    "name": "James Taylor",
+    "initials": "JT",
+    "role": "Data Engineer",
+    "status": "Active",
+    "email": "james.taylor@example.com",
+    "dept": "UX & Strategy",
+    "location": "Remote",
+    "projects": [
+      "Search Infra",
+      "Churn Model",
+      "Data Warehouse"
+    ]
+  },
+  {
+    "id": 1010,
+    "name": "Olivia Martinez",
+    "initials": "OM",
+    "role": "Frontend Engineer",
+    "status": "Inactive",
+    "email": "olivia.martinez@example.com",
+    "dept": "UX & Strategy",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Feature Flags"
+    ]
+  },
+  {
+    "id": 1011,
+    "name": "Daniel Anderson",
+    "initials": "DA",
+    "role": "Engineering Manager",
+    "status": "Active",
+    "email": "daniel.anderson@example.com",
+    "dept": "UX & Strategy",
+    "location": "Boston, MA",
+    "projects": [
+      "ML Pipeline",
+      "Roadmap 2026"
+    ]
+  },
+  {
+    "id": 1012,
+    "name": "Sophia Thomas",
+    "initials": "ST",
+    "role": "Mobile Developer",
+    "status": "Active",
+    "email": "sophia.thomas@example.com",
+    "dept": "Infrastructure",
+    "location": "New York, NY",
+    "projects": [
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1013,
+    "name": "Matthew Jackson",
+    "initials": "MJ",
+    "role": "UX Researcher",
+    "status": "Inactive",
+    "email": "matthew.jackson@example.com",
+    "dept": "UX & Strategy",
+    "location": "London, UK",
+    "projects": [
+      "Payments V2"
+    ]
+  },
+  {
+    "id": 1014,
+    "name": "Isabella White",
+    "initials": "IW",
+    "role": "Backend Engineer",
+    "status": "Active",
+    "email": "isabella.white@example.com",
+    "dept": "Infrastructure",
+    "location": "Chicago, IL",
+    "projects": [
+      "Mobile App 3.0",
+      "Observability"
+    ]
+  },
+  {
+    "id": 1015,
+    "name": "Christopher Harris",
+    "initials": "CH",
+    "role": "Backend Engineer",
+    "status": "Active",
+    "email": "christopher.harris@example.com",
+    "dept": "Product",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Feature Flags"
+    ]
+  },
+  {
+    "id": 1016,
+    "name": "Ava Martin",
+    "initials": "AM",
+    "role": "Site Reliability Engineer",
+    "status": "Active",
+    "email": "ava.martin@example.com",
+    "dept": "Growth",
+    "location": "Denver, CO",
+    "projects": [
+      "Search Infra"
+    ]
+  },
+  {
+    "id": 1017,
+    "name": "Andrew Thompson",
+    "initials": "AT",
+    "role": "Site Reliability Engineer",
+    "status": "Active",
+    "email": "andrew.thompson@example.com",
+    "dept": "AI Lab",
+    "location": "Berlin, DE",
+    "projects": [
+      "Mobile App 3.0",
+      "Roadmap 2026"
+    ]
+  },
+  {
+    "id": 1018,
+    "name": "Mia Robinson",
+    "initials": "MR",
+    "role": "QA Engineer",
+    "status": "Active",
+    "email": "mia.robinson@example.com",
+    "dept": "Quality",
+    "location": "Seattle, WA",
+    "projects": [
+      "Payments V2",
+      "Data Warehouse",
+      "ML Pipeline"
+    ]
+  },
+  {
+    "id": 1019,
+    "name": "Joshua Clark",
+    "initials": "JC",
+    "role": "Security Engineer",
+    "status": "Active",
+    "email": "joshua.clark@example.com",
+    "dept": "Mobile",
+    "location": "Portland, OR",
+    "projects": [
+      "Design System 2.0"
+    ]
+  },
+  {
+    "id": 1020,
+    "name": "Charlotte Lewis",
+    "initials": "CL",
+    "role": "Platform Engineer",
+    "status": "Active",
+    "email": "charlotte.lewis@example.com",
+    "dept": "UX & Strategy",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1021,
+    "name": "David Walker",
+    "initials": "DW",
+    "role": "Product Manager",
+    "status": "Active",
+    "email": "david.walker@example.com",
+    "dept": "Growth",
+    "location": "London, UK",
+    "projects": [
+      "Test Automation",
+      "Search Infra"
+    ]
+  },
+  {
+    "id": 1022,
+    "name": "Amelia Hall",
+    "initials": "AH",
+    "role": "ML Engineer",
+    "status": "On Leave",
+    "email": "amelia.hall@example.com",
+    "dept": "Data",
+    "location": "Denver, CO",
+    "projects": [
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1023,
+    "name": "Ryan Allen",
+    "initials": "RA",
+    "role": "Data Scientist",
+    "status": "Inactive",
+    "email": "ryan.allen@example.com",
+    "dept": "Data",
+    "location": "Denver, CO",
+    "projects": [
+      "Auth Service",
+      "ML Pipeline"
+    ]
+  },
+  {
+    "id": 1024,
+    "name": "Harper Young",
+    "initials": "HY",
+    "role": "Security Engineer",
+    "status": "Active",
+    "email": "harper.young@example.com",
+    "dept": "Infrastructure",
+    "location": "Chicago, IL",
+    "projects": [
+      "Observability",
+      "ML Pipeline",
+      "Payments V2"
+    ]
+  },
+  {
+    "id": 1025,
+    "name": "Tyler Hernandez",
+    "initials": "TH",
+    "role": "Product Manager",
+    "status": "Inactive",
+    "email": "tyler.hernandez@example.com",
+    "dept": "Data",
+    "location": "Austin, TX",
+    "projects": [
+      "Data Warehouse",
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1026,
+    "name": "Evelyn King",
+    "initials": "EK",
+    "role": "Frontend Engineer",
+    "status": "Active",
+    "email": "evelyn.king@example.com",
+    "dept": "Infrastructure",
+    "location": "New York, NY",
+    "projects": [
+      "Feature Flags",
+      "Payments V2",
+      "API Redesign"
+    ]
+  },
+  {
+    "id": 1027,
+    "name": "Brandon Wright",
+    "initials": "BW",
+    "role": "Site Reliability Engineer",
+    "status": "Active",
+    "email": "brandon.wright@example.com",
+    "dept": "Security",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Data Warehouse",
+      "Feature Flags"
+    ]
+  },
+  {
+    "id": 1028,
+    "name": "Abigail Lopez",
+    "initials": "AL",
+    "role": "Engineering Manager",
+    "status": "Active",
+    "email": "abigail.lopez@example.com",
+    "dept": "AI Lab",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Auth Service",
+      "Data Warehouse",
+      "Observability"
+    ]
+  },
+  {
+    "id": 1029,
+    "name": "Kevin Hill",
+    "initials": "KH",
+    "role": "Platform Engineer",
+    "status": "Active",
+    "email": "kevin.hill@example.com",
+    "dept": "UX & Strategy",
+    "location": "Remote",
+    "projects": [
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1030,
+    "name": "Elizabeth Scott",
+    "initials": "ES",
+    "role": "Platform Engineer",
+    "status": "Active",
+    "email": "elizabeth.scott@example.com",
+    "dept": "Data",
+    "location": "Seattle, WA",
+    "projects": [
+      "Data Warehouse",
+      "Search Infra",
+      "Test Automation"
+    ]
+  },
+  {
+    "id": 1031,
+    "name": "Jason Green",
+    "initials": "JG",
+    "role": "Frontend Engineer",
+    "status": "Inactive",
+    "email": "jason.green@example.com",
+    "dept": "Data",
+    "location": "Toronto, CA",
+    "projects": [
+      "Observability"
+    ]
+  },
+  {
+    "id": 1032,
+    "name": "Sofia Adams",
+    "initials": "SA",
+    "role": "Engineering Manager",
+    "status": "Inactive",
+    "email": "sofia.adams@example.com",
+    "dept": "Growth",
+    "location": "Berlin, DE",
+    "projects": [
+      "Roadmap 2026",
+      "Payments V2"
+    ]
+  },
+  {
+    "id": 1033,
+    "name": "Justin Baker",
+    "initials": "JB",
+    "role": "ML Engineer",
+    "status": "Active",
+    "email": "justin.baker@example.com",
+    "dept": "UX & Strategy",
+    "location": "Boston, MA",
+    "projects": [
+      "Churn Model"
+    ]
+  },
+  {
+    "id": 1034,
+    "name": "Avery Nelson",
+    "initials": "AN",
+    "role": "Software Engineer",
+    "status": "Active",
+    "email": "avery.nelson@example.com",
+    "dept": "Mobile",
+    "location": "Remote",
+    "projects": [
+      "K8s Migration",
+      "API Redesign",
+      "Auth Service"
+    ]
+  },
+  {
+    "id": 1035,
+    "name": "Jacob Carter",
+    "initials": "JC",
+    "role": "Product Designer",
+    "status": "Active",
+    "email": "jacob.carter@example.com",
+    "dept": "AI Lab",
+    "location": "Austin, TX",
+    "projects": [
+      "Auth Service",
+      "Payments V2"
+    ]
+  },
+  {
+    "id": 1036,
+    "name": "Lily Mitchell",
+    "initials": "LM",
+    "role": "Backend Engineer",
+    "status": "Active",
+    "email": "lily.mitchell@example.com",
+    "dept": "Quality",
+    "location": "Berlin, DE",
+    "projects": [
+      "Payments V2"
+    ]
+  },
+  {
+    "id": 1037,
+    "name": "Nathan Perez",
+    "initials": "NP",
+    "role": "QA Engineer",
+    "status": "Active",
+    "email": "nathan.perez@example.com",
+    "dept": "Mobile",
+    "location": "London, UK",
+    "projects": [
+      "Feature Flags"
+    ]
+  },
+  {
+    "id": 1038,
+    "name": "Grace Roberts",
+    "initials": "GR",
+    "role": "Platform Engineer",
+    "status": "Active",
+    "email": "grace.roberts@example.com",
+    "dept": "Growth",
+    "location": "Boston, MA",
+    "projects": [
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1039,
+    "name": "Samuel Turner",
+    "initials": "ST",
+    "role": "Security Engineer",
+    "status": "Active",
+    "email": "samuel.turner@example.com",
+    "dept": "Product",
+    "location": "Portland, OR",
+    "projects": [
+      "Data Warehouse",
+      "Observability"
+    ]
+  },
+  {
+    "id": 1040,
+    "name": "Chloe Phillips",
+    "initials": "CP",
+    "role": "Product Designer",
+    "status": "Active",
+    "email": "chloe.phillips@example.com",
+    "dept": "UX & Strategy",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Churn Model",
+      "Feature Flags",
+      "Auth Service"
+    ]
+  },
+  {
+    "id": 1041,
+    "name": "Benjamin Campbell",
+    "initials": "BC",
+    "role": "Backend Engineer",
+    "status": "On Leave",
+    "email": "benjamin.campbell@example.com",
+    "dept": "AI Lab",
+    "location": "Boston, MA",
+    "projects": [
+      "Design System 2.0",
+      "Test Automation"
+    ]
+  },
+  {
+    "id": 1042,
+    "name": "Zoey Parker",
+    "initials": "ZP",
+    "role": "Product Manager",
+    "status": "Active",
+    "email": "zoey.parker@example.com",
+    "dept": "Quality",
+    "location": "Chicago, IL",
+    "projects": [
+      "Roadmap 2026"
+    ]
+  },
+  {
+    "id": 1043,
+    "name": "Samuel Evans",
+    "initials": "SE",
+    "role": "Data Scientist",
+    "status": "On Leave",
+    "email": "samuel.evans@example.com",
+    "dept": "Core Platform",
+    "location": "Berlin, DE",
+    "projects": [
+      "Auth Service"
+    ]
+  },
+  {
+    "id": 1044,
+    "name": "Layla Edwards",
+    "initials": "LE",
+    "role": "Backend Engineer",
+    "status": "Active",
+    "email": "layla.edwards@example.com",
+    "dept": "Infrastructure",
+    "location": "Portland, OR",
+    "projects": [
+      "K8s Migration",
+      "Test Automation"
+    ]
+  },
+  {
+    "id": 1045,
+    "name": "Henry Collins",
+    "initials": "HC",
+    "role": "Product Designer",
+    "status": "Active",
+    "email": "henry.collins@example.com",
+    "dept": "Infrastructure",
+    "location": "Portland, OR",
+    "projects": [
+      "ML Pipeline",
+      "Feature Flags"
+    ]
+  },
+  {
+    "id": 1046,
+    "name": "Nora Stewart",
+    "initials": "NS",
+    "role": "ML Engineer",
+    "status": "Inactive",
+    "email": "nora.stewart@example.com",
+    "dept": "Quality",
+    "location": "Portland, OR",
+    "projects": [
+      "Feature Flags",
+      "Payments V2",
+      "Mobile App 3.0"
+    ]
+  },
+  {
+    "id": 1047,
+    "name": "Alexander Morris",
+    "initials": "AM",
+    "role": "Platform Engineer",
+    "status": "Active",
+    "email": "alexander.morris@example.com",
+    "dept": "Infrastructure",
+    "location": "Boston, MA",
+    "projects": [
+      "API Redesign"
+    ]
+  },
+  {
+    "id": 1048,
+    "name": "Riley Rogers",
+    "initials": "RR",
+    "role": "Product Designer",
+    "status": "Active",
+    "email": "riley.rogers@example.com",
+    "dept": "Product",
+    "location": "San Francisco, CA",
+    "projects": [
+      "Roadmap 2026",
+      "Payments V2",
+      "Feature Flags"
+    ]
+  }
+]

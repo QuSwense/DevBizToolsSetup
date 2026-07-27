@@ -1,0 +1,205 @@
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-brand">
+            <div class="brand-mark">SH</div>
+            <div class="brand-text">
+                <span class="brand-title">SERVICE HUB</span>
+                <span class="brand-sub">V8 Enterprise</span>
+            </div>
+        </div>
+        <button class="btn-collapse" aria-label="Collapse sidebar" onclick="toggleSidebar()">
+            <span style="font-size:14px">&#9664;</span>
+        </button>
+    </div>
+    <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+        <a class="menu-item@(currentPage == "/" ? " active" : "")" href="/">
+            <span class="menu-icon">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+            </span>
+            <span class="menu-label">Dashboard</span>
+        </a>
+
+        <!-- SOAP Section -->
+        <div class="menu-item@(currentPage.StartsWith("/soap") ? " active" : "")" role="button" tabindex="0"
+             onclick="toggleSubmenu(this)">
+            <span class="menu-icon">
+                <i class="bi bi-database"></i>
+            </span>
+            <span class="menu-label">SOAP</span>
+            <span class="menu-chevron">
+                <i class="bi bi-chevron-down"></i>
+            </span>
+        </div>
+        <div class="submenu @(currentPage.StartsWith("/soap") ? "submenu-open" : "")">
+            <a class="submenu-item@(currentPage == "/soap/applications" ? " active" : "")" href="/soap/applications">
+                <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
+                <span class="sub-label">Applications</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/soap/request-files" ? " active" : "")" href="/soap/request-files">
+                <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
+                <span class="sub-label">Request Files</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/soap/templates" ? " active" : "")" href="/soap/templates">
+                <span class="sub-icon"><i class="bi bi-download"></i></span>
+                <span class="sub-label">Templates</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/soap/wsdl-sync" ? " active" : "")" href="/soap/wsdl-sync">
+                <span class="sub-icon"><i class="bi bi-arrow-repeat"></i></span>
+                <span class="sub-label">WSDL Sync</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/soap/execute-history" ? " active" : "")"
+               href="/soap/execute-history">
+                <span class="sub-icon"><i class="bi bi-clock-history"></i></span>
+                <span class="sub-label">Execute &amp; History</span>
+            </a>
+        </div>
+
+        <!-- REST Section -->
+        <div class="menu-item@(currentPage.StartsWith("/rest") ? " active" : "")" role="button" tabindex="0"
+             onclick="toggleSubmenu(this)">
+            <span class="menu-icon">
+                <i class="bi bi-window-stack"></i>
+            </span>
+            <span class="menu-label">REST</span>
+            <span class="menu-chevron">
+                <i class="bi bi-chevron-down"></i>
+            </span>
+        </div>
+        <div class="submenu @(currentPage.StartsWith("/rest") ? "submenu-open" : "")">
+            <a class="submenu-item@(currentPage == "/rest/applications" ? " active" : "")" href="/rest/applications">
+                <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
+                <span class="sub-label">Applications</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/rest/request-files" ? " active" : "")" href="/rest/request-files">
+                <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
+                <span class="sub-label">Request Files</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/rest/templates" ? " active" : "")" href="/rest/templates">
+                <span class="sub-icon"><i class="bi bi-download"></i></span>
+                <span class="sub-label">Templates</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/rest/swagger-sync" ? " active" : "")" href="/rest/swagger-sync">
+                <span class="sub-icon"><i class="bi bi-arrow-repeat"></i></span>
+                <span class="sub-label">Swagger Sync</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/rest/execute-history" ? " active" : "")"
+               href="/rest/execute-history">
+                <span class="sub-icon"><i class="bi bi-clock-history"></i></span>
+                <span class="sub-label">Execute &amp; History</span>
+            </a>
+        </div>
+
+        <!-- File Management Section -->
+        <div class="menu-item@(currentPage.StartsWith("/file") ? " active" : "")" role="button" tabindex="0"
+             onclick="toggleSubmenu(this)">
+            <span class="menu-icon">
+                <i class="bi bi-folder"></i>
+            </span>
+            <span class="menu-label">File Management</span>
+            <span class="menu-chevron">
+                <i class="bi bi-chevron-down"></i>
+            </span>
+        </div>
+        <div class="submenu @(currentPage.StartsWith("/file") ? "submenu-open" : "")">
+            <a class="submenu-item@(currentPage == "/file/library" ? " active" : "")" href="/file/library">
+                <span class="sub-icon"><i class="bi bi-file-earmark"></i></span>
+                <span class="sub-label">File Library</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/file/browser" ? " active" : "")" href="/file/browser">
+                <span class="sub-icon"><i class="bi bi-folder-open"></i></span>
+                <span class="sub-label">File Browser WebDAV</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/file/viewer" ? " active" : "")" href="/file/viewer">
+                <span class="sub-icon"><i class="bi bi-eye"></i></span>
+                <span class="sub-label">File Viewer PDF</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/file/comparer" ? " active" : "")" href="/file/comparer">
+                <span class="sub-icon"><i class="bi bi-file-diff"></i></span>
+                <span class="sub-label">Editor Comparer</span>
+            </a>
+        </div>
+
+        <!-- Test Suite Section -->
+        <div class="menu-item@(currentPage.StartsWith("/test") ? " active" : "")" role="button" tabindex="0"
+             onclick="toggleSubmenu(this)">
+            <span class="menu-icon">
+                <i class="bi bi-check2-square"></i>
+            </span>
+            <span class="menu-label">Test Suite</span>
+            <span class="menu-chevron">
+                <i class="bi bi-chevron-down"></i>
+            </span>
+        </div>
+        <div class="submenu @(currentPage.StartsWith("/test") ? "submenu-open" : "")">
+            <a class="submenu-item@(currentPage == "/test/cases" ? " active" : "")" href="/test/cases">
+                <span class="sub-icon"><i class="bi bi-list-check"></i></span>
+                <span class="sub-label">Test Cases</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/test/suites" ? " active" : "")" href="/test/suites">
+                <span class="sub-icon"><i class="bi bi-collection"></i></span>
+                <span class="sub-label">Test Suites</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/test/criteria" ? " active" : "")" href="/test/criteria">
+                <span class="sub-icon"><i class="bi bi-check2-square"></i></span>
+                <span class="sub-label">Success Criteria</span>
+            </a>
+            <a class="submenu-item@(currentPage == "/test/executions" ? " active" : "")" href="/test/executions">
+                <span class="sub-icon"><i class="bi bi-clock-history"></i></span>
+                <span class="sub-label">Executions &amp; History</span>
+            </a>
+        </div>
+
+        <!-- Flat items -->
+        <a class="menu-item@(currentPage == "/health" ? " active" : "")" href="/health">
+            <span class="menu-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </span>
+            <span class="menu-label">Monitoring Health Dashboard</span>
+        </a>
+        <a class="menu-item@(currentPage == "/adviewer" ? " active" : "")" href="/adviewer">
+            <span class="menu-icon">
+                <i class="bi bi-people"></i>
+            </span>
+            <span class="menu-label">AD Viewer</span>
+        </a>
+        <a class="menu-item@(currentPage == "/settings" ? " active" : "")" href="/settings">
+            <span class="menu-icon">
+                <i class="bi bi-gear"></i>
+            </span>
+            <span class="menu-label">Settings</span>
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-info">Admin &bull; Priya Sharma</div>
+    </div>
+</aside>
+
+@code {
+    private string currentPage = "/";
+
+    protected override void OnInitialized()
+    {
+        UpdateCurrentPage();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdateCurrentPage();
+        StateHasChanged();
+    }
+
+    private void UpdateCurrentPage()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri);
+        currentPage = string.IsNullOrEmpty(path) ? "/" : "/" + path;
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}

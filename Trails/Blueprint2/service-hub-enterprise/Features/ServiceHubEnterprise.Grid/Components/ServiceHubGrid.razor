@@ -1,0 +1,274 @@
+@namespace ServiceHubEnterprise.Grid.Components
+@typeparam TItem
+
+@{
+    var gridId = string.IsNullOrEmpty(Id) ? $"shg-{Guid.NewGuid():N}"[..20] : Id;
+}
+
+<div class="datagrid-card" data-grid-id="@gridId"
+     data-page-size="@PageSize"
+     data-total-records="@TotalItems"
+     id="@gridId"
+     @attributes="AdditionalAttributes">
+    <!-- ── Header / Toolbar ── -->
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            @if (EnableSearch)
+            {
+                <div class="search-box@(!string.IsNullOrEmpty(SearchText) ? " has-value" : "")">
+                    <span class="search-icon">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text"
+                           placeholder="@SearchPlaceholder"
+                           aria-label="@SearchPlaceholder"
+                           value="@SearchText"
+                           @oninput="OnSearchInput" />
+                </div>
+            }
+            <div class="meta-group">
+                <span class="meta-pill">@TotalItems records</span>
+                @if (EnableSelection)
+                {
+                    <span class="meta-pill">@SelectedIds.Count selected</span>
+                }
+                @if (ToolbarCenter is not null)
+                {
+                    <span class="meta-sep"></span>
+                    @ToolbarCenter
+                }
+            </div>
+        </div>
+        <div class="toolbar-right">
+            @ToolbarRight
+            @if (HeaderActions is not null)
+            {
+                <div class="header-actions-wrap">
+                    @HeaderActions
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Table ── -->
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    @if (EnableSelection)
+                    {
+                        <th class="check-cell" style="width:32px">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   aria-label="Select all"
+                                   checked="@(SelectedIds.Count == Items.Count() && Items.Any())"
+                                   @onclick="ToggleSelectAll" />
+                        </th>
+                    }
+                    @if (EnableExpand)
+                    {
+                        <th class="check-cell" style="width:32px" aria-label="Expand/Collapse"></th>
+                    }
+                    @foreach (var col in Columns)
+                    {
+                        var sortField = col.GetFieldName();
+                        var isSorted = sortField is not null && SortColumn == sortField;
+                        var thClass = col.Sortable ? "sortable" : "";
+                        if (col.CssClass is not null) thClass += " " + col.CssClass;
+                        var thStyle = col.Width is not null ? "width:" + col.Width : "";
+                        <th class="@thClass"
+                            style="@thStyle"
+                            @onclick="() => HandleColumnClick(col)">
+                            <span class="th-inner">
+                                @col.Title
+                                @if (col.Sortable)
+                                {
+                                    <span class="sort-indicator">
+                                        @if (isSorted)
+                                        {
+                                            <i class="bi @(SortAscending ? "bi-chevron-up" : "bi-chevron-down")"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-chevron-expand"></i>
+                                        }
+                                    </span>
+                                }
+                            </span>
+                        </th>
+                    }
+                    @if (RowActions is not null)
+                    {
+                        <th>Actions</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Items is null || !Items.Any())
+                {
+                    <tr>
+                        <td colspan="@_totalColumns" style="text-align:center;padding:32px 14px;color:var(--dg-text-faint)">
+                            @EmptyText
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    var paged = EnablePagination
+                        ? Items.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList()
+                        : Items.ToList();
+
+                    @foreach (var item in paged)
+                    {
+                        var rowId = GetRowId(item);
+                        var isSelected = SelectedIds.Contains(rowId);
+                        var isExpanded = _expandedIds.Contains(rowId);
+                        var rowClasses = new List<string>();
+                        if (isSelected) rowClasses.Add("is-selected");
+                        if (EnableContextMenu) rowClasses.Add("has-context-menu");
+
+                        <tr class="@(string.Join(" ", rowClasses))"
+                            data-row-id="@rowId">
+                            @if (EnableSelection)
+                            {
+                                <td class="check-cell" style="width:32px">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           aria-label="Select row"
+                                           checked="@isSelected"
+                                           @onclick="() => ToggleSelect(rowId)" />
+                                </td>
+                            }
+                            @if (EnableExpand)
+                            {
+                                <td style="width:32px;padding:8px 4px;text-align:center">
+                                    <button class="expand-btn" @onclick="() => ToggleExpand(rowId)" type="button">
+                                        @if (isExpanded)
+                                        {
+                                            <i class="bi bi-chevron-up"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-chevron-down"></i>
+                                        }
+                                    </button>
+                                </td>
+                            }
+                            @foreach (var col in Columns)
+                            {
+                                <td class="@(col.CssClass ?? "")">
+                                    @if (col.Template is not null)
+                                    {
+                                        @col.Template(item)
+                                    }
+                                    else
+                                    {
+                                        @col.GetFieldValue(item)
+                                    }
+                                </td>
+                            }
+                            @if (RowActions is not null)
+                            {
+                                <td class="text-end" role="gridcell" style="padding-right:10px;">
+                                    @RowActions(item)
+                                </td>
+                            }
+                        </tr>
+
+                        @* Expandable detail row *@
+                        @if (isExpanded && DetailRow is not null)
+                        {
+                            <tr>
+                                <td colspan="@_totalColumns" style="padding:0;background:var(--dg-surface-2)">
+                                    @DetailRow(item)
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ── Footer / Pagination ── -->
+    @if (FooterActions is not null)
+    {
+        <div class="grid-footer">
+            <div class="footer-actions-wrap">
+                @FooterActions
+            </div>
+        </div>
+    }
+    @if (EnablePagination && TotalPages > 1)
+    {
+        <div class="pagination-footer">
+            <div class="pagination-info">
+                Showing @((CurrentPage - 1) * PageSize + 1) -
+                @(Math.Min(CurrentPage * PageSize, TotalItems))
+                of @TotalItems
+            </div>
+            <div class="pagination-controls">
+                <button class="pagination-btn"
+                        disabled="@(CurrentPage == 1)"
+                        @onclick="() => GoToPage(Math.Max(1, CurrentPage - 1))">
+                    <i class="bi bi-chevron-left"></i>
+                    Prev
+                </button>
+                @foreach (var pg in GetPageRange())
+                {
+                    <button class="pagination-btn pagination-num"
+                            @onclick="() => GoToPage(pg)">
+                        @if (pg == CurrentPage)
+                        {
+                            <span style="font-weight:700">@pg</span>
+                        }
+                        else
+                        {
+                            @pg
+                        }
+                    </button>
+                }
+                <button class="pagination-btn"
+                        disabled="@(CurrentPage == TotalPages)"
+                        @onclick="() => GoToPage(Math.Min(TotalPages, CurrentPage + 1))">
+                    Next
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+            @if (FooterActions is not null)
+            {
+                <div class="pagination-footer-inner-wrap">
+                    <div class="footer-actions-wrap">
+                        @FooterActions
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- ── Inline Filter Modal ── -->
+@if (ShowFilterModal)
+{
+    <div class="modal-overlay" @onclick="CloseFilterModalOutside" @onclick:stopPropagation="true">
+        <div class="modal-content-dg" @onclick:stopPropagation="true">
+            <div class="modal-header-dg">
+                <h3>@FilterModalTitle</h3>
+                <button class="action-icon-btn" @onclick="() => OnShowFilterModal(false)" type="button">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                @FilterModalBody
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-outline-secondary btn-dg" @onclick="ResetFiltersClick" type="button">Reset</button>
+                <button class="btn btn-dark btn-dg-primary"
+                        @onclick="ApplyFilterClick"
+                        type="button">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+    </div>
+}

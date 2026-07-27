@@ -1,0 +1,202 @@
+@page "/"
+
+@{
+    // Dashboard data - matching the original Service Hub React dashboard
+    var statsCards = new[]
+    {
+        new { Label = "REST Apps", Value = "4", Sub = "3 enabled, 1 disabled", Color = "var(--dg-accent)" },
+        new { Label = "SOAP Apps", Value = "2", Sub = "1 enabled, 1 disabled", Color = "var(--dg-text)" },
+        new { Label = "Request Files", Value = "4", Sub = "2 JSON, 2 XML", Color = "var(--dg-accent)" },
+        new { Label = "Test Suites", Value = "4", Sub = "25 / 84 cases passing", Color = "var(--dg-success)" }
+    };
+
+    var healthServices = new[]
+    {
+        new { Name = "Payment Gateway", Status = "ok" },
+        new { Name = "User API", Status = "ok" },
+        new { Name = "Billing SOAP", Status = "down" },
+        new { Name = "Inventory", Status = "ok" },
+        new { Name = "Shipping SOAP", Status = "down" }
+    };
+
+    var testSuites = new[]
+    {
+        new { Name = "Smoke Suite", Cases = 6, Files = 18 },
+        new { Name = "Regression Core", Cases = 12, Files = 42 },
+        new { Name = "Payment Full", Cases = 4, Files = 15 },
+        new { Name = "SOAP Billing", Cases = 3, Files = 9 }
+    };
+
+    var activityLog = new[]
+    {
+        new { User = "Priya Sharma", Action = "created application PaymentService", Time = "2 hours ago" },
+        new { User = "Rahul Patel", Action = "executed Test Suite Smoke Suite and 12 files passed", Time = "2 hours ago" },
+        new { User = "Anita Desai", Action = "disabled application InventoryAPI", Time = "5 hours ago" },
+        new { User = "Vikram Singh", Action = "added 3 new APIs to OrderService", Time = "yesterday" },
+        new { User = "Suresh Kumar", Action = "imported WSDL for LegacyBilling and 3 operations synced", Time = "yesterday" },
+        new { User = "Priya Sharma", Action = "created template Payment Success Template", Time = "1 day ago" },
+        new { User = "System", Action = "detected Billing SOAP service down", Time = "2 hours ago" }
+    };
+}
+
+<div class="dashboard-grid">
+    <!-- Stats Cards Row -->
+    @foreach (var card in statsCards)
+    {
+        <div class="dash-card">
+            <div class="card-header">
+                <span class="card-title">@card.Label</span>
+            </div>
+            <div class="card-value" style="color:@card.Color">@card.Value</div>
+            <div class="card-sub">@card.Sub</div>
+        </div>
+    }
+
+    <!-- Files Card -->
+    <div class="dash-card">
+        <div class="card-header">
+            <span class="card-title">Files</span>
+            <div class="meta-group">
+                <span class="meta-pill">XML</span>
+                <span class="meta-pill selected">JSON</span>
+                <span class="meta-sep"></span>
+                <span class="meta-pill">REST</span>
+                <span class="meta-pill">SOAP</span>
+            </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:8px">
+            <div><span class="dash-card-value">2</span><span class="dash-card-sub" style="margin-left:4px">JSON</span>
+            </div>
+            <div><span class="dash-card-value">2</span><span class="dash-card-sub" style="margin-left:4px">XML</span>
+            </div>
+            <div><span class="dash-card-value">3</span><span class="dash-card-sub" style="margin-left:4px">REST</span>
+            </div>
+            <div><span class="dash-card-value">1</span><span class="dash-card-sub" style="margin-left:4px">SOAP</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Suites Card -->
+    <div class="dash-card">
+        <div class="card-header">
+            <span class="card-title">Test Suites</span>
+            <span style="font-size:11px;color:var(--dg-text-faint)">25 / 84 passing</span>
+        </div>
+        <div class="suite-progress">
+            @foreach (var suite in testSuites)
+            {
+                var pct = suite.Files > 0 ? (suite.Cases * 100 / suite.Files) : 0;
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span class="suite-name">@suite.Name</span>
+                    <div class="suite-bar">
+                        <div
+                            style="width:@(pct)%;height:100%;background:@(pct >= 50 ? "var(--dg-success)" : "var(--dg-warning)");transition:width .3s">
+                        </div>
+                    </div>
+                    <span class="suite-stats">@suite.Cases /
+                        @suite.Files</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Executions Card -->
+        <div class="dash-card">
+            <div class="card-header">
+                <span class="card-title">Executions</span>
+                <div class="meta-group">
+                    <span class="meta-pill selected">7d</span>
+                    <span class="meta-pill">30d</span>
+                    <span class="meta-pill">All</span>
+                </div>
+            </div>
+            <div style="margin-top:8px">
+                <div class="bar-chart">
+                    <div style="flex:1;height:32px;background:var(--dg-accent);opacity:.7"></div>
+                    <div style="flex:1;height:48px;background:var(--dg-accent);opacity:.9"></div>
+                    <div style="flex:1;height:24px;background:var(--dg-accent);opacity:.5"></div>
+                    <div style="flex:1;height:56px;background:var(--dg-accent)"></div>
+                    <div style="flex:1;height:40px;background:var(--dg-accent);opacity:.8"></div>
+                    <div style="flex:1;height:28px;background:var(--dg-accent);opacity:.6"></div>
+                    <div style="flex:1;height:36px;background:var(--dg-accent);opacity:.75"></div>
+                </div>
+                <div class="bar-chart-labels">
+                    <span class="bar-chart-label">Mon</span>
+                    <span class="bar-chart-label">Tue</span>
+                    <span class="bar-chart-label">Wed</span>
+                    <span class="bar-chart-label">Thu</span>
+                    <span class="bar-chart-label">Fri</span>
+                    <span class="bar-chart-label">Sat</span>
+                    <span class="bar-chart-label">Sun</span>
+                </div>
+            </div>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
+                <div style="font-size:13px;font-weight:600">87%</div>
+                <div class="suite-bar">
+                    <div style="width:87%;height:100%;background:var(--dg-success)"></div>
+                </div>
+                <span style="font-size:11px;color:var(--dg-text-soft)">Pass rate</span>
+            </div>
+        </div>
+
+        <!-- Health Card -->
+        <div class="dash-card">
+            <div class="card-header">
+                <span class="card-title">Service Health</span>
+                <span style="font-size:11px;color:var(--dg-text-faint)">3 operational</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+                @foreach (var svc in healthServices)
+                {
+                    var badgeClass = svc.Status == "ok" ? "status-enabled" : "status-down";
+                    var badgeIcon = svc.Status == "ok"
+                        ? "<i class=\"bi bi-check-lg\"></i>"
+                        : "<i class=\"bi bi-x-lg\"></i>";
+                    <div class="health-row">
+                        <span class="health-name">@svc.Name</span>
+                        <span class="status-badge @badgeClass">@((MarkupString)badgeIcon) @(svc.Status == "ok" ? "Operational" :
+                                                                                                                                                                                                                                                     "Down")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="dash-card" style="grid-column:span 2">
+                <div class="card-header">
+                    <span class="card-title">Recent Activity</span>
+                    <a href="#" class="quick-action-link" style="font-size:11px">View All</a>
+                </div>
+                <div style="margin-top:4px;display:flex;flex-direction:column;gap:0">
+                    @foreach (var entry in activityLog)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-avatar">@entry.User.Substring(0,
+                                                                                                                                                                                                                    Math.Min(2, entry.User.Length)).ToUpper()</div>
+                                <div style="flex:1;min-width:0">
+                                    <span class="activity-user">@entry.User</span>
+                                    <span class="activity-action">@entry.Action</span>
+                                </div>
+                                <span class="activity-time">@entry.Time</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Quick Actions</span>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/File/Library" class="quick-action-link">
+                            <i class="bi bi-file-earmark"></i>
+                            File Library
+                        </a>
+                        <a href="/Rest/ExecuteHistory" class="quick-action-link">
+                            <i class="bi bi-clock-history"></i>
+                            Execute History
+                        </a>
+                    </div>
+                </div>
+            </div>

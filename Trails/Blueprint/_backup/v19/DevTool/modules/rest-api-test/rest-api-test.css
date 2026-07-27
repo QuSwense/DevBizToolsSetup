@@ -1,0 +1,68 @@
+/* REST API Test Module - Specific styles */
+
+.rest-exec-header-row {
+    align-items: center;
+}
+
+.rest-exec-header-row .form-control-sm {
+    font-size: 0.82rem;
+}
+
+.rest-exec-header-row .btn-outline-danger {
+    padding: 0.15rem 0.3rem;
+}
+
+#restExecBody {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    background: var(--editor-bg-fixed);
+    color: var(--ux-text-primary);
+    border-color: var(--ux-border);
+    resize: vertical;
+}
+
+#restExecBody:focus {
+    border-color: var(--ux-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ux-primary) 20%, transparent);
+}
+
+#restResponsePanel .card-header {
+    border-bottom: 1px solid var(--ux-border);
+}
+
+#restResponseBody {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    background: var(--editor-bg-fixed);
+    color: var(--ux-text-primary);
+    border-color: var(--ux-border);
+    resize: vertical;
+}
+
+.rest-op-row {
+    padding: 0.15rem 0.5rem;
+    border-bottom: 1px solid var(--ux-border);
+}
+
+.rest-op-row:last-child {
+    border-bottom: none;
+}
+
+.rest-op-row .badge {
+    min-width: 48px;
+    text-align: center;
+}
+
+#restSwaggerPreview {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    background: var(--editor-bg-fixed);
+    color: var(--ux-text-primary);
+    border-color: var(--ux-border);
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+#restHistoryTbody td {
+    vertical-align: middle;
+}

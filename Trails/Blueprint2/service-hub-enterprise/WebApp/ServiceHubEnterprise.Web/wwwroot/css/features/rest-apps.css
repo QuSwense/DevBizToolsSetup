@@ -1,0 +1,66 @@
+/* REST Applications Feature Styles */
+
+/* Verb badges */
+.verb-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    border: 1px solid currentColor;
+}
+
+.verb-badge-post {
+    background: var(--dg-success-bg);
+    color: var(--dg-success);
+}
+
+.verb-badge-get {
+    background: var(--dg-accent-soft);
+    color: var(--dg-accent);
+}
+
+.verb-badge-put {
+    background: var(--dg-warning-bg);
+    color: var(--dg-warning);
+}
+
+.verb-badge-delete {
+    background: var(--dg-error-bg);
+    color: var(--dg-error);
+}
+
+/* Type badges */
+.type-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--dg-surface-2);
+    color: var(--dg-text-soft);
+    border: 1px solid var(--dg-border);
+    text-transform: uppercase;
+}
+
+/* Monospace text */
+.mono-text {
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 12px;
+}
+
+/* Status filter select */
+.status-select {
+    height: 26px;
+    padding: 0 6px;
+    font-size: 11px;
+    background: var(--dg-surface-2);
+    border: 1px solid var(--dg-border);
+}
+
+/* Truncated cell */
+.cell-truncated {
+    color: var(--dg-text-soft);
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

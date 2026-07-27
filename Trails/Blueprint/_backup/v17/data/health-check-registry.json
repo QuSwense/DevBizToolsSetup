@@ -1,0 +1,156 @@
+[
+    {
+        "id": 0,
+        "name": "Core Identity Provider",
+        "endpoint": "https://idp.intranet.corp/health",
+        "group": "apps",
+        "field1Label": "Response Time",
+        "field2Label": "Status",
+        "mockResult": {
+            "borderClass": "border-success",
+            "badgeClass": "badge-status-healthy",
+            "badgeHtml": "Healthy",
+            "responseTime": "42 ms",
+            "statusText": "200 OK"
+        },
+        "detailData": {
+            "status": "healthy",
+            "statusText": "Healthy — 200 OK",
+            "httpStatus": "200 OK",
+            "responseTime": "42 ms",
+            "body": "{\n  \"status\": \"healthy\",\n  \"service\": \"CoreIdentityProvider\",\n  \"version\": \"2.4.1\",\n  \"uptime\": \"14d 7h 32m\",\n  \"database\": { \"connected\": true, \"latency_ms\": 3 },\n  \"cache\": { \"hit_rate\": \"98.7%\", \"memory_usage_mb\": 128 },\n  \"endpoints\": {\n    \"authenticate\": { \"status\": \"up\", \"avg_response_ms\": 35 },\n    \"authorize\": { \"status\": \"up\", \"avg_response_ms\": 28 },\n    \"validate\": { \"status\": \"up\", \"avg_response_ms\": 22 }\n  },\n  \"checks\": [\n    { \"name\": \"JWT signing key\", \"status\": \"valid\", \"expires\": \"2026-09-15\" },\n    { \"name\": \"LDAP connectivity\", \"status\": \"connected\", \"server\": \"ldap.corp.intranet\" },\n    { \"name\": \"Certificate revocation\", \"status\": \"passed\" }\n  ]\n}"
+        }
+    },
+    {
+        "id": 1,
+        "name": "SQL Database Gateway",
+        "endpoint": "https://db-gw.intranet.corp/ping",
+        "group": "apps",
+        "field1Label": "Response Time",
+        "field2Label": "Expected",
+        "mockResult": {
+            "borderClass": "border-success",
+            "badgeClass": "badge-status-healthy",
+            "badgeHtml": "Healthy",
+            "responseTime": "58 ms",
+            "statusText": "200 OK"
+        },
+        "detailData": {
+            "status": "healthy",
+            "statusText": "Healthy — 200 OK",
+            "httpStatus": "200 OK",
+            "responseTime": "58 ms",
+            "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<HealthResponse>\n  <status>healthy</status>\n  <gateway>SQL Database Gateway</gateway>\n  <version>3.0.2</version>\n  <uptime>21d 4h 12m</uptime>\n  <pool>\n    <activeConnections>12</activeConnections>\n    <idleConnections>5</idleConnections>\n    <maxPoolSize>50</maxPoolSize>\n    <waitingQueries>0</waitingQueries>\n  </pool>\n  <latencyMs>3</latencyMs>\n  <lastQueryTimeMs>7</lastQueryTimeMs>\n</HealthResponse>"
+        }
+    },
+    {
+        "id": 2,
+        "name": "Payment WCF Service",
+        "endpoint": "https://intranet.corp/services/Payment",
+        "group": "apps",
+        "field1Label": "Response Time",
+        "field2Label": "Expected",
+        "mockResult": {
+            "borderClass": "border-danger",
+            "badgeClass": "badge-status-danger",
+            "badgeHtml": "Failed",
+            "responseTime": "1310 ms",
+            "statusText": "504 Timeout"
+        },
+        "detailData": {
+            "status": "failed",
+            "statusText": "Failed — 504 Gateway Timeout",
+            "httpStatus": "504 Gateway Timeout",
+            "responseTime": "1310 ms",
+            "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Fault xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <faultcode>soap:Server</faultcode>\n  <faultstring>Service Unavailable</faultstring>\n  <detail>\n    <error>\n      <code>HTTP_TIMEOUT</code>\n      <message>The upstream payment gateway did not respond within the configured timeout window (1000 ms).</message>\n      <suggestion>Check network connectivity to payment processor or increase timeout threshold in Web.config.</suggestion>\n      <innerException>System.Net.Http.HttpRequestException: The operation timed out after 1000ms</innerException>\n      <stackTrace> at PaymentGateway.Client.SubmitTransaction(String payload) in PaymentGateway.Client.cs:line 142</stackTrace>\n    </error>\n  </detail>\n</Fault>"
+        }
+    },
+    {
+        "id": 3,
+        "name": "SQL Server (Primary)",
+        "endpoint": "sql:://db01.intranet.corp:1433/ProdDB",
+        "group": "database",
+        "field1Label": "Response Time",
+        "field2Label": "Connection",
+        "mockResult": {
+            "borderClass": "border-success",
+            "badgeClass": "badge-status-healthy",
+            "badgeHtml": "Connected",
+            "responseTime": "12 ms",
+            "statusText": "OK"
+        },
+        "detailData": {
+            "status": "healthy",
+            "statusText": "Connected — OK",
+            "httpStatus": "TCP 1433 — Open",
+            "responseTime": "12 ms",
+            "body": "{\n  \"status\": \"connected\",\n  \"server\": \"db01.intranet.corp\",\n  \"instance\": \"ProdDB\",\n  \"sql_version\": \"SQL Server 2022 (16.0.4125.3)\",\n  \"connection_pool\": {\n    \"active\": 3,\n    \"idle\": 8,\n    \"max\": 100\n  },\n  \"database_health\": {\n    \"name\": \"ProdDB\",\n    \"size_gb\": 245.3,\n    \"free_space_gb\": 32.1,\n    \"last_backup\": \"2026-07-25 02:00:00\",\n    \"backup_type\": \"FULL\",\n    \"status\": \"ONLINE\"\n  },\n  \"wait_stats\": [\n    { \"wait_type\": \"LCK_M_S\", \"wait_time_ms\": 45, \"waiting_tasks\": 2 },\n    { \"wait_type\": \"PAGEIOLATCH_SH\", \"wait_time_ms\": 12, \"waiting_tasks\": 1 },\n    { \"wait_type\": \"CXPACKET\", \"wait_time_ms\": 8, \"waiting_tasks\": 3 }\n  ]\n}"
+        }
+    },
+    {
+        "id": 4,
+        "name": "SQL Server (Replica)",
+        "endpoint": "sql:://db02.intranet.corp:1433/ProdDB_RO",
+        "group": "database",
+        "field1Label": "Response Time",
+        "field2Label": "Connection",
+        "mockResult": {
+            "borderClass": "border-success",
+            "badgeClass": "badge-status-healthy",
+            "badgeHtml": "Connected",
+            "responseTime": "15 ms",
+            "statusText": "OK"
+        },
+        "detailData": {
+            "status": "healthy",
+            "statusText": "Connected — OK",
+            "httpStatus": "TCP 1433 — Open",
+            "responseTime": "15 ms",
+            "body": "{\n  \"status\": \"connected\",\n  \"server\": \"db02.intranet.corp\",\n  \"instance\": \"ProdDB_RO\",\n  \"role\": \"Read-Only Replica\",\n  \"replication\": {\n    \"status\": \"Synchronized\",\n    \"log_send_queue_size_kb\": 0,\n    \"redo_queue_size_kb\": 12,\n    \"last_redone_time\": \"2026-07-25 10:15:32\",\n    \"secondary_lag_seconds\": 0\n  },\n  \"database_health\": {\n    \"name\": \"ProdDB_RO\",\n    \"size_gb\": 245.1,\n    \"status\": \"ONLINE, READ_ONLY\"\n  }\n}"
+        }
+    },
+    {
+        "id": 5,
+        "name": "PostgreSQL Warehouse",
+        "endpoint": "postgresql://dw.intranet.corp:5432/analytics",
+        "group": "database",
+        "field1Label": "Response Time",
+        "field2Label": "Connection",
+        "mockResult": {
+            "borderClass": "border-success",
+            "badgeClass": "badge-status-healthy",
+            "badgeHtml": "Connected",
+            "responseTime": "23 ms",
+            "statusText": "OK"
+        },
+        "detailData": {
+            "status": "healthy",
+            "statusText": "Connected — OK",
+            "httpStatus": "TCP 5432 — Open",
+            "responseTime": "23 ms",
+            "body": "{\n  \"status\": \"connected\",\n  \"server\": \"dw.intranet.corp\",\n  \"database\": \"analytics\",\n  \"pg_version\": \"PostgreSQL 16.2\",\n  \"connections\": {\n    \"active\": 7,\n    \"idle\": 14,\n    \"max\": 200,\n    \"waiting\": 1\n  },\n  \"replication\": {\n    \"role\": \"Primary\",\n    \"wal_written_mb\": 1284,\n    \"wal_replay_lag_bytes\": 0\n  },\n  \"performance\": {\n    \"cache_hit_ratio\": \"0.992\",\n    \"index_scans_per_sec\": 145,\n    \"seq_scans_per_sec\": 23,\n    \"tuples_fetched_per_sec\": 12450\n  },\n  \"longest_running_query\": {\n    \"pid\": 18472,\n    \"duration_sec\": 312,\n    \"query\": \"SELECT * FROM fact_sales WHERE order_date >= '2026-01-01' ORDER BY total DESC\"\n  },\n  \"table_bloat\": [\n    {\"table\": \"fact_sales\", \"bloat_bytes\": 245000000, \"bloat_pct\": 12.4},\n    {\"table\": \"dim_products\", \"bloat_bytes\": 12000000, \"bloat_pct\": 3.1}\n  ]\n}"
+        }
+    },
+    {
+        "id": 6,
+        "name": "MongoDB Cache",
+        "endpoint": "mongodb://cache.intranet.corp:27017/session",
+        "group": "database",
+        "field1Label": "Response Time",
+        "field2Label": "Connection",
+        "mockResult": {
+            "borderClass": "border-danger",
+            "badgeClass": "badge-status-danger",
+            "badgeHtml": "Disconnected",
+            "responseTime": "5000 ms",
+            "statusText": "Timeout"
+        },
+        "detailData": {
+            "status": "failed",
+            "statusText": "Disconnected — Connection Timeout",
+            "httpStatus": "TCP 27017 — Timed Out",
+            "responseTime": "5000 ms",
+            "body": "{\n  \"error\": \"ConnectionTimeout\",\n  \"server\": \"cache.intranet.corp:27017\",\n  \"message\": \"Failed to establish a connection within 5000ms timeout window.\",\n  \"details\": {\n    \"attempted_addresses\": [\"10.0.4.25:27017\", \"10.0.4.26:27017\"],\n    \"resolved_dns\": \"cache.intranet.corp -> 10.0.4.25, 10.0.4.26\",\n    \"last_error\": \"connect ETIMEDOUT 10.0.4.25:27017\",\n    \"replica_set_status\": \"Primary not reachable\"\n  },\n  \"suggestions\": [\n    \"Verify MongoDB service is running on cache.intranet.corp\",\n    \"Check firewall rules for port 27017\",\n    \"Verify replica set configuration and election status\",\n    \"Check network latency between app server and cache node\"\n  ]\n}"
+        }
+    }
+]

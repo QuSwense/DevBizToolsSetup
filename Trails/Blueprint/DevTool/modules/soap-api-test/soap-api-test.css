@@ -1,0 +1,90 @@
+/* SOAP API Test Module - Specific styles */
+
+.soap-auth-basic,
+.soap-auth-bearer,
+.soap-auth-wssecurity {
+    background: var(--ux-bg-secondary);
+    border-radius: 0.5rem;
+}
+
+.soap-exec-header-row {
+    align-items: center;
+}
+
+.soap-exec-header-row .form-control-sm {
+    font-size: var(--font-size-sm);
+}
+
+.soap-exec-header-row .btn-outline-danger {
+    padding: 0.15rem 0.3rem;
+}
+
+#soapExecBody {
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    background: var(--editor-bg-fixed);
+    color: var(--ux-text-primary);
+    border-color: var(--ux-border);
+    resize: vertical;
+}
+
+#soapExecBody:focus {
+    border-color: var(--ux-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ux-primary) 20%, transparent);
+}
+
+#soapResponsePanel .card-header {
+    border-bottom: 1px solid var(--ux-border);
+}
+
+#soapResponseBody {
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    background: var(--editor-bg-fixed);
+    color: var(--ux-text-primary);
+    border-color: var(--ux-border);
+    resize: vertical;
+}
+
+.soap-action-row {
+    padding: 0.15rem 0.5rem;
+    border-bottom: 1px solid var(--ux-border);
+}
+
+.soap-action-row:last-child {
+    border-bottom: none;
+}
+
+.soap-action-input-row {
+    padding: 0.4rem 0.5rem;
+    background: var(--ux-bg-secondary, #f8f9fa);
+    border-radius: 0.375rem;
+}
+
+.soap-action-input-row .form-control-sm {
+    font-size: var(--font-size-sm);
+}
+
+#soapWsdlPreview {
+    font-size: var(--font-size-xs);
+    line-height: 1.4;
+    background: var(--editor-bg-fixed);
+    color: var(--ux-text-primary);
+    border-color: var(--ux-border);
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+#soapHistoryTbody td {
+    vertical-align: middle;
+}
+
+#soapHistoryTbody .btn-group .btn {
+    padding: 0.15rem 0.4rem;
+}
+
+/* Toast overrides for SOAP module */
+#soapResponsePanel .badge {
+    font-size: var(--font-size-xs);
+    padding: 0.3rem 0.6rem;
+}

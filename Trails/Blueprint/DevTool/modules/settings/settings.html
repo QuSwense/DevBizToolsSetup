@@ -1,0 +1,181 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0"><i class="bi bi-gear text-primary me-2"></i>Settings</h4>
+    <span class="badge bg-light text-dark border">Configuration</span>
+</div>
+
+<!-- Sub-tab Navigation -->
+<ul class="nav nav-tabs nav-tabs-module mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="settings-access-tab" data-bs-toggle="tab"
+            data-bs-target="#settings-access-panel" type="button" role="tab">
+            <i class="bi bi-people me-1"></i>User Access
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="settings-params-tab" data-bs-toggle="tab" data-bs-target="#settings-params-panel"
+            type="button" role="tab">
+            <i class="bi bi-sliders me-1"></i>System Parameters
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="settings-appearance-tab" data-bs-toggle="tab"
+            data-bs-target="#settings-appearance-panel" type="button" role="tab">
+            <i class="bi bi-palette me-1"></i>Appearance
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- ─── User Access Tab ─── -->
+    <div class="tab-pane fade show active" id="settings-access-panel" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-people text-primary me-2"></i>User Whitelist
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Status</th>
+                                <th>Created Date</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="settingsUserTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── System Parameters Tab ─── -->
+    <div class="tab-pane fade" id="settings-params-panel" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-sliders text-primary me-2"></i>System
+                Configuration</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">SOAP Max History Records</label>
+                        <input id="settingsSoapMaxHistory" type="text" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">REST Max History Records</label>
+                        <input id="settingsRestMaxHistory" type="text" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Health Check Timeout (seconds)</label>
+                        <input id="settingsHealthTimeout" type="text" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ORM Framework</label>
+                        <input id="settingsOrmFramework" type="text" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Appearance Tab ─── -->
+    <div class="tab-pane fade" id="settings-appearance-panel" role="tabpanel">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-palette text-primary me-2"></i>Color Palette
+                Selector</div>
+            <div class="card-body">
+                <div class="row g-3" id="settingsPaletteGallery">
+                    <!-- Populated by JS -->
+                </div>
+                <hr>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="settingsThemeToggle"
+                            onchange="window.SETTINGS_MODULE.toggleTheme()">
+                        <label class="form-check-label" for="settingsThemeToggle">
+                            <span id="settingsThemeLabel"><i class="bi bi-sun me-1"></i>Light Mode</span>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="settingsLighterPalette" checked>
+                        <label class="form-check-label" for="settingsLighterPalette">Use lighter palette variant</label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="settingsGradientMode">
+                        <label class="form-check-label" for="settingsGradientMode">Gradient mode</label>
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="window.SETTINGS_MODULE.applyPalette()"><i
+                            class="bi bi-check-lg me-1"></i>Apply</button>
+                    <button class="btn btn-outline-secondary" onclick="window.SETTINGS_MODULE.resetPalette()"><i
+                            class="bi bi-arrow-counterclockwise me-1"></i>Reset to Default</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Font Settings Card ─── -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-fonts text-primary me-2"></i>Font Settings
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="settingsFontFamily">Font Family</label>
+                        <select id="settingsFontFamily" class="form-select">
+                            <option value="'Segoe UI', system-ui, -apple-system, sans-serif">Segoe UI (Default)</option>
+                            <option value="system-ui, -apple-system, sans-serif">System UI</option>
+                            <option value="'Inter', system-ui, -apple-system, sans-serif">Inter</option>
+                            <option value="'Roboto', system-ui, -apple-system, sans-serif">Roboto</option>
+                            <option value="'Open Sans', system-ui, -apple-system, sans-serif">Open Sans</option>
+                            <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI (Legacy)</option>
+                            <option value="Georgia, 'Times New Roman', serif">Georgia (Serif)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" for="settingsFontSizeBase">Base Font Size</label>
+                        <select id="settingsFontSizeBase" class="form-select">
+                            <option value="0.75rem">Small (12px)</option>
+                            <option value="0.8125rem">Medium-Small (13px)</option>
+                            <option value="0.875rem" selected>Normal (14px)</option>
+                            <option value="0.9375rem">Medium-Large (15px)</option>
+                            <option value="1rem">Large (16px)</option>
+                            <option value="1.0625rem">Extra Large (17px)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" for="settingsFontSizeHeadings">Heading Size
+                            Multiplier</label>
+                        <select id="settingsFontSizeHeadings" class="form-select">
+                            <option value="1.1">Compact (1.1x)</option>
+                            <option value="1.25" selected>Normal (1.25x)</option>
+                            <option value="1.5">Large (1.5x)</option>
+                            <option value="1.75">X-Large (1.75x)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="settingsFontMonospace">Monospace Font</label>
+                        <select id="settingsFontMonospace" class="form-select">
+                            <option value="'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace">
+                                Cascadia Code (Default)</option>
+                            <option value="'JetBrains Mono', Consolas, 'Courier New', monospace">JetBrains Mono</option>
+                            <option value="'Fira Code', Consolas, 'Courier New', monospace">Fira Code</option>
+                            <option value="'Source Code Pro', Consolas, monospace">Source Code Pro</option>
+                            <option value="Consolas, 'Courier New', monospace">Consolas</option>
+                            <option value="Menlo, Monaco, monospace">Menlo</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="window.SETTINGS_MODULE.applyFontSettings()"><i
+                            class="bi bi-check-lg me-1"></i>Apply Font</button>
+                    <button class="btn btn-outline-secondary" onclick="window.SETTINGS_MODULE.resetFontSettings()"><i
+                            class="bi bi-arrow-counterclockwise me-1"></i>Reset to Default</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

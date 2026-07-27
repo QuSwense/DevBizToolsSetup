@@ -1,0 +1,167 @@
+[
+    {
+        "timestamp": "2026-03-31 10:14:02",
+        "application": "Payment Gateway Service",
+        "soapAction": "ProcessPayment",
+        "endpoint": "https://intranet.corp/services/PaymentService.svc",
+        "status": 200,
+        "statusText": "OK",
+        "ttfb": "38 ms",
+        "duration": "142 ms",
+        "contentType": "text/xml; charset=utf-8",
+        "contentLength": "1228",
+        "responseBody": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <Body>\n    <ProcessPaymentResponse xmlns=\"http://tempuri.org/\">\n      <Result>Success</Result>\n      <TransactionId>TXN-123456</TransactionId>\n      <Amount>250.00</Amount>\n      <Currency>USD</Currency>\n    </ProcessPaymentResponse>\n  </Body>\n</Envelope>",
+        "responseHeaders": [
+            {
+                "name": "Content-Type",
+                "value": "text/xml; charset=utf-8"
+            },
+            {
+                "name": "Content-Length",
+                "value": "1228"
+            },
+            {
+                "name": "Server",
+                "value": "Microsoft-IIS/10.0"
+            },
+            {
+                "name": "Cache-Control",
+                "value": "no-cache"
+            },
+            {
+                "name": "Date",
+                "value": "2026-03-31 10:14:02"
+            }
+        ],
+        "faultCode": null,
+        "faultString": null,
+        "faultActor": null,
+        "faultDetail": null,
+        "assertions": [
+            {
+                "name": "HTTP Status Code",
+                "expected": "200",
+                "actual": "200",
+                "passed": true
+            },
+            {
+                "name": "SLA Response Time",
+                "expected": "< 3000 ms",
+                "actual": "142 ms",
+                "passed": true
+            },
+            {
+                "name": "SOAP Fault Present",
+                "expected": "false",
+                "actual": "No",
+                "passed": true
+            }
+        ]
+    },
+    {
+        "timestamp": "2026-04-01 09:22:15",
+        "application": "Customer Account Service",
+        "soapAction": "GetCustomer",
+        "endpoint": "https://intranet.corp/services/AccountService.svc",
+        "status": 200,
+        "statusText": "OK",
+        "ttfb": "45 ms",
+        "duration": "187 ms",
+        "contentType": "text/xml; charset=utf-8",
+        "contentLength": "892",
+        "responseBody": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <Body>\n    <GetCustomerResponse xmlns=\"http://tempuri.org/\">\n      <CustomerId>12345</CustomerId>\n      <Name>John Doe</Name>\n      <Email>john.doe@example.com</Email>\n      <Status>Active</Status>\n    </GetCustomerResponse>\n  </Body>\n</Envelope>",
+        "responseHeaders": [
+            {
+                "name": "Content-Type",
+                "value": "text/xml; charset=utf-8"
+            },
+            {
+                "name": "Content-Length",
+                "value": "892"
+            },
+            {
+                "name": "Server",
+                "value": "Microsoft-IIS/10.0"
+            },
+            {
+                "name": "x-aspnet-version",
+                "value": "4.0.30319"
+            }
+        ],
+        "faultCode": null,
+        "faultString": null,
+        "faultActor": null,
+        "faultDetail": null,
+        "assertions": [
+            {
+                "name": "HTTP Status Code",
+                "expected": "200",
+                "actual": "200",
+                "passed": true
+            },
+            {
+                "name": "SLA Response Time",
+                "expected": "< 3000 ms",
+                "actual": "187 ms",
+                "passed": true
+            },
+            {
+                "name": "SOAP Fault Present",
+                "expected": "false",
+                "actual": "No",
+                "passed": true
+            }
+        ]
+    },
+    {
+        "timestamp": "2026-04-02 14:05:33",
+        "application": "Enterprise Inventory Engine",
+        "soapAction": "CheckStock",
+        "endpoint": "https://intranet.corp/services/InventoryService.svc",
+        "status": 500,
+        "statusText": "Internal Server Error",
+        "ttfb": "120 ms",
+        "duration": "2450 ms",
+        "contentType": "text/xml; charset=utf-8",
+        "contentLength": "1560",
+        "responseBody": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <Body>\n    <Fault>\n      <faultcode>soap:Server</faultcode>\n      <faultstring>Server was unable to process request. ---&gt; Database connection timeout.</faultstring>\n      <faultactor>https://intranet.corp/services/InventoryService.svc</faultactor>\n      <detail>\n        <ErrorInfo xmlns=\"http://tempuri.org/\">\n          <ErrorCode>DB_TIMEOUT</ErrorCode>\n          <Message>SQL connection pool exhausted after 30s wait</Message>\n        </ErrorInfo>\n      </detail>\n    </Fault>\n  </Body>\n</Envelope>",
+        "responseHeaders": [
+            {
+                "name": "Content-Type",
+                "value": "text/xml; charset=utf-8"
+            },
+            {
+                "name": "Content-Length",
+                "value": "1560"
+            },
+            {
+                "name": "Server",
+                "value": "Microsoft-IIS/10.0"
+            }
+        ],
+        "faultCode": "soap:Server",
+        "faultString": "Server was unable to process request. ---> Database connection timeout.",
+        "faultActor": "https://intranet.corp/services/InventoryService.svc",
+        "faultDetail": "ErrorCode: DB_TIMEOUT | Message: SQL connection pool exhausted after 30s wait",
+        "assertions": [
+            {
+                "name": "HTTP Status Code",
+                "expected": "200",
+                "actual": "500",
+                "passed": false
+            },
+            {
+                "name": "SLA Response Time",
+                "expected": "< 3000 ms",
+                "actual": "2450 ms",
+                "passed": true
+            },
+            {
+                "name": "SOAP Fault Present",
+                "expected": "false",
+                "actual": "Yes",
+                "passed": false
+            }
+        ]
+    }
+]

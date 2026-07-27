@@ -1,0 +1,259 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0"><i class="fa-solid fa-flask text-warning me-2"></i>Test Suites</h4>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-light text-dark border">Combined SOAP &amp; REST</span>
+        <button class="btn btn-sm btn-primary" onclick="window.TS_MODULE.addSuite()">
+            <i class="fa-solid fa-plus me-1"></i>New Suite
+        </button>
+    </div>
+</div>
+
+<!-- ─── Stats Summary Cards ─── -->
+<div class="ts-stats-row">
+    <div class="ts-stat-card">
+        <div class="ts-stat-icon icon-suites"><i class="fa-solid fa-flask"></i></div>
+        <div class="ts-stat-info">
+            <span class="ts-stat-label">Total Suites</span>
+            <span class="ts-stat-value" id="tsTotalSuites">0</span>
+            <span class="ts-stat-sub" id="tsSuitesSub">Active test collections</span>
+        </div>
+    </div>
+    <div class="ts-stat-card">
+        <div class="ts-stat-icon icon-cases"><i class="fa-solid fa-vial"></i></div>
+        <div class="ts-stat-info">
+            <span class="ts-stat-label">Test Cases</span>
+            <span class="ts-stat-value" id="tsTotalCases">0</span>
+            <span class="ts-stat-sub" id="tsCasesSub">Across all suites</span>
+        </div>
+    </div>
+    <div class="ts-stat-card">
+        <div class="ts-stat-icon icon-passed"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="ts-stat-info">
+            <span class="ts-stat-label">Pass Rate</span>
+            <span class="ts-stat-value" id="tsPassRate">0%</span>
+            <span class="ts-stat-sub" id="tsPassSub">Last 100 executions</span>
+        </div>
+    </div>
+    <div class="ts-stat-card">
+        <div class="ts-stat-icon icon-duration"><i class="fa-solid fa-clock"></i></div>
+        <div class="ts-stat-info">
+            <span class="ts-stat-label">Avg Duration</span>
+            <span class="ts-stat-value" id="tsAvgDuration">0 ms</span>
+            <span class="ts-stat-sub" id="tsDurationSub">Across all test runs</span>
+        </div>
+    </div>
+    <div class="ts-stat-card">
+        <div class="ts-stat-icon icon-failed"><i class="fa-solid fa-bug"></i></div>
+        <div class="ts-stat-info">
+            <span class="ts-stat-label">Total Failures</span>
+            <span class="ts-stat-value" id="tsTotalFailures">0</span>
+            <span class="ts-stat-sub" id="tsFailuresSub">Across history</span>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Sub-tab Navigation ─── -->
+<ul class="nav nav-tabs nav-tabs-module mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="ts-suites-tab" data-bs-toggle="tab" data-bs-target="#ts-suites-panel"
+            type="button" role="tab">
+            <i class="fa-solid fa-list-check me-1"></i>Test Suites &amp; Cases
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ts-history-tab" data-bs-toggle="tab" data-bs-target="#ts-history-panel"
+            type="button" role="tab">
+            <i class="fa-solid fa-clock-rotate-left me-1"></i>Execution History
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- ─── Test Suites & Cases Tab ─── -->
+    <div class="tab-pane fade show active" id="ts-suites-panel" role="tabpanel">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                <span><i class="fa-solid fa-list-check text-warning me-2"></i>Test Suites &amp; Cases</span>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-filter me-1"></i>Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-3 ts-filter-menu">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="form-label fs-7 fw-semibold mb-1" for="tsFilterName">Suite / Case
+                                        Name</label>
+                                    <input id="tsFilterName" type="text" class="form-control form-control-sm"
+                                        placeholder="Search...">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fs-7 fw-semibold mb-1" for="tsFilterApiType">API
+                                        Type</label>
+                                    <select id="tsFilterApiType" class="form-select form-select-sm">
+                                        <option value="all">All</option>
+                                        <option value="soap">SOAP</option>
+                                        <option value="rest">REST</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fs-7 fw-semibold mb-1" for="tsFilterStatus">Status</label>
+                                    <select id="tsFilterStatus" class="form-select form-select-sm">
+                                        <option value="all">All</option>
+                                        <option value="pass">Pass</option>
+                                        <option value="fail">Fail</option>
+                                        <option value="pending">Pending</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2 mt-3 border-top pt-2">
+                                <button id="tsFilterResetBtn" type="button"
+                                    class="btn btn-sm btn-outline-secondary">Reset</button>
+                                <button id="tsFilterApplyBtn" type="button"
+                                    class="btn btn-sm btn-primary">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-3" id="tsSuitesContainer">
+                <div class="text-center text-muted py-4" id="tsSuitesEmpty">
+                    <i class="fa-solid fa-flask fa-2x mb-2 d-block"></i>
+                    No test suites yet. Click <strong>"New Suite"</strong> to create one.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Execution History Tab ─── -->
+    <div class="tab-pane fade" id="ts-history-panel" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                <span><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i>Execution History</span>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="btn-group btn-group-sm ts-view-toggle" role="group" aria-label="History View">
+                        <button id="tsHistoryListViewBtn" type="button" class="btn btn-outline-secondary active">
+                            <i class="fa-solid fa-list me-1"></i>List
+                        </button>
+                        <button id="tsHistoryGraphViewBtn" type="button" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-chart-pie me-1"></i>Stats
+                        </button>
+                    </div>
+                    <span class="badge bg-light text-dark border" id="tsHistoryCount">0 records</span>
+                    <button class="btn btn-sm btn-outline-danger" onclick="window.TS_MODULE.clearHistory()">
+                        <i class="fa-solid fa-trash-can me-1"></i>Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div id="tsHistoryListView">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Suite</th>
+                                    <th>Case Name</th>
+                                    <th>Type</th>
+                                    <th>Application</th>
+                                    <th class="text-center">Result</th>
+                                    <th class="text-center">Duration</th>
+                                    <th class="text-center">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tsHistoryTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div
+                    class="card-footer bg-white py-2 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div id="tsHistoryPaginationSummary" class="fs-7 text-muted">
+                        Showing <strong>0 to 0</strong> of <strong>0</strong> records
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <select id="tsHistoryPageSize" class="form-select form-select-sm" style="width:120px;"
+                            aria-label="Records per page">
+                            <option value="5">5 / page</option>
+                            <option value="10" selected>10 / page</option>
+                            <option value="25">25 / page</option>
+                        </select>
+                        <nav>
+                            <ul id="tsHistoryPagination" class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="#" data-page="prev"><i
+                                            class="fa-solid fa-angle-left"></i></a></li>
+                                <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#" data-page="2">2</a></li>
+                                <li class="page-item d-none"><a class="page-link" href="#" data-page="3">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#" data-page="next"><i
+                                            class="fa-solid fa-angle-right"></i></a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats / Graph View -->
+            <div id="tsHistoryGraphView" class="d-none">
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-1"></i>Pass / Fail
+                                    Distribution</h6>
+                                <div class="btn-group btn-group-sm ts-metric-toggle" role="group"
+                                    aria-label="Graph Metric">
+                                    <button type="button" class="btn btn-outline-secondary active"
+                                        data-metric="passfail">Pass/Fail</button>
+                                    <button type="button" class="btn btn-outline-secondary" data-metric="type">By API
+                                        Type</button>
+                                    <button type="button" class="btn btn-outline-secondary" data-metric="suite">By
+                                        Suite</button>
+                                </div>
+                            </div>
+                            <div class="ts-pie-layout">
+                                <div class="ts-pie-wrap">
+                                    <div class="ts-pie-chart" role="img" aria-label="Test execution distribution chart">
+                                        <canvas id="tsHistoryChartCanvas"
+                                            aria-label="Test history doughnut chart"></canvas>
+                                        <div id="tsHistoryPieCenter" class="ts-pie-center">No Data</div>
+                                    </div>
+                                </div>
+                                <div id="tsHistoryGraphRows" class="ts-pie-legend"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-1"></i>Duration Trend</h6>
+                                <span class="badge bg-light text-dark border">Last 20 runs</span>
+                            </div>
+                            <div style="height:220px;">
+                                <canvas id="tsDurationChartCanvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Test Case Detail Modal ─── -->
+<div class="modal fade" id="tsCaseDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-vial text-warning me-2"></i>Test Case Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="tsCaseDetailBody">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

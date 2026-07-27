@@ -1,0 +1,76 @@
+@page "/rest/execute-history"
+
+@{
+    var executions = new[]
+    {
+        new { Id = "EX-001", AppName = "PaymentService", Status = "success", Duration = "1.2s", Date = "2024-06-15 14:30:22",
+TriggeredBy = "Priya Sharma" },
+        new { Id = "EX-002", AppName = "UserManagement", Status = "success", Duration = "0.8s", Date = "2024-06-15 13:12:05",
+TriggeredBy = "Rahul Patel" },
+        new { Id = "EX-003", AppName = "OrderService", Status = "failed", Duration = "5.1s", Date = "2024-06-15 11:45:33",
+TriggeredBy = "System" },
+        new { Id = "EX-004", AppName = "PaymentService", Status = "success", Duration = "1.1s", Date = "2024-06-14 16:20:18",
+TriggeredBy = "Vikram Singh" }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search executions..." aria-label="Search executions" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">4 records</span>
+                <span class="meta-sep"></span>
+                <select class="form-control-dg status-select">
+                    <option>All Status</option>
+                    <option>Success</option>
+                    <option>Failed</option>
+                </select>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-download"></i>
+                Export
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="sortable">
+                        <span class="th-inner">Execution ID<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Application</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Date</th>
+                    <th>Triggered By</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var exec in executions)
+                {
+                    var statusClass = exec.Status == "success" ? "status-enabled" : "status-down";
+                    var statusLabel = exec.Status == "success" ? "Success" : "Failed";
+                    <tr>
+                        <td><span class="cell-id">@exec.Id</span></td>
+                        <td>@exec.AppName</td>
+                        <td><span class="status-badge @statusClass">@statusLabel</span></td>
+                        <td style="color:var(--dg-text-soft)">@exec.Duration</td>
+                        <td style="color:var(--dg-text-soft)">@exec.Date</td>
+                        <td style="color:var(--dg-text-soft)">@exec.TriggeredBy</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,174 @@
+/* Dashboard Feature Styles */
+
+/* Placeholder empty-state card */
+.empty-state-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 16px;
+}
+
+.empty-state-icon {
+    font-size: 56px;
+    color: var(--dg-text-faint);
+}
+
+.empty-state-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dg-text);
+}
+
+.empty-state-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--dg-text-soft);
+    text-align: center;
+    max-width: 380px;
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Dashboard cards */
+.dash-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.dash-card-sub {
+    font-size: 11px;
+    color: var(--dg-text-faint);
+    margin-top: 4px;
+}
+
+/* Bar chart */
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+}
+
+.bar-chart-item {
+    flex: 1;
+}
+
+.bar-chart-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.bar-chart-label {
+    font-size: 10px;
+    color: var(--dg-text-faint);
+}
+
+/* Activity feed */
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--dg-border);
+}
+
+.activity-avatar {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--dg-surface-3);
+    border: 1px solid var(--dg-border);
+    flex-shrink: 0;
+}
+
+.activity-user {
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.activity-action {
+    font-size: 12px;
+    color: var(--dg-text-soft);
+    margin-left: 4px;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: var(--dg-text-faint);
+    white-space: nowrap;
+}
+
+/* Quick actions */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.quick-action-link {
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* Test suite progress */
+.suite-progress {
+    flex: 1;
+    height: 6px;
+    background: var(--dg-surface-3);
+    overflow: hidden;
+}
+
+.suite-bar {
+    height: 100%;
+    transition: width .3s;
+}
+
+.suite-stats {
+    font-size: 11px;
+    color: var(--dg-text-soft);
+    min-width: 36px;
+    text-align: right;
+}
+
+.suite-name {
+    font-size: 12px;
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--dg-text);
+    font-weight: 500;
+}
+
+/* Service health list */
+.health-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.health-name {
+    font-size: 12px;
+    color: var(--dg-text);
+}
+
+/* Status badge inline icons */
+.status-icon-sm {
+    width: 10px;
+    height: 10px;
+    vertical-align: middle;
+}

@@ -1,0 +1,86 @@
+@page "/test/suites"
+
+@{
+    var suites = new[]
+    {
+        new { Name = "Smoke Suite", Cases = 6, Files = 18 },
+        new { Name = "Regression Core", Cases = 12, Files = 42 },
+        new { Name = "Payment Full", Cases = 4, Files = 15 },
+        new { Name = "SOAP Billing", Cases = 3, Files = 9 }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search suites..." aria-label="Search suites" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">4 suites</span>
+                <span class="meta-pill">25 / 84 passing</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Create Suite
+            </button>
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-play-fill"></i>
+                Run All
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">Suite Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Cases Passing</th>
+                    <th>Total Files</th>
+                    <th>Pass Rate</th>
+                    <th>Progress</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var suite in suites)
+                {
+                    var pct = suite.Files > 0 ? (suite.Cases * 100 / suite.Files) : 0;
+                    var barColor = pct >= 60 ? "var(--dg-success)" : pct >= 30 ? "var(--dg-warning)" : "var(--dg-error)";
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @suite.Name" /></td>
+                            <td>@suite.Name</td>
+                            <td style="color:var(--dg-text-soft)">@suite.Cases</td>
+                            <td style="color:var(--dg-text-soft)">@suite.Files</td>
+                            <td>
+                                <span style="font-weight:600;color:@barColor">@pct%</span>
+                            </td>
+                            <td style="width:140px">
+                                <div class="progress-bar-dg">
+                                    <div class="progress-fill-dg" style="width:@(pct)%;background:@barColor"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="action-icon-btn">Run</button>
+                                    <button class="action-icon-btn">Edit</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>

@@ -1,0 +1,245 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0"><i class="fa-solid fa-cloud text-primary me-2"></i>REST API Test Module</h4>
+    <span class="badge bg-light text-dark border">REST</span>
+</div>
+
+<!-- Sub-tab Navigation -->
+<ul class="nav nav-tabs nav-tabs-module mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="rest-exec-tab" data-bs-toggle="tab" data-bs-target="#rest-exec-panel"
+            type="button" role="tab">
+            <i class="fa-solid fa-play me-1"></i>Execute
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rest-swagger-tab" data-bs-toggle="tab" data-bs-target="#rest-swagger-panel"
+            type="button" role="tab">
+            <i class="fa-solid fa-file-code me-1"></i>Swagger/OpenAPI Management
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rest-apis-tab" data-bs-toggle="tab" data-bs-target="#rest-apis-panel" type="button"
+            role="tab">
+            <i class="fa-solid fa-server me-1"></i>Registered APIs
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rest-files-tab" data-bs-toggle="tab" data-bs-target="#rest-files-panel"
+            type="button" role="tab">
+            <i class="fa-solid fa-file-lines me-1"></i>REST Request Files
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rest-history-tab" data-bs-toggle="tab" data-bs-target="#rest-history-panel"
+            type="button" role="tab">
+            <i class="fa-solid fa-clock-rotate-left me-1"></i>History Log
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- ─── Execute Tab ─── -->
+    <div class="tab-pane fade show active" id="rest-exec-panel" role="tabpanel">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-bold"><i class="fa-solid fa-gear text-primary me-2"></i>Request
+                Configuration</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Application *</label>
+                        <select id="restExecApplication" class="form-select">
+                            <option value="">-- Select Application --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Operation *</label>
+                        <select id="restExecOperation" class="form-select">
+                            <option value="">-- Select Operation --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">HTTP Method</label>
+                        <input id="restExecMethod" type="text" class="form-control" readonly placeholder="GET">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Request URL *</label>
+                        <input id="restExecUrl" type="text" class="form-control"
+                            placeholder="https://api.intranet.corp/v1/inventory/items">
+                    </div>
+                </div>
+
+                <!-- Headers -->
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label fw-semibold mb-0">Custom Headers</label>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="window.REST_MODULE.addHeaderRow()"><i
+                                class="fa-solid fa-plus me-1"></i>Add Header</button>
+                    </div>
+                    <div id="restExecHeadersContainer"></div>
+                </div>
+
+                <!-- JSON Body -->
+                <div class="mt-3">
+                    <label class="form-label fw-semibold">Request Body (JSON)</label>
+                    <textarea id="restExecBody" class="form-control font-monospace rich-editor-source" rows="8"
+                        data-editor-language="json"
+                        placeholder="{&#10;  &quot;key&quot;: &quot;value&quot;&#10;}"></textarea>
+                </div>
+
+                <div class="mt-3">
+                    <button class="btn btn-primary" onclick="window.REST_MODULE.execute()"><i
+                            class="fa-solid fa-paper-plane me-1"></i>Execute</button>
+                    <button class="btn btn-outline-secondary" onclick="window.REST_MODULE.clearForm()"><i
+                            class="fa-solid fa-eraser me-1"></i>Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Panel -->
+        <div id="restResponsePanel" class="card shadow-sm mb-3" style="display:none;">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-reply text-primary me-2"></i>Response</span>
+                <button class="btn btn-sm btn-outline-secondary"
+                    onclick="document.getElementById('restResponsePanel').style.display='none'"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <div><span class="fw-semibold">Status:</span> <span id="restResponseStatusCode"
+                            class="badge">--</span></div>
+                    <div><span class="fw-semibold">Response Time:</span> <span id="restResponseTime">--</span></div>
+                    <div><span class="fw-semibold" id="restResponseTtfb">TTFB: --</span></div>
+                    <div><span class="fw-semibold" id="restResponseSize">Size: --</span></div>
+                </div>
+                <div>
+                    <label class="form-label fw-semibold fs-7">Response Body</label>
+                    <textarea id="restResponseBody" class="form-control font-monospace" rows="8" readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Swagger/OpenAPI Tab ─── -->
+    <div class="tab-pane fade" id="rest-swagger-panel" role="tabpanel">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-bold"><i class="fa-solid fa-file-code text-primary me-2"></i>OpenAPI
+                Configuration</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Application Name</label>
+                        <select id="restSwaggerApplication" class="form-select">
+                            <option value="">-- Select Application --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">OpenAPI URL</label>
+                        <input id="restSwaggerUrl" type="text" class="form-control"
+                            placeholder="https://api.intranet.corp/swagger/v1/swagger.json">
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="window.REST_MODULE.updateSwagger()"><i
+                            class="fa-solid fa-rotate me-1"></i>Update</button>
+                    <button class="btn btn-outline-success" onclick="window.REST_MODULE.saveSwagger()"><i
+                            class="fa-solid fa-floppy-disk me-1"></i>Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="fa-solid fa-eye text-primary me-2"></i>OpenAPI Preview
+            </div>
+            <div class="card-body">
+                <pre id="restSwaggerPreview"
+                    class="font-monospace border rounded p-3 mb-0 rich-editor-source editor-tall"
+                    data-editor-language="json" data-editor-readonly="true"
+                    style="max-height:400px;overflow:auto;font-size:0.78rem;background:var(--ux-bg-secondary);">Select an application and update to preview OpenAPI spec.</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Registered APIs Tab ─── -->
+    <div class="tab-pane fade" id="rest-apis-panel" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="fa-solid fa-server text-primary me-2"></i>Registered REST APIs</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-dark border" id="restApisCount">0 APIs</span>
+                    <button class="btn btn-sm btn-primary" onclick="window.REST_MODULE.addApi()"><i
+                            class="fa-solid fa-plus me-1"></i>Add API</button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>API Name</th>
+                                <th>Base URL</th>
+                                <th>Auth Type</th>
+                                <th>Registered</th>
+                                <th class="text-center">Operations</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="restApisTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── REST Request Files Tab ─── -->
+    <div class="tab-pane fade" id="rest-files-panel" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="fa-solid fa-file-lines text-primary me-2"></i>REST
+                Request Files</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Last Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody id="restFilesTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── History Log Tab ─── -->
+    <div class="tab-pane fade" id="rest-history-panel" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>REST Execution History</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-dark border" id="restHistoryCount">0 records</span>
+                    <button class="btn btn-sm btn-outline-danger" onclick="window.REST_MODULE.clearHistory()"><i
+                            class="fa-solid fa-trash-can me-1"></i>Clear</button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Duration</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody id="restHistoryTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

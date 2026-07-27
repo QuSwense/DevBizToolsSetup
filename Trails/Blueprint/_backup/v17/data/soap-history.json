@@ -1,0 +1,10 @@
+[
+    {
+        "timestamp": "2026-03-31 10:14:02",
+        "endpoint": ".../PaymentService.svc",
+        "status": 200,
+        "statusClass": "bg-success",
+        "duration": "142ms",
+        "action": "Load"
+    }
+]

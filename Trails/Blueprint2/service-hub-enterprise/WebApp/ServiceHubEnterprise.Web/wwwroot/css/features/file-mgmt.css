@@ -1,0 +1,30 @@
+/* File Management Feature Styles */
+
+/* Breadcrumb */
+.breadcrumb-dg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.breadcrumb-root {
+    color: var(--dg-text-soft);
+    font-size: 12px;
+}
+
+.breadcrumb-current {
+    color: var(--dg-accent);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* File icon in table */
+.file-icon {
+    font-size: 16px;
+}
+
+/* File name in library */
+.file-name {
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 12px;
+}

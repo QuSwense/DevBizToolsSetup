@@ -1,0 +1,72 @@
+@page "/rest/templates"
+
+@{
+    var templates = new[]
+    {
+        new { Name = "Payment Success Template", Type = "JSON", Created = "2024-03-28", Usage = 24 },
+        new { Name = "User List Filter Request", Type = "XML", Created = "2024-03-15", Usage = 18 },
+        new { Name = "Order Creation Payload", Type = "JSON", Created = "2024-04-01", Usage = 12 }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search templates..." aria-label="Search templates" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">3 templates</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Create Template
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">Template Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Type</th>
+                    <th>Created</th>
+                    <th>Usage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tpl in templates)
+                {
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @tpl.Name" /></td>
+                            <td>@tpl.Name</td>
+                            <td>
+                                <span class="type-badge">@tpl.Type</span>
+                            </td>
+                            <td style="color:var(--dg-text-soft)">@tpl.Created</td>
+                            <td style="color:var(--dg-text-soft)">@tpl.Usage uses</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="action-icon-btn">Edit</button>
+                                    <button class="action-icon-btn">Use</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>

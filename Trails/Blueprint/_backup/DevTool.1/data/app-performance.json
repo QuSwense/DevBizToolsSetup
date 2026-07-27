@@ -1,0 +1,62 @@
+[
+    {
+        "app": "Payment Gateway Service",
+        "apiType": "SOAP",
+        "apiLabel": "soap",
+        "calls": 6320,
+        "successRate": 99.5,
+        "responseTime": 212,
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    {
+        "app": "Customer Account Service",
+        "apiType": "SOAP",
+        "apiLabel": "soap",
+        "calls": 3980,
+        "successRate": 99.1,
+        "responseTime": 238,
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    {
+        "app": "Enterprise Inventory Engine",
+        "apiType": "SOAP",
+        "apiLabel": "soap",
+        "calls": 2640,
+        "successRate": 98.7,
+        "responseTime": 276,
+        "status": "Watch",
+        "statusClass": "text-bg-warning"
+    },
+    {
+        "app": "Inventory Service API",
+        "apiType": "REST",
+        "apiLabel": "rest",
+        "calls": 2430,
+        "successRate": 99.3,
+        "responseTime": 188,
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    {
+        "app": "Customer Profile API",
+        "apiType": "REST",
+        "apiLabel": "rest",
+        "calls": 1980,
+        "successRate": 98.9,
+        "responseTime": 254,
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    {
+        "app": "Billing Events API",
+        "apiType": "REST",
+        "apiLabel": "rest",
+        "calls": 1070,
+        "successRate": 98.4,
+        "responseTime": 321,
+        "status": "At Risk",
+        "statusClass": "text-bg-danger"
+    }
+]

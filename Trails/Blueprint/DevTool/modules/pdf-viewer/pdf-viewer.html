@@ -1,0 +1,73 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0"><i class="fa-solid fa-file-pdf text-primary me-2"></i>PDF Viewer &amp; Artifact Storage
+    </h4>
+    <span class="badge bg-light text-dark border">Artifacts</span>
+</div>
+
+<div class="row g-3">
+    <!-- Left: Artifact List -->
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-folder-open text-primary me-2"></i>Artifact Files</span>
+                <span class="badge bg-light text-dark border" id="pdfFileCount">0 files</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="pdfArtifactList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: PDF Viewer -->
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="fa-solid fa-eye text-primary me-2"></i>Document Viewer</span>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" id="pdfZoomOut" title="Zoom Out"><i
+                            class="fa-solid fa-minus"></i></button>
+                    <span class="badge bg-light text-dark border" id="pdfZoomLevel">100%</span>
+                    <button class="btn btn-sm btn-outline-secondary" id="pdfZoomIn" title="Zoom In"><i
+                            class="fa-solid fa-plus"></i></button>
+                    <div class="vr mx-1"></div>
+                    <button class="btn btn-sm btn-outline-secondary" id="pdfPrevPage" title="Previous Page"><i
+                            class="fa-solid fa-chevron-left"></i></button>
+                    <span class="badge bg-light text-dark border" id="pdfPageInfo">1 / 1</span>
+                    <button class="btn btn-sm btn-outline-secondary" id="pdfNextPage" title="Next Page"><i
+                            class="fa-solid fa-chevron-right"></i></button>
+                    <div class="vr mx-1"></div>
+                    <button class="btn btn-sm btn-primary" id="pdfDownload" title="Download"><i
+                            class="fa-solid fa-download me-1"></i>Download</button>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center" style="min-height:420px;">
+                <div id="pdfViewerPlaceholder" class="text-center text-muted">
+                    <i class="fa-regular fa-file-pdf fa-5x mb-3 d-block" style="color:var(--ux-border);"></i>
+                    <p class="mb-1 fw-semibold">No document selected</p>
+                    <p class="fs-7 mb-0">Select an artifact from the list to preview.</p>
+                </div>
+                <div id="pdfViewerCanvas" class="w-100 h-100 d-none">
+                    <div class="pdf-viewer-mock d-flex flex-column align-items-center justify-content-center border rounded p-4"
+                        style="min-height:380px;background:var(--ux-bg-secondary);">
+                        <i class="fa-regular fa-file-lines fa-4x mb-3" style="color:var(--ux-primary);"></i>
+                        <div class="pdf-mock-content w-100" style="max-width:400px;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-semibold" id="pdfMockTitle">Document Name</span>
+                                <span class="text-muted fs-7" id="pdfMockPages">Page 1 of 1</span>
+                            </div>
+                            <div class="border rounded p-3"
+                                style="background:var(--ux-bg-primary);font-size:var(--font-size-sm);line-height:1.6;">
+                                <p class="mb-2"><strong>Executive Summary</strong></p>
+                                <p class="text-muted mb-1" id="pdfMockContent">This document contains the operational
+                                    report and technical specifications for the selected artifact. Use the navigation
+                                    controls above to browse pages.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

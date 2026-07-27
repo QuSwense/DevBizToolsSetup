@@ -1,0 +1,20 @@
+[
+    {
+        "timestamp": "2026-03-31 11:22:15",
+        "endpoint": ".../inventory/items",
+        "method": "GET",
+        "status": 200,
+        "statusClass": "bg-success",
+        "duration": "88ms",
+        "action": "Load"
+    },
+    {
+        "timestamp": "2026-03-31 10:58:03",
+        "endpoint": ".../customers/search",
+        "method": "GET",
+        "status": 200,
+        "statusClass": "bg-success",
+        "duration": "112ms",
+        "action": "Load"
+    }
+]

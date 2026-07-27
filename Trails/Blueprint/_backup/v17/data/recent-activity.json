@@ -1,0 +1,34 @@
+[
+    {
+        "icon": "fa-circle-check",
+        "iconColor": "text-success",
+        "message": "SOAP regression suite completed",
+        "user": "svc.apiops",
+        "timestamp": "2m ago",
+        "timeAgo": "2 minutes"
+    },
+    {
+        "icon": "fa-file-pen",
+        "iconColor": "text-primary",
+        "message": "Request template updated for Payment API",
+        "user": "john.doe",
+        "timestamp": "18m ago",
+        "timeAgo": "18 minutes"
+    },
+    {
+        "icon": "fa-triangle-exclamation",
+        "iconColor": "text-warning",
+        "message": "REST endpoint latency spike detected",
+        "user": "svc.monitor",
+        "timestamp": "35m ago",
+        "timeAgo": "35 minutes"
+    },
+    {
+        "icon": "fa-user-plus",
+        "iconColor": "text-info",
+        "message": "New tester account added to whitelist",
+        "user": "jane.smith",
+        "timestamp": "1h ago",
+        "timeAgo": "1 hour"
+    }
+]

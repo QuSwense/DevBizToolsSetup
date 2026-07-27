@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBizToolsSuite - Enterprise Portal</title>
+
+    <!-- Global Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="css/common.css">
+
+    <!-- Dynamic Module Stylesheet (swapped by router) -->
+    <link id="module-style" rel="stylesheet" href="">
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand navbar-dark sticky-top"
+        style="background:var(--ux-gradient);border-bottom:1px solid var(--ux-border);box-shadow:0 2px 8px var(--ux-shadow);z-index:1030;">
+        <div class="container-fluid px-3">
+            <a id="homeBrandLink" class="navbar-brand d-flex align-items-center gap-2" href="#dashboard">
+                <i class="fa-solid fa-cubes text-primary fs-4"></i>
+                <span class="fw-bold">DevBizToolsSuite</span>
+                <span class="badge bg-secondary fs-xs ms-1">v1.0 (.NET 8)</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <div class="d-none d-sm-block fs-7 navbar-user-meta">
+                    <div class="fw-semibold"><i class="fa-brands fa-windows me-1"></i> John.Doe</div>
+                </div>
+                <div class="vr bg-secondary mx-1 d-none d-sm-block"></div>
+                <button id="sidebarToggleBtn" class="btn btn-outline-light btn-sm" title="Collapse Sidebar"
+                    aria-label="Toggle sidebar" type="button">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <button class="btn btn-outline-light btn-sm" title="Toggle Theme" onclick="toggleTheme()">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== SIDEBAR + MAIN CONTENT ===== -->
+    <div class="d-flex flex-nowrap align-items-stretch">
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="py-3 flex-shrink-0">
+            <div class="px-3 mb-2 text-uppercase text-muted fs-8 fw-bold sidebar-heading">Modules</div>
+            <nav class="nav flex-column" id="moduleTabs" role="tablist">
+                <!-- Home / Dashboard -->
+                <a class="nav-link-custom active" id="nav-dashboard" href="#dashboard" data-module-name="Home">
+                    <i class="fa-solid fa-chart-line text-primary module-icon"></i>
+                    <span class="module-label">Home</span>
+                </a>
+
+                <!-- SOAP API Tester -->
+                <div class="nav-group">
+                    <a class="nav-link-custom nav-parent" id="nav-soap" href="#soap-api-test"
+                        data-module-name="SOAP API Tester">
+                        <i class="fa-solid fa-soap text-info module-icon"></i>
+                        <span class="module-label">SOAP API Tester</span>
+                        <i class="fa-solid fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <div class="nav-submenu" id="soap-submenu">
+                        <a class="submenu-item active" data-module="soap-api-test" data-subview="execute">Execution</a>
+                        <a class="submenu-item" data-module="soap-api-test" data-subview="wsdl">WSDL Management</a>
+                        <a class="submenu-item" data-module="soap-api-test" data-subview="test-suites">Test Suites</a>
+                        <a class="submenu-item" data-module="soap-api-test" data-subview="apps">Registered
+                            Applications</a>
+                        <a class="submenu-item" data-module="soap-api-test" data-subview="files">SOAP Request Files</a>
+                        <a class="submenu-item" data-module="soap-api-test" data-subview="history">History Log</a>
+                    </div>
+                </div>
+
+                <!-- REST API Tester -->
+                <div class="nav-group">
+                    <a class="nav-link-custom nav-parent" id="nav-rest" href="#rest-api-test"
+                        data-module-name="REST API Tester">
+                        <i class="fa-solid fa-network-wired text-success module-icon"></i>
+                        <span class="module-label">REST API Tester</span>
+                        <i class="fa-solid fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <div class="nav-submenu" id="rest-submenu">
+                        <a class="submenu-item active" data-module="rest-api-test" data-subview="execute">Execution</a>
+                        <a class="submenu-item" data-module="rest-api-test" data-subview="swagger">Swagger / OpenAPI
+                            Management</a>
+                        <a class="submenu-item" data-module="rest-api-test" data-subview="apps">Registered APIs</a>
+                        <a class="submenu-item" data-module="rest-api-test" data-subview="files">REST Request Files</a>
+                        <a class="submenu-item" data-module="rest-api-test" data-subview="history">History Log</a>
+                    </div>
+                </div>
+
+                <!-- PDF & Artifacts -->
+                <a class="nav-link-custom" id="nav-pdf" href="#pdf-viewer" data-module-name="PDF and Artifacts">
+                    <i class="fa-solid fa-file-pdf text-danger module-icon"></i>
+                    <span class="module-label">PDF &amp; Artifacts</span>
+                </a>
+
+                <!-- Health Checks -->
+                <a class="nav-link-custom" id="nav-health" href="#health-checks" data-module-name="Health Checks">
+                    <i class="fa-solid fa-heart-pulse text-warning module-icon"></i>
+                    <span class="module-label">Health Checks</span>
+                </a>
+
+                <hr class="mx-3 my-2 text-secondary menu-divider">
+
+                <!-- Settings -->
+                <div class="nav-group">
+                    <a class="nav-link-custom nav-parent" id="nav-settings" href="#settings"
+                        data-module-name="Settings">
+                        <i class="fa-solid fa-cog text-primary module-icon"></i>
+                        <span class="module-label">Settings</span>
+                        <i class="fa-solid fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <div class="nav-submenu" id="settings-submenu">
+                        <a class="submenu-item active" data-module="settings" data-subview="access">User Access</a>
+                        <a class="submenu-item" data-module="settings" data-subview="params">System Parameters</a>
+                        <a class="submenu-item" data-module="settings" data-subview="appearance">Appearance</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area (dynamic module injection) -->
+        <main id="main-content" class="flex-grow-1 p-3 p-md-4">
+            <div id="app-content"></div>
+        </main>
+
+    </div>
+
+    <!-- ===== GLOBAL MODALS ===== -->
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Add Domain User to Whitelist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="addUserDomainUsername">Domain Username</label>
+                        <input type="text" id="addUserDomainUsername" name="addUserDomainUsername" class="form-control"
+                            placeholder="DOMAIN\username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="addUserFullName">Full Name</label>
+                        <input type="text" id="addUserFullName" name="addUserFullName" class="form-control"
+                            placeholder="e.g. Alex Johnson">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save Access Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Detail Modal -->
+    <div class="modal fade" id="healthDetailModal" tabindex="-1" aria-labelledby="healthDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="healthDetailModalLabel">
+                        <i class="fa-solid fa-heart-pulse text-warning"></i>
+                        <span id="healthDetailTitle">Health Check Details</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="healthDetailBanner" class="health-detail-status-banner healthy">
+                        <i class="fa-solid fa-circle-check fa-lg"></i>
+                        <span id="healthDetailStatusText">Healthy</span>
+                    </div>
+                    <dl class="health-detail-meta">
+                        <dt>Service</dt>
+                        <dd id="healthDetailService">--</dd>
+                        <dt>Endpoint</dt>
+                        <dd id="healthDetailEndpoint">--</dd>
+                        <dt>Response Time</dt>
+                        <dd id="healthDetailResponseTime">--</dd>
+                        <dt>HTTP Status</dt>
+                        <dd id="healthDetailHttpStatus">--</dd>
+                        <dt>Checked At</dt>
+                        <dd id="healthDetailTimestamp">--</dd>
+                    </dl>
+                    <div class="health-detail-body-wrap">
+                        <div class="health-detail-body-header">
+                            <span><i class="fa-solid fa-code me-1"></i>Response Body</span>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-outline-secondary health-detail-copy-btn"
+                                    onclick="copyHealthDetailBody()" title="Copy to clipboard">
+                                    <i class="fa-solid fa-copy"></i> Copy
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary health-detail-copy-btn"
+                                    onclick="toggleHealthDetailWrap()" title="Toggle word wrap">
+                                    <i class="fa-solid fa-wrap"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="healthDetailBody" class="health-detail-body-content">--</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="runSingleHealthCheckFromModal()">
+                        <i class="fa-solid fa-play me-1"></i> Re-run Check
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REST API Modal -->
+    <div class="modal fade" id="restApiModal" tabindex="-1" aria-labelledby="restApiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="restApiModalLabel">
+                        <i class="fa-solid fa-cubes text-success"></i>
+                        <span>Add Registered API</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="restApiName">API Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="restApiName" name="restApiName" class="form-control"
+                                placeholder="e.g. Inventory Service API">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="restApiAuthType">Auth Type</label>
+                            <select id="restApiAuthType" name="restApiAuthType" class="form-select">
+                                <option>Bearer Token</option>
+                                <option>API Key</option>
+                                <option>Basic Auth</option>
+                                <option>OAuth2</option>
+                                <option>None</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="restApiBaseUrl">Base URL <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="restApiBaseUrl" name="restApiBaseUrl" class="form-control"
+                                placeholder="https://api.intranet.corp/v1/inventory">
+                        </div>
+                    </div>
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="form-label fw-semibold mb-0">API Operations <span
+                                    class="text-danger">*</span></span>
+                            <button type="button" id="restApiAddOpBtn" class="btn btn-sm btn-outline-success">
+                                <i class="fa-solid fa-plus me-1"></i>Add Operation
+                            </button>
+                        </div>
+                        <div class="fs-7 text-secondary mb-2">Each operation requires an operationId (camelCase,
+                            unique),
+                            HTTP method, endpoint path, optional summary, and optional description.</div>
+                        <div id="restApiOpsContainer"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="restApiSaveBtn" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>Save API
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOAP App Modal -->
+    <div class="modal fade" id="soapAppModal" tabindex="-1" aria-labelledby="soapAppModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="soapAppModalLabel">
+                        <i class="fa-solid fa-cubes text-info"></i>
+                        <span>Add SOAP Application</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapAppName">Application Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="soapAppName" name="soapAppName" class="form-control"
+                                placeholder="e.g. Payment Gateway Service">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapAppDate">Registered Date</label>
+                            <input type="date" id="soapAppDate" name="soapAppDate" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="soapAppWsdlUrl">Base Service / WSDL URL <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="soapAppWsdlUrl" name="soapAppWsdlUrl" class="form-control"
+                                placeholder="https://intranet.corp/services/PaymentService.svc?wsdl">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="soapAppDescription">Description</label>
+                            <textarea id="soapAppDescription" name="soapAppDescription" class="form-control" rows="2"
+                                placeholder="Brief description of the SOAP application..."></textarea>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="form-label fw-semibold mb-0">SOAP Actions <span
+                                    class="text-danger">*</span></span>
+                            <button type="button" id="soapAppAddActionBtn" class="btn btn-sm btn-outline-info">
+                                <i class="fa-solid fa-plus me-1"></i>Add SOAP Action
+                            </button>
+                        </div>
+                        <div class="fs-7 text-secondary mb-2">Each SOAP action represents an operation.</div>
+                        <div id="soapAppActionsContainer"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="soapAppSaveBtn" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>Save Application
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOAP Test Suite Modal -->
+    <div class="modal fade" id="soapTestSuiteModal" tabindex="-1" aria-labelledby="soapTestSuiteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="soapTestSuiteModalLabel">
+                        <i class="fa-solid fa-vial text-info"></i>
+                        <span>Add Test Suite</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapSuiteName">Suite Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="soapSuiteName" name="soapSuiteName" class="form-control"
+                                placeholder="e.g. Payment Gateway Regression">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapSuiteApp">Associated Application <span
+                                    class="text-danger">*</span></label>
+                            <select id="soapSuiteApp" name="soapSuiteApp" class="form-select">
+                                <option value="">-- Select Application --</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="soapSuiteDescription">Description</label>
+                            <textarea id="soapSuiteDescription" name="soapSuiteDescription" class="form-control"
+                                rows="2" placeholder="Brief description of this test suite..."></textarea>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="form-label fw-semibold mb-0">Test Cases <span
+                                    class="text-danger">*</span></span>
+                            <button type="button" id="soapSuiteAddCaseBtn" class="btn btn-sm btn-outline-info">
+                                <i class="fa-solid fa-plus me-1"></i>Add Test Case
+                            </button>
+                        </div>
+                        <div class="fs-7 text-secondary mb-2">Each test case targets a specific SOAPAction.</div>
+                        <div id="soapSuiteCasesContainer"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="soapSuiteSaveBtn" class="btn btn-info text-white">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>Save Suite
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOAP History Detail Modal -->
+    <div class="modal fade" id="soapHistoryDetailModal" tabindex="-1" aria-labelledby="soapHistoryDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="soapHistoryDetailModalLabel">
+                        <i class="fa-solid fa-clock-rotate-left text-info"></i>
+                        <span id="soapHistoryDetailTitle">Execution Detail</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="soapHistoryDetailBanner" class="health-detail-status-banner healthy">
+                        <i class="fa-solid fa-circle-check fa-lg"></i>
+                        <span id="soapHistoryDetailStatus">Healthy</span>
+                    </div>
+                    <dl class="health-detail-meta">
+                        <dt>Timestamp</dt>
+                        <dd id="soapHistMetaTimestamp">--</dd>
+                        <dt>Application</dt>
+                        <dd id="soapHistMetaApp">--</dd>
+                        <dt>SOAPAction</dt>
+                        <dd id="soapHistMetaAction">--</dd>
+                        <dt>Endpoint URL</dt>
+                        <dd id="soapHistMetaUrl">--</dd>
+                        <dt>HTTP Status</dt>
+                        <dd id="soapHistMetaStatus">--</dd>
+                        <dt>Status Text</dt>
+                        <dd id="soapHistMetaStatusText">--</dd>
+                        <dt>TTFB</dt>
+                        <dd id="soapHistMetaTtfb">--</dd>
+                        <dt>Total Response Time</dt>
+                        <dd id="soapHistMetaTotalTime">--</dd>
+                        <dt>Content-Type</dt>
+                        <dd id="soapHistMetaContentType">--</dd>
+                        <dt>Content-Length</dt>
+                        <dd id="soapHistMetaContentLength">--</dd>
+                    </dl>
+                    <ul class="nav nav-tabs mb-2" role="tablist">
+                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab"
+                                data-bs-target="#soap-hist-response-headers"><i
+                                    class="fa-solid fa-list me-1"></i>Response Headers</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                                data-bs-target="#soap-hist-response-body"><i class="fa-solid fa-code me-1"></i>Response
+                                Payload</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                                data-bs-target="#soap-hist-fault"><i
+                                    class="fa-solid fa-triangle-exclamation me-1"></i>SOAP Fault Log</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                                data-bs-target="#soap-hist-assertions"><i
+                                    class="fa-solid fa-check-double me-1"></i>Assertion Results</button></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="soap-hist-response-headers">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <thead>
+                                        <tr class="fs-8 text-secondary">
+                                            <th style="width:250px;">Header</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="soapHistHeadersTbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="soap-hist-response-body">
+                            <textarea id="soapHistResponseBody" name="soapHistResponseBody"
+                                class="form-control font-monospace fs-7 rich-editor-source" rows="12"
+                                data-editor-language="xml" data-editor-readonly="true"></textarea>
+                        </div>
+                        <div class="tab-pane fade" id="soap-hist-fault">
+                            <div id="soapHistFaultContent" class="p-3 text-center text-muted">
+                                <i class="fa-solid fa-circle-check text-success fa-2x mb-2"></i>
+                                <p class="mb-0">No SOAP Fault recorded for this execution.</p>
+                            </div>
+                            <div id="soapHistFaultDetail" style="display:none;">
+                                <div class="health-detail-status-banner failed mb-2">
+                                    <i class="fa-solid fa-circle-xmark fa-lg"></i>
+                                    <span id="soapHistFaultString">--</span>
+                                </div>
+                                <dl class="health-detail-meta">
+                                    <dt>faultcode</dt>
+                                    <dd id="soapHistFaultCode">--</dd>
+                                    <dt>faultactor</dt>
+                                    <dd id="soapHistFaultActor">--</dd>
+                                    <dt>detail</dt>
+                                    <dd id="soapHistFaultDetailText">--</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="soap-hist-assertions">
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0 unified-table">
+                                    <thead>
+                                        <tr class="fs-8 text-secondary">
+                                            <th>Assertion</th>
+                                            <th>Expected</th>
+                                            <th>Actual</th>
+                                            <th style="width:80px;" class="text-center">Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="soapHistAssertionsTbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="replaySoapHistoryEntry()">
+                        <i class="fa-solid fa-play me-1"></i>Re-run
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOAP Test Case Modal -->
+    <div class="modal fade" id="soapTestCaseModal" tabindex="-1" aria-labelledby="soapTestCaseModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="soapTestCaseModalLabel">
+                        <i class="fa-solid fa-flask text-primary"></i>
+                        <span>Add Test Case</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapCaseName">Test Case Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="soapCaseName" name="soapCaseName" class="form-control"
+                                placeholder="e.g. Valid Payment - USD 250">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapCaseSuite">Parent Suite <span
+                                    class="text-danger">*</span></label>
+                            <select id="soapCaseSuite" name="soapCaseSuite" class="form-select">
+                                <option value="">-- Select Suite --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapCaseAction">Target SOAPAction <span
+                                    class="text-danger">*</span></label>
+                            <select id="soapCaseAction" name="soapCaseAction" class="form-select">
+                                <option value="">-- Select SOAPAction --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="soapCaseRequestFile">Request XML Template</label>
+                            <select id="soapCaseRequestFile" name="soapCaseRequestFile" class="form-select">
+                                <option value="">-- Select Template --</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="soapCaseDescription">Description</label>
+                            <textarea id="soapCaseDescription" name="soapCaseDescription" class="form-control" rows="2"
+                                placeholder="Optional description..."></textarea>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3">
+                        <span class="form-label fw-semibold mb-2 d-block">Variable Bindings (Placeholder
+                            Overrides)</span>
+                        <div class="fs-7 text-secondary mb-2">Override template placeholders (e.g.
+                            <code>${Amount}</code>) with test-case-specific values.</div>
+                        <div id="soapCaseVarsContainer">
+                            <div class="text-muted fs-7 fst-italic">Select an action and template above to see available
+                                placeholders.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="soapCaseSaveBtn" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>Save Case
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="js/data-loader.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/common.js"></script>
+</body>
+
+</html>

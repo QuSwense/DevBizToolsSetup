@@ -1,0 +1,19 @@
+{
+    "deployment": {
+        "label": "Current Deployment",
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    "apiEndpoints": {
+        "label": "API Endpoints",
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    "artifactStorage": {
+        "label": "Artifact Storage",
+        "status": "Healthy",
+        "statusClass": "text-bg-success"
+    },
+    "nextScheduledCheck": "14:30",
+    "monitoringHookActive": true
+}

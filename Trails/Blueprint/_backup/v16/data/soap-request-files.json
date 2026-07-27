@@ -1,0 +1,62 @@
+[
+    {
+        "name": "ProcessPayment_USD.xml",
+        "application": "Payment Gateway Service",
+        "actionName": "ProcessPayment",
+        "soapAction": "http://tempuri.org/IPaymentService/ProcessPayment",
+        "payloadSize": "1.4 KB",
+        "lastModified": "2026-03-28 14:20",
+        "selected": true,
+        "xmlContent": "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <Body>\n        <ProcessPayment xmlns=\"http://tempuri.org/\">\n            <Amount>250.00</Amount>\n            <Currency>USD</Currency>\n        </ProcessPayment>\n    </Body>\n</Envelope>"
+    },
+    {
+        "name": "ProcessPayment_EUR_Refund.xml",
+        "application": "Payment Gateway Service",
+        "actionName": "RefundPayment",
+        "soapAction": "http://tempuri.org/IPaymentService/ProcessPayment",
+        "payloadSize": "1.8 KB",
+        "lastModified": "2026-03-29 09:12",
+        "selected": true,
+        "xmlContent": "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <Body>\n        <RefundPayment xmlns=\"http://tempuri.org/\">\n            <TransactionId>TXN-98765</TransactionId>\n            <Amount>50.00</Amount>\n            <Currency>USD</Currency>\n        </RefundPayment>\n    </Body>\n</Envelope>"
+    },
+    {
+        "name": "GetCustomerDetails_ById.xml",
+        "application": "Customer Account Service",
+        "actionName": "GetCustomer",
+        "soapAction": "http://tempuri.org/IAccountService/GetCustomer",
+        "payloadSize": "0.8 KB",
+        "lastModified": "2026-03-30 11:45",
+        "selected": false,
+        "xmlContent": "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <Body>\n        <GetCustomer xmlns=\"http://tempuri.org/\">\n            <CustomerId>12345</CustomerId>\n        </GetCustomer>\n    </Body>\n</Envelope>"
+    },
+    {
+        "name": "CheckStock_BulkItems.xml",
+        "application": "Enterprise Inventory Engine",
+        "actionName": "CheckStock",
+        "soapAction": "http://tempuri.org/IInventoryService/CheckStock",
+        "payloadSize": "2.2 KB",
+        "lastModified": "2026-03-31 08:30",
+        "selected": false,
+        "xmlContent": "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <Body>\n        <CheckStock xmlns=\"http://tempuri.org/\">\n            <WarehouseId>WH-01</WarehouseId>\n            <Sku>INV-1001</Sku>\n        </CheckStock>\n    </Body>\n</Envelope>"
+    },
+    {
+        "name": "UpdateAccount_Contact.xml",
+        "application": "Customer Account Service",
+        "actionName": "UpdateAccount",
+        "soapAction": "http://tempuri.org/IAccountService/UpdateAccount",
+        "payloadSize": "1.1 KB",
+        "lastModified": "2026-04-02 10:15",
+        "selected": false,
+        "xmlContent": "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <Body>\n        <UpdateAccount xmlns=\"http://tempuri.org/\">\n            <CustomerId>12345</CustomerId>\n            <Email>newemail@example.com</Email>\n            <Phone>+1-555-0199</Phone>\n        </UpdateAccount>\n    </Body>\n</Envelope>"
+    },
+    {
+        "name": "UpdateInventory_StockMove.xml",
+        "application": "Enterprise Inventory Engine",
+        "actionName": "UpdateInventory",
+        "soapAction": "http://tempuri.org/IInventoryService/UpdateInventory",
+        "payloadSize": "1.3 KB",
+        "lastModified": "2026-04-05 14:30",
+        "selected": false,
+        "xmlContent": "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <Body>\n        <UpdateInventory xmlns=\"http://tempuri.org/\">\n            <ItemId>INV-1001</ItemId>\n            <QuantityChange>-5</QuantityChange>\n            <WarehouseId>WH-01</WarehouseId>\n        </UpdateInventory>\n    </Body>\n</Envelope>"
+    }
+]

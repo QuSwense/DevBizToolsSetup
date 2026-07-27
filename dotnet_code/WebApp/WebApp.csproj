@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Features\SoapApiTest\SoapApiTest.csproj" />
+    <ProjectReference Include="..\Features\RestApiTest\RestApiTest.csproj" />
+    <ProjectReference Include="..\Features\PdfViewer\PdfViewer.csproj" />
+    <ProjectReference Include="..\Features\HealthCheck\HealthCheck.csproj" />
+    <ProjectReference Include="..\Features\Admin\Admin.csproj" />
+  </ItemGroup>
+
+</Project>

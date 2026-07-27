@@ -1,0 +1,89 @@
+@page "/rest/request-files"
+
+@{
+    var files = new[]
+    {
+        new { FileName = "payment_create_001.json", AppName = "PaymentService", ApiPath = "/payments", Verb = "POST",
+Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-01" },
+        new { FileName = "user_list_filter.xml", AppName = "UserManagement", ApiPath = "/users", Verb = "GET", Description =
+"List active users filtered by role admin", Type = "xml", Created = "2024-04-02" },
+        new { FileName = "stock_update_003.json", AppName = "InventoryAPI", ApiPath = "/stock", Verb = "PUT", Description =
+"Update stock for SKU-889", Type = "json", Created = "2024-04-03" }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search request files..." aria-label="Search request files" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">3 records</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Upload File
+            </button>
+            <button class="btn btn-outline-secondary btn-dg">
+                <i class="bi bi-download"></i>
+                Export
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">File Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Application</th>
+                    <th>API Path</th>
+                    <th>Verb</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in files)
+                {
+                    var verbColor = file.Verb == "POST" ? "var(--dg-success)" : file.Verb == "GET" ? "var(--dg-accent)" :
+                file.Verb == "DELETE" ? "var(--dg-error)" : "var(--dg-warning)";
+                    var verbBg = file.Verb == "POST" ? "var(--dg-success-bg)" : file.Verb == "GET" ? "var(--dg-accent-soft)" : file.Verb == "DELETE" ?
+             "var(--dg-error-bg)" : "var(--dg-warning-bg)";
+                    var typeIcon = file.Type == "json"
+                        ? "<i class=\"bi bi-file-earmark-code\" style=\"color:var(--dg-success);font-size:14px\"></i>"
+                        : "<i class=\"bi bi-file-earmark-code\" style=\"color:var(--dg-warning);font-size:14px\"></i>";
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @file.FileName" /></td>
+                            <td>
+                                <span class="mono-text">@file.FileName</span>
+                            </td>
+                            <td style="color:var(--dg-text-soft)">@file.AppName</td>
+                            <td><span class="cell-id">@file.ApiPath</span></td>
+                            <td>
+                                <span class="verb-badge"
+                                      style="background:@verbBg;color:@verbColor;border-color:currentColor">@file.Verb</span>
+                            </td>
+                            <td class="cell-truncated">
+                                @file.Description</td>
+                                <td>@((MarkupString)typeIcon)</td>
+                                <td style="color:var(--dg-text-soft)">@file.Created</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

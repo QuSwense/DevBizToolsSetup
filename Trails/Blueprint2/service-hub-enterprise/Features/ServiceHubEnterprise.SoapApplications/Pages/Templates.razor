@@ -1,0 +1,72 @@
+@page "/soap/templates"
+
+@{
+    var templates = new[]
+    {
+        new { Name = "Billing Invoice Request", Type = "XML", Created = "2024-02-10", Usage = 15 },
+        new { Name = "Shipping Track Envelope", Type = "XML", Created = "2024-02-22", Usage = 9 },
+        new { Name = "Billing Cancel Envelope", Type = "XML", Created = "2024-03-05", Usage = 6 }
+    };
+}
+
+<div class="datagrid-card">
+    <div class="grid-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" placeholder="Search templates..." aria-label="Search templates" />
+            </div>
+            <div class="meta-group">
+                <span class="meta-pill">3 templates</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-dark btn-dg-primary">
+                <i class="bi bi-plus-lg"></i>
+                Create Template
+            </button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="datagrid">
+            <thead>
+                <tr>
+                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
+                    </th>
+                    <th class="sortable">
+                        <span class="th-inner">Template Name<span class="sort-indicator">
+                            <i class="bi bi-chevron-expand"></i>
+                        </span></span>
+                    </th>
+                    <th>Type</th>
+                    <th>Created</th>
+                    <th>Usage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tpl in templates)
+                {
+                    <tr>
+                        <td class="check-cell"><input type="checkbox" class="form-check-input"
+                                                          aria-label="Select @tpl.Name" /></td>
+                            <td>@tpl.Name</td>
+                            <td>
+                                <span class="type-badge">@tpl.Type</span>
+                            </td>
+                            <td style="color:var(--dg-text-soft)">@tpl.Created</td>
+                            <td style="color:var(--dg-text-soft)">@tpl.Usage uses</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="action-icon-btn">Edit</button>
+                                    <button class="action-icon-btn">Use</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>

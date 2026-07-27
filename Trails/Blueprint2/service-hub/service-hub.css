@@ -1,0 +1,1379 @@
+/* ============================================================
+   SERVICE HUB V8 — Enterprise Flat Design System
+   Based on DataGrid design philosophy: zero-radius, 1px borders,
+   Inter font, CSS variables, light/dark, minimal
+   ============================================================ */
+
+/* --- CSS Variables (from datagrid.css) --- */
+:root {
+    --dg-bg: #f1f5f9;
+    --dg-surface: #ffffff;
+    --dg-surface-2: #f8fafc;
+    --dg-surface-3: #f1f5f9;
+    --dg-border: #e2e8f0;
+    --dg-border-strong: #cbd5e1;
+    --dg-text: #0f172a;
+    --dg-text-soft: #64748b;
+    --dg-text-faint: #94a3b8;
+    --dg-primary: #111827;
+    --dg-primary-hover: #1f2937;
+    --dg-primary-text: #ffffff;
+    --dg-accent: #2563eb;
+    --dg-accent-soft: #eff6ff;
+    --dg-shadow-sm: 0 1px 2px rgba(16, 24, 40, .04);
+    --dg-shadow-md: 0 4px 16px rgba(16, 24, 40, .06), 0 1px 2px rgba(16, 24, 40, .05);
+    --dg-focus: 0 0 0 4px rgba(37, 99, 235, .12);
+    --dg-table-head: #f8fafc;
+    --dg-row-hover: #f8fafc;
+    --dg-row-selected: #f0f7ff;
+    --dg-input-bg: #f8fafc;
+    --sb-width: 280px;
+    --sb-collapsed-width: 64px;
+    --sb-bg: #0f172a;
+    --sb-border: #1e293b;
+    --sb-text: #cbd5e1;
+    --sb-text-soft: #94a3b8;
+    --sb-text-faint: #64748b;
+    --sb-hover: #1e293b;
+    --sb-active: #1e293b;
+    --sb-active-border: #ffffff;
+}
+
+[data-theme="dark"] {
+    --dg-bg: #070a0f;
+    --dg-surface: #111820;
+    --dg-surface-2: #16202e;
+    --dg-surface-3: #1c2a3a;
+    --dg-border: #1e2e42;
+    --dg-border-strong: #2a3d56;
+    --dg-text: #e6edf6;
+    --dg-text-soft: #8a9bb3;
+    --dg-text-faint: #5c708a;
+    --dg-primary: #f1f5f9;
+    --dg-primary-hover: #e2e8f0;
+    --dg-primary-text: #0f172a;
+    --dg-accent: #60a5fa;
+    --dg-accent-soft: #10233f;
+    --dg-shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+    --dg-shadow-md: 0 8px 24px rgba(0, 0, 0, .4);
+    --dg-focus: 0 0 0 4px rgba(96, 165, 250, .18);
+    --dg-table-head: #0f1a28;
+    --dg-row-hover: #16202e;
+    --dg-row-selected: #13233a;
+    --dg-input-bg: #16202e;
+    --sb-bg: #0a0e14;
+    --sb-border: #1a2538;
+    --sb-text: #94a3b8;
+    --sb-text-soft: #64748b;
+    --sb-text-faint: #475569;
+    --sb-hover: #16202e;
+    --sb-active: #16202e;
+    --sb-active-border: #60a5fa;
+}
+
+/* --- Reset --- */
+*,
+*::before,
+*::after {
+    border-radius: 0 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    transition: background-color .18s ease, color .18s ease;
+}
+
+body {
+    background: var(--dg-bg);
+    color: var(--dg-text);
+    font-family: 'Inter', 'system-ui', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+:focus-visible {
+    outline: 2px solid var(--dg-accent);
+    outline-offset: 2px;
+}
+
+/* --- Utility --- */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ============================================================
+   SIDEBAR — Dark theme, collapsible (from sidebar.css adapted)
+   ============================================================ */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--dg-bg);
+}
+
+.sidebar {
+    width: var(--sb-width);
+    min-width: var(--sb-width);
+    background: var(--sb-bg);
+    border-right: 1px solid var(--sb-border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    transition: width 0.22s cubic-bezier(0.2, 0, 0, 1), min-width 0.22s cubic-bezier(0.2, 0, 0, 1);
+    z-index: 30;
+}
+
+.sidebar.collapsed {
+    width: var(--sb-collapsed-width);
+    min-width: var(--sb-collapsed-width);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    height: 64px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px 0 16px;
+    border-bottom: 1px solid var(--sb-border);
+    gap: 8px;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.brand-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--dg-primary-text);
+    color: var(--dg-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    min-width: 0;
+    transition: opacity 0.18s, transform 0.18s;
+}
+
+.brand-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.brand-sub {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--sb-text-faint);
+    white-space: nowrap;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.sidebar.collapsed .brand-text {
+    opacity: 0;
+    transform: translateX(-8px);
+    pointer-events: none;
+}
+
+.btn-collapse {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--sb-border);
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sb-text);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: .15s;
+}
+
+.btn-collapse:hover {
+    background: var(--sb-hover);
+    color: #e2e8f0;
+}
+
+/* Sidebar Nav */
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    display: none;
+}
+
+/* Menu Item */
+.menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 36px;
+    padding: 0 8px 0 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--sb-text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: background .12s, color .12s;
+}
+
+.menu-item:hover {
+    background: var(--sb-hover);
+    color: #e2e8f0;
+}
+
+.menu-item.active {
+    background: var(--sb-active);
+    color: #ffffff;
+    border-left: 2px solid var(--sb-active-border);
+    padding-left: 11px;
+}
+
+.menu-item .menu-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.menu-item .menu-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12.5px;
+    transition: opacity .18s;
+}
+
+.menu-item .menu-chevron {
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: transform .2s ease;
+    color: var(--sb-text-faint);
+    flex-shrink: 0;
+}
+
+.menu-item.open .menu-chevron {
+    transform: rotate(90deg);
+}
+
+.sidebar.collapsed .menu-item {
+    justify-content: center;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    margin: 0 auto;
+}
+
+.sidebar.collapsed .menu-item .menu-label,
+.sidebar.collapsed .menu-item .menu-chevron {
+    display: none;
+}
+
+.sidebar.collapsed .menu-item.active {
+    padding-left: 0;
+    border-left-width: 1px;
+}
+
+/* Submenu */
+.submenu {
+    display: none;
+    flex-direction: column;
+    gap: 1px;
+    padding: 2px 0 6px 0;
+    margin-left: 12px;
+    border-left: 1px solid rgba(148, 163, 184, .15);
+    padding-left: 10px;
+}
+
+.menu-item.open+.submenu {
+    display: flex;
+}
+
+.submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--sb-text-soft);
+    font-size: 12.5px;
+    font-weight: 450;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .12s;
+}
+
+.submenu-item:hover {
+    background: var(--sb-hover);
+    color: #e2e8f0;
+}
+
+.submenu-item.active {
+    background: var(--sb-active);
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.submenu-item .sub-icon {
+    font-size: 12px;
+    width: 14px;
+    text-align: center;
+    opacity: .7;
+}
+
+.submenu-item .sub-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    border-top: 1px solid var(--sb-border);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: opacity .18s;
+}
+
+.sidebar.collapsed .sidebar-footer {
+    padding: 12px 4px;
+    align-items: center;
+}
+
+.sidebar-footer .user-info {
+    font-size: 11px;
+    color: var(--sb-text-faint);
+    text-align: center;
+}
+
+.sidebar.collapsed .sidebar-footer .user-info {
+    display: none;
+}
+
+/* ============================================================
+   MAIN HEADER
+   ============================================================ */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: var(--dg-surface);
+    border-bottom: 1px solid var(--dg-border);
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.main-body {
+    flex: 1;
+    padding: 24px;
+    overflow: auto;
+}
+
+/* ============================================================
+   DATAGRID CARD — Table container (from datagrid.css)
+   ============================================================ */
+.datagrid-card {
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    box-shadow: var(--dg-shadow-sm);
+    overflow: visible;
+}
+
+/* Toolbar */
+.grid-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--dg-surface);
+    border-bottom: 1px solid var(--dg-border);
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+    width: 280px;
+    max-width: 100%;
+}
+
+.search-box .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dg-text-faint);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.search-box input {
+    width: 100%;
+    height: 36px;
+    padding: 0 36px 0 34px;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-input-bg);
+    font-size: 13px;
+    color: var(--dg-text);
+}
+
+.search-box input:focus {
+    outline: 0;
+    background: var(--dg-surface);
+    border-color: var(--dg-accent);
+    box-shadow: var(--dg-focus);
+}
+
+.search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border: 0;
+    background: transparent;
+    color: var(--dg-text-faint);
+    display: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-box.has-value .search-clear {
+    display: inline-flex;
+}
+
+/* Meta pills */
+.meta-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 9px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--dg-surface-2);
+    border: 1px solid var(--dg-border);
+    color: var(--dg-text-soft);
+}
+
+.meta-pill.selected {
+    background: var(--dg-accent-soft);
+    color: var(--dg-accent);
+}
+
+.meta-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--dg-border);
+}
+
+/* ============================================================
+   BUTTONS (from datagrid.css)
+   ============================================================ */
+.btn-dg {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-surface);
+    color: var(--dg-text);
+    font-size: 12.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: .15s;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-dg:hover {
+    background: var(--dg-surface-2);
+}
+
+.btn-dg.active {
+    background: var(--dg-primary);
+    color: var(--dg-primary-text);
+    border-color: var(--dg-primary);
+}
+
+.btn-dg-icon {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+}
+
+.btn-dg-primary {
+    background: var(--dg-primary);
+    border-color: var(--dg-primary);
+    color: var(--dg-primary-text);
+}
+
+.btn-dg-primary:hover {
+    background: var(--dg-primary-hover);
+}
+
+.btn-dg-ghost {
+    border-color: transparent;
+    background: transparent;
+}
+
+.btn-dg-danger {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+
+.btn-dg-danger:hover {
+    background: #b91c1c;
+}
+
+/* ============================================================
+   TABLE — DataGrid style (from datagrid.css)
+   ============================================================ */
+.table-wrap {
+    overflow: auto;
+    background: var(--dg-surface);
+}
+
+table.datagrid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.datagrid thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--dg-table-head);
+    border-bottom: 1px solid var(--dg-border);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--dg-text-soft);
+    padding: 8px 14px;
+    white-space: nowrap;
+    user-select: none;
+    text-align: left;
+}
+
+.datagrid thead th.sortable {
+    cursor: pointer;
+}
+
+.datagrid thead th.sortable:hover {
+    background: var(--dg-surface-2);
+    color: var(--dg-text);
+}
+
+.datagrid tbody td {
+    padding: 8px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--dg-border);
+    color: var(--dg-text);
+    background: var(--dg-surface);
+    vertical-align: middle;
+}
+
+.datagrid tbody tr:hover td {
+    background: var(--dg-row-hover);
+}
+
+.datagrid tbody tr.is-selected td {
+    background: var(--dg-row-selected);
+}
+
+.check-cell {
+    width: 40px;
+    text-align: center;
+}
+
+/* ============================================================
+   TABLE — Standard (non-datagrid) tables styled consistently
+   ============================================================ */
+.sh-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--dg-surface);
+}
+
+.sh-table thead th {
+    background: var(--dg-table-head);
+    border-bottom: 1px solid var(--dg-border);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--dg-text-soft);
+    padding: 8px 12px;
+    white-space: nowrap;
+    text-align: left;
+    user-select: none;
+}
+
+.sh-table tbody td {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--dg-border);
+    color: var(--dg-text);
+    background: var(--dg-surface);
+    vertical-align: middle;
+}
+
+.sh-table tbody tr:hover td {
+    background: var(--dg-row-hover);
+}
+
+.sh-table tbody tr.is-selected td {
+    background: var(--dg-row-selected);
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--dg-border);
+}
+
+.status-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 0;
+    display: inline-block;
+}
+
+.status-enabled {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+
+[data-theme="dark"] .status-enabled {
+    background: #0c2a1a;
+    color: #6ee7b7;
+    border-color: #166534;
+}
+
+.status-disabled {
+    background: var(--dg-surface-2);
+    color: var(--dg-text-soft);
+    border-color: var(--dg-border);
+}
+
+.status-down {
+    background: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+[data-theme="dark"] .status-down {
+    background: #2a0c0c;
+    color: #fca5a5;
+    border-color: #7f1d1d;
+}
+
+/* ============================================================
+   CELL TYPES
+   ============================================================ */
+.cell-id {
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 12px;
+    color: var(--dg-text-soft);
+}
+
+.cell-name {
+    font-weight: 500;
+}
+
+.name-stack {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avatar-sm {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-accent-soft);
+    color: var(--dg-accent);
+}
+
+/* ============================================================
+   DETAIL PANEL (expandable rows)
+   ============================================================ */
+.detail-panel {
+    padding: 16px;
+    background: var(--dg-surface-2);
+    border: 1px solid var(--dg-border);
+    margin: 8px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--dg-text-faint);
+    margin-bottom: 4px;
+}
+
+.detail-item .value {
+    font-size: 13px;
+    color: var(--dg-text);
+}
+
+.chip {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 11px;
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    margin: 2px;
+    color: var(--dg-text-soft);
+}
+
+/* ============================================================
+   PAGINATION (from datagrid.css)
+   ============================================================ */
+.grid-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--dg-border);
+    font-size: 12.5px;
+    color: var(--dg-text-soft);
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rows-select select {
+    height: 30px;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-surface);
+    color: var(--dg-text);
+    font-size: 12px;
+    padding: 0 8px;
+    margin-left: 4px;
+}
+
+.pagination-modern {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.page-btn {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 6px;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-surface);
+    color: var(--dg-text);
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: .12s;
+}
+
+.page-btn:hover {
+    background: var(--dg-surface-2);
+}
+
+.page-btn.active {
+    background: var(--dg-primary);
+    color: var(--dg-primary-text);
+    border-color: var(--dg-primary);
+}
+
+.page-btn:disabled {
+    opacity: .4;
+    cursor: default;
+}
+
+.page-btn.dots {
+    border-color: transparent;
+    background: transparent;
+    cursor: default;
+}
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+.filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--dg-surface-2);
+    border-bottom: 1px solid var(--dg-border);
+    font-size: 12.5px;
+}
+
+.filter-badge {
+    display: inline-flex;
+    padding: 4px 8px;
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    color: var(--dg-text-soft);
+}
+
+/* ============================================================
+   MODALS (DataGrid-style)
+   ============================================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content-dg {
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    box-shadow: var(--dg-shadow-md);
+    width: 100%;
+    max-width: 640px;
+    max-height: 85vh;
+    overflow: auto;
+}
+
+.modal-header-dg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--dg-border);
+}
+
+.modal-header-dg h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.modal-body-dg {
+    padding: 16px;
+}
+
+.modal-footer-dg {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--dg-border);
+    background: var(--dg-surface-2);
+}
+
+/* Form controls */
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--dg-text-soft);
+    margin-bottom: 4px;
+}
+
+.form-control-dg {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-input-bg);
+    color: var(--dg-text);
+    font-size: 13px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-control-dg:focus {
+    outline: 0;
+    border-color: var(--dg-accent);
+    box-shadow: var(--dg-focus);
+}
+
+.form-control-dg.textarea {
+    height: auto;
+    padding: 8px 10px;
+    min-height: 80px;
+    resize: vertical;
+}
+
+select.form-control-dg {
+    appearance: auto;
+}
+
+/* ============================================================
+   DASHBOARD CARDS
+   ============================================================ */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.dash-card {
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    box-shadow: var(--dg-shadow-sm);
+    padding: 16px;
+}
+
+.dash-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.dash-card .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--dg-text-soft);
+    margin: 0;
+}
+
+.dash-card .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dg-text);
+    line-height: 1.2;
+}
+
+.dash-card .card-sub {
+    font-size: 12px;
+    color: var(--dg-text-soft);
+    margin-top: 4px;
+}
+
+.dash-card-dark {
+    background: var(--sb-bg);
+    border-color: var(--sb-border);
+}
+
+.dash-card-dark .card-title {
+    color: var(--sb-text);
+}
+
+.dash-card-dark .card-value {
+    color: #e2e8f0;
+}
+
+.dash-card-dark .card-sub {
+    color: var(--sb-text-soft);
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-100%);
+        width: 280px !important;
+        min-width: 280px !important;
+        z-index: 100;
+        box-shadow: var(--dg-shadow-md);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.4);
+        z-index: 99;
+        display: none;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    .main-header {
+        padding: 0 12px;
+    }
+
+    .main-body {
+        padding: 12px;
+    }
+
+    .grid-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   TOOLTIP (from datagrid.css)
+   ============================================================ */
+#shTooltip {
+    position: fixed;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .14s ease, transform .14s ease;
+    max-width: 280px;
+    background: var(--dg-primary);
+    color: var(--dg-primary-text);
+    border: 1px solid var(--dg-primary);
+    padding: 6px 8px;
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: var(--dg-shadow-md);
+    white-space: nowrap;
+}
+
+#shTooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================================
+   SPINNER
+   ============================================================ */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* ============================================================
+   CONTEXT MENU (from datagrid.css)
+   ============================================================ */
+.context-menu {
+    position: fixed;
+    min-width: 200px;
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    box-shadow: var(--dg-shadow-md);
+    z-index: 9999;
+    display: none;
+    padding: 4px;
+}
+
+.context-menu.show {
+    display: block;
+}
+
+.ctx-item {
+    padding: 7px 10px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dg-text);
+    cursor: pointer;
+}
+
+.ctx-item:hover {
+    background: var(--dg-surface-2);
+}
+
+.ctx-item.danger {
+    color: #dc2626;
+}
+
+.ctx-sep {
+    height: 1px;
+    background: var(--dg-border);
+    margin: 4px 0;
+}
+
+/* ============================================================
+   INLINE ACTIONS (row actions)
+   ============================================================ */
+.row-actions-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.action-trigger {
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--dg-text-faint);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.action-trigger:hover {
+    background: var(--dg-surface-2);
+    border-color: var(--dg-border);
+    color: var(--dg-text);
+}
+
+.inline-actions {
+    display: none;
+    gap: 2px;
+}
+
+.row-actions-wrap.open .inline-actions {
+    display: inline-flex;
+}
+
+.row-actions-wrap.open .action-trigger {
+    display: none;
+}
+
+.ia-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--dg-border);
+    background: var(--dg-surface);
+    color: var(--dg-text-soft);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.ia-btn:hover {
+    background: var(--dg-surface-2);
+    color: var(--dg-text);
+}
+
+.ia-btn.ia-danger {
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.ia-btn.ia-danger:hover {
+    background: #fef2f2;
+}
+
+/* ============================================================
+   MOBILE CARDS (alternative to table on small screens)
+   ============================================================ */
+.mobile-cards {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .mobile-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .table-wrap table.datagrid,
+    .table-wrap table.sh-table {
+        display: none;
+    }
+}
+
+.m-card {
+    background: var(--dg-surface);
+    border: 1px solid var(--dg-border);
+    padding: 12px;
+}
+
+.m-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.m-card-name {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.m-card-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.m-card-meta label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--dg-text-faint);
+    display: block;
+}
+
+.m-card-foot {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}

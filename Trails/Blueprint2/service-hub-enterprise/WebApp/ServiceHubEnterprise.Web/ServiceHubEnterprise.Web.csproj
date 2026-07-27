@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Dashboard\ServiceHubEnterprise.Dashboard.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.RestApplications\ServiceHubEnterprise.RestApplications.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.SoapApplications\ServiceHubEnterprise.SoapApplications.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.FileManagement\ServiceHubEnterprise.FileManagement.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.TestSuite\ServiceHubEnterprise.TestSuite.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.MonitoringHealth\ServiceHubEnterprise.MonitoringHealth.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.ADViewer\ServiceHubEnterprise.ADViewer.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Settings\ServiceHubEnterprise.Settings.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
