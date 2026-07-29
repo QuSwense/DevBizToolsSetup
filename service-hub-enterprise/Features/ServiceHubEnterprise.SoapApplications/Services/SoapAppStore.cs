@@ -272,28 +272,111 @@ public class WsdlSyncStore
         });
     }
 
+    // ── Sample WSDL content for seed data ──
+
+    private const string SampleWsdlBasic = @"<wsdl:definitions xmlns:wsdl=""http://schemas.xmlsoap.org/wsdl/"" xmlns:soap=""http://schemas.xmlsoap.org/wsdl/soap/"" xmlns:tns=""http://example.com/billing"" targetNamespace=""http://example.com/billing"">
+  <wsdl:types>
+    <schema xmlns=""http://www.w3.org/2001/XMLSchema"">
+      <element name=""GetUserRequest""><complexType><sequence><element name=""Id"" type=""string""/></sequence></complexType></element>
+      <element name=""GetUserResponse""><complexType><sequence><element name=""User"" type=""string""/></sequence></complexType></element>
+      <element name=""UpdateUserRequest""><complexType><sequence><element name=""Id"" type=""string""/><element name=""Name"" type=""string""/><element name=""Email"" type=""string""/></sequence></complexType></element>
+      <element name=""UpdateUserResponse""><complexType><sequence><element name=""Status"" type=""string""/></sequence></complexType></element>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name=""GetUserRequest""><part name=""parameters"" element=""tns:GetUserRequest""/></wsdl:message>
+  <wsdl:message name=""GetUserResponse""><part name=""parameters"" element=""tns:GetUserResponse""/></wsdl:message>
+  <wsdl:message name=""UpdateUserRequest""><part name=""parameters"" element=""tns:UpdateUserRequest""/></wsdl:message>
+  <wsdl:message name=""UpdateUserResponse""><part name=""parameters"" element=""tns:UpdateUserResponse""/></wsdl:message>
+  <wsdl:portType name=""BillingPortType"">
+    <operation name=""GetUser"">
+      <input message=""tns:GetUserRequest""/>
+      <output message=""tns:GetUserResponse""/>
+    </operation>
+    <operation name=""UpdateUser"">
+      <input message=""tns:UpdateUserRequest""/>
+      <output message=""tns:UpdateUserResponse""/>
+    </operation>
+  </wsdl:portType>
+  <wsdl:binding name=""BillingBinding"" type=""tns:BillingPortType"">
+    <soap:binding style=""document"" transport=""http://schemas.xmlsoap.org/soap/http""/>
+    <operation name=""GetUser""><soap:operation soapAction=""getUser""/><input><soap:body use=""literal""/></input><output><soap:body use=""literal""/></output></operation>
+    <operation name=""UpdateUser""><soap:operation soapAction=""updateUser""/><input><soap:body use=""literal""/></input><output><soap:body use=""literal""/></output></operation>
+  </wsdl:binding>
+  <wsdl:service name=""BillingService"">
+    <port name=""BillingPort"" binding=""tns:BillingBinding""><soap:address location=""http://example.com/billing""/></port>
+  </wsdl:service>
+</wsdl:definitions>";
+
+    private const string SampleWsdlCustomer = @"<wsdl:definitions xmlns:wsdl=""http://schemas.xmlsoap.org/wsdl/"" xmlns:soap=""http://schemas.xmlsoap.org/wsdl/soap/"" xmlns:tns=""http://example.com/customer"" targetNamespace=""http://example.com/customer"">
+  <wsdl:types>
+    <schema xmlns=""http://www.w3.org/2001/XMLSchema"">
+      <element name=""GetProfileRequest""><complexType><sequence><element name=""CustomerId"" type=""string""/></sequence></complexType></element>
+      <element name=""GetProfileResponse""><complexType><sequence><element name=""Name"" type=""string""/><element name=""Email"" type=""string""/><element name=""Tier"" type=""string""/></sequence></complexType></element>
+      <element name=""SubmitTicketRequest""><complexType><sequence><element name=""Subject"" type=""string""/><element name=""Description"" type=""string""/><element name=""Priority"" type=""string""/></sequence></complexType></element>
+      <element name=""SubmitTicketResponse""><complexType><sequence><element name=""TicketId"" type=""string""/><element name=""Status"" type=""string""/></sequence></complexType></element>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name=""GetProfileRequest""><part name=""parameters"" element=""tns:GetProfileRequest""/></wsdl:message>
+  <wsdl:message name=""GetProfileResponse""><part name=""parameters"" element=""tns:GetProfileResponse""/></wsdl:message>
+  <wsdl:message name=""SubmitTicketRequest""><part name=""parameters"" element=""tns:SubmitTicketRequest""/></wsdl:message>
+  <wsdl:message name=""SubmitTicketResponse""><part name=""parameters"" element=""tns:SubmitTicketResponse""/></wsdl:message>
+  <wsdl:portType name=""CustomerPortType"">
+    <operation name=""GetProfile""><input message=""tns:GetProfileRequest""/><output message=""tns:GetProfileResponse""/></operation>
+    <operation name=""SubmitTicket""><input message=""tns:SubmitTicketRequest""/><output message=""tns:SubmitTicketResponse""/></operation>
+  </wsdl:portType>
+  <wsdl:binding name=""CustomerBinding"" type=""tns:CustomerPortType"">
+    <soap:binding style=""document"" transport=""http://schemas.xmlsoap.org/soap/http""/>
+    <operation name=""GetProfile""><soap:operation soapAction=""getProfile""/><input><soap:body use=""literal""/></input><output><soap:body use=""literal""/></output></operation>
+    <operation name=""SubmitTicket""><soap:operation soapAction=""submitTicket""/><input><soap:body use=""literal""/></input><output><soap:body use=""literal""/></output></operation>
+  </wsdl:binding>
+  <wsdl:service name=""CustomerService"">
+    <port name=""CustomerPort"" binding=""tns:CustomerBinding""><soap:address location=""http://example.com/customer""/></port>
+  </wsdl:service>
+</wsdl:definitions>";
+
+    private const string SampleWsdlOrders = @"<wsdl:definitions xmlns:wsdl=""http://schemas.xmlsoap.org/wsdl/"" xmlns:soap=""http://schemas.xmlsoap.org/wsdl/soap/"" xmlns:tns=""http://example.com/orders"" targetNamespace=""http://example.com/orders"">
+  <wsdl:types>
+    <schema xmlns=""http://www.w3.org/2001/XMLSchema"">
+      <element name=""CreateOrderRequest""><complexType><sequence><element name=""ItemCode"" type=""string""/><element name=""Quantity"" type=""int""/><element name=""CustomerId"" type=""string""/></sequence></complexType></element>
+      <element name=""CreateOrderResponse""><complexType><sequence><element name=""OrderId"" type=""string""/><element name=""Status"" type=""string""/></sequence></complexType></element>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name=""CreateOrderRequest""><part name=""parameters"" element=""tns:CreateOrderRequest""/></wsdl:message>
+  <wsdl:message name=""CreateOrderResponse""><part name=""parameters"" element=""tns:CreateOrderResponse""/></wsdl:message>
+  <wsdl:portType name=""OrderPortType"">
+    <operation name=""CreateOrder""><input message=""tns:CreateOrderRequest""/><output message=""tns:CreateOrderResponse""/></operation>
+  </wsdl:portType>
+  <wsdl:binding name=""OrderBinding"" type=""tns:OrderPortType"">
+    <soap:binding style=""document"" transport=""http://schemas.xmlsoap.org/soap/http""/>
+    <operation name=""CreateOrder""><soap:operation soapAction=""createOrder""/><input><soap:body use=""literal""/></input><output><soap:body use=""literal""/></output></operation>
+  </wsdl:binding>
+  <wsdl:service name=""OrderService"">
+    <port name=""OrderPort"" binding=""tns:OrderBinding""><soap:address location=""http://example.com/orders""/></port>
+  </wsdl:service>
+</wsdl:definitions>";
+
     private static (List<WsdlSyncRecord> Records, List<WsdlVersionEntry> Versions, List<WsdlTemplate> Templates) GetSeedData()
     {
         var records = new List<WsdlSyncRecord>
         {
-            new() { Id = "wsdl-1", AppId = "s1", AppName = "LegacyBilling", SourceType = "url", SourceUrl = "https://soap.billing.com/BillingService?singlewsdl", UploadedBy = "Suresh Kumar", UploadedAt = "2024-06-15 10:30:00", Status = "synced", VersionCount = 2 },
-            new() { Id = "wsdl-2", AppId = "s1", AppName = "LegacyBilling", SourceType = "upload", SourceUrl = "billing_v2.wsdl", UploadedBy = "Priya Sharma", UploadedAt = "2024-08-01 14:15:00", Status = "synced", VersionCount = 1 },
-            new() { Id = "wsdl-3", AppId = "s3", AppName = "CustomerPortal", SourceType = "url", SourceUrl = "https://soap.customer.com/PortalService?wsdl", UploadedBy = "Anita Desai", UploadedAt = "2024-05-20 09:00:00", Status = "synced", VersionCount = 3 },
-            new() { Id = "wsdl-4", AppId = "s5", AppName = "PaymentGateway", SourceType = "url", SourceUrl = "https://soap.payment.com/Gateway?wsdl", UploadedBy = "Priya Sharma", UploadedAt = "2024-07-10 11:45:00", Status = "parsing", VersionCount = 1 },
-            new() { Id = "wsdl-5", AppId = "s6", AppName = "OrderProcessing", SourceType = "upload", SourceUrl = "order_service_2024.wsdl", UploadedBy = "Rahul Patel", UploadedAt = "2024-04-05 16:30:00", Status = "synced", VersionCount = 2 },
+            new() { Id = "wsdl-1", AppId = "s1", AppName = "LegacyBilling", SourceType = "url", SourceUrl = "https://soap.billing.com/BillingService?singlewsdl", UploadedBy = "Suresh Kumar", UploadedAt = "2024-06-15 10:30:00", Status = "synced", VersionCount = 2, WsdlContent = SampleWsdlBasic },
+            new() { Id = "wsdl-2", AppId = "s1", AppName = "LegacyBilling", SourceType = "upload", SourceUrl = "billing_v2.wsdl", UploadedBy = "Priya Sharma", UploadedAt = "2024-08-01 14:15:00", Status = "synced", VersionCount = 1, WsdlContent = SampleWsdlBasic },
+            new() { Id = "wsdl-3", AppId = "s3", AppName = "CustomerPortal", SourceType = "url", SourceUrl = "https://soap.customer.com/PortalService?wsdl", UploadedBy = "Anita Desai", UploadedAt = "2024-05-20 09:00:00", Status = "synced", VersionCount = 3, WsdlContent = SampleWsdlCustomer },
+            new() { Id = "wsdl-4", AppId = "s5", AppName = "PaymentGateway", SourceType = "url", SourceUrl = "https://soap.payment.com/Gateway?wsdl", UploadedBy = "Priya Sharma", UploadedAt = "2024-07-10 11:45:00", Status = "parsing", VersionCount = 1, WsdlContent = SampleWsdlBasic },
+            new() { Id = "wsdl-5", AppId = "s6", AppName = "OrderProcessing", SourceType = "upload", SourceUrl = "order_service_2024.wsdl", UploadedBy = "Rahul Patel", UploadedAt = "2024-04-05 16:30:00", Status = "synced", VersionCount = 2, WsdlContent = SampleWsdlOrders },
         };
 
         var versions = new List<WsdlVersionEntry>
         {
-            new() { Id = "wv-1", SyncRecordId = "wsdl-1", VersionNumber = 1, Label = "v1 — Initial", UploadedBy = "Suresh Kumar", UploadedAt = "2024-06-15 10:30:00", Status = "active", Notes = "Initial WSDL import from billing service" },
-            new() { Id = "wv-2", SyncRecordId = "wsdl-1", VersionNumber = 2, Label = "v2 — Updated endpoints", UploadedBy = "Suresh Kumar", UploadedAt = "2024-07-20 08:45:00", Status = "active", Notes = "Added new reporting endpoints" },
-            new() { Id = "wv-3", SyncRecordId = "wsdl-2", VersionNumber = 1, Label = "v1 — Local file upload", UploadedBy = "Priya Sharma", UploadedAt = "2024-08-01 14:15:00", Status = "active", Notes = "Uploaded from local billing_v2.wsdl" },
-            new() { Id = "wv-4", SyncRecordId = "wsdl-3", VersionNumber = 1, Label = "v1 — Initial sync", UploadedBy = "Anita Desai", UploadedAt = "2024-05-20 09:00:00", Status = "archived", Notes = "Original WSDL" },
-            new() { Id = "wv-5", SyncRecordId = "wsdl-3", VersionNumber = 2, Label = "v2 — Portal update", UploadedBy = "Anita Desai", UploadedAt = "2024-06-10 10:30:00", Status = "active", Notes = "Updated profile operations" },
-            new() { Id = "wv-6", SyncRecordId = "wsdl-3", VersionNumber = 3, Label = "v3 — Ticket endpoints", UploadedBy = "Anita Desai", UploadedAt = "2024-07-05 15:00:00", Status = "active", Notes = "Added support ticket APIs" },
-            new() { Id = "wv-7", SyncRecordId = "wsdl-4", VersionNumber = 1, Label = "v1 — From URL", UploadedBy = "Priya Sharma", UploadedAt = "2024-07-10 11:45:00", Status = "active", Notes = "Awaiting parsing completion" },
-            new() { Id = "wv-8", SyncRecordId = "wsdl-5", VersionNumber = 1, Label = "v1 — Initial upload", UploadedBy = "Rahul Patel", UploadedAt = "2024-04-05 16:30:00", Status = "active", Notes = "Full order service WSDL" },
-            new() { Id = "wv-9", SyncRecordId = "wsdl-5", VersionNumber = 2, Label = "v2 — Revised schema", UploadedBy = "Rahul Patel", UploadedAt = "2024-04-20 12:00:00", Status = "active", Notes = "Updated schema for new order types" },
+            new() { Id = "wv-1", SyncRecordId = "wsdl-1", VersionNumber = 1, Label = "24.20.1", UploadedBy = "Suresh Kumar", UploadedAt = "2024-06-15 10:30:00", Status = "active", Notes = "Initial WSDL import from billing service" },
+            new() { Id = "wv-2", SyncRecordId = "wsdl-1", VersionNumber = 2, Label = "24.30.1", UploadedBy = "Suresh Kumar", UploadedAt = "2024-07-20 08:45:00", Status = "active", Notes = "Added new reporting endpoints" },
+            new() { Id = "wv-3", SyncRecordId = "wsdl-2", VersionNumber = 1, Label = "24.30.2", UploadedBy = "Priya Sharma", UploadedAt = "2024-08-01 14:15:00", Status = "active", Notes = "Uploaded from local billing_v2.wsdl" },
+            new() { Id = "wv-4", SyncRecordId = "wsdl-3", VersionNumber = 1, Label = "24.20.1", UploadedBy = "Anita Desai", UploadedAt = "2024-05-20 09:00:00", Status = "archived", Notes = "Original WSDL" },
+            new() { Id = "wv-5", SyncRecordId = "wsdl-3", VersionNumber = 2, Label = "24.20.2", UploadedBy = "Anita Desai", UploadedAt = "2024-06-10 10:30:00", Status = "active", Notes = "Updated profile operations" },
+            new() { Id = "wv-6", SyncRecordId = "wsdl-3", VersionNumber = 3, Label = "24.30.1", UploadedBy = "Anita Desai", UploadedAt = "2024-07-05 15:00:00", Status = "active", Notes = "Added support ticket APIs" },
+            new() { Id = "wv-7", SyncRecordId = "wsdl-4", VersionNumber = 1, Label = "24.30.1", UploadedBy = "Priya Sharma", UploadedAt = "2024-07-10 11:45:00", Status = "active", Notes = "Awaiting parsing completion" },
+            new() { Id = "wv-8", SyncRecordId = "wsdl-5", VersionNumber = 1, Label = "24.10.1", UploadedBy = "Rahul Patel", UploadedAt = "2024-04-05 16:30:00", Status = "active", Notes = "Full order service WSDL" },
+            new() { Id = "wv-9", SyncRecordId = "wsdl-5", VersionNumber = 2, Label = "24.10.2", UploadedBy = "Rahul Patel", UploadedAt = "2024-04-20 12:00:00", Status = "active", Notes = "Updated schema for new order types" },
         };
 
         var templates = new List<WsdlTemplate>

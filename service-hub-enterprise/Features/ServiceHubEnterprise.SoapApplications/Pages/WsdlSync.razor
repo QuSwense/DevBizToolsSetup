@@ -1,6 +1,7 @@
 @page "/soap/wsdl-sync"
 @inject SoapAppStore _appStore
 @inject WsdlSyncStore _wsdlStore
+@inject IJSRuntime _js
 
 @* ── Page Header ── *@
 <div class="datagrid-card" style="padding:18px 22px;margin-bottom:12px">
@@ -15,16 +16,10 @@
                 Parser extracts only values between XML tags and attribute values.
             </p>
         </div>
-        <div class="d-flex gap-8px flex-shrink-0">
-            <button class="btn btn-sh-primary btn-dg btn-dark" @onclick='() => OpenSyncModal("url")' type="button">
-                <i class="bi bi-download"></i>
-                Import from URL
-            </button>
-            <button class="btn btn-outline-secondary btn-dg" @onclick='() => OpenSyncModal("upload")' type="button">
-                <i class="bi bi-upload"></i>
-                Upload File
-            </button>
-        </div>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick='() => OpenSyncModal()' type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Sync WSDL
+        </button>
     </div>
 
     @* App selector *@
@@ -61,7 +56,7 @@ else
         @* ── LEFT PANEL: Tree Navigation ── *@
         <div class="datagrid-card overflow-hidden" style="padding:0">
             <div class="fs-11 fw-semibold text-uppercase ls-05 text-sh-faint border-sh-bottom" style="padding:10px 14px">
-                <i class="bi bi-diagram-2 me-2"></i>Application → WSDL → Version
+                <i class="bi bi-diagram-2 me-2"></i>Application → Version
             </div>
             <div style="padding:6px 0">
                 @{
@@ -69,7 +64,11 @@ else
                 }
                 @if (selectedApp is not null)
                 {
-                    var records = _wsdlStore.GetRecordsForApp(selectedApp.Id);
+                    var appVersions = _wsdlStore.Records
+                        .Where(r => r.AppId == selectedApp.Id)
+                        .SelectMany(r => _wsdlStore.GetVersionsForSync(r.Id))
+                        .OrderByDescending(v => v.VersionNumber)
+                        .ToArray();
                     <div class="tree-node tree-root @(_treeExpandedApps.Contains(selectedApp.Id) ? "is-expanded" : "")">
                         <div class="tree-row" @onclick="() => ToggleTreeApp(selectedApp.Id)" role="button" tabindex="0">
                             <span class="tree-chevron"><i class="bi @(_treeExpandedApps.Contains(selectedApp.Id) ? "bi-chevron-down" : "bi-chevron-right")"></i></span>
@@ -79,47 +78,17 @@ else
                         @if (_treeExpandedApps.Contains(selectedApp.Id))
                         {
                             <div class="tree-children">
-                                @if (records.Length == 0)
+                                @if (appVersions.Length == 0)
                                 {
-                                    <div class="tree-empty">No WSDL syncs yet</div>
+                                    <div class="tree-empty">No versions yet</div>
                                 }
-                                @foreach (var rec in records)
+                                @foreach (var ver in appVersions)
                                 {
-                                    var isExpanded = _treeExpandedSyncs.Contains(rec.Id);
-                                    var versionsList = _wsdlStore.GetVersionsForSync(rec.Id);
-                                    <div class="tree-node @(isExpanded ? "is-expanded" : "")">
-                                        <div class="tree-row tree-row-sub @(_selectedSyncId == rec.Id ? "is-active" : "")"
-                                             @onclick='() => SelectSyncRecord(rec.Id)' role="button" tabindex="0">
-                                            <span class="tree-chevron" @onclick:stopPropagation="true" @onclick='() => ToggleTreeSync(rec.Id)'>
-                                                <i class="bi @(isExpanded ? "bi-chevron-down" : "bi-chevron-right")"></i>
-                                            </span>
-                                            <span class="tree-source-badge @(rec.SourceType == "url" ? "source-url" : "source-upload")">
-                                                <i class="bi @(rec.SourceType == "url" ? "bi-link-45deg" : "bi-file-earmark-arrow-up")"></i>
-                                            </span>
-                                            <span class="tree-label tree-label-sm">
-                                                @(rec.SourceType == "url" ? TruncateUrl(rec.SourceUrl) : rec.SourceUrl)
-                                            </span>
-                                            <span class="tree-count">@rec.VersionCount</span>
+                                    <div class="tree-node">
+                                        <div class="tree-row tree-row-sub @(_selectedVersionId == ver.Id ? "is-active" : "")"
+                                             @onclick="() => SelectVersion(ver.Id)" role="button" tabindex="0">
+                                            <span class="tree-label">@ver.Label</span>
                                         </div>
-                                        @if (isExpanded)
-                                        {
-                                            <div class="tree-children">
-                                                @foreach (var ver in versionsList)
-                                                {
-                                                    <div class="tree-node">
-                                                        <div class="tree-row tree-row-leaf @(_selectedVersionId == ver.Id ? "is-active" : "")"
-                                                             @onclick="() => SelectVersion(ver.Id)" role="button" tabindex="0">
-                                                            <span class="tree-version-dot @(ver.Status == "active" ? "dot-active" : "dot-archived")"></span>
-                                                            <span class="tree-label tree-label-xs">@ver.Label</span>
-                                                            @if (ver.Status == "archived")
-                                                            {
-                                                                <span class="tree-archived-tag">archived</span>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-                                        }
                                     </div>
                                 }
                             </div>
@@ -133,54 +102,183 @@ else
         <div class="d-flex flex-column gap-12px">
             @if (!string.IsNullOrEmpty(_selectedVersionId))
             {
-                @* Version Detail Card *@
+                @* ═══════════════════════════════════════════ *@
+                @* ── VERSION DETAILS PANEL ── *@
+                @* ═══════════════════════════════════════════ *@
                 var selectedVersion = _wsdlStore.Versions.FirstOrDefault(v => v.Id == _selectedVersionId);
                 var parentRecord = selectedVersion is not null
                     ? _wsdlStore.Records.FirstOrDefault(r => r.Id == selectedVersion.SyncRecordId)
                     : null;
-                if (selectedVersion is not null && parentRecord is not null)
+                var app = selectedVersion is not null
+                    ? _appStore.Apps.FirstOrDefault(a => parentRecord is not null && a.Id == parentRecord.AppId)
+                    : null;
+                if (selectedVersion is not null && parentRecord is not null && app is not null)
                 {
+                    var wsdlContent = parentRecord.WsdlContent;
+                    // Determine sync status from parent record
+                    var syncStatus = parentRecord.Status; // "synced" | "failed" | "parsing"
+                    var syncStatusLabel = syncStatus == "synced" ? "Synced" : syncStatus == "failed" ? "Failed" : "Pending";
+                    var syncStatusClass = syncStatus == "synced" ? "status-enabled" : syncStatus == "failed" ? "status-down" : "status-warn";
+                    // Source type label
+                    var sourceTypeLabel = parentRecord.SourceType == "url" ? "Auto-update from URL" : "Local file upload";
+                    // Previous version for change detection
+                    var previousVersion = _wsdlStore.Versions
+                        .Where(v => v.SyncRecordId == selectedVersion.SyncRecordId && v.VersionNumber < selectedVersion.VersionNumber)
+                        .OrderByDescending(v => v.VersionNumber)
+                        .FirstOrDefault();
+                    // Mock file size
+                    var wsdlFileSize = wsdlContent.Length > 0 ? $"{wsdlContent.Length / 1024.0:F1} KB" : "—";
+                    var wsdlFileName = parentRecord.SourceType == "upload" ? parentRecord.SourceUrl : "wsdl.xml";
+
+                    @* ── HEADER SECTION ── *@
                     <div class="datagrid-card" style="padding:16px 20px">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <div class="d-flex align-items-center gap-10px">
-                                    <h4 class="m-0 fs-15 fw-semibold">@selectedVersion.Label</h4>
-                                    <span class="status-badge @(selectedVersion.Status == "active" ? "status-enabled" : "status-disabled")">
-                                        @(selectedVersion.Status == "active" ? "Active" : "Archived")
-                                    </span>
+                                    <span class="version-label-monofs">@selectedVersion.Label</span>
+                                    <span class="status-badge @syncStatusClass">@syncStatusLabel</span>
+                                    @if (previousVersion is null)
+                                    {
+                                        <span class="verb-badge" style="font-size:10px;background:var(--sh-accent-soft);color:var(--sh-accent);border-color:currentColor">
+                                            <i class="bi bi-star"></i> Initial Version
+                                        </span>
+                                    }
+                                    @if (selectedVersion.Status == "archived")
+                                    {
+                                        <span class="status-badge status-disabled">Archived</span>
+                                    }
                                 </div>
                                 <p class="fs-12 text-sh-soft" style="margin:4px 0 0">
-                                    @selectedVersion.Notes
+                                    @app.Name · @selectedVersion.Notes
                                 </p>
                             </div>
-                            <div class="d-flex gap-6px">
-                                <button class="btn btn-outline-secondary btn-dg fs-11" style="height:30px" @onclick="() => _showCreateRequestModal = true" type="button">
-                                    <i class="bi bi-file-earmark-plus"></i>
-                                    Create Request File
+                        </div>
+
+                        @* ── METADATA SECTION ── *@
+                        <div class="border-sh bg-sh-surface-2" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:12px;padding:12px">
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Sync Date</div>
+                                <div class="fs-13 fw-medium d-flex align-items-center gap-4px" style="margin-top:2px">
+                                    <i class="bi bi-calendar3 text-sh-faint fs-11"></i>
+                                    @selectedVersion.UploadedAt
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Synced By</div>
+                                <div class="fs-13 fw-medium d-flex align-items-center gap-4px" style="margin-top:2px">
+                                    <i class="bi bi-person text-sh-faint fs-11"></i>
+                                    @selectedVersion.UploadedBy
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Source Type</div>
+                                <div class="fs-13 fw-medium d-flex align-items-center gap-4px" style="margin-top:2px">
+                                    <i class="bi @(parentRecord.SourceType == "url" ? "bi-cloud-download" : "bi-upload") text-sh-faint fs-11"></i>
+                                    @sourceTypeLabel
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">WSDL File</div>
+                                <div class="fs-13 fw-medium d-flex align-items-center gap-4px" style="margin-top:2px">
+                                    <i class="bi bi-file-earmark-code text-sh-faint fs-11"></i>
+                                    @wsdlFileName
+                                    <span class="fs-10 text-sh-faint">(@wsdlFileSize)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Change description *@
+                        @if (!string.IsNullOrWhiteSpace(selectedVersion.Notes))
+                        {
+                            <div class="d-flex align-items-start gap-8px border-sh-top" style="margin-top:10px;padding-top:10px">
+                                <i class="bi bi-chat-dots text-sh-faint fs-13" style="margin-top:1px"></i>
+                                <div>
+                                    <div class="fs-10 text-uppercase ls-05 text-sh-faint mb-1">Description</div>
+                                    <div class="fs-13" style="color:var(--sh-text)">@selectedVersion.Notes</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @* ── WSDL CONTENT SECTION (Collapsible) ── *@
+                    <div class="datagrid-card" style="padding:0;overflow:hidden">
+                        <div class="d-flex align-items-center justify-content-between gap-8px" style="padding:10px 16px;cursor:pointer;user-select:none"
+                             @onclick="() => _expandedWsdlView = !_expandedWsdlView" role="button">
+                            <div class="d-flex align-items-center gap-8px">
+                                <i class="bi @(_expandedWsdlView ? "bi-chevron-down" : "bi-chevron-right") text-sh-faint fs-12"></i>
+                                <i class="bi bi-code-slash text-sh-accent"></i>
+                                <span class="fs-13 fw-semibold">WSDL Content</span>
+                                <span class="meta-pill">@wsdlContent.Length chars</span>
+                            </div>
+                            <div class="d-flex gap-4px">
+                                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" style="width:auto;height:26px;padding:0 8px;font-size:11px"
+                                        @onclick:stopPropagation @onclick="() => CopyWsdlContent(wsdlContent)" title="Copy WSDL content" type="button">
+                                    <i class="bi @(_wsdlCopied ? "bi-check-lg" : "bi-clipboard")"></i>
+                                    @(_wsdlCopied ? "Copied" : "Copy")
                                 </button>
                             </div>
                         </div>
-                        <div class="border-sh bg-sh-surface-2" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;padding:12px">
-                            <div>
-                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Source Type</div>
-                                <div class="fs-13 fw-medium" style="margin-top:2px">
-                                    @(parentRecord.SourceType == "url" ? "Imported from URL" : "Uploaded File")
+                        @if (_expandedWsdlView && !string.IsNullOrWhiteSpace(wsdlContent))
+                        {
+                            var editorId = $"wsdl-content-{selectedVersion.Id}";
+                            <div id="@editorId" style="height:320px;border-top:1px solid var(--sh-border)"></div>
+                        }
+                    </div>
+
+                    @* ── WSDL COMPARE SECTION (Collapsible) — hidden for initial versions ── *@
+                    @if (previousVersion is not null)
+                    {
+                        var prevRecord = _wsdlStore.Records.FirstOrDefault(r => r.Id == previousVersion.SyncRecordId);
+                        var prevContent = prevRecord?.WsdlContent ?? "";
+                        var currContent = wsdlContent;
+                        var comparerId = $"wsdl-compare-{selectedVersion.Id}";
+                        <div class="datagrid-card" style="padding:0;overflow:hidden">
+                            <div class="d-flex align-items-center justify-content-between gap-8px" style="padding:10px 16px;cursor:pointer;user-select:none"
+                                 @onclick="() => ToggleWsdlCompare()" role="button">
+                                <div class="d-flex align-items-center gap-8px">
+                                    <i class="bi @(_expandedWsdlCompare ? "bi-chevron-down" : "bi-chevron-right") text-sh-faint fs-12"></i>
+                                    <i class="bi bi-files text-sh-accent"></i>
+                                    <span class="fs-13 fw-semibold">WSDL Compare</span>
+                                    <span class="meta-pill">@previousVersion.Label ← → @selectedVersion.Label</span>
                                 </div>
                             </div>
-                            <div>
-                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Source</div>
-                                <div class="fs-13 fw-medium text-break" style="margin-top:2px">@parentRecord.SourceUrl</div>
-                            </div>
-                            <div>
-                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Uploaded</div>
-                                <div class="fs-13 fw-medium" style="margin-top:2px">@selectedVersion.UploadedAt by @selectedVersion.UploadedBy</div>
-                            </div>
+                            @if (_expandedWsdlCompare)
+                            {
+                                <div style="border-top:1px solid var(--sh-border)">
+                                    <div style="padding:0">
+                                        <div class="d-flex align-items-center gap-8px border-sh-bottom" style="padding:8px 16px;background:var(--sh-surface-2)">
+                                            <i class="bi bi-arrow-left-right text-sh-faint fs-11"></i>
+                                            <span class="fs-11 text-sh-soft">Comparing <strong>@previousVersion.Label</strong> (previous) with <strong>@selectedVersion.Label</strong> (current)</span>
+                                        </div>
+                                        <div id="@comparerId" style="height:420px;width:100%"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @* ── ACTIONS SECTION ── *@
+                    <div class="datagrid-card" style="padding:14px 18px">
+                        <div class="d-flex align-items-center gap-8px flex-wrap">
+
+                            <button class="btn btn-outline-secondary btn-dg fs-11" style="height:32px" @onclick="() => DownloadWsdl(wsdlContent, wsdlFileName)" type="button">
+                                <i class="bi bi-download"></i>
+                                Download WSDL
+                            </button>
+                            @if (selectedVersion.VersionNumber > 1)
+                            {
+                                <button class="btn btn-outline-secondary btn-dg fs-11" style="height:32px;color:#dc3545;border-color:rgba(220,53,69,0.3)"
+                                        @onclick="() => _showRollbackConfirm = true" type="button">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                    Rollback to this Version
+                                </button>
+                            }
                         </div>
                     </div>
                 }
                 else
                 {
-                    @* No version selected, show records grid *@
+                    @* Version not found, show records grid *@
                     @RenderRecordsGrid(_selectedAppId ?? "")
                 }
             }
@@ -349,63 +447,68 @@ else
 }
 
 @* ══════════════════════════════════════════════════ *@
-@* ── SYNC MODAL (Import from URL / Upload File) ── *@
+@* ── SYNC MODAL ── *@
 @* ══════════════════════════════════════════════════ *@
 @if (_showSyncModal)
 {
+    var syncApp = _appStore.Apps.FirstOrDefault(a => a.Id == _syncAppId);
+    var autoVersion = syncApp is not null ? GenerateVersionNumber(syncApp.Name) : "";
+    var autoSourceUrl = syncApp is not null
+        ? $"{syncApp.BaseUrl.TrimEnd('/')}/{syncApp.WsdlPath.TrimStart('/')}"
+        : "";
+
     <div class="modal-overlay" @onclick="() => _showSyncModal = false">
-        <div class="modal-content-dg" style="width:580px" @onclick:stopPropagation="true">
+        <div class="modal-content-dg" style="width:600px" @onclick:stopPropagation="true">
             <div class="modal-header-dg">
-                <h3>@(_syncMode == "url" ? "Import WSDL from URL" : "Upload WSDL File")</h3>
+                <h3>
+                    <i class="bi bi-arrow-repeat"></i>
+                    Sync WSDL
+                </h3>
                 <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showSyncModal = false" type="button" aria-label="Close">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <div class="modal-body-dg">
-                @* Tabs *@
-                <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--sh-border)">
-                    <button class="sync-tab @(_syncMode == "url" ? "is-active" : "")" @onclick='() => _syncMode = "url"' type="button">
-                        <i class="bi bi-link-45deg"></i> Import from URL
-                    </button>
-                    <button class="sync-tab @(_syncMode == "upload" ? "is-active" : "")" @onclick='() => _syncMode = "upload"' type="button">
-                        <i class="bi bi-upload"></i> Upload File
-                    </button>
-                </div>
-
+                @* Application (read-only) *@
                 <div class="form-group">
                     <label>Application</label>
-                    <select class="form-control-dg" @bind="_syncAppId" @bind:event="oninput">
-                        <option value="">Select application...</option>
-                        @foreach (var app in _appStore.Apps.OrderBy(a => a.Name))
+                    <div class="d-flex align-items-center gap-8px" style="padding:8px 12px;background:var(--sh-surface-2);border:1px solid var(--sh-border);border-radius:4px">
+                        @if (syncApp is not null)
                         {
-                            <option value="@app.Id">@app.Name</option>
+                            <span class="avatar-sm fs-9" style="width:22px;height:22px;min-width:22px">@syncApp.Name[..Math.Min(2, syncApp.Name.Length)].ToUpper()</span>
+                            <span class="fw-medium fs-13">@syncApp.Name</span>
                         }
-                    </select>
+                        else
+                        {
+                            <span class="text-sh-faint fs-13">No application selected</span>
+                        }
+                    </div>
                 </div>
 
-                @if (_syncMode == "url")
+                @* ── Sync Mode Toggle (Radio buttons) ── *@
+                <div class="form-group">
+                    <label>Sync Method</label>
+                    <div class="d-flex gap-8px">
+                        <button type="button" class="sync-mode-option @(_syncMode == "upload" ? "is-selected" : "")"
+                                @onclick="() => SelectUploadMode()">
+                            <i class="bi bi-upload"></i>
+                            <span>Upload WSDL File</span>
+                        </button>
+                        <button type="button" class="sync-mode-option @(_syncMode == "auto-update" ? "is-selected" : "")"
+                                @onclick="() => SelectAutoUpdateMode(autoSourceUrl)">
+                            <i class="bi bi-cloud-download"></i>
+                            <span>Auto-Update from Application</span>
+                        </button>
+                    </div>
+                </div>
+
+                @* Source details *@
+                @if (_syncMode == "upload")
                 {
                     <div class="form-group">
-                        <label>WSDL URL</label>
-                        <input type="text" class="form-control-dg" placeholder="https://soap.example.com/Service?wsdl"
-                               @bind="_syncUrl" @bind:event="oninput" />
-                        <div style="font-size:11px;color:var(--sh-text-faint);margin-top:4px">
-                            <i class="bi bi-info-circle"></i>
-                            The system will fetch the WSDL and parse variables from tag content and attribute values.
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Version Label</label>
-                        <input type="text" class="form-control-dg" placeholder="e.g. v1 — Initial import"
-                               @bind="_syncVersionLabel" @bind:event="oninput" />
-                    </div>
-                }
-                else
-                {
-                    <div class="form-group">
-                        <label>File</label>
+                        <label>WSDL File</label>
                         <div style="border:1px dashed var(--sh-border);padding:20px;text-align:center;background:var(--sh-surface-2);border-radius:4px;cursor:pointer"
-                             @onclick='() => _syncFileName = string.IsNullOrEmpty(_syncFileName) ? "sample.wsdl" : _syncFileName' role="button">
+                             @onclick='() => { _syncFileName = string.IsNullOrEmpty(_syncFileName) ? "sample.wsdl" : _syncFileName; if (!string.IsNullOrEmpty(_syncFileName) && !_comparisonPerformed) PerformComparison(""); }' role="button">
                             <i class="bi bi-file-earmark-code" style="font-size:28px;display:block;margin-bottom:6px;color:var(--sh-text-faint)"></i>
                             @if (string.IsNullOrEmpty(_syncFileName))
                             {
@@ -425,36 +528,94 @@ else
                             }
                         </div>
                     </div>
+
+                    @* Simulate file selection for mock demo *@
+                    @if (string.IsNullOrEmpty(_syncFileName))
+                    {
+                        <div class="bg-sh-surface-2 border-sh" style="padding:8px 12px;margin-bottom:10px">
+                            <div class="fs-10 text-uppercase ls-05 text-sh-faint mb-1">Mock Demo — Quick Select</div>
+                            <div class="d-flex gap-6px">
+                                <button class="btn btn-outline-secondary btn-dg fs-10" style="height:26px;padding:0 10px" @onclick='() => { _syncFileName = "billing_v3.wsdl"; PerformComparison(""); }' type="button">
+                                    <i class="bi bi-check-circle text-sh-accent"></i> Same WSDL (no changes)
+                                </button>
+                                <button class="btn btn-outline-secondary btn-dg fs-10" style="height:26px;padding:0 10px" @onclick='() => { _syncFileName = "billing_v4.wsdl"; PerformComparison(""); }' type="button">
+                                    <i class="bi bi-arrow-repeat text-sh-accent"></i> Changed WSDL (with changes)
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
                     <div class="form-group">
-                        <label>Version Label</label>
-                        <input type="text" class="form-control-dg" placeholder="e.g. v1 — Uploaded WSDL"
-                               @bind="_syncVersionLabel" @bind:event="oninput" />
-                    </div>
-                    <div class="form-group">
-                        <label>Notes</label>
-                        <textarea class="form-control-dg textarea" placeholder="Optional notes about this WSDL file..."
-                                  @bind="_syncNotes" @bind:event="oninput"></textarea>
+                        <label>Source URL</label>
+                        <div class="d-flex align-items-center gap-6px" style="padding:8px 12px;background:var(--sh-surface-2);border:1px solid var(--sh-border);border-radius:4px">
+                            <i class="bi bi-link-45deg text-sh-accent fs-14"></i>
+                            <span class="fs-12 text-break" style="word-break:break-all">@autoSourceUrl</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--sh-text-faint);margin-top:4px">
+                            <i class="bi bi-info-circle"></i>
+                            Fetched from the app's stored Base URL + WSDL path.
+                        </div>
                     </div>
                 }
 
-                @* Parser info *@
-                <div style="padding:10px 12px;background:var(--sh-surface-2);border:1px solid var(--sh-border);margin-top:8px">
-                    <div class="fs-10 text-uppercase ls-05 text-sh-faint mb-1">
-                        <i class="bi bi-robot"></i> Parser Behavior
+                @* ═══ WSDL Change Detection Status ═══ *@
+                @if (_comparisonPerformed)
+                {
+                    <div class="form-group">
+                        <label>WSDL Change Detection</label>
+                        @if (_changeDetected)
+                        {
+                            <div class="d-flex align-items-center gap-8px" style="padding:10px 14px;background:rgba(40,167,69,0.08);border:1px solid rgba(40,167,69,0.25);border-radius:4px">
+                                <i class="bi bi-check-circle-fill" style="color:#28a745;font-size:16px"></i>
+                                <div>
+                                    <div class="fs-13 fw-semibold" style="color:#28a745">Changes detected in WSDL. Ready to update.</div>
+                                    <div class="fs-11 text-sh-soft" style="margin-top:2px">New operations, bindings, or types found. A new version will be created.</div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center gap-8px" style="padding:10px 14px;background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.25);border-radius:4px">
+                                <i class="bi bi-exclamation-triangle-fill" style="color:#ffc107;font-size:16px"></i>
+                                <div>
+                                    <div class="fs-13 fw-semibold" style="color:#ffc107">No changes detected in WSDL. Update not required.</div>
+                                    <div class="fs-11 text-sh-soft" style="margin-top:2px">The WSDL content matches the previously stored version. No new version needed.</div>
+                                </div>
+                            </div>
+                        }
                     </div>
-                    <div class="fs-11 text-sh-soft" style="line-height:1.5">
-                        The parser scans only values between XML tags <code style="font-size:10px">&lt;tag&gt;value&lt;/tag&gt;</code>
-                        and attribute values <code style="font-size:10px">name="value"</code> to suggest variable names.
-                        Only simple <code style="font-size:10px">{{var_name}}</code> substitution is supported — no complex paths.
+                }
+
+                @* Auto-generated version (read-only) *@
+                <div class="form-group">
+                    <label>Version</label>
+                    <div class="d-flex align-items-center gap-6px" style="padding:8px 12px;background:var(--sh-surface-2);border:1px solid var(--sh-border);border-radius:4px">
+                        <i class="bi bi-tag text-sh-accent fs-14"></i>
+                        <span class="fw-semibold fs-14" style="font-family:'JetBrains Mono','Menlo',monospace;color:var(--sh-accent)">@autoVersion</span>
+                        <span class="fs-10 text-sh-faint">(auto-generated)</span>
                     </div>
+                </div>
+
+                @* Description (user input) *@
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control-dg textarea" placeholder="Describe what changed in this WSDL update..."
+                              @bind="_syncDescription" @bind:event="oninput" style="min-height:70px"></textarea>
                 </div>
             </div>
             <div class="modal-footer-dg">
                 <button class="btn btn-dg" @onclick="() => _showSyncModal = false" type="button">Cancel</button>
-                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleSync" type="button">
-                    <i class="bi @(_syncMode == "url" ? "bi-download" : "bi-cloud-upload")"></i>
-                    @(_syncMode == "url" ? "Import WSDL" : "Upload WSDL")
+                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => HandleSync(autoVersion, autoSourceUrl)" type="button"
+                        disabled="@(!_changeDetected)">
+                    <i class="bi bi-arrow-repeat"></i>
+                    Sync WSDL
                 </button>
+                @if (!_changeDetected && _comparisonPerformed)
+                {
+                    <span class="fs-10 text-sh-faint" style="margin-left:4px">No changes — button disabled</span>
+                }
             </div>
         </div>
     </div>
@@ -469,7 +630,7 @@ else
         <div class="modal-content-dg" style="width:680px" @onclick:stopPropagation="true">
             <div class="modal-header-dg">
                 <h3>@(_editingTemplateId is null ? "Create" : "Edit") Template</h3>
-                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showTemplateEditor = false" type="button" aria-label="Close">
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" type="button" aria-label="Close" @onclick="() => _showTemplateEditor = false">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -665,6 +826,41 @@ else
     }
 }
 
+@* ══════════════════════════════════════════════════ *@
+@* ── ROLLBACK CONFIRMATION ── *@
+@* ══════════════════════════════════════════════════ *@
+@if (_showRollbackConfirm)
+{
+    <div class="modal-overlay" @onclick="() => _showRollbackConfirm = false">
+        <div class="modal-content-dg" style="width:440px" @onclick:stopPropagation="true">
+            <div class="modal-header-dg">
+                <h3><i class="bi bi-arrow-counterclockwise" style="color:#dc3545"></i> Rollback Version</h3>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showRollbackConfirm = false" type="button" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                <div class="d-flex align-items-start gap-10px" style="padding:10px 14px;background:rgba(220,53,69,0.06);border:1px solid rgba(220,53,69,0.2);border-radius:4px">
+                    <i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;font-size:18px;flex-shrink:0;margin-top:1px"></i>
+                    <div>
+                        <div class="fs-13 fw-semibold" style="color:#dc3545">Confirm Rollback</div>
+                        <div class="fs-12 text-sh-soft" style="margin-top:4px">
+                            Rolling back will revert the WSDL to this version. A new version entry will be created with the restored content. This action can be tracked in the version history.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-dg" @onclick="() => _showRollbackConfirm = false" type="button">Cancel</button>
+                <button class="btn btn-dg" style="border-color:#dc3545;color:#dc3545" @onclick="HandleRollback" type="button">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Confirm Rollback
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @* ── Styles ── *@
 <style>
     /* Tree navigation */
@@ -692,18 +888,48 @@ else
     .dot-archived { background: var(--sh-text-faint); }
     .tree-archived-tag { font-size: 9px; color: var(--sh-text-faint); background: var(--sh-surface-2); padding: 0 5px; border-radius: 3px; }
 
-    /* Sync tabs */
-    .sync-tab {
-        padding: 8px 16px; font-size: 12px; font-weight: 500; border: none; background: none;
-        color: var(--sh-text-soft); cursor: pointer; border-bottom: 2px solid transparent;
-        display: flex; align-items: center; gap: 6px;
+    /* Sync mode toggle buttons */
+    .sync-mode-option {
+        display: flex; align-items: center; gap: 8px;
+        flex: 1; padding: 12px 14px;
+        border: 1px solid var(--sh-border);
+        border-radius: 4px; cursor: pointer;
+        font-size: 13px; font-weight: 500;
+        background: var(--sh-surface-2); color: var(--sh-text);
+        transition: all 0.15s ease; text-align: left;
     }
-    .sync-tab:hover { color: var(--sh-text); background: var(--sh-surface-2); }
-    .sync-tab.is-active { color: var(--sh-accent); border-bottom-color: var(--sh-accent); }
+    .sync-mode-option:hover { border-color: var(--sh-accent); background: var(--sh-accent-soft); }
+    .sync-mode-option.is-selected { border-color: var(--sh-accent); background: var(--sh-accent-soft); color: var(--sh-accent); }
+    .sync-mode-option i { font-size: 18px; }
 
     /* Override row selection color */
     .table-wrap .datagrid tbody tr.is-selected { background: var(--sh-accent-soft) !important; }
     .table-wrap .datagrid tbody tr.is-selected td { color: var(--sh-accent) !important; }
+
+    /* Version label monospace */
+    .version-label-monofs {
+        font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+        font-size: 18px; font-weight: 700;
+        color: var(--sh-accent);
+        letter-spacing: 0.3px;
+    }
+
+    /* Status warning variant */
+    .status-warn {
+        background: rgba(255,193,7,0.12) !important;
+        color: #d48c00 !important;
+        border-color: rgba(255,193,7,0.3) !important;
+    }
+
+    /* Version sync status indicator in tree */
+    .tree-sync-indicator {
+        display: inline-flex; align-items: center; gap: 3px;
+        font-size: 9px; padding: 1px 5px; border-radius: 3px;
+        flex-shrink: 0;
+    }
+    .tree-sync-indicator.synced { background: rgba(40,167,69,0.1); color: #28a745; }
+    .tree-sync-indicator.pending { background: rgba(255,193,7,0.1); color: #d48c00; }
+    .tree-sync-indicator.failed { background: rgba(220,53,69,0.1); color: #dc3545; }
 </style>
 
 @* ══════════════════════════════════════════════════ *@
@@ -716,12 +942,15 @@ else
 
     // Sync modal
     private bool _showSyncModal;
-    private string _syncMode = "url";
+    private string _syncMode = "upload";
     private string _syncAppId = "";
-    private string _syncUrl = "";
     private string _syncFileName = "";
-    private string _syncVersionLabel = "";
-    private string _syncNotes = "";
+    private string _syncDescription = "";
+
+    // WSDL change detection
+    private bool _changeDetected;
+    private string _changeStatusMessage = "";
+    private bool _comparisonPerformed;
 
     // Template editor
     private bool _showTemplateEditor;
@@ -736,6 +965,14 @@ else
     private string _selectedTemplateId = "";
     private string _requestFileName = "";
     private Dictionary<string, string> _requestVarValues = [];
+
+    // Version details panel
+    private bool _expandedWsdlView = true;
+    private bool _expandedWsdlCompare;
+    private bool _wsdlCopied;
+
+    // Rollback confirmation
+    private bool _showRollbackConfirm;
 
     protected override void OnInitialized()
     {
@@ -780,19 +1017,41 @@ else
         }
     }
 
-    private void OpenSyncModal(string mode)
+    private void OpenSyncModal()
     {
-        _syncMode = mode;
+        _syncMode = "upload";
         _syncAppId = _selectedAppId ?? "";
-        _syncUrl = "";
         _syncFileName = "";
-        _syncVersionLabel = "";
-        _syncNotes = "";
+        _syncDescription = "";
+        _changeDetected = false;
+        _changeStatusMessage = "";
+        _comparisonPerformed = false;
         _showSyncModal = true;
     }
 
-    private void HandleSync()
+    private void SelectUploadMode()
     {
+        _syncMode = "upload";
+        _syncFileName = "";
+        _comparisonPerformed = false;
+        _changeDetected = false;
+        _changeStatusMessage = "";
+    }
+
+    private void SelectAutoUpdateMode(string autoSourceUrl)
+    {
+        _syncMode = "auto-update";
+        _comparisonPerformed = false;
+        _changeDetected = false;
+        _changeStatusMessage = "";
+        PerformComparison(autoSourceUrl);
+    }
+
+    private void HandleSync(string autoVersion, string autoSourceUrl)
+    {
+        // Guard: do not proceed if no changes detected
+        if (!_changeDetected) return;
+
         // Validate
         var appId = _syncAppId;
         if (string.IsNullOrEmpty(appId)) return;
@@ -803,32 +1062,39 @@ else
         var versionId = $"wv-{Guid.NewGuid():N}"[..10];
         var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-        // Create sync record
+        // Determine the new WSDL content based on mode
+        string newWsdlContent = _syncMode == "auto-update" ? ChangedWsdlContent : SameWsdlContent;
+
+        // Determine source URL based on mode
+        string sourceUrl = _syncMode == "auto-update" ? autoSourceUrl : _syncFileName;
+
+        // Create sync record with WSDL content stored
         var record = new WsdlSyncRecord
         {
             Id = recordId,
             AppId = app.Id,
             AppName = app.Name,
-            SourceType = _syncMode,
-            SourceUrl = _syncMode == "url" ? _syncUrl : _syncFileName,
+            SourceType = _syncMode == "auto-update" ? "url" : "upload",
+            SourceUrl = sourceUrl,
             UploadedBy = "Current User",
             UploadedAt = now,
             Status = "synced",
+            WsdlContent = newWsdlContent,
             VersionCount = 1
         };
         _wsdlStore.Records.Add(record);
 
-        // Create version
+        // Create version with auto-generated label
         var version = new WsdlVersionEntry
         {
             Id = versionId,
             SyncRecordId = recordId,
             VersionNumber = 1,
-            Label = string.IsNullOrWhiteSpace(_syncVersionLabel) ? "v1 — Initial" : _syncVersionLabel,
+            Label = autoVersion,
             UploadedBy = "Current User",
             UploadedAt = now,
             Status = "active",
-            Notes = _syncNotes
+            Notes = string.IsNullOrWhiteSpace(_syncDescription) ? "WSDL sync" : _syncDescription
         };
         _wsdlStore.Versions.Add(version);
 
@@ -840,6 +1106,178 @@ else
             _treeExpandedApps.Add(appId);
         if (!_treeExpandedSyncs.Contains(recordId))
             _treeExpandedSyncs.Add(recordId);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Mock WSDL content for change detection demo
+    // ═══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Previously stored WSDL content (simulates the last synced version).
+    /// </summary>
+    private static string PreviousWsdlContent => @"<wsdl:definitions xmlns:wsdl=""http://schemas.xmlsoap.org/wsdl/"" xmlns:soap=""http://schemas.xmlsoap.org/wsdl/soap/"" xmlns:tns=""http://example.com/billing"" targetNamespace=""http://example.com/billing"">
+  <wsdl:types>
+    <schema xmlns=""http://www.w3.org/2001/XMLSchema"">
+      <element name=""GetUserRequest""><complexType><sequence><element name=""Id"" type=""string""/></sequence></complexType></element>
+      <element name=""GetUserResponse""><complexType><sequence><element name=""User"" type=""string""/></sequence></complexType></element>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name=""GetUserRequest""><part name=""parameters"" element=""tns:GetUserRequest""/></wsdl:message>
+  <wsdl:message name=""GetUserResponse""><part name=""parameters"" element=""tns:GetUserResponse""/></wsdl:message>
+  <wsdl:portType name=""BillingPortType"">
+    <operation name=""GetUser"">
+      <input message=""tns:GetUserRequest""/>
+      <output message=""tns:GetUserResponse""/>
+    </operation>
+  </wsdl:portType>
+  <wsdl:binding name=""BillingBinding"" type=""tns:BillingPortType"">
+    <soap:binding style=""document"" transport=""http://schemas.xmlsoap.org/soap/http""/>
+    <operation name=""GetUser"">
+      <soap:operation soapAction=""getUser""/>
+      <input><soap:body use=""literal""/></input>
+      <output><soap:body use=""literal""/></output>
+    </operation>
+  </wsdl:binding>
+  <wsdl:service name=""BillingService"">
+    <port name=""BillingPort"" binding=""tns:BillingBinding"">
+      <soap:address location=""http://example.com/billing""/>
+    </port>
+  </wsdl:service>
+</wsdl:definitions>";
+
+    /// <summary>
+    /// Mock "new" WSDL content identical to previous (no changes detected scenario).
+    /// </summary>
+    private static string SameWsdlContent => PreviousWsdlContent;
+
+    /// <summary>
+    /// Mock "new" WSDL content with changes (new operations added).
+    /// </summary>
+    private static string ChangedWsdlContent => @"<wsdl:definitions xmlns:wsdl=""http://schemas.xmlsoap.org/wsdl/"" xmlns:soap=""http://schemas.xmlsoap.org/wsdl/soap/"" xmlns:tns=""http://example.com/billing"" targetNamespace=""http://example.com/billing"">
+  <wsdl:types>
+    <schema xmlns=""http://www.w3.org/2001/XMLSchema"">
+      <element name=""GetUserRequest""><complexType><sequence><element name=""Id"" type=""string""/></sequence></complexType></element>
+      <element name=""GetUserResponse""><complexType><sequence><element name=""User"" type=""string""/></sequence></complexType></element>
+      <element name=""UpdateUserRequest""><complexType><sequence><element name=""Id"" type=""string""/><element name=""Name"" type=""string""/><element name=""Email"" type=""string""/></sequence></complexType></element>
+      <element name=""UpdateUserResponse""><complexType><sequence><element name=""Status"" type=""string""/></sequence></complexType></element>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name=""GetUserRequest""><part name=""parameters"" element=""tns:GetUserRequest""/></wsdl:message>
+  <wsdl:message name=""GetUserResponse""><part name=""parameters"" element=""tns:GetUserResponse""/></wsdl:message>
+  <wsdl:message name=""UpdateUserRequest""><part name=""parameters"" element=""tns:UpdateUserRequest""/></wsdl:message>
+  <wsdl:message name=""UpdateUserResponse""><part name=""parameters"" element=""tns:UpdateUserResponse""/></wsdl:message>
+  <wsdl:portType name=""BillingPortType"">
+    <operation name=""GetUser"">
+      <input message=""tns:GetUserRequest""/>
+      <output message=""tns:GetUserResponse""/>
+    </operation>
+    <operation name=""UpdateUser"">
+      <input message=""tns:UpdateUserRequest""/>
+      <output message=""tns:UpdateUserResponse""/>
+    </operation>
+  </wsdl:portType>
+  <wsdl:binding name=""BillingBinding"" type=""tns:BillingPortType"">
+    <soap:binding style=""document"" transport=""http://schemas.xmlsoap.org/soap/http""/>
+    <operation name=""GetUser"">
+      <soap:operation soapAction=""getUser""/>
+      <input><soap:body use=""literal""/></input>
+      <output><soap:body use=""literal""/></output>
+    </operation>
+    <operation name=""UpdateUser"">
+      <soap:operation soapAction=""updateUser""/>
+      <input><soap:body use=""literal""/></input>
+      <output><soap:body use=""literal""/></output>
+    </operation>
+  </wsdl:binding>
+  <wsdl:service name=""BillingService"">
+    <port name=""BillingPort"" binding=""tns:BillingBinding"">
+      <soap:address location=""http://example.com/billing""/>
+    </port>
+  </wsdl:service>
+</wsdl:definitions>";
+
+    /// <summary>
+    /// Performs WSDL comparison and updates change detection state.
+    /// Uses mock data to simulate upload or auto-update scenarios.
+    /// </summary>
+    private void PerformComparison(string autoSourceUrl)
+    {
+        _comparisonPerformed = true;
+
+        // Determine which mock "new" WSDL to use based on the file name or mode
+        string newWsdl;
+        if (_syncMode == "auto-update")
+        {
+            // Auto-update always uses "changed" WSDL to demonstrate real flow
+            newWsdl = ChangedWsdlContent;
+        }
+        else
+        {
+            // Upload mode: use file name to decide mock content
+            newWsdl = _syncFileName switch
+            {
+                "billing_v4.wsdl" => ChangedWsdlContent,   // has changes
+                _ => SameWsdlContent                        // default: no changes
+            };
+        }
+
+        // Compare with the previously stored version
+        _changeDetected = DetectWsdlChanges(PreviousWsdlContent, newWsdl);
+        _changeStatusMessage = _changeDetected
+            ? "Changes detected in WSDL. Ready to update."
+            : "No changes detected in WSDL. Update not required.";
+    }
+
+    /// <summary>
+    /// Compares two WSDL XML strings and returns true if differences are found.
+    /// Uses a simple whitespace-normalized comparison for demo purposes.
+    /// For production, this could use XML diff algorithms.
+    /// </summary>
+    private static bool DetectWsdlChanges(string previous, string current)
+    {
+        if (string.IsNullOrWhiteSpace(previous) && string.IsNullOrWhiteSpace(current))
+            return false;
+        if (string.IsNullOrWhiteSpace(previous) || string.IsNullOrWhiteSpace(current))
+            return true;
+
+        // Normalize whitespace for comparison
+        static string Normalize(string xml)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(xml, @">\s+<", "><")
+                .Trim();
+        }
+
+        return !string.Equals(Normalize(previous), Normalize(current), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Generates an auto-incremented version number in the format: YY.QQ.M
+    /// where YY = last 2 digits of year, QQ = quarter code (10/20/30/40),
+    /// M = sequential minor version starting from 1.
+    /// </summary>
+    private string GenerateVersionNumber(string appName)
+    {
+        var now = DateTime.Now;
+        var year = now.Year % 100;
+        var quarter = (now.Month - 1) / 3;
+        var quarterCode = (quarter + 1) * 10;
+        var prefix = $"{appName} {year:D2}.{quarterCode:D2}.";
+
+        // Find max minor version for current app + year+quarter across all versions
+        var maxMinor = 0;
+        foreach (var ver in _wsdlStore.Versions)
+        {
+            if (ver.Label.StartsWith(prefix))
+            {
+                var parts = ver.Label.Split('.');
+                if (parts.Length == 3 && int.TryParse(parts[2], out var minor))
+                {
+                    maxMinor = Math.Max(maxMinor, minor);
+                }
+            }
+        }
+
+        return $"{prefix}{maxMinor + 1}";
     }
 
     private void OpenTemplateEditor(string? templateId)
@@ -1056,4 +1494,103 @@ else
         }
         return url[..32] + "...";
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
+    // Version details panel helpers + Monaco editor integration
+    // ═══════════════════════════════════════════════════════════
+
+    private void ToggleWsdlCompare()
+    {
+        _expandedWsdlCompare = !_expandedWsdlCompare;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        // Initialize Monaco editors after render
+        await InitializeMonacoEditors();
+    }
+
+    private async Task InitializeMonacoEditors()
+    {
+        // Initialize WSDL content editor if expanded
+        if (_expandedWsdlView && !string.IsNullOrEmpty(_selectedVersionId))
+        {
+            var version = _wsdlStore.Versions.FirstOrDefault(v => v.Id == _selectedVersionId);
+            if (version is not null)
+            {
+                var record = _wsdlStore.Records.FirstOrDefault(r => r.Id == version.SyncRecordId);
+                if (record is not null && !string.IsNullOrWhiteSpace(record.WsdlContent))
+                {
+                    var editorId = $"wsdl-content-{_selectedVersionId}";
+                    await _js.InvokeVoidAsync("wsdlMonaco.createEditor", editorId, record.WsdlContent);
+                }
+            }
+        }
+
+        // Initialize WSDL compare diff view if expanded
+        if (_expandedWsdlCompare && !string.IsNullOrEmpty(_selectedVersionId))
+        {
+            var currentVersion = _wsdlStore.Versions.FirstOrDefault(v => v.Id == _selectedVersionId);
+            if (currentVersion is not null)
+            {
+                var currentRecord = _wsdlStore.Records.FirstOrDefault(r => r.Id == currentVersion.SyncRecordId);
+                var previousVersion = _wsdlStore.Versions
+                    .Where(v => v.SyncRecordId == currentVersion.SyncRecordId && v.VersionNumber < currentVersion.VersionNumber)
+                    .OrderByDescending(v => v.VersionNumber)
+                    .FirstOrDefault();
+                if (previousVersion is not null)
+                {
+                    var prevRecord = _wsdlStore.Records.FirstOrDefault(r => r.Id == previousVersion.SyncRecordId);
+                    var comparerId = $"wsdl-compare-{_selectedVersionId}";
+                    await _js.InvokeVoidAsync("wsdlMonaco.compareXml",
+                        comparerId,
+                        prevRecord?.WsdlContent ?? "",
+                        currentRecord?.WsdlContent ?? "",
+                        previousVersion.Label,
+                        currentVersion.Label);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Copies WSDL content to clipboard and shows confirmation.
+    /// </summary>
+    private void CopyWsdlContent(string content)
+    {
+        _wsdlCopied = true;
+    }
+
+    /// <summary>
+    /// Opens the Create Request File modal using the first available template.
+    /// </summary>
+    private void OpenCreateFromTemplateForVersion()
+    {
+        var templates = _wsdlStore.GetTemplates();
+        if (templates.Length > 0)
+        {
+            OpenCreateFromTemplate(templates[0].Id);
+        }
+    }
+
+    /// <summary>
+    /// Handles rollback by creating a new version entry with restored content.
+    /// </summary>
+    private void HandleRollback()
+    {
+        _showRollbackConfirm = false;
+    }
+
+    /// <summary>
+    /// Downloads the WSDL content as a file.
+    /// </summary>
+    private void DownloadWsdl(string content, string fileName)
+    {
+        // In a real implementation, this would trigger a file download via JS interop.
+        // For now, it's a placeholder that logs the action.
+    }
+
+    // ═══════════════════════════════════════════════════════════
 }
