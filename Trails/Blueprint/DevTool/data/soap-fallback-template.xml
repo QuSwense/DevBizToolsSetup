@@ -1,7 +1,0 @@
-<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
-    <Body>
-        <{{ACTION_NAME}} xmlns="http://tempuri.org/">
-            <!-- Add request parameters here -->
-        </{{ACTION_NAME}}>
-    </Body>
-</Envelope>

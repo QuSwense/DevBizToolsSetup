@@ -1,6 +1,0 @@
-{
-    "soapMaxHistoryRecords": 100,
-    "restMaxHistoryRecords": 100,
-    "healthCheckTimeoutSec": 10,
-    "ormFramework": "LINQ2DB (.NET 8)"
-}
