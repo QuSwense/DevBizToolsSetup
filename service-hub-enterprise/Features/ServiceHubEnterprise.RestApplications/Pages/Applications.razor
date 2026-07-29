@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="toolbar-right">
-            <button class="btn btn-dark btn-dg-primary">
+            <button class="btn btn-dark btn-sh-primary">
                 <i class="bi bi-plus-lg"></i>
                 Add Application
             </button>
@@ -45,7 +45,7 @@
                 <i class="bi bi-download"></i>
                 JSON
             </button>
-            <button class="btn btn-danger btn-dg-danger">
+            <button class="btn btn-danger btn-sh-danger">
                 <i class="bi bi-trash3"></i>
                 Delete
             </button>
@@ -86,15 +86,15 @@
                             <td>
                                 <div class="name-stack">
                                     <span class="avatar-sm">@initials</span>
-                                    <span style="font-weight:500">@app.Name</span>
+                                    <span class="fw-medium">@app.Name</span>
                                 </div>
                             </td>
                             <td><span class="cell-id">@app.BaseUrl</span></td>
                             <td><span class="status-badge @badgeClass">@(app.Status == "enabled" ? "Enabled" :
                                                                                                                                                                                                                "Disabled")</span></td>
-                                <td style="color:var(--dg-text-soft)">@app.UpdatedBy</td>
-                                <td style="color:var(--dg-text-soft)">@app.CreatedDate</td>
-                                <td><span style="font-weight:600">@app.ApisCount</span></td>
+                                <td style="color:var(--sh-text-soft)">@app.UpdatedBy</td>
+                                <td style="color:var(--sh-text-soft)">@app.CreatedDate</td>
+                                <td><span class="fw-semibold">@app.ApisCount</span></td>
                                 <td>
                                     <div class="action-icons">
                                         <button class="action-icon-btn">Edit</button>

@@ -26,7 +26,7 @@ Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-
             </div>
         </div>
         <div class="toolbar-right">
-            <button class="btn btn-dark btn-dg-primary">
+            <button class="btn btn-dark btn-sh-primary">
                 <i class="bi bi-plus-lg"></i>
                 Upload File
             </button>
@@ -58,20 +58,20 @@ Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-
             <tbody>
                 @foreach (var file in files)
                 {
-                    var verbColor = file.Verb == "POST" ? "var(--dg-success)" : file.Verb == "GET" ? "var(--dg-accent)" :
-                file.Verb == "DELETE" ? "var(--dg-error)" : "var(--dg-warning)";
-                    var verbBg = file.Verb == "POST" ? "var(--dg-success-bg)" : file.Verb == "GET" ? "var(--dg-accent-soft)" : file.Verb == "DELETE" ?
-             "var(--dg-error-bg)" : "var(--dg-warning-bg)";
+                    var verbColor = file.Verb == "POST" ? "var(--sh-success)" : file.Verb == "GET" ? "var(--sh-accent)" :
+                file.Verb == "DELETE" ? "var(--sh-error)" : "var(--sh-warning)";
+                    var verbBg = file.Verb == "POST" ? "var(--sh-success-bg)" : file.Verb == "GET" ? "var(--sh-accent-soft)" : file.Verb == "DELETE" ?
+             "var(--sh-error-bg)" : "var(--sh-warning-bg)";
                     var typeIcon = file.Type == "json"
-                        ? "<i class=\"bi bi-file-earmark-code\" style=\"color:var(--dg-success);font-size:14px\"></i>"
-                        : "<i class=\"bi bi-file-earmark-code\" style=\"color:var(--dg-warning);font-size:14px\"></i>";
+                        ? "<i class=\"bi bi-file-earmark-code\" style=\"color:var(--sh-success);font-size:14px\"></i>"
+                        : "<i class=\"bi bi-file-earmark-code\" style=\"color:var(--sh-warning);font-size:14px\"></i>";
                     <tr>
                         <td class="check-cell"><input type="checkbox" class="form-check-input"
                                                           aria-label="Select @file.FileName" /></td>
                             <td>
                                 <span class="mono-text">@file.FileName</span>
                             </td>
-                            <td style="color:var(--dg-text-soft)">@file.AppName</td>
+                            <td style="color:var(--sh-text-soft)">@file.AppName</td>
                             <td><span class="cell-id">@file.ApiPath</span></td>
                             <td>
                                 <span class="verb-badge"
@@ -80,7 +80,7 @@ Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-
                             <td class="cell-truncated">
                                 @file.Description</td>
                                 <td>@((MarkupString)typeIcon)</td>
-                                <td style="color:var(--dg-text-soft)">@file.Created</td>
+                                <td style="color:var(--sh-text-soft)">@file.Created</td>
                             </tr>
                         }
                     </tbody>

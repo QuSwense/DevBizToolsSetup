@@ -107,7 +107,7 @@
                 @if (Items is null || !Items.Any())
                 {
                     <tr>
-                        <td colspan="@_totalColumns" style="text-align:center;padding:32px 14px;color:var(--dg-text-faint)">
+                        <td colspan="@_totalColumns" class="text-center" style="padding:32px 14px;color:var(--sh-text-faint)">
                             @EmptyText
                         </td>
                     </tr>
@@ -141,7 +141,7 @@
                             }
                             @if (EnableExpand)
                             {
-                                <td style="width:32px;padding:8px 4px;text-align:center">
+                                <td class="text-center" style="width:32px;padding:8px 4px">
                                     <button class="expand-btn" @onclick="() => ToggleExpand(rowId)" type="button">
                                         @if (isExpanded)
                                         {
@@ -179,7 +179,7 @@
                         @if (isExpanded && DetailRow is not null)
                         {
                             <tr>
-                                <td colspan="@_totalColumns" style="padding:0;background:var(--dg-surface-2)">
+                                <td colspan="@_totalColumns" class="p-0" style="background:var(--sh-surface-2)">
                                     @DetailRow(item)
                                 </td>
                             </tr>
@@ -220,7 +220,7 @@
                             @onclick="() => GoToPage(pg)">
                         @if (pg == CurrentPage)
                         {
-                            <span style="font-weight:700">@pg</span>
+                            <span class="fw-bold">@pg</span>
                         }
                         else
                         {
@@ -263,7 +263,7 @@
             </div>
             <div class="modal-footer-dg">
                 <button class="btn btn-outline-secondary btn-dg" @onclick="ResetFiltersClick" type="button">Reset</button>
-                <button class="btn btn-dark btn-dg-primary"
+                <button class="btn btn-dark btn-sh-primary"
                         @onclick="ApplyFilterClick"
                         type="button">
                     Apply Filters

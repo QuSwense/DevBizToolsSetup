@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch ServiceHubEnterprise.Web",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-webapp",
+      "program": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/bin/Debug/net8.0/ServiceHubEnterprise.Web.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      }
+    }
+  ]
+}

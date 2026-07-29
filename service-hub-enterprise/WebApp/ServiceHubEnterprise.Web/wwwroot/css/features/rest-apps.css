@@ -10,23 +10,23 @@
 }
 
 .verb-badge-post {
-    background: var(--dg-success-bg);
-    color: var(--dg-success);
+    background: var(--sh-success-bg);
+    color: var(--sh-success);
 }
 
 .verb-badge-get {
-    background: var(--dg-accent-soft);
-    color: var(--dg-accent);
+    background: var(--sh-accent-soft);
+    color: var(--sh-accent);
 }
 
 .verb-badge-put {
-    background: var(--dg-warning-bg);
-    color: var(--dg-warning);
+    background: var(--sh-warning-bg);
+    color: var(--sh-warning);
 }
 
 .verb-badge-delete {
-    background: var(--dg-error-bg);
-    color: var(--dg-error);
+    background: var(--sh-error-bg);
+    color: var(--sh-error);
 }
 
 /* Type badges */
@@ -35,9 +35,9 @@
     padding: 1px 6px;
     font-size: 10px;
     font-weight: 600;
-    background: var(--dg-surface-2);
-    color: var(--dg-text-soft);
-    border: 1px solid var(--dg-border);
+    background: var(--sh-surface-2);
+    color: var(--sh-text-soft);
+    border: 1px solid var(--sh-border);
     text-transform: uppercase;
 }
 
@@ -52,13 +52,13 @@
     height: 26px;
     padding: 0 6px;
     font-size: 11px;
-    background: var(--dg-surface-2);
-    border: 1px solid var(--dg-border);
+    background: var(--sh-surface-2);
+    border: 1px solid var(--sh-border);
 }
 
 /* Truncated cell */
 .cell-truncated {
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;

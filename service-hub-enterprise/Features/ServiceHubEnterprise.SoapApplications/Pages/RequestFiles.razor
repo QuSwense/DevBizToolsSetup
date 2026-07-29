@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="toolbar-right">
-            <button class="btn btn-dark btn-dg-primary">
+            <button class="btn btn-dark btn-sh-primary">
                 <i class="bi bi-plus-lg"></i>
                 Upload File
             </button>
@@ -54,15 +54,15 @@
             <tbody>
                 @foreach (var file in files)
                 {
-                    var verbColor = "var(--dg-success)";
-                    var verbBg = "var(--dg-success-bg)";
+                    var verbColor = "var(--sh-success)";
+                    var verbBg = "var(--sh-success-bg)";
                     <tr>
                         <td class="check-cell"><input type="checkbox" class="form-check-input"
                                                           aria-label="Select @file.FileName" /></td>
                             <td>
                                 <span class="mono-text">@file.FileName</span>
                             </td>
-                            <td style="color:var(--dg-text-soft)">@file.AppName</td>
+                            <td style="color:var(--sh-text-soft)">@file.AppName</td>
                             <td><span class="cell-id">@file.ApiPath</span></td>
                             <td>
                                 <span class="verb-badge"
@@ -71,9 +71,9 @@
                             <td class="cell-truncated">
                                 @file.Description</td>
                                 <td>
-                                    <i class="bi bi-file-earmark-code" style="color:var(--dg-warning);font-size:14px"></i>
+                                    <i class="bi bi-file-earmark-code" style="color:var(--sh-warning);font-size:14px"></i>
                                 </td>
-                                <td style="color:var(--dg-text-soft)">@file.Created</td>
+                                <td style="color:var(--sh-text-soft)">@file.Created</td>
                             </tr>
                         }
                     </tbody>

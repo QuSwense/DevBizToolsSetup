@@ -12,20 +12,20 @@
 
 .empty-state-icon {
     font-size: 56px;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
 }
 
 .empty-state-title {
     margin: 0;
     font-size: 15px;
     font-weight: 600;
-    color: var(--dg-text);
+    color: var(--sh-text);
 }
 
 .empty-state-desc {
     margin: 0;
     font-size: 13px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     text-align: center;
     max-width: 380px;
 }
@@ -45,7 +45,7 @@
 
 .dash-card-sub {
     font-size: 11px;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     margin-top: 4px;
 }
 
@@ -69,7 +69,7 @@
 
 .bar-chart-label {
     font-size: 10px;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
 }
 
 /* Activity feed */
@@ -78,7 +78,7 @@
     align-items: center;
     gap: 8px;
     padding: 6px 0;
-    border-bottom: 1px solid var(--dg-border);
+    border-bottom: 1px solid var(--sh-border);
 }
 
 .activity-avatar {
@@ -89,8 +89,8 @@
     justify-content: center;
     font-size: 10px;
     font-weight: 600;
-    background: var(--dg-surface-3);
-    border: 1px solid var(--dg-border);
+    background: var(--sh-surface-3);
+    border: 1px solid var(--sh-border);
     flex-shrink: 0;
 }
 
@@ -101,13 +101,13 @@
 
 .activity-action {
     font-size: 12px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     margin-left: 4px;
 }
 
 .activity-time {
     font-size: 11px;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     white-space: nowrap;
 }
 
@@ -126,20 +126,23 @@
 
 /* Test suite progress */
 .suite-progress {
-    flex: 1;
-    height: 6px;
-    background: var(--dg-surface-3);
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .suite-bar {
-    height: 100%;
-    transition: width .3s;
+    flex: 1;
+    height: 6px;
+    background: var(--sh-surface-3);
+    border-radius: 3px;
+    overflow: hidden;
 }
 
 .suite-stats {
     font-size: 11px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     min-width: 36px;
     text-align: right;
 }
@@ -150,7 +153,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--dg-text);
+    color: var(--sh-text);
     font-weight: 500;
 }
 
@@ -163,7 +166,7 @@
 
 .health-name {
     font-size: 12px;
-    color: var(--dg-text);
+    color: var(--sh-text);
 }
 
 /* Status badge inline icons */
@@ -171,4 +174,296 @@
     width: 10px;
     height: 10px;
     vertical-align: middle;
+}
+
+/* ── Design token text color utilities ── */
+.text-sh-soft { color: var(--sh-text-soft); }
+.text-sh-faint { color: var(--sh-text-faint); }
+.text-sh-accent { color: var(--sh-accent); }
+.text-sh-success { color: var(--sh-success); }
+.text-sh-warning { color: var(--sh-warning); }
+
+/* ── Design token background utilities ── */
+.bg-sh-bg { background: var(--sh-bg); }
+.bg-sh-surface-3 { background: var(--sh-surface-3); }
+.bg-sh-success { background: var(--sh-success); }
+
+/* ── Design token border utilities ── */
+.border-sh { border: 1px solid var(--sh-border); }
+.border-sh-top { border-top: 1px solid var(--sh-border); }
+
+/* ── Custom font-size utilities ── */
+.fs-9 { font-size: 9px; }
+.fs-10 { font-size: 10px; }
+.fs-11 { font-size: 11px; }
+.fs-12 { font-size: 12px; }
+.fs-13 { font-size: 13px; }
+.fs-15 { font-size: 15px; }
+.fs-18 { font-size: 18px; }
+.fs-28 { font-size: 28px; }
+
+/* ── Custom gap utilities ── */
+.gap-3px { gap: 3px; }
+.gap-6px { gap: 6px; }
+.gap-10px { gap: 10px; }
+
+/* ── Stacked bar segments ── */
+.stacked-bar {
+    display: flex;
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    gap: 3px;
+}
+
+.bar-segment {
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+}
+
+.bar-segment span {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,.3);
+    line-height: 1;
+}
+
+/* ── Date picker overlay ── */
+.datepicker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99;
+    background: transparent;
+}
+
+/* ── Date picker popup ── */
+.datepicker-popup {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 100;
+    background: var(--sh-bg);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    min-width: 220px;
+}
+
+.datepicker-popup label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--sh-text);
+    display: block;
+}
+
+.datepicker-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--sh-border);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--sh-bg);
+    color: var(--sh-text);
+}
+
+.datepicker-info {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--sh-text-faint);
+}
+
+.datepicker-clear {
+    font-size: 11px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* ── Dashboard card grid spacing ── */
+.dashboard-grid + .dashboard-grid {
+    margin-top: 16px;
+}
+
+.dashboard-grid + .dash-card-full {
+    margin-top: 16px;
+}
+
+.dash-card-full {
+    grid-column: 1 / -1;
+}
+
+/* ── Execution summary bar ── */
+.exec-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.exec-total {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--sh-accent);
+    line-height: 1;
+}
+
+.exec-metrics {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.exec-pass {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.exec-pass-bar {
+    width: 72px;
+    height: 6px;
+}
+
+.exec-fail {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.exec-trend {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sh-success);
+}
+
+/* ── Full-width recent activity row ── */
+.activity-row {
+    width: 100%;
+}
+
+.activity-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    padding: 16px;
+    box-shadow: var(--sh-shadow-sm);
+}
+
+.activity-body {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Donut chart for Health Card ── */
+.donut-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.donut-chart-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.donut-center {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.donut-value {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--sh-text);
+}
+
+.donut-sub {
+    font-size: 10px;
+    color: var(--sh-text-soft);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.donut-legend {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--sh-text);
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-label {
+    color: var(--sh-text-soft);
+}
+
+.legend-count {
+    font-weight: 600;
+    color: var(--sh-text);
+    margin-left: 2px;
+}
+
+/* ── Merged Files Card breakdown ── */
+.files-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.files-breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.files-breakdown-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--sh-border);
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 60px;
+}
+
+.files-breakdown-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width .4s ease;
 }

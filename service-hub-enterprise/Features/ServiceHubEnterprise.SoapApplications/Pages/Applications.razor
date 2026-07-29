@@ -30,11 +30,11 @@
     </ToolbarCenter>
 
     <ToolbarRight>
-        <button class="btn btn-dark btn-dg-primary" type="button">
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => _showAddModal = true" type="button">
             <i class="bi bi-plus-lg"></i>
             Add Application
         </button>
-        <div style="position:relative">
+        <div class="position-relative">
             <button class="btn btn-outline-secondary btn-dg" @onclick="() => _showDropdown = !_showDropdown" type="button">
                 <i class="bi bi-three-dots-vertical"></i>
                 Actions
@@ -42,7 +42,7 @@
             </button>
             @if (_showDropdown)
             {
-                <div style="position:fixed;inset:0;z-index:50" @onclick="() => _showDropdown = false"></div>
+                <div class="position-fixed" style="inset:0;z-index:50" @onclick="() => _showDropdown = false"></div>
                 <div class="dropdown-menu-dg">
                     <div style="padding:4px 0">
                         <div class="dropdown-header-dg">Export</div>
@@ -55,7 +55,7 @@
                             Export to JSON
                         </button>
                         <div class="dropdown-divider-dg"></div>
-                        <button class="btn dropdown-item-dg-danger" @onclick="() => _showDropdown = false" type="button">
+                        <button class="btn dropdown-item-dg dropdown-item-sh-danger" @onclick="() => _showDropdown = false" type="button">
                             <i class="bi bi-trash3"></i>
                             Delete Selected
                         </button>
@@ -169,8 +169,159 @@
     </FilterModalBody>
 </ServiceHubGrid>
 
+@if (_showAddModal)
+{
+    <div class="modal-overlay" @onclick="() => _showAddModal = false">
+        <div class="modal-content-dg" @onclick:stopPropagation="true">
+            <div class="modal-header-dg">
+                <h3>Add SOAP Application</h3>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showAddModal = false" type="button" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                <div class="form-group">
+                    <label>App Name</label>
+                    <input type="text" class="form-control-dg" placeholder="Enter application name..."
+                           @bind="_newAppName" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label>Base URL</label>
+                    <input type="text" class="form-control-dg" placeholder="https://soap.example.com/Service"
+                           @bind="_newAppUrl" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control-dg textarea" placeholder="Describe the SOAP application..."
+                              @bind="_newAppDescription" @bind:event="oninput"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="form-control-dg" @bind="_newAppStatus">
+                        <option value="enabled">Enabled</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                </div>
+
+                <div style="border-top:1px solid var(--sh-border);margin:4px 0 8px"></div>
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sh-text-soft);margin-bottom:8px">
+                    Authentication Details
+                </div>
+                <div class="form-group">
+                    <label>Auth Type</label>
+                    <select class="form-control-dg" @bind="_newAuthType">
+                        <option value="none">No Authentication</option>
+                        <option value="basic">Basic Auth</option>
+                        <option value="api-key">API Key</option>
+                        <option value="bearer">Bearer Token</option>
+                        <option value="ntlm">NTLM</option>
+                    </select>
+                </div>
+
+                @if (_newAuthType == "basic")
+                {
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" class="form-control-dg" placeholder="Authentication username..."
+                               @bind="_newAuthUsername" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control-dg" placeholder="Authentication password..."
+                               @bind="_newAuthPassword" @bind:event="oninput" />
+                    </div>
+                }
+                else if (_newAuthType == "api-key")
+                {
+                    <div class="form-group">
+                        <label>Key Name</label>
+                        <input type="text" class="form-control-dg" placeholder="e.g. X-API-Key"
+                               @bind="_newAuthUsername" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label>Key Value</label>
+                        <input type="text" class="form-control-dg" placeholder="API key value..."
+                               @bind="_newAuthPassword" @bind:event="oninput" />
+                    </div>
+                }
+                else if (_newAuthType == "bearer")
+                {
+                    <div class="form-group">
+                        <label>Token</label>
+                        <input type="password" class="form-control-dg" placeholder="Bearer token..."
+                               @bind="_newAuthPassword" @bind:event="oninput" />
+                    </div>
+                }
+                else if (_newAuthType == "ntlm")
+                {
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" class="form-control-dg" placeholder="DOMAIN\\Username"
+                               @bind="_newAuthUsername" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control-dg" placeholder="NTLM password..."
+                               @bind="_newAuthPassword" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label>Domain</label>
+                        <input type="text" class="form-control-dg" placeholder="NTLM domain..."
+                               @bind="_newAuthExtra" @bind:event="oninput" />
+                    </div>
+                }
+
+                <div style="border-top:1px solid var(--sh-border);margin:4px 0 8px"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sh-text-soft)">
+                        SOAP APIs
+                    </span>
+                    <button class="btn btn-dg" style="height:30px;font-size:11px" @onclick="AddApiEntry" type="button">
+                        <i class="bi bi-plus-lg"></i>
+                        Add API
+                    </button>
+                </div>
+                @for (var i = 0; i < _newApis.Count; i++)
+                {
+                    var idx = i;
+                    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px">
+                        <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                            <input type="text" class="form-control-dg" placeholder="API name..."
+                                   @bind="_newApis[idx].Name" @bind:event="oninput" />
+                            <input type="text" class="form-control-dg" placeholder="API description..."
+                                   @bind="_newApis[idx].Description" @bind:event="oninput" />
+                        </div>
+                        <button class="btn btn-dg btn-sh-ghost" style="height:36px;width:36px;padding:0;flex-shrink:0;color:var(--sh-error);border-color:transparent"
+                                @onclick="() => RemoveApiEntry(idx)" type="button" aria-label="Remove API">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                }
+                @if (_newApis.Count == 0)
+                {
+                    <div style="font-size:12px;color:var(--sh-text-faint);padding:4px 0">
+                        No APIs added yet. Click "Add API" to define SOAP endpoints.
+                    </div>
+                }
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-dg" @onclick="() => _showAddModal = false" type="button">Cancel</button>
+                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleAddApplication" type="button">
+                    <i class="bi bi-plus-lg"></i>
+                    Add Application
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
-    private record SoapApp(string Id, string Name, string BaseUrl, string Status, string UpdatedBy, string CreatedDate, int ApisCount);
+    private class SoapApiEntry
+    {
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+    private record SoapApp(string Id, string Name, string BaseUrl, string Description, string Status, string UpdatedBy, string CreatedDate, int ApisCount, string AuthType, string AuthUsername, string AuthPassword, string AuthExtra, SoapApiEntry[] Apis);
 
     private List<GridColumn<SoapApp>> _columns = [];
 
@@ -234,16 +385,16 @@
         ];
     }
 
-    private static readonly SoapApp[] _allApps =
+    private static SoapApp[] _allApps =
     [
-        new("s1", "LegacyBilling", "https://soap.billing.com/BillingService", "enabled", "Suresh Kumar", "2023-08-12", 3),
-        new("s2", "ShippingSOAP", "https://soap.shipping.com/ShipService", "disabled", "Priya Sharma", "2023-09-01", 2),
-        new("s3", "CustomerPortal", "https://soap.customer.com/PortalService", "enabled", "Anita Desai", "2023-07-05", 5),
-        new("s4", "InventorySync", "https://soap.inventory.com/SyncService", "disabled", "Vikram Singh", "2024-01-15", 1),
-        new("s5", "PaymentGateway", "https://soap.payment.com/Gateway", "enabled", "Priya Sharma", "2023-11-20", 4),
-        new("s6", "OrderProcessing", "https://soap.orders.com/OrderService", "enabled", "Rahul Patel", "2024-03-10", 6),
-        new("s7", "NotificationHub", "https://soap.notify.com/NotifyService", "enabled", "Suresh Kumar", "2024-02-28", 3),
-        new("s8", "ReportingEngine", "https://soap.report.com/ReportService", "disabled", "Anita Desai", "2023-10-12", 2)
+        new("s1", "LegacyBilling", "https://soap.billing.com/BillingService", "Enterprise billing service", "enabled", "Suresh Kumar", "2023-08-12", 3, "basic", "billing_user", "", "", [new SoapApiEntry { Name = "SubmitInvoice", Description = "Submit billing invoices" }, new SoapApiEntry { Name = "GetInvoiceStatus", Description = "Check invoice status" }, new SoapApiEntry { Name = "GenerateReport", Description = "Generate billing reports" }]),
+        new("s2", "ShippingSOAP", "https://soap.shipping.com/ShipService", "Global shipping and tracking", "disabled", "Priya Sharma", "2023-09-01", 2, "basic", "shipping_admin", "", "", [new SoapApiEntry { Name = "TrackShipment", Description = "Track package location" }, new SoapApiEntry { Name = "CreateLabel", Description = "Generate shipping labels" }]),
+        new("s3", "CustomerPortal", "https://soap.customer.com/PortalService", "Customer self-service portal", "enabled", "Anita Desai", "2023-07-05", 5, "basic", "portal_api", "", "", [new SoapApiEntry { Name = "GetProfile", Description = "Fetch customer profile" }, new SoapApiEntry { Name = "UpdateProfile", Description = "Update customer details" }, new SoapApiEntry { Name = "GetOrders", Description = "List customer orders" }, new SoapApiEntry { Name = "SubmitTicket", Description = "Submit support ticket" }, new SoapApiEntry { Name = "GetTicketStatus", Description = "Check ticket status" }]),
+        new("s4", "InventorySync", "https://soap.inventory.com/SyncService", "Real-time inventory sync", "disabled", "Vikram Singh", "2024-01-15", 1, "api-key", "sync_user", "sk-sync-abc123", "", [new SoapApiEntry { Name = "SyncInventory", Description = "Synchronize inventory data" }]),
+        new("s5", "PaymentGateway", "https://soap.payment.com/Gateway", "Payment processing gateway", "enabled", "Priya Sharma", "2023-11-20", 4, "bearer", "", "eyJhbGciOiJIUzI1NiJ9.eyJ...", "", [new SoapApiEntry { Name = "ProcessPayment", Description = "Process customer payment" }, new SoapApiEntry { Name = "RefundTransaction", Description = "Issue refund" }, new SoapApiEntry { Name = "GetTransactionLog", Description = "Retrieve transaction log" }, new SoapApiEntry { Name = "ValidateCard", Description = "Validate credit card" }]),
+        new("s6", "OrderProcessing", "https://soap.orders.com/OrderService", "Order management system", "enabled", "Rahul Patel", "2024-03-10", 6, "ntlm", "ORDERS\\svc_order", "p@ssw0rd", "ORDERS", [new SoapApiEntry { Name = "CreateOrder", Description = "Create new order" }, new SoapApiEntry { Name = "CancelOrder", Description = "Cancel existing order" }, new SoapApiEntry { Name = "GetOrderDetails", Description = "Get order details" }, new SoapApiEntry { Name = "UpdateOrderStatus", Description = "Update order status" }, new SoapApiEntry { Name = "ListOrders", Description = "List all orders" }, new SoapApiEntry { Name = "GetOrderHistory", Description = "Get order history" }]),
+        new("s7", "NotificationHub", "https://soap.notify.com/NotifyService", "Centralized notification service", "enabled", "Suresh Kumar", "2024-02-28", 3, "none", "", "", "", [new SoapApiEntry { Name = "SendEmail", Description = "Send email notification" }, new SoapApiEntry { Name = "SendSms", Description = "Send SMS notification" }, new SoapApiEntry { Name = "GetDeliveryStatus", Description = "Check delivery status" }]),
+        new("s8", "ReportingEngine", "https://soap.report.com/ReportService", "Business reporting engine", "disabled", "Anita Desai", "2023-10-12", 2, "basic", "report_user", "", "", [new SoapApiEntry { Name = "GenerateReport", Description = "Generate business report" }, new SoapApiEntry { Name = "ExportReport", Description = "Export report as file" }])
     ];
 
     private string _searchText = "";
@@ -255,6 +406,16 @@
     private string _filterOperations = "";
     private int _currentPage = 1;
     private bool _showFilterModal = false;
+    private bool _showAddModal = false;
+    private string _newAppName = "";
+    private string _newAppUrl = "";
+    private string _newAppDescription = "";
+    private string _newAppStatus = "enabled";
+    private string _newAuthType = "basic";
+    private string _newAuthUsername = "";
+    private string _newAuthPassword = "";
+    private string _newAuthExtra = "";
+    private List<SoapApiEntry> _newApis = [];
     private bool _showDropdown = false;
     private string _sortColumn = "";
     private bool _sortAscending = true;
@@ -309,6 +470,57 @@
     private void OnFilterApplied()
     {
         _currentPage = 1;
+    }
+
+    private void HandleAddApplication()
+    {
+        if (string.IsNullOrWhiteSpace(_newAppName) || string.IsNullOrWhiteSpace(_newAppUrl))
+            return;
+
+        var newId = $"s{_allApps.Length + 1}";
+        var newApp = new SoapApp(
+            newId,
+            _newAppName.Trim(),
+            _newAppUrl.Trim(),
+            _newAppDescription.Trim(),
+            _newAppStatus,
+            "Anonymous",
+            DateTime.Now.ToString("yyyy-MM-dd"),
+            _newApis.Count,
+            _newAuthType,
+            _newAuthUsername.Trim(),
+            _newAuthPassword.Trim(),
+            _newAuthExtra.Trim(),
+            [.._newApis]
+        );
+        _allApps = [.._allApps, newApp];
+
+        _showAddModal = false;
+        ResetAddForm();
+        _currentPage = 1;
+    }
+
+    private void AddApiEntry()
+    {
+        _newApis.Add(new SoapApiEntry());
+    }
+
+    private void RemoveApiEntry(int index)
+    {
+        _newApis.RemoveAt(index);
+    }
+
+    private void ResetAddForm()
+    {
+        _newAppName = "";
+        _newAppUrl = "";
+        _newAppDescription = "";
+        _newAppStatus = "enabled";
+        _newAuthType = "basic";
+        _newAuthUsername = "";
+        _newAuthPassword = "";
+        _newAuthExtra = "";
+        _newApis = [];
     }
 
     private void HandleResetSort()

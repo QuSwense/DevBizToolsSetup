@@ -16,11 +16,22 @@
         const current = html.getAttribute('data-theme') || 'light';
         const next = current === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', next);
-        localStorage.setItem('dg-theme', next);
+        localStorage.setItem('sh-theme', next);
     };
 
     window.toggleSidebar = function () {
-        document.getElementById('mainSidebar').classList.toggle('collapsed');
+        const sidebar = document.getElementById('mainSidebar');
+        sidebar.classList.toggle('collapsed');
+        const icon = document.querySelector('.btn-collapse i');
+        if (icon) {
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            icon.className = isCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
+        }
+        const btn = document.querySelector('.btn-collapse');
+        if (btn) {
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            btn.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+        }
     };
 
     window.toggleSubmenu = function (el) {
@@ -29,6 +40,11 @@
         if (sub && sub.classList.contains('submenu')) {
             sub.style.display = sub.style.display === 'flex' ? 'none' : 'flex';
         }
+    };
+
+    window.toggleMobileMenu = function () {
+        document.querySelector('.sidebar')?.classList.toggle('mobile-open');
+        document.getElementById('sidebarOverlay')?.classList.toggle('show');
     };
 
     function matchNavPath(currentPath, href) {
@@ -66,7 +82,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const saved = localStorage.getItem('dg-theme');
+        const saved = localStorage.getItem('sh-theme');
         if (saved) document.documentElement.setAttribute('data-theme', saved);
 
         function checkMobile() {

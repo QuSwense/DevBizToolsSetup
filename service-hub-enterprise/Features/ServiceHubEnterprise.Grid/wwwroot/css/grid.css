@@ -5,9 +5,9 @@
 
 /* ── DataGrid Card ── */
 .datagrid-card {
-    background: var(--dg-surface);
-    border: 1px solid var(--dg-border);
-    box-shadow: var(--dg-shadow-sm);
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    box-shadow: var(--sh-shadow-sm);
     overflow: visible;
 }
 
@@ -18,8 +18,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 12px 14px;
-    background: var(--dg-surface);
-    border-bottom: 1px solid var(--dg-border);
+    background: var(--sh-surface);
+    border-bottom: 1px solid var(--sh-border);
 }
 
 .toolbar-left {
@@ -49,7 +49,7 @@
     left: 11px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     font-size: 14px;
     pointer-events: none;
 }
@@ -58,17 +58,17 @@
     width: 100%;
     height: 36px;
     padding: 0 36px 0 34px;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-input-bg);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-input-bg);
     font-size: 13px;
-    color: var(--dg-text);
+    color: var(--sh-text);
 }
 
 .search-box input:focus {
     outline: 0;
-    background: var(--dg-surface);
-    border-color: var(--dg-accent);
-    box-shadow: var(--dg-focus);
+    background: var(--sh-surface);
+    border-color: var(--sh-accent);
+    box-shadow: var(--sh-focus);
 }
 
 .search-clear {
@@ -80,7 +80,7 @@
     height: 22px;
     border: 0;
     background: transparent;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     display: none;
     cursor: pointer;
     align-items: center;
@@ -106,29 +106,29 @@
     padding: 0 9px;
     font-size: 12px;
     font-weight: 500;
-    background: var(--dg-surface-2);
-    border: 1px solid var(--dg-border);
-    color: var(--dg-text-soft);
+    background: var(--sh-surface-2);
+    border: 1px solid var(--sh-border);
+    color: var(--sh-text-soft);
 }
 
 .meta-pill.selected {
-    background: var(--dg-accent-soft);
-    color: var(--dg-accent);
+    background: var(--sh-accent-soft);
+    color: var(--sh-accent);
 }
 
 .meta-sep {
     width: 1px;
     height: 18px;
-    background: var(--dg-border);
+    background: var(--sh-border);
 }
 
 /* ── Buttons ── */
 .btn-dg {
     height: 36px;
     padding: 0 12px;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-surface);
-    color: var(--dg-text);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-surface);
+    color: var(--sh-text);
     font-size: 12.5px;
     font-weight: 500;
     display: inline-flex;
@@ -142,16 +142,16 @@
 }
 
 .btn-dg:hover {
-    background: var(--dg-surface-2);
+    background: var(--sh-surface-2);
 }
 
 .btn-dg.active {
-    background: var(--dg-primary);
-    color: var(--dg-primary-text);
-    border-color: var(--dg-primary);
+    background: var(--sh-primary);
+    color: var(--sh-primary-text);
+    border-color: var(--sh-primary);
 }
 
-.btn-dg-icon {
+.btn-sh-icon {
     width: 36px;
     padding: 0;
     justify-content: center;
@@ -166,35 +166,35 @@
     justify-content: center;
 }
 
-.btn-dg-primary {
-    background: var(--dg-primary);
-    border-color: var(--dg-primary);
-    color: var(--dg-primary-text);
+.btn-sh-primary {
+    background: var(--sh-primary);
+    border-color: var(--sh-border);
+    color: var(--sh-primary-text);
 }
 
-.btn-dg-primary:hover {
-    background: var(--dg-primary-hover);
+.btn-sh-primary:hover {
+    background: var(--sh-primary-hover);
 }
 
-.btn-dg-ghost {
+.btn-sh-ghost {
     border-color: transparent;
     background: transparent;
 }
 
-.btn-dg-danger {
-    background: var(--dg-error);
-    border-color: var(--dg-error);
-    color: var(--dg-primary-text);
+.btn-sh-danger {
+    background: var(--sh-error);
+    border-color: var(--sh-border);
+    color: var(--sh-primary-text);
 }
 
-.btn-dg-danger:hover {
-    background: var(--dg-error-hover);
+.btn-sh-danger:hover {
+    background: var(--sh-error-hover);
 }
 
 /* ── Table ── */
 .table-wrap {
     overflow: auto;
-    background: var(--dg-surface);
+    background: var(--sh-surface);
 }
 
 table.datagrid {
@@ -207,13 +207,13 @@ table.datagrid {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: var(--dg-table-head);
-    border-bottom: 1px solid var(--dg-border);
+    background: var(--sh-table-head);
+    border-bottom: 1px solid var(--sh-border);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: .06em;
     text-transform: uppercase;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     padding: 8px 14px;
     white-space: nowrap;
     user-select: none;
@@ -225,25 +225,25 @@ table.datagrid {
 }
 
 .datagrid thead th.sortable:hover {
-    background: var(--dg-surface-2);
-    color: var(--dg-text);
+    background: var(--sh-surface-2);
+    color: var(--sh-text);
 }
 
 .datagrid tbody td {
     padding: 8px 14px;
     font-size: 13px;
-    border-bottom: 1px solid var(--dg-border);
-    color: var(--dg-text);
-    background: var(--dg-surface);
+    border-bottom: 1px solid var(--sh-border);
+    color: var(--sh-text);
+    background: var(--sh-surface);
     vertical-align: middle;
 }
 
 .datagrid tbody tr:hover td {
-    background: var(--dg-row-hover);
+    background: var(--sh-row-hover);
 }
 
 .datagrid tbody tr.is-selected td {
-    background: var(--dg-row-selected);
+    background: var(--sh-row-selected);
 }
 
 .check-cell {
@@ -260,44 +260,44 @@ table.datagrid {
     padding: 0 8px;
     font-size: 11px;
     font-weight: 600;
-    border: 1px solid var(--dg-border);
+    border: 1px solid var(--sh-border);
 }
 
 .status-enabled {
-    background: var(--dg-success-bg);
-    color: var(--dg-success-text);
-    border-color: var(--dg-success-border);
+    background: var(--sh-success-bg);
+    color: var(--sh-success-text);
+    border-color: var(--sh-success-border);
 }
 
 [data-theme="dark"] .status-enabled {
-    background: var(--dg-success-bg);
-    color: var(--dg-success-text);
-    border-color: var(--dg-success-border);
+    background: var(--sh-success-bg);
+    color: var(--sh-success-text);
+    border-color: var(--sh-success-border);
 }
 
 .status-disabled {
-    background: var(--dg-surface-2);
-    color: var(--dg-text-soft);
-    border-color: var(--dg-border);
+    background: var(--sh-surface-2);
+    color: var(--sh-text-soft);
+    border-color: var(--sh-border);
 }
 
 .status-down {
-    background: var(--dg-error-bg);
-    color: var(--dg-error-text);
-    border-color: var(--dg-error-border);
+    background: var(--sh-error-bg);
+    color: var(--sh-error-text);
+    border-color: var(--sh-error-border);
 }
 
 [data-theme="dark"] .status-down {
-    background: var(--dg-error-bg);
-    color: var(--dg-error-text);
-    border-color: var(--dg-error-border);
+    background: var(--sh-error-bg);
+    color: var(--sh-error-text);
+    border-color: var(--sh-error-border);
 }
 
 /* ── Cell Types ── */
 .cell-id {
     font-family: 'JetBrains Mono', 'Menlo', monospace;
     font-size: 12px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
 }
 
 .name-stack {
@@ -314,8 +314,8 @@ table.datagrid {
     justify-content: center;
     font-size: 11px;
     font-weight: 600;
-    background: var(--dg-surface-3);
-    border: 1px solid var(--dg-border);
+    background: var(--sh-surface-3);
+    border: 1px solid var(--sh-border);
     flex-shrink: 0;
 }
 
@@ -339,18 +339,18 @@ th.sortable:hover .sort-indicator {
 .form-control-dg {
     height: 36px;
     padding: 0 10px;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-input-bg);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-input-bg);
     font-size: 13px;
-    color: var(--dg-text);
+    color: var(--sh-text);
     font-family: inherit;
 }
 
 .form-control-dg:focus {
     outline: 0;
-    border-color: var(--dg-accent);
-    box-shadow: var(--dg-focus);
-    background: var(--dg-surface);
+    border-color: var(--sh-accent);
+    box-shadow: var(--sh-focus);
+    background: var(--sh-surface);
 }
 
 .form-control-dg.textarea {
@@ -365,7 +365,7 @@ th.sortable:hover .sort-indicator {
     height: 15px;
     margin: 0;
     cursor: pointer;
-    accent-color: var(--dg-accent);
+    accent-color: var(--sh-accent);
 }
 
 .form-group {
@@ -379,14 +379,14 @@ th.sortable:hover .sort-indicator {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
 }
 
 /* ── Modal ── */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: var(--dg-overlay);
+    background: var(--sh-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -394,9 +394,9 @@ th.sortable:hover .sort-indicator {
 }
 
 .modal-content-dg {
-    background: var(--dg-surface);
-    border: 1px solid var(--dg-border);
-    box-shadow: var(--dg-shadow-md);
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    box-shadow: var(--sh-shadow-md);
     width: 480px;
     max-width: calc(100vw - 48px);
     max-height: calc(100vh - 48px);
@@ -408,7 +408,7 @@ th.sortable:hover .sort-indicator {
     align-items: center;
     justify-content: space-between;
     padding: 14px 16px;
-    border-bottom: 1px solid var(--dg-border);
+    border-bottom: 1px solid var(--sh-border);
 }
 
 .modal-header-dg h3 {
@@ -430,7 +430,7 @@ th.sortable:hover .sort-indicator {
     justify-content: flex-end;
     gap: 8px;
     padding: 12px 16px;
-    border-top: 1px solid var(--dg-border);
+    border-top: 1px solid var(--sh-border);
 }
 
 /* ── Row / Header / Footer Action Wraps (action-trigger + inline-actions) ── */
@@ -444,28 +444,28 @@ th.sortable:hover .sort-indicator {
 .action-trigger {
     width: 32px;
     height: 30px;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-surface);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-surface);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     cursor: pointer;
     font-size: 14px;
     transition: background .12s, color .12s;
 }
 
 .action-trigger:hover {
-    background: var(--dg-surface-2);
-    color: var(--dg-text);
+    background: var(--sh-surface-2);
+    color: var(--sh-text);
 }
 
 .inline-actions {
     display: none;
     align-items: center;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-surface);
-    box-shadow: var(--dg-shadow-md);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-surface);
+    box-shadow: var(--sh-shadow-md);
     height: 30px;
 }
 
@@ -474,9 +474,9 @@ th.sortable:hover .sort-indicator {
 .footer-actions-wrap .inline-actions {
     display: none;
     align-items: center;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-surface);
-    box-shadow: var(--dg-shadow-md);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-surface);
+    box-shadow: var(--sh-shadow-md);
     height: 30px;
 }
 
@@ -501,8 +501,8 @@ th.sortable:hover .sort-indicator {
     align-items: center;
     justify-content: flex-end;
     padding: 10px 14px;
-    border-top: 1px solid var(--dg-border);
-    background: var(--dg-surface);
+    border-top: 1px solid var(--sh-border);
+    background: var(--sh-surface);
 }
 
 .pagination-footer-inner-wrap {
@@ -517,7 +517,7 @@ th.sortable:hover .sort-indicator {
     padding: 0 8px;
     border: none;
     background: transparent;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -528,20 +528,20 @@ th.sortable:hover .sort-indicator {
 }
 
 .ia-btn:hover {
-    background: var(--dg-surface-2);
-    color: var(--dg-text);
+    background: var(--sh-surface-2);
+    color: var(--sh-text);
 }
 
 .ia-btn.ia-edit:hover {
-    color: var(--dg-accent);
+    color: var(--sh-accent);
 }
 
 .ia-btn.ia-danger:hover {
-    color: var(--dg-error);
+    color: var(--sh-error);
 }
 
 .ia-btn.ia-close:hover {
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
 }
 
 /* ── Expand / Collapse ── */
@@ -551,7 +551,7 @@ th.sortable:hover .sort-indicator {
     padding: 0;
     border: 1px solid transparent;
     background: transparent;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -562,8 +562,8 @@ th.sortable:hover .sort-indicator {
 }
 
 .expand-btn:hover {
-    background: var(--dg-surface-2);
-    color: var(--dg-text);
+    background: var(--sh-surface-2);
+    color: var(--sh-text);
 }
 
 /* ── Detail Row ── */
@@ -576,7 +576,7 @@ th.sortable:hover .sort-indicator {
 }
 
 .detail-label {
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .05em;
@@ -584,16 +584,16 @@ th.sortable:hover .sort-indicator {
 }
 
 .detail-value {
-    color: var(--dg-text);
+    color: var(--sh-text);
 }
 
 /* ── Filter Button ── */
 .filter-btn {
     height: 26px;
     padding: 0 9px;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-surface-2);
-    color: var(--dg-text-soft);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-surface-2);
+    color: var(--sh-text-soft);
     font-size: 11px;
     font-weight: 500;
     display: inline-flex;
@@ -605,8 +605,8 @@ th.sortable:hover .sort-indicator {
 }
 
 .filter-btn:hover {
-    background: var(--dg-surface);
-    color: var(--dg-text);
+    background: var(--sh-surface);
+    color: var(--sh-text);
 }
 
 /* ── Dropdown Menu ── */
@@ -616,9 +616,9 @@ th.sortable:hover .sort-indicator {
     right: 0;
     z-index: 51;
     min-width: 200px;
-    background: var(--dg-surface);
-    border: 1px solid var(--dg-border);
-    box-shadow: var(--dg-shadow-md);
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    box-shadow: var(--sh-shadow-md);
     margin-top: 4px;
 }
 
@@ -631,7 +631,7 @@ th.sortable:hover .sort-indicator {
     background: transparent;
     font-size: 12.5px;
     font-weight: 500;
-    color: var(--dg-text);
+    color: var(--sh-text);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -641,11 +641,11 @@ th.sortable:hover .sort-indicator {
 }
 
 .dropdown-item-dg:hover {
-    background: var(--dg-surface-2);
+    background: var(--sh-surface-2);
 }
 
-.dropdown-item-dg-danger {
-    color: var(--dg-error);
+.dropdown-item-sh-danger {
+    color: var(--sh-error);
 }
 
 .dropdown-header-dg {
@@ -654,12 +654,12 @@ th.sortable:hover .sort-indicator {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .06em;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
 }
 
 .dropdown-divider-dg {
     height: 1px;
-    background: var(--dg-border);
+    background: var(--sh-border);
     margin: 4px 0;
 }
 
@@ -669,13 +669,13 @@ th.sortable:hover .sort-indicator {
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    border-top: 1px solid var(--dg-border);
-    background: var(--dg-surface);
+    border-top: 1px solid var(--sh-border);
+    background: var(--sh-surface);
 }
 
 .pagination-info {
     font-size: 12px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
 }
 
 .pagination-controls {
@@ -687,9 +687,9 @@ th.sortable:hover .sort-indicator {
 .pagination-btn {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid var(--dg-border);
-    background: var(--dg-surface);
-    color: var(--dg-text);
+    border: 1px solid var(--sh-border);
+    background: var(--sh-surface);
+    color: var(--sh-text);
     font-size: 11px;
     font-weight: 500;
     cursor: pointer;
@@ -701,8 +701,8 @@ th.sortable:hover .sort-indicator {
 }
 
 .pagination-btn:hover:not(:disabled) {
-    background: var(--dg-surface-2);
-    border-color: var(--dg-border-strong);
+    background: var(--sh-surface-2);
+    border-color: var(--sh-border-strong);
 }
 
 .pagination-btn:disabled {
@@ -718,7 +718,7 @@ th.sortable:hover .sort-indicator {
 }
 
 .pagination-num span {
-    color: var(--dg-accent);
+    color: var(--sh-accent);
 }
 
 /* ── Action Icons ── */
@@ -733,7 +733,7 @@ th.sortable:hover .sort-indicator {
     padding: 0;
     border: 1px solid transparent;
     background: transparent;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -744,8 +744,8 @@ th.sortable:hover .sort-indicator {
 }
 
 .action-icon-btn:hover {
-    background: var(--dg-surface-2);
-    color: var(--dg-text);
+    background: var(--sh-surface-2);
+    color: var(--sh-text);
 }
 
 /* ── Verb Badge ── */
@@ -763,8 +763,8 @@ th.sortable:hover .sort-indicator {
 /* ── Progress Bar ── */
 .progress-bar-dg {
     height: 6px;
-    background: var(--dg-surface-2);
-    border: 1px solid var(--dg-border);
+    background: var(--sh-surface-2);
+    border: 1px solid var(--sh-border);
     overflow: hidden;
 }
 
@@ -781,9 +781,9 @@ th.sortable:hover .sort-indicator {
     padding: 0 6px;
     font-size: 10px;
     font-weight: 600;
-    background: var(--dg-surface-2);
-    border: 1px solid var(--dg-border);
-    color: var(--dg-text-soft);
+    background: var(--sh-surface-2);
+    border: 1px solid var(--sh-border);
+    color: var(--sh-text-soft);
 }
 
 /* ── Empty State ── */
@@ -799,20 +799,20 @@ th.sortable:hover .sort-indicator {
 
 .empty-state-icon {
     font-size: 40px;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     margin-bottom: 4px;
 }
 
 .empty-state-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--dg-text);
+    color: var(--sh-text);
     margin: 0;
 }
 
 .empty-state-desc {
     font-size: 13px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     max-width: 420px;
     line-height: 1.5;
     margin: 0;
@@ -838,24 +838,24 @@ th.sortable:hover .sort-indicator {
     align-items: center;
     gap: 4px;
     font-size: 13px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
 }
 
 .breadcrumb-root {
     font-weight: 500;
-    color: var(--dg-accent);
+    color: var(--sh-accent);
 }
 
 .breadcrumb-current {
     font-weight: 600;
-    color: var(--dg-text);
+    color: var(--sh-text);
 }
 
 /* ── Mono text ── */
 .mono-text {
     font-family: 'JetBrains Mono', 'Menlo', monospace;
     font-size: 12px;
-    color: var(--dg-text);
+    color: var(--sh-text);
 }
 
 /* ── Context Menu ── */
@@ -864,9 +864,9 @@ th.sortable:hover .sort-indicator {
     z-index: 1000;
     min-width: 180px;
     max-width: 260px;
-    background: var(--dg-surface);
-    border: 1px solid var(--dg-border);
-    box-shadow: var(--dg-shadow-md);
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    box-shadow: var(--sh-shadow-md);
     padding: 4px 0;
     display: none;
     font-size: 12.5px;
@@ -884,7 +884,7 @@ th.sortable:hover .sort-indicator {
     padding: 7px 14px;
     border: none;
     background: transparent;
-    color: var(--dg-text);
+    color: var(--sh-text);
     cursor: pointer;
     font-family: inherit;
     font-size: 12.5px;
@@ -894,32 +894,32 @@ th.sortable:hover .sort-indicator {
 }
 
 .context-menu-item-dg:hover {
-    background: var(--dg-surface-2);
+    background: var(--sh-surface-2);
 }
 
 .context-menu-item-dg i {
     width: 16px;
     text-align: center;
     font-size: 13px;
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     flex-shrink: 0;
 }
 
-.context-menu-item-dg-danger {
-    color: var(--dg-error);
+.context-menu-item-sh-danger {
+    color: var(--sh-error);
 }
 
-.context-menu-item-dg-danger i {
-    color: var(--dg-error);
+.context-menu-item-sh-danger i {
+    color: var(--sh-error);
 }
 
-.context-menu-item-dg-danger:hover {
-    background: var(--dg-error-bg);
+.context-menu-item-sh-danger:hover {
+    background: var(--sh-error-bg);
 }
 
 .context-menu-divider-dg {
     height: 1px;
-    background: var(--dg-border);
+    background: var(--sh-border);
     margin: 4px 0;
 }
 
@@ -929,7 +929,7 @@ th.sortable:hover .sort-indicator {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .06em;
-    color: var(--dg-text-faint);
+    color: var(--sh-text-faint);
     user-select: none;
 }
 

@@ -8,12 +8,12 @@
 }
 
 .breadcrumb-root {
-    color: var(--dg-text-soft);
+    color: var(--sh-text-soft);
     font-size: 12px;
 }
 
 .breadcrumb-current {
-    color: var(--dg-accent);
+    color: var(--sh-accent);
     font-size: 12px;
     font-weight: 500;
 }

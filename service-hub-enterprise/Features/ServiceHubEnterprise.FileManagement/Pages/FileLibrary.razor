@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="toolbar-right">
-            <button class="btn btn-dark btn-dg-primary">
+            <button class="btn btn-dark btn-sh-primary">
                 <i class="bi bi-plus-lg"></i>
                 Upload
             </button>
@@ -59,7 +59,7 @@
             <tbody>
                 @foreach (var file in files)
                 {
-                    var typeColor = file.Type == "json" ? "var(--dg-success)" : "var(--dg-warning)";
+                    var typeColor = file.Type == "json" ? "var(--sh-success)" : "var(--sh-warning)";
                     <tr>
                         <td class="check-cell"><input type="checkbox" class="form-check-input"
                                                           aria-label="Select @file.FileName" /></td>
@@ -69,13 +69,13 @@
                                     <span class="file-name">@file.FileName</span>
                                 </div>
                             </td>
-                            <td style="color:var(--dg-text-soft)">@file.AppName</td>
+                            <td style="color:var(--sh-text-soft)">@file.AppName</td>
                             <td>
-                                <span class="type-badge" style="text-transform:uppercase">@file.Type</span>
+                                <span class="type-badge text-uppercase">@file.Type</span>
                             </td>
-                            <td style="color:var(--dg-text-soft)">@file.Size</td>
-                            <td
-                                style="color:var(--dg-text-soft);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                            <td style="color:var(--sh-text-soft)">@file.Size</td>
+                            <td class="text-nowrap overflow-hidden"
+                                style="color:var(--sh-text-soft);max-width:200px;text-overflow:ellipsis">
                                 @file.LinkedTo</td>
                                 <td>
                                     <div class="action-icons">

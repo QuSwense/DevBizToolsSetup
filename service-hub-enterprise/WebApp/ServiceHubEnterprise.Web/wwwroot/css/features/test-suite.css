@@ -3,7 +3,7 @@
 /* Progress bar */
 .progress-bar-dg {
     height: 6px;
-    background: var(--dg-surface-3);
+    background: var(--sh-surface-3);
     overflow: hidden;
 }
 

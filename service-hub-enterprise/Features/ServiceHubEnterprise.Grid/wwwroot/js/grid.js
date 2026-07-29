@@ -24,7 +24,7 @@
  *       </div>
  *     </div>
  *     <div class="toolbar-right">
- *       <button class="btn btn-dark btn-dg-primary"><i class="bi bi-plus-lg"></i> Add</button>
+ *       <button class="btn btn-dark btn-sh-primary"><i class="bi bi-plus-lg"></i> Add</button>
  *       <button class="btn btn-outline-secondary btn-dg"><i class="bi bi-download"></i> Export</button>
  *       <!-- Header actions using action-trigger + inline-actions pattern -->
  *       <div class="header-actions-wrap">

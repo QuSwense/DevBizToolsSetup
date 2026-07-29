@@ -1,0 +1,111 @@
+/* ============================================================
+   SERVICE HUB V8 — Design Tokens / CSS Variables
+   ============================================================
+   Shared design tokens consumed by service-hub.css and all
+   feature-specific stylesheets. Host apps can override any
+   variable by defining it in their own :root.
+   ============================================================ */
+
+:root {
+    --sh-bg: #f1f5f9;
+    --sh-surface: #ffffff;
+    --sh-surface-2: #f8fafc;
+    --sh-surface-3: #f1f5f9;
+    --sh-border: #e2e8f0;
+    --sh-border-strong: #cbd5e1;
+    --sh-text: #0f172a;
+    --sh-text-soft: #64748b;
+    --sh-text-faint: #94a3b8;
+    --sh-primary: #111827;
+    --sh-primary-hover: #1f2937;
+    --sh-primary-text: #ffffff;
+    --sh-accent: #2563eb;
+    --sh-accent-soft: #eff6ff;
+    --sh-shadow-sm: 0 1px 2px rgba(16, 24, 40, .04);
+    --sh-shadow-md: 0 4px 16px rgba(16, 24, 40, .06), 0 1px 2px rgba(16, 24, 40, .05);
+    --sh-focus: 0 0 0 4px rgba(37, 99, 235, .12);
+    --sh-table-head: #f8fafc;
+    --sh-row-hover: #f8fafc;
+    --sh-row-selected: #f0f7ff;
+    --sh-input-bg: #f8fafc;
+
+    /* Semantic status colors */
+    --sh-success: #059669;
+    --sh-success-bg: #ecfdf5;
+    --sh-success-text: #065f46;
+    --sh-success-border: #a7f3d0;
+    --sh-warning: #d97706;
+    --sh-warning-bg: #fffbeb;
+    --sh-error: #dc2626;
+    --sh-error-bg: #fef2f2;
+    --sh-error-text: #991b1b;
+    --sh-error-border: #fecaca;
+    --sh-error-hover: #b91c1c;
+
+    /* Overlays & misc */
+    --sh-overlay: rgba(0, 0, 0, .35);
+    --sh-overlay-strong: rgba(0, 0, 0, .4);
+    --sh-submenu-border: rgba(148, 163, 184, .15);
+    --sh-active-inset: rgba(255, 255, 255, 0.04);
+
+    /* Sidebar extras */
+    --sb-text-bright: #e2e8f0;
+    --sb-text-active: #ffffff;
+    --sb-width: 280px;
+    --sb-collapsed-width: 64px;
+    --sb-bg: #0f172a;
+    --sb-border: #1e293b;
+    --sb-text: #cbd5e1;
+    --sb-text-soft: #94a3b8;
+    --sb-text-faint: #64748b;
+    --sb-hover: #1e293b;
+    --sb-active: #334155;
+    --sb-active-border: #60a5fa;
+}
+
+[data-theme="dark"] {
+    --sh-bg: #070a0f;
+    --sh-surface: #111820;
+    --sh-surface-2: #16202e;
+    --sh-surface-3: #1c2a3a;
+    --sh-border: #1e2e42;
+    --sh-border-strong: #2a3d56;
+    --sh-text: #e6edf6;
+    --sh-text-soft: #8a9bb3;
+    --sh-text-faint: #5c708a;
+    --sh-primary: #f1f5f9;
+    --sh-primary-hover: #e2e8f0;
+    --sh-primary-text: #0f172a;
+    --sh-accent: #60a5fa;
+    --sh-accent-soft: #10233f;
+    --sh-shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+    --sh-shadow-md: 0 8px 24px rgba(0, 0, 0, .4);
+    --sh-focus: 0 0 0 4px rgba(96, 165, 250, .18);
+    --sh-table-head: #0f1a28;
+    --sh-row-hover: #16202e;
+    --sh-row-selected: #13233a;
+    --sh-input-bg: #16202e;
+
+    /* Semantic status colors (dark) */
+    --sh-success-bg: #0c2a1a;
+    --sh-success-text: #6ee7b7;
+    --sh-success-border: #166534;
+    --sh-error-bg: #2a0c0c;
+    --sh-error-text: #fca5a5;
+    --sh-error-border: #7f1d1d;
+
+    /* Overlays & misc (dark) */
+    --sh-overlay: rgba(0, 0, 0, .5);
+    --sh-overlay-strong: rgba(0, 0, 0, .6);
+    --sh-submenu-border: rgba(148, 163, 184, .08);
+
+    /* Sidebar extras (dark) */
+    --sb-bg: #0a0e14;
+    --sb-border: #1a2538;
+    --sb-text: #94a3b8;
+    --sb-text-soft: #64748b;
+    --sb-text-faint: #475569;
+    --sb-hover: #16202e;
+    --sb-active: #16202e;
+    --sb-active-border: #60a5fa;
+}

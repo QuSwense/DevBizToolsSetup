@@ -1,5 +1,6 @@
 {
     "github.copilot.chat.codeGeneration.useInstructionFiles": true,
     "chat.includeApplyingInstructions": true,
-    "http.proxyStrictSSL": false
+    "http.proxyStrictSSL": false,
+    "dotnet.defaultSolution": "ServiceHubEnterprise.slnx"
 }

@@ -12,7 +12,7 @@
  *       <i class="bi bi-eye"></i> View
  *     </button>
  *     <div class="context-menu-divider-dg"></div>
- *     <button class="context-menu-item-dg context-menu-item-dg-danger" data-action="delete">
+ *     <button class="context-menu-item-dg context-menu-item-sh-danger" data-action="delete">
  *       <i class="bi bi-trash"></i> Delete
  *     </button>
  *   </div>
@@ -197,7 +197,7 @@ class ServiceHubContextMenu {
             let className = 'context-menu-item-dg';
 
             if (item.danger) {
-                className += ' context-menu-item-dg-danger';
+                className += ' context-menu-item-sh-danger';
             }
 
             if (item.disabled) {

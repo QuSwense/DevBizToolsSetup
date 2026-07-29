@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="toolbar-right">
-            <button class="btn btn-dark btn-dg-primary">
+            <button class="btn btn-dark btn-sh-primary">
                 <i class="bi bi-plus-lg"></i>
                 Create Suite
             </button>
@@ -57,15 +57,15 @@
                 @foreach (var suite in suites)
                 {
                     var pct = suite.Files > 0 ? (suite.Cases * 100 / suite.Files) : 0;
-                    var barColor = pct >= 60 ? "var(--dg-success)" : pct >= 30 ? "var(--dg-warning)" : "var(--dg-error)";
+                    var barColor = pct >= 60 ? "var(--sh-success)" : pct >= 30 ? "var(--sh-warning)" : "var(--sh-error)";
                     <tr>
                         <td class="check-cell"><input type="checkbox" class="form-check-input"
                                                           aria-label="Select @suite.Name" /></td>
                             <td>@suite.Name</td>
-                            <td style="color:var(--dg-text-soft)">@suite.Cases</td>
-                            <td style="color:var(--dg-text-soft)">@suite.Files</td>
+                            <td style="color:var(--sh-text-soft)">@suite.Cases</td>
+                            <td style="color:var(--sh-text-soft)">@suite.Files</td>
                             <td>
-                                <span style="font-weight:600;color:@barColor">@pct%</span>
+                                <span class="fw-semibold" style="color:@barColor">@pct%</span>
                             </td>
                             <td style="width:140px">
                                 <div class="progress-bar-dg">
