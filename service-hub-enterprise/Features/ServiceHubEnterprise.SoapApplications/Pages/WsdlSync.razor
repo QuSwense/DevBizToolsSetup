@@ -1,19 +1,1059 @@
 @page "/soap/wsdl-sync"
+@inject SoapAppStore _appStore
+@inject WsdlSyncStore _wsdlStore
 
-<div class="datagrid-card empty-state-card" style="padding:60px 20px;gap:12px">
-    <i class="bi bi-globe2 empty-state-icon" style="font-size:48px"></i>
-    <h3 class="empty-state-title">WSDL Sync</h3>
-    <p class="empty-state-desc">
-        Import WSDL documents to automatically create and update SOAP application definitions and operations.
-    </p>
-    <div class="empty-state-actions">
-        <button class="btn btn-dark btn-sh-primary">
-            <i class="bi bi-download"></i>
-            Import WSDL URL
-        </button>
-        <button class="btn btn-outline-secondary btn-dg">
-            <i class="bi bi-upload"></i>
-            Upload File
-        </button>
+@* ── Page Header ── *@
+<div class="datagrid-card" style="padding:18px 22px;margin-bottom:12px">
+    <div class="d-flex align-items-start justify-content-between gap-16px">
+        <div>
+            <div class="d-flex align-items-center gap-10px">
+                <i class="bi bi-globe2 fs-24 text-sh-accent"></i>
+                <h3 class="m-0 fs-18 fw-semibold">WSDL Sync</h3>
+            </div>
+            <p class="fs-13 text-sh-soft" style="margin:4px 0 0;max-width:500px">
+                Import WSDL documents to create and update SOAP application definitions.
+                Parser extracts only values between XML tags and attribute values.
+            </p>
+        </div>
+        <div class="d-flex gap-8px flex-shrink-0">
+            <button class="btn btn-sh-primary btn-dg btn-dark" @onclick='() => OpenSyncModal("url")' type="button">
+                <i class="bi bi-download"></i>
+                Import from URL
+            </button>
+            <button class="btn btn-outline-secondary btn-dg" @onclick='() => OpenSyncModal("upload")' type="button">
+                <i class="bi bi-upload"></i>
+                Upload File
+            </button>
+        </div>
+    </div>
+
+    @* App selector *@
+    <div class="d-flex align-items-center gap-12px border-sh-top" style="margin-top:14px;padding-top:14px">
+        <label class="fs-12 fw-semibold text-sh-soft text-nowrap">Application</label>
+        <select class="form-control-dg" style="max-width:300px" @bind="_selectedAppId" @bind:event="oninput">
+            <option value="">Select a SOAP application...</option>
+            @foreach (var app in _appStore.Apps.OrderBy(a => a.Name))
+            {
+                <option value="@app.Id">@app.Name</option>
+            }
+        </select>
+        <span class="meta-pill" style="display:@(_selectedAppId is null or "" ? "none" : "inline-flex")">
+            @_wsdlStore.GetRecordsForApp(_selectedAppId ?? "").Length syncs
+        </span>
     </div>
 </div>
+
+@if (string.IsNullOrEmpty(_selectedAppId))
+{
+    @* Empty state when no app selected *@
+    <div class="datagrid-card empty-state-card gap-10px" style="padding:48px 20px">
+        <i class="bi bi-hand-index-thumb fs-36 text-sh-faint"></i>
+        <p class="empty-state-desc text-sh-soft">
+            Select an application above to view its WSDL sync versions and templates.
+        </p>
+    </div>
+}
+else
+{
+    @* ── Two-panel layout ── *@
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:start">
+
+        @* ── LEFT PANEL: Tree Navigation ── *@
+        <div class="datagrid-card overflow-hidden" style="padding:0">
+            <div class="fs-11 fw-semibold text-uppercase ls-05 text-sh-faint border-sh-bottom" style="padding:10px 14px">
+                <i class="bi bi-diagram-2 me-2"></i>Application → WSDL → Version
+            </div>
+            <div style="padding:6px 0">
+                @{
+                    var selectedApp = _appStore.Apps.FirstOrDefault(a => a.Id == _selectedAppId);
+                }
+                @if (selectedApp is not null)
+                {
+                    var records = _wsdlStore.GetRecordsForApp(selectedApp.Id);
+                    <div class="tree-node tree-root @(_treeExpandedApps.Contains(selectedApp.Id) ? "is-expanded" : "")">
+                        <div class="tree-row" @onclick="() => ToggleTreeApp(selectedApp.Id)" role="button" tabindex="0">
+                            <span class="tree-chevron"><i class="bi @(_treeExpandedApps.Contains(selectedApp.Id) ? "bi-chevron-down" : "bi-chevron-right")"></i></span>
+                            <span class="avatar-sm fs-9" style="width:20px;height:20px;min-width:20px">@selectedApp.Name[..Math.Min(2, selectedApp.Name.Length)].ToUpper()</span>
+                            <span class="tree-label">@selectedApp.Name</span>
+                        </div>
+                        @if (_treeExpandedApps.Contains(selectedApp.Id))
+                        {
+                            <div class="tree-children">
+                                @if (records.Length == 0)
+                                {
+                                    <div class="tree-empty">No WSDL syncs yet</div>
+                                }
+                                @foreach (var rec in records)
+                                {
+                                    var isExpanded = _treeExpandedSyncs.Contains(rec.Id);
+                                    var versionsList = _wsdlStore.GetVersionsForSync(rec.Id);
+                                    <div class="tree-node @(isExpanded ? "is-expanded" : "")">
+                                        <div class="tree-row tree-row-sub @(_selectedSyncId == rec.Id ? "is-active" : "")"
+                                             @onclick='() => SelectSyncRecord(rec.Id)' role="button" tabindex="0">
+                                            <span class="tree-chevron" @onclick:stopPropagation="true" @onclick='() => ToggleTreeSync(rec.Id)'>
+                                                <i class="bi @(isExpanded ? "bi-chevron-down" : "bi-chevron-right")"></i>
+                                            </span>
+                                            <span class="tree-source-badge @(rec.SourceType == "url" ? "source-url" : "source-upload")">
+                                                <i class="bi @(rec.SourceType == "url" ? "bi-link-45deg" : "bi-file-earmark-arrow-up")"></i>
+                                            </span>
+                                            <span class="tree-label tree-label-sm">
+                                                @(rec.SourceType == "url" ? TruncateUrl(rec.SourceUrl) : rec.SourceUrl)
+                                            </span>
+                                            <span class="tree-count">@rec.VersionCount</span>
+                                        </div>
+                                        @if (isExpanded)
+                                        {
+                                            <div class="tree-children">
+                                                @foreach (var ver in versionsList)
+                                                {
+                                                    <div class="tree-node">
+                                                        <div class="tree-row tree-row-leaf @(_selectedVersionId == ver.Id ? "is-active" : "")"
+                                                             @onclick="() => SelectVersion(ver.Id)" role="button" tabindex="0">
+                                                            <span class="tree-version-dot @(ver.Status == "active" ? "dot-active" : "dot-archived")"></span>
+                                                            <span class="tree-label tree-label-xs">@ver.Label</span>
+                                                            @if (ver.Status == "archived")
+                                                            {
+                                                                <span class="tree-archived-tag">archived</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* ── RIGHT PANEL: Content Area ── *@
+        <div class="d-flex flex-column gap-12px">
+            @if (!string.IsNullOrEmpty(_selectedVersionId))
+            {
+                @* Version Detail Card *@
+                var selectedVersion = _wsdlStore.Versions.FirstOrDefault(v => v.Id == _selectedVersionId);
+                var parentRecord = selectedVersion is not null
+                    ? _wsdlStore.Records.FirstOrDefault(r => r.Id == selectedVersion.SyncRecordId)
+                    : null;
+                if (selectedVersion is not null && parentRecord is not null)
+                {
+                    <div class="datagrid-card" style="padding:16px 20px">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="d-flex align-items-center gap-10px">
+                                    <h4 class="m-0 fs-15 fw-semibold">@selectedVersion.Label</h4>
+                                    <span class="status-badge @(selectedVersion.Status == "active" ? "status-enabled" : "status-disabled")">
+                                        @(selectedVersion.Status == "active" ? "Active" : "Archived")
+                                    </span>
+                                </div>
+                                <p class="fs-12 text-sh-soft" style="margin:4px 0 0">
+                                    @selectedVersion.Notes
+                                </p>
+                            </div>
+                            <div class="d-flex gap-6px">
+                                <button class="btn btn-outline-secondary btn-dg fs-11" style="height:30px" @onclick="() => _showCreateRequestModal = true" type="button">
+                                    <i class="bi bi-file-earmark-plus"></i>
+                                    Create Request File
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border-sh bg-sh-surface-2" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;padding:12px">
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Source Type</div>
+                                <div class="fs-13 fw-medium" style="margin-top:2px">
+                                    @(parentRecord.SourceType == "url" ? "Imported from URL" : "Uploaded File")
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Source</div>
+                                <div class="fs-13 fw-medium text-break" style="margin-top:2px">@parentRecord.SourceUrl</div>
+                            </div>
+                            <div>
+                                <div class="fs-10 text-uppercase ls-05 text-sh-faint">Uploaded</div>
+                                <div class="fs-13 fw-medium" style="margin-top:2px">@selectedVersion.UploadedAt by @selectedVersion.UploadedBy</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @* No version selected, show records grid *@
+                    @RenderRecordsGrid(_selectedAppId ?? "")
+                }
+            }
+            else if (!string.IsNullOrEmpty(_selectedSyncId))
+            {
+                @* WSDL Record selected, show versions *@
+                var record = _wsdlStore.Records.FirstOrDefault(r => r.Id == _selectedSyncId);
+                var recordVersions = _wsdlStore.GetVersionsForSync(_selectedSyncId);
+                if (record is not null)
+                {
+                    <div class="datagrid-card" style="padding:16px 20px">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="d-flex align-items-center gap-8px">
+                                    <h4 class="m-0 fs-15 fw-semibold">
+                                        <i class="bi @(record.SourceType == "url" ? "bi-link-45deg" : "bi-file-earmark-arrow-up")" style="margin-right:6px;color:var(--sh-accent)"></i>
+                                        @(record.SourceType == "url" ? TruncateUrl(record.SourceUrl) : record.SourceUrl)
+                                    </h4>
+                                    <span class="status-badge @(record.Status == "synced" ? "status-enabled" : "status-down")">
+                                        @(record.Status == "synced" ? "Synced" : record.Status == "failed" ? "Failed" : "Parsing...")
+                                    </span>
+                                </div>
+                                <p class="fs-12 text-sh-soft" style="margin:4px 0 0">
+                                    @record.UploadedAt — @record.UploadedBy
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Versions grid *@
+                    <div class="datagrid-card">
+                        <div class="grid-toolbar">
+                            <div class="toolbar-left">
+                                <div class="meta-group">
+                                    <span class="meta-pill">@recordVersions.Length version(s)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="datagrid">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable"><span class="th-inner">Version<span class="sort-indicator"><i class="bi bi-chevron-expand"></i></span></span></th>
+                                        <th>Uploaded By</th>
+                                        <th>Uploaded At</th>
+                                        <th>Status</th>
+                                        <th>Notes</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ver in recordVersions)
+                                    {
+                                        <tr class="@(_selectedVersionId == ver.Id ? "is-selected" : "") cursor-pointer" @onclick="() => SelectVersion(ver.Id)" role="button">
+                                            <td><span class="cell-id">@ver.Label</span></td>
+                                            <td class="text-sh-soft">@ver.UploadedBy</td>
+                                            <td class="text-sh-soft">@ver.UploadedAt</td>
+                                            <td>
+                                                <span class="status-badge @(ver.Status == "active" ? "status-enabled" : "status-disabled")">
+                                                    @(ver.Status == "active" ? "Active" : "Archived")
+                                                </span>
+                                            </td>
+                                            <td class="text-sh-soft" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@ver.Notes</td>
+                                            <td>
+                                                <div class="action-icons">
+                                                    <button class="action-icon-btn" @onclick:stopPropagation @onclick="() => SelectVersion(ver.Id)" title="View details">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show all records for the selected app *@
+                @RenderRecordsGrid(_selectedAppId ?? "")
+            }
+        </div>
+    </div>
+
+    @* ── TEMPLATES SECTION (below two-panel) ── *@
+    <div class="mt-3">
+        <div class="datagrid-card">
+            <div class="grid-toolbar">
+                <div class="toolbar-left">
+                    <div class="fs-13 fw-semibold">
+                        <i class="bi bi-file-text me-2 text-sh-accent"></i>Request File Templates
+                    </div>
+                    <div class="meta-group ms-3">
+                        <span class="meta-pill">@_wsdlStore.Templates.Count templates</span>
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => OpenTemplateEditor(null)" type="button">
+                        <i class="bi bi-plus-lg"></i>
+                        Create Template
+                    </button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="datagrid">
+                    <thead>
+                        <tr>
+                            <th class="sortable"><span class="th-inner">Template Name<span class="sort-indicator"><i class="bi bi-chevron-expand"></i></span></span></th>
+                            <th>Description</th>
+                            <th>Extends</th>
+                            <th>Variables</th>
+                            <th>Usage</th>
+                            <th>Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tpl in _wsdlStore.GetTemplates())
+                        {
+                            <tr>
+                                <td><span class="cell-id">@tpl.Name</span></td>
+                                <td class="text-sh-soft" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@tpl.Description</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(tpl.ExtendsTemplateName))
+                                    {
+                                        <span class="type-badge text-sh-accent" style="background:var(--sh-accent-soft);border-color:currentColor">
+                                            <i class="bi bi-arrow-up-short me-1"></i>@tpl.ExtendsTemplateName
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-sh-faint">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:4px;flex-wrap:wrap">
+                                        @foreach (var v in tpl.Variables)
+                                        {
+                                            <span class="verb-badge" style="font-family:'JetBrains Mono','Menlo',monospace;font-size:10px;background:var(--sh-surface-2);border-color:var(--sh-border);color:var(--sh-text-soft)">
+                                                {{@v}}
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-sh-soft">@tpl.UsageCount uses</td>
+                                <td class="text-sh-soft">@tpl.UpdatedAt</td>
+                                <td>
+                                    <div class="action-icons">
+                                        <button class="action-icon-btn" @onclick="() => OpenTemplateEditor(tpl.Id)" title="Edit">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </button>
+                                        <button class="action-icon-btn" @onclick="() => OpenCreateFromTemplate(tpl.Id)" title="Create Request File">
+                                            <i class="bi bi-file-earmark-plus"></i> Use
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@* ══════════════════════════════════════════════════ *@
+@* ── SYNC MODAL (Import from URL / Upload File) ── *@
+@* ══════════════════════════════════════════════════ *@
+@if (_showSyncModal)
+{
+    <div class="modal-overlay" @onclick="() => _showSyncModal = false">
+        <div class="modal-content-dg" style="width:580px" @onclick:stopPropagation="true">
+            <div class="modal-header-dg">
+                <h3>@(_syncMode == "url" ? "Import WSDL from URL" : "Upload WSDL File")</h3>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showSyncModal = false" type="button" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                @* Tabs *@
+                <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--sh-border)">
+                    <button class="sync-tab @(_syncMode == "url" ? "is-active" : "")" @onclick='() => _syncMode = "url"' type="button">
+                        <i class="bi bi-link-45deg"></i> Import from URL
+                    </button>
+                    <button class="sync-tab @(_syncMode == "upload" ? "is-active" : "")" @onclick='() => _syncMode = "upload"' type="button">
+                        <i class="bi bi-upload"></i> Upload File
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Application</label>
+                    <select class="form-control-dg" @bind="_syncAppId" @bind:event="oninput">
+                        <option value="">Select application...</option>
+                        @foreach (var app in _appStore.Apps.OrderBy(a => a.Name))
+                        {
+                            <option value="@app.Id">@app.Name</option>
+                        }
+                    </select>
+                </div>
+
+                @if (_syncMode == "url")
+                {
+                    <div class="form-group">
+                        <label>WSDL URL</label>
+                        <input type="text" class="form-control-dg" placeholder="https://soap.example.com/Service?wsdl"
+                               @bind="_syncUrl" @bind:event="oninput" />
+                        <div style="font-size:11px;color:var(--sh-text-faint);margin-top:4px">
+                            <i class="bi bi-info-circle"></i>
+                            The system will fetch the WSDL and parse variables from tag content and attribute values.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Version Label</label>
+                        <input type="text" class="form-control-dg" placeholder="e.g. v1 — Initial import"
+                               @bind="_syncVersionLabel" @bind:event="oninput" />
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label>File</label>
+                        <div style="border:1px dashed var(--sh-border);padding:20px;text-align:center;background:var(--sh-surface-2);border-radius:4px;cursor:pointer"
+                             @onclick='() => _syncFileName = string.IsNullOrEmpty(_syncFileName) ? "sample.wsdl" : _syncFileName' role="button">
+                            <i class="bi bi-file-earmark-code" style="font-size:28px;display:block;margin-bottom:6px;color:var(--sh-text-faint)"></i>
+                            @if (string.IsNullOrEmpty(_syncFileName))
+                            {
+                                <div style="font-size:13px;color:var(--sh-text-soft)">
+                                    Click to select a <strong>.wsdl</strong> or <strong>.xml</strong> file
+                                </div>
+                                <div style="font-size:11px;color:var(--sh-text-faint);margin-top:4px">
+                                    or drag and drop here
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="font-size:13px;font-weight:500">@_syncFileName</div>
+                                <div style="font-size:11px;color:var(--sh-text-faint);margin-top:4px">
+                                    <i class="bi bi-check-circle" style="color:var(--sh-accent)"></i> File selected
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Version Label</label>
+                        <input type="text" class="form-control-dg" placeholder="e.g. v1 — Uploaded WSDL"
+                               @bind="_syncVersionLabel" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea class="form-control-dg textarea" placeholder="Optional notes about this WSDL file..."
+                                  @bind="_syncNotes" @bind:event="oninput"></textarea>
+                    </div>
+                }
+
+                @* Parser info *@
+                <div style="padding:10px 12px;background:var(--sh-surface-2);border:1px solid var(--sh-border);margin-top:8px">
+                    <div class="fs-10 text-uppercase ls-05 text-sh-faint mb-1">
+                        <i class="bi bi-robot"></i> Parser Behavior
+                    </div>
+                    <div class="fs-11 text-sh-soft" style="line-height:1.5">
+                        The parser scans only values between XML tags <code style="font-size:10px">&lt;tag&gt;value&lt;/tag&gt;</code>
+                        and attribute values <code style="font-size:10px">name="value"</code> to suggest variable names.
+                        Only simple <code style="font-size:10px">{{var_name}}</code> substitution is supported — no complex paths.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-dg" @onclick="() => _showSyncModal = false" type="button">Cancel</button>
+                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleSync" type="button">
+                    <i class="bi @(_syncMode == "url" ? "bi-download" : "bi-cloud-upload")"></i>
+                    @(_syncMode == "url" ? "Import WSDL" : "Upload WSDL")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@* ══════════════════════════════════════════════════ *@
+@* ── TEMPLATE EDITOR MODAL ── *@
+@* ══════════════════════════════════════════════════ *@
+@if (_showTemplateEditor)
+{
+    <div class="modal-overlay" @onclick="() => _showTemplateEditor = false">
+        <div class="modal-content-dg" style="width:680px" @onclick:stopPropagation="true">
+            <div class="modal-header-dg">
+                <h3>@(_editingTemplateId is null ? "Create" : "Edit") Template</h3>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showTemplateEditor = false" type="button" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                <div class="form-group">
+                    <label>Template Name</label>
+                    <input type="text" class="form-control-dg" placeholder="e.g. Billing Invoice Request"
+                           @bind="_editTplName" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" class="form-control-dg" placeholder="Describe what this template is for..."
+                           @bind="_editTplDescription" @bind:event="oninput" />
+                </div>
+
+                @* Extend template *@
+                <div class="form-group">
+                    <label>Extends Template <span style="font-weight:400;color:var(--sh-text-faint)">(optional)</span></label>
+                    <select class="form-control-dg" @bind="_editTplExtendsId" @bind:event="oninput">
+                        <option value="">None — Base template</option>
+                        @foreach (var t in _wsdlStore.GetTemplates().Where(t => t.Id != _editingTemplateId))
+                        {
+                            <option value="@t.Id">@t.Name</option>
+                        }
+                    </select>
+                    <div class="fs-11 text-sh-faint" style="margin-top:4px">
+                        <i class="bi bi-info-circle"></i>
+                        Extending a template inherits its content and variables. The child can override or add new variables.
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(_editTplExtendsId))
+                {
+                    var parent = _wsdlStore.GetTemplate(_editTplExtendsId);
+                    if (parent is not null)
+                    {
+                        <div class="bg-sh-surface-2 border-sh mb-3" style="padding:10px 12px">
+                            <div class="fs-10 text-uppercase ls-05 text-sh-faint" style="margin-bottom:6px">
+                                <i class="bi bi-arrow-up-short"></i> Inherited from: @parent.Name
+                            </div>
+                            <div style="display:flex;gap:4px;flex-wrap:wrap">
+                                @foreach (var v in parent.Variables)
+                                {
+                                    <span class="verb-badge" style="font-family:'JetBrains Mono','Menlo',monospace;font-size:10px;background:var(--sh-surface-2);border-color:var(--sh-border);color:var(--sh-accent)">
+                                        {{@v}} <span style="color:var(--sh-text-faint);font-size:9px">(inherited)</span>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+
+                <div class="form-group">
+                    <label>Template Content</label>
+                    <textarea class="form-control-dg textarea" placeholder="Paste SOAP envelope XML with {{var_name}} placeholders..."
+                              style="min-height:180px;font-family:'JetBrains Mono','Menlo',monospace;font-size:12px;line-height:1.6"
+                              @bind="_editTplContent" @bind:event="oninput"></textarea>
+                </div>
+
+                @* Parsed variables preview *@
+                @{
+                    var parsedVars = ExtractTemplateVars(_editTplContent);
+                }
+                @if (parsedVars.Length > 0)
+                {
+                    <div class="bg-sh-surface-2 border-sh" style="padding:10px 12px">
+                        <div class="fs-10 text-uppercase ls-05 text-sh-faint mb-1">
+                            <i class="bi bi-tags"></i> Detected Variables (@parsedVars.Length)
+                        </div>
+                        <div class="d-flex gap-4px flex-wrap">
+                            @foreach (var v in parsedVars)
+                            {
+                                <span class="verb-badge" style="font-family:'JetBrains Mono','Menlo',monospace;font-size:10px;background:var(--sh-accent-soft);color:var(--sh-accent);border-color:currentColor">
+                                    {{@v}}
+                                </span>
+                            }
+                        </div>
+                        <div class="fs-10 text-sh-faint" style="margin-top:4px">
+                            <i class="bi bi-lightbulb"></i>
+                            These variables will prompt the user with a dynamic form when creating a request file.
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-dg" @onclick="() => _showTemplateEditor = false" type="button">Cancel</button>
+                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleSaveTemplate" type="button">
+                    <i class="bi bi-check-lg"></i>
+                    @(_editingTemplateId is null ? "Create" : "Save") Template
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@* ══════════════════════════════════════════════════ *@
+@* ── CREATE REQUEST FILE FROM TEMPLATE (Dynamic Form) ── *@
+@* ══════════════════════════════════════════════════ *@
+@if (_showCreateRequestModal)
+{
+    var template = _wsdlStore.GetTemplate(_selectedTemplateId);
+    if (template is not null)
+    {
+        var allVars = _wsdlStore.ResolveVariables(template);
+
+        <div class="modal-overlay" @onclick="() => _showCreateRequestModal = false">
+            <div class="modal-content-dg" style="width:620px" @onclick:stopPropagation="true">
+                <div class="modal-header-dg">
+                    <h3>Create Request File</h3>
+                    <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showCreateRequestModal = false" type="button" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body-dg">
+                    <div class="d-flex align-items-center gap-8px bg-sh-surface-2 border-sh" style="margin-bottom:14px;padding:8px 12px">
+                        <i class="bi bi-file-text text-sh-accent"></i>
+                        <span class="fs-13 fw-medium">Template: <span class="cell-id">@template.Name</span></span>
+                        @if (!string.IsNullOrEmpty(template.ExtendsTemplateName))
+                        {
+                            <span class="fs-11 text-sh-faint">
+                                (extends <span class="cell-id">@template.ExtendsTemplateName</span>)
+                            </span>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label>File Name</label>
+                        <input type="text" class="form-control-dg" placeholder="e.g. create_invoice.xml"
+                               @bind="_requestFileName" @bind:event="oninput" />
+                    </div>
+
+                    @* Dynamic form generated from template variables *@
+                    <div class="border-sh-top" style="padding-top:12px;margin-top:4px">
+                        <div class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft mb-2">
+                            <i class="bi bi-pencil-square"></i> Fill in Template Variables
+                        </div>
+                        @foreach (var v in allVars)
+                        {
+                            <div class="form-group">
+                                <label>@v.Label</label>
+                                <div style="display:flex;align-items:center;gap:8px">
+                                    <code style="font-size:11px;color:var(--sh-text-faint);white-space:nowrap">{{@v.Name}}</code>
+                                    @if (v.InputType == "textarea")
+                                    {
+                                        <textarea class="form-control-dg" style="flex:1;font-family:'JetBrains Mono','Menlo',monospace;font-size:12px;min-height:60px"
+                                                  placeholder="Enter @v.Label..."
+                                                  @bind="_requestVarValues[v.Name]" @bind:event="oninput"></textarea>
+                                    }
+                                    else if (v.InputType == "select" && v.Options.Length > 0)
+                                    {
+                                        <select class="form-control-dg" style="flex:1" @bind="_requestVarValues[v.Name]" @bind:event="oninput">
+                                            <option value="">Select @v.Label...</option>
+                                            @foreach (var opt in v.Options)
+                                            {
+                                                <option value="@opt">@opt</option>
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control-dg" style="flex:1;font-family:'JetBrains Mono','Menlo',monospace;font-size:12px"
+                                               placeholder="Enter @v.Label..."
+                                               @bind="_requestVarValues[v.Name]" @bind:event="oninput" />
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @* Preview of the generated request file *@
+                    @{
+                        var previewContent = WsdlSyncStore.ApplyVariables(template.Content, _requestVarValues);
+                    }
+                    <div class="border-sh-top" style="margin-top:12px;padding-top:12px">
+                        <div class="d-flex align-items-center justify-content-between" style="margin-bottom:6px">
+                            <span class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft">
+                                <i class="bi bi-eye"></i> Preview
+                            </span>
+                            <span class="fs-10 text-sh-faint">@previewContent.Length chars</span>
+                        </div>
+                        <pre style="margin:0;padding:10px;background:var(--sh-surface-2);border:1px solid var(--sh-border);font-family:'JetBrains Mono','Menlo',monospace;font-size:11px;line-height:1.5;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-all">@previewContent</pre>
+                    </div>
+                </div>
+                <div class="modal-footer-dg">
+                    <button class="btn btn-dg" @onclick="() => _showCreateRequestModal = false" type="button">Cancel</button>
+                    <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleCreateRequestFile" type="button">
+                        <i class="bi bi-file-earmark-check"></i>
+                        Create Request File
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@* ── Styles ── *@
+<style>
+    /* Tree navigation */
+    .tree-node { user-select: none; }
+    .tree-row {
+        display: flex; align-items: center; gap: 6px; padding: 7px 14px; cursor: pointer;
+        font-size: 13px; color: var(--sh-text); position: relative;
+    }
+    .tree-row:hover { background: var(--sh-surface-2); }
+    .tree-row.is-active { background: var(--sh-accent-soft); color: var(--sh-accent); }
+    .tree-row-sub { padding-left: 34px; font-size: 12px; }
+    .tree-row-leaf { padding-left: 50px; font-size: 12px; }
+    .tree-chevron { width: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--sh-text-faint); flex-shrink: 0; }
+    .tree-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .tree-label-sm { font-size: 12px; }
+    .tree-label-xs { font-size: 12px; }
+    .tree-count { font-size: 10px; color: var(--sh-text-faint); background: var(--sh-surface-2); padding: 0 6px; border-radius: 8px; flex-shrink: 0; }
+    .tree-children { }
+    .tree-empty { padding: 8px 34px; font-size: 11px; color: var(--sh-text-faint); font-style: italic; }
+    .tree-source-badge { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 10px; flex-shrink: 0; }
+    .source-url { background: var(--sh-accent-soft); color: var(--sh-accent); }
+    .source-upload { background: #fff4e5; color: #d48c00; }
+    .tree-version-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-left: 2px; }
+    .dot-active { background: var(--sh-accent); }
+    .dot-archived { background: var(--sh-text-faint); }
+    .tree-archived-tag { font-size: 9px; color: var(--sh-text-faint); background: var(--sh-surface-2); padding: 0 5px; border-radius: 3px; }
+
+    /* Sync tabs */
+    .sync-tab {
+        padding: 8px 16px; font-size: 12px; font-weight: 500; border: none; background: none;
+        color: var(--sh-text-soft); cursor: pointer; border-bottom: 2px solid transparent;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .sync-tab:hover { color: var(--sh-text); background: var(--sh-surface-2); }
+    .sync-tab.is-active { color: var(--sh-accent); border-bottom-color: var(--sh-accent); }
+
+    /* Override row selection color */
+    .table-wrap .datagrid tbody tr.is-selected { background: var(--sh-accent-soft) !important; }
+    .table-wrap .datagrid tbody tr.is-selected td { color: var(--sh-accent) !important; }
+</style>
+
+@* ══════════════════════════════════════════════════ *@
+@code {
+    private string? _selectedAppId;
+    private string? _selectedSyncId;
+    private string? _selectedVersionId;
+    private HashSet<string> _treeExpandedApps = [];
+    private HashSet<string> _treeExpandedSyncs = [];
+
+    // Sync modal
+    private bool _showSyncModal;
+    private string _syncMode = "url";
+    private string _syncAppId = "";
+    private string _syncUrl = "";
+    private string _syncFileName = "";
+    private string _syncVersionLabel = "";
+    private string _syncNotes = "";
+
+    // Template editor
+    private bool _showTemplateEditor;
+    private string? _editingTemplateId;
+    private string _editTplName = "";
+    private string _editTplDescription = "";
+    private string _editTplExtendsId = "";
+    private string _editTplContent = "";
+
+    // Create request file from template
+    private bool _showCreateRequestModal;
+    private string _selectedTemplateId = "";
+    private string _requestFileName = "";
+    private Dictionary<string, string> _requestVarValues = [];
+
+    protected override void OnInitialized()
+    {
+        // Auto-select first app
+        var first = _appStore.Apps.FirstOrDefault();
+        if (first is not null)
+        {
+            _selectedAppId = first.Id;
+            _treeExpandedApps.Add(first.Id);
+        }
+    }
+
+    private void ToggleTreeApp(string appId)
+    {
+        if (!_treeExpandedApps.Remove(appId))
+            _treeExpandedApps.Add(appId);
+    }
+
+    private void ToggleTreeSync(string syncId)
+    {
+        if (!_treeExpandedSyncs.Remove(syncId))
+            _treeExpandedSyncs.Add(syncId);
+    }
+
+    private void SelectSyncRecord(string syncId)
+    {
+        _selectedSyncId = syncId;
+        _selectedVersionId = null;
+        if (!_treeExpandedSyncs.Contains(syncId))
+            _treeExpandedSyncs.Add(syncId);
+    }
+
+    private void SelectVersion(string versionId)
+    {
+        _selectedVersionId = versionId;
+        var version = _wsdlStore.Versions.FirstOrDefault(v => v.Id == versionId);
+        if (version is not null)
+        {
+            _selectedSyncId = version.SyncRecordId;
+            if (!_treeExpandedSyncs.Contains(version.SyncRecordId))
+                _treeExpandedSyncs.Add(version.SyncRecordId);
+        }
+    }
+
+    private void OpenSyncModal(string mode)
+    {
+        _syncMode = mode;
+        _syncAppId = _selectedAppId ?? "";
+        _syncUrl = "";
+        _syncFileName = "";
+        _syncVersionLabel = "";
+        _syncNotes = "";
+        _showSyncModal = true;
+    }
+
+    private void HandleSync()
+    {
+        // Validate
+        var appId = _syncAppId;
+        if (string.IsNullOrEmpty(appId)) return;
+        var app = _appStore.Apps.FirstOrDefault(a => a.Id == appId);
+        if (app is null) return;
+
+        var recordId = $"wsdl-{Guid.NewGuid():N}"[..10];
+        var versionId = $"wv-{Guid.NewGuid():N}"[..10];
+        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+        // Create sync record
+        var record = new WsdlSyncRecord
+        {
+            Id = recordId,
+            AppId = app.Id,
+            AppName = app.Name,
+            SourceType = _syncMode,
+            SourceUrl = _syncMode == "url" ? _syncUrl : _syncFileName,
+            UploadedBy = "Current User",
+            UploadedAt = now,
+            Status = "synced",
+            VersionCount = 1
+        };
+        _wsdlStore.Records.Add(record);
+
+        // Create version
+        var version = new WsdlVersionEntry
+        {
+            Id = versionId,
+            SyncRecordId = recordId,
+            VersionNumber = 1,
+            Label = string.IsNullOrWhiteSpace(_syncVersionLabel) ? "v1 — Initial" : _syncVersionLabel,
+            UploadedBy = "Current User",
+            UploadedAt = now,
+            Status = "active",
+            Notes = _syncNotes
+        };
+        _wsdlStore.Versions.Add(version);
+
+        _selectedSyncId = recordId;
+        _selectedVersionId = versionId;
+        _showSyncModal = false;
+
+        if (!_treeExpandedApps.Contains(appId))
+            _treeExpandedApps.Add(appId);
+        if (!_treeExpandedSyncs.Contains(recordId))
+            _treeExpandedSyncs.Add(recordId);
+    }
+
+    private void OpenTemplateEditor(string? templateId)
+    {
+        _editingTemplateId = templateId;
+        if (templateId is not null)
+        {
+            var tpl = _wsdlStore.GetTemplate(templateId);
+            if (tpl is not null)
+            {
+                _editTplName = tpl.Name;
+                _editTplDescription = tpl.Description;
+                _editTplExtendsId = tpl.ExtendsTemplateId ?? "";
+                _editTplContent = tpl.Content;
+            }
+        }
+        else
+        {
+            _editTplName = "";
+            _editTplDescription = "";
+            _editTplExtendsId = "";
+            _editTplContent = "";
+        }
+        _showTemplateEditor = true;
+    }
+
+    private void HandleSaveTemplate()
+    {
+        if (string.IsNullOrWhiteSpace(_editTplName)) return;
+
+        var vars = ExtractTemplateVars(_editTplContent);
+        var now = DateTime.Now.ToString("yyyy-MM-dd");
+
+        if (_editingTemplateId is not null)
+        {
+            var existing = _wsdlStore.GetTemplate(_editingTemplateId);
+            if (existing is not null)
+            {
+                var parentName = "";
+                if (!string.IsNullOrEmpty(_editTplExtendsId))
+                {
+                    var parent = _wsdlStore.GetTemplate(_editTplExtendsId);
+                    if (parent is not null) parentName = parent.Name;
+                }
+
+                existing.Name = _editTplName;
+                existing.Description = _editTplDescription;
+                existing.ExtendsTemplateId = string.IsNullOrEmpty(_editTplExtendsId) ? null : _editTplExtendsId;
+                existing.ExtendsTemplateName = string.IsNullOrEmpty(parentName) ? null : parentName;
+                existing.Content = _editTplContent;
+                existing.Variables = vars;
+                existing.UpdatedAt = now;
+            }
+        }
+        else
+        {
+            var parentName = "";
+            if (!string.IsNullOrEmpty(_editTplExtendsId))
+            {
+                var parent = _wsdlStore.GetTemplate(_editTplExtendsId);
+                if (parent is not null) parentName = parent.Name;
+            }
+
+            _wsdlStore.Templates.Add(new WsdlTemplate
+            {
+                Id = $"tpl-{Guid.NewGuid():N}"[..10],
+                Name = _editTplName,
+                Description = _editTplDescription,
+                ExtendsTemplateId = string.IsNullOrEmpty(_editTplExtendsId) ? null : _editTplExtendsId,
+                ExtendsTemplateName = string.IsNullOrEmpty(parentName) ? null : parentName,
+                Content = _editTplContent,
+                Variables = vars,
+                CreatedBy = "Current User",
+                CreatedAt = now,
+                UpdatedAt = now,
+                UsageCount = 0
+            });
+        }
+
+        _showTemplateEditor = false;
+    }
+
+    private void OpenCreateFromTemplate(string templateId)
+    {
+        _selectedTemplateId = templateId;
+        var template = _wsdlStore.GetTemplate(templateId);
+        if (template is not null)
+        {
+            _requestFileName = "";
+            _requestVarValues = [];
+            var allVars = _wsdlStore.ResolveVariables(template);
+            foreach (var v in allVars)
+            {
+                _requestVarValues[v.Name] = v.DefaultValue;
+            }
+        }
+        _showCreateRequestModal = true;
+    }
+
+    private void HandleCreateRequestFile()
+    {
+        // Close the modal
+        _showCreateRequestModal = false;
+    }
+
+    /// <summary>
+    /// Extracts {{var_name}} placeholders from template content.
+    /// Only supports simple variable names (no complex paths).
+    /// </summary>
+    private static string[] ExtractTemplateVars(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return [];
+        var matches = System.Text.RegularExpressions.Regex.Matches(content, @"\{\{(\w+)\}\}");
+        return matches.Select(m => m.Groups[1].Value).Distinct().OrderBy(v => v).ToArray();
+    }
+
+    /// <summary>
+    /// Renders the WSDL sync records grid for a given application.
+    /// </summary>
+    private RenderFragment RenderRecordsGrid(string appId) => builder =>
+    {
+        var records = _wsdlStore.GetRecordsForApp(appId);
+        if (records.Length == 0)
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "datagrid-card empty-state-card");
+            builder.AddAttribute(2, "style", "padding:40px 20px;gap:8px");
+            builder.OpenElement(3, "i");
+            builder.AddAttribute(4, "class", "bi bi-inbox empty-state-icon");
+            builder.AddAttribute(5, "style", "font-size:36px");
+            builder.CloseElement();
+            builder.OpenElement(6, "p");
+            builder.AddAttribute(7, "class", "empty-state-desc");
+            builder.AddAttribute(8, "style", "color:var(--sh-text-soft)");
+            builder.AddContent(9, "No WSDL syncs for this application yet. Click \"Import from URL\" or \"Upload File\" to get started.");
+            builder.CloseElement();
+            builder.CloseElement();
+            return;
+        }
+
+        foreach (var rec in records)
+        {
+            var versionsList = _wsdlStore.GetVersionsForSync(rec.Id);
+
+            // Record card
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "datagrid-card");
+            builder.AddAttribute(2, "style", "padding:14px 18px;margin-bottom:8px;cursor:pointer");
+            builder.AddAttribute(3, "onclick", EventCallback.Factory.Create(this, () => SelectSyncRecord(rec.Id)));
+
+            // Header row
+            builder.OpenElement(4, "div");
+            builder.AddAttribute(5, "style", "display:flex;justify-content:space-between;align-items:center");
+
+            builder.OpenElement(6, "div");
+            builder.AddAttribute(7, "style", "display:flex;align-items:center;gap:8px");
+            builder.OpenElement(8, "span");
+            builder.AddAttribute(9, "class", $"tree-source-badge {(rec.SourceType == "url" ? "source-url" : "source-upload")}");
+            builder.OpenElement(10, "i");
+            builder.AddAttribute(11, "class", $"bi {(rec.SourceType == "url" ? "bi-link-45deg" : "bi-file-earmark-arrow-up")}");
+            builder.CloseElement();
+            builder.CloseElement();
+            builder.OpenElement(12, "span");
+            builder.AddAttribute(13, "style", "font-weight:500;font-size:13px");
+            builder.AddContent(14, rec.SourceType == "url" ? TruncateUrl(rec.SourceUrl) : rec.SourceUrl);
+            builder.CloseElement();
+            builder.OpenElement(15, "span");
+            builder.AddAttribute(16, "class", $"status-badge {(rec.Status == "synced" ? "status-enabled" : "status-down")}");
+            builder.AddContent(17, rec.Status == "synced" ? "Synced" : rec.Status == "failed" ? "Failed" : "Parsing...");
+            builder.CloseElement();
+            builder.CloseElement();
+
+            builder.OpenElement(18, "div");
+            builder.AddAttribute(19, "style", "font-size:11px;color:var(--sh-text-faint)");
+            builder.AddContent(20, $"{rec.UploadedAt} — {rec.UploadedBy} · {rec.VersionCount} version(s)");
+            builder.CloseElement();
+
+            builder.CloseElement(); // header row
+
+            // Version chips
+            if (versionsList.Length > 0)
+            {
+                builder.OpenElement(21, "div");
+                builder.AddAttribute(22, "style", "display:flex;gap:6px;margin-top:8px;flex-wrap:wrap");
+                foreach (var ver in versionsList)
+                {
+                    builder.OpenElement(23, "span");
+                    builder.AddAttribute(24, "class", "verb-badge");
+                    builder.AddAttribute(25, "style", $"font-size:10px;cursor:pointer;background:{(ver.Status == "active" ? "var(--sh-accent-soft)" : "var(--sh-surface-2)")};color:{(ver.Status == "active" ? "var(--sh-accent)" : "var(--sh-text-faint)")};border-color:currentColor");
+                    builder.AddAttribute(26, "onclick", EventCallback.Factory.Create(this, () => SelectVersion(ver.Id)));
+                    builder.AddContent(27, ver.Label);
+                    builder.CloseElement();
+                }
+                builder.CloseElement();
+            }
+
+            builder.CloseElement(); // card
+        }
+    };
+
+    private static string TruncateUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return "";
+        if (url.Length <= 35) return url;
+        // Try to show meaningful part
+        var uri = Uri.TryCreate(url, UriKind.Absolute, out var u) ? u : null;
+        if (uri is not null)
+        {
+            var host = uri.Host;
+            var lastSeg = uri.Segments.LastOrDefault()?.Trim('/');
+            if (!string.IsNullOrEmpty(lastSeg) && lastSeg.Length > 3)
+                return $"{host}/.../{lastSeg}";
+            return host;
+        }
+        return url[..32] + "...";
+    }
+}

@@ -1,3 +1,73 @@
 /* SOAP Applications Feature Styles */
 /* Grid-related styles (dropdown, pagination, detail, actions, filter-btn)
    have been moved to _content/ServiceHubEnterprise.Grid/css/grid.css */
+
+/* ── Request Files custom utilities ── */
+
+/* Grid full-width column (spans all grid columns) */
+.grid-col-full { grid-column: 1 / -1; }
+
+/* Modal width override */
+.modal-w-560 { width: 560px; }
+
+/* Validation error alert */
+.alert-validation {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--sh-error);
+    background: color-mix(in srgb, var(--sh-error) 10%, transparent);
+    font-size: 12px;
+    color: var(--sh-error);
+}
+
+/* Height utility */
+.h-30 { height: 30px; }
+
+/* Padding utility */
+.p-10 { padding: 10px; }
+
+/* Verb badge accent variant */
+.verb-badge-accent {
+    background: var(--sh-accent-soft);
+    color: var(--sh-accent);
+    border-color: currentColor;
+}
+
+/* Monospace textarea */
+.mono-textarea {
+    min-height: 70px;
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 12px;
+}
+
+/* File chars meta info */
+.file-chars-info {
+    font-size: 10px;
+    color: var(--sh-text-faint);
+}
+
+/* Upload empty state */
+.upload-empty-state {
+    font-size: 12px;
+    color: var(--sh-text-faint);
+    padding: 8px 0;
+    text-align: center;
+    border: 1px dashed var(--sh-border);
+    background: var(--sh-surface-2);
+}
+
+/* Remove file button */
+.btn-remove-file {
+    height: 36px;
+    width: 36px;
+    padding: 0;
+    flex-shrink: 0;
+    color: var(--sh-error);
+    border-color: transparent;
+}
+
+/* Min-width utility */
+.minw-28 { min-width: 28px; }
+
+/* Padding-left utility */
+.ps-20 { padding-left: 20px; }

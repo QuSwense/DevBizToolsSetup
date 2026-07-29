@@ -53,14 +53,14 @@
                     var isDir = item.Type == "Directory";
                     var iconColor = isDir ? "var(--sh-accent)" : item.Name.EndsWith(".json") ? "var(--sh-success)" :
         "var(--sh-warning)";
-                    <tr style="cursor:pointer">
+                    <tr class="cursor-pointer">
                         <td class="check-cell"><input type="checkbox" class="form-check-input"
                                                           aria-label="Select @item.Name" /></td>
                             <td>
                                 <div class="name-stack">
                                     @if (isDir)
                                     {
-                                        <i class="bi bi-folder" style="color:var(--sh-accent);font-size:16px"></i>
+                                        <i class="bi bi-folder text-sh-accent fs-16"></i>
                                     }
                                     else
                                     {
@@ -69,9 +69,9 @@
                                     <span style="font-weight:@(isDir ? "500" : "400")">@item.Name</span>
                                 </div>
                             </td>
-                            <td style="color:var(--sh-text-soft)">@item.Type</td>
-                            <td style="color:var(--sh-text-soft)">@item.Modified</td>
-                            <td style="color:var(--sh-text-soft)">@item.Size</td>
+                            <td class="text-sh-soft">@item.Type</td>
+                            <td class="text-sh-soft">@item.Modified</td>
+                            <td class="text-sh-soft">@item.Size</td>
                         </tr>
                     }
                 </tbody>

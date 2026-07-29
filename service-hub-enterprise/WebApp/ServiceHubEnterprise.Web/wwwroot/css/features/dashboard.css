@@ -182,15 +182,26 @@
 .text-sh-accent { color: var(--sh-accent); }
 .text-sh-success { color: var(--sh-success); }
 .text-sh-warning { color: var(--sh-warning); }
+.text-sh-error { color: var(--sh-error); }
 
 /* ── Design token background utilities ── */
 .bg-sh-bg { background: var(--sh-bg); }
+.bg-sh-surface-2 { background: var(--sh-surface-2); }
 .bg-sh-surface-3 { background: var(--sh-surface-3); }
 .bg-sh-success { background: var(--sh-success); }
+.bg-sh-warning { background: var(--sh-warning); }
+
+/* ── Cursor utilities ── */
+.cursor-pointer { cursor: pointer; }
+
+/* ── Letter spacing utilities ── */
+.ls-05 { letter-spacing: .05em; }
+.ls-06 { letter-spacing: .06em; }
 
 /* ── Design token border utilities ── */
 .border-sh { border: 1px solid var(--sh-border); }
 .border-sh-top { border-top: 1px solid var(--sh-border); }
+.border-sh-bottom { border-bottom: 1px solid var(--sh-border); }
 
 /* ── Custom font-size utilities ── */
 .fs-9 { font-size: 9px; }
@@ -198,14 +209,24 @@
 .fs-11 { font-size: 11px; }
 .fs-12 { font-size: 12px; }
 .fs-13 { font-size: 13px; }
+.fs-14 { font-size: 14px; }
 .fs-15 { font-size: 15px; }
+.fs-16 { font-size: 16px; }
 .fs-18 { font-size: 18px; }
+.fs-20 { font-size: 20px; }
+.fs-24 { font-size: 24px; }
 .fs-28 { font-size: 28px; }
+.fs-36 { font-size: 36px; }
+.fs-48 { font-size: 48px; }
 
 /* ── Custom gap utilities ── */
 .gap-3px { gap: 3px; }
+.gap-4px { gap: 4px; }
 .gap-6px { gap: 6px; }
+.gap-8px { gap: 8px; }
 .gap-10px { gap: 10px; }
+.gap-12px { gap: 12px; }
+.gap-16px { gap: 16px; }
 
 /* ── Stacked bar segments ── */
 .stacked-bar {

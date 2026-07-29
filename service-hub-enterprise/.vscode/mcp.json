@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "tokensaver": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": ["tool", "execute", "TokenSaver.Mcp", "--yes"],
+      "env": {
+        "TOKENSAVER_API_URL": "https://tokensavermcp.com"
+      }
+    }
+  }
+}

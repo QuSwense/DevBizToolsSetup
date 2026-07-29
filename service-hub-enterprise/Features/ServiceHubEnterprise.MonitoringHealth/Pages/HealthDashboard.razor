@@ -17,7 +17,7 @@
         <div class="card-header">
             <span class="card-title">Overall Health</span>
         </div>
-        <div class="card-value" style="color:var(--sh-warning)">3 / 5</div>
+        <div class="card-value text-sh-warning">3 / 5</div>
         <div class="card-sub">Services operational</div>
         <div class="mt-3">
             <div class="d-flex gap-2">
@@ -38,7 +38,7 @@
         <div class="card-header">
             <span class="card-title">Avg Response Time</span>
         </div>
-        <div class="card-value" style="color:var(--sh-accent)">68ms</div>
+        <div class="card-value text-sh-accent">68ms</div>
         <div class="card-sub">Across all services</div>
     </div>
 
@@ -47,7 +47,7 @@
         <div class="card-header">
             <span class="card-title">Uptime</span>
         </div>
-        <div class="card-value" style="color:var(--sh-success)">97.7%</div>
+        <div class="card-value text-sh-success">97.7%</div>
         <div class="card-sub">Last 30 days average</div>
     </div>
 
@@ -56,7 +56,7 @@
         <div class="card-header">
             <span class="card-title">Last Checked</span>
         </div>
-        <div class="card-value dash-card-value" style="color:var(--sh-text-soft)">Just now</div>
+        <div class="card-value dash-card-value text-sh-soft">Just now</div>
         <div class="d-flex gap-2 mt-2">
             <button class="btn btn-dark btn-sh-primary" style="height:32px;font-size:12px">
                 <i class="bi bi-arrow-repeat"></i>
@@ -70,7 +70,7 @@
 <div class="datagrid-card mt-3">
     <div class="grid-toolbar">
         <div class="toolbar-left">
-            <span class="card-title" style="font-size:12px">Service Details</span>
+            <span class="card-title fs-12">Service Details</span>
         </div>
         <div class="toolbar-right">
             <select class="form-control-dg status-select">
@@ -107,7 +107,7 @@
                         <td><span class="status-badge @badgeClass">@((MarkupString)statusIcon) @statusLabel</span></td>
                         <td style="color:var(--sh-text-soft);font-family:'JetBrains Mono','Menlo',monospace">
                             @svc.ResponseTime</td>
-                            <td style="color:var(--sh-text-soft)">@svc.Uptime</td>
+                            <td class="text-sh-soft">@svc.Uptime</td>
                         </tr>
                     }
                 </tbody>

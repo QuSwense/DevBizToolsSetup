@@ -23,14 +23,14 @@
                 Columns="@_columns">
 
     <ToolbarCenter>
-        <button class="filter-btn" @onclick="() => _showFilterModal = true" type="button">
+        <button class="filter-btn" @onclick="() => _showFilterModal = true" type="button" aria-label="Filter applications">
             <i class="bi bi-funnel"></i>
             Filter
         </button>
     </ToolbarCenter>
 
     <ToolbarRight>
-        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => _showAddModal = true" type="button">
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => { _validationErrors = []; _showAddModal = true; }" type="button" aria-label="Add Application">
             <i class="bi bi-plus-lg"></i>
             Add Application
         </button>
@@ -93,28 +93,44 @@
     </ToolbarRight>
 
     <RowActions Context="app">
+        @{
+            var isEnabled = string.Compare(app.Status, "enabled", StringComparison.OrdinalIgnoreCase) == 0;
+        }
         <div class="row-actions-wrap blazor-managed@(_expandedActionRows.Contains(app.Id) ? " is-open" : "")">
             <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions"
                     @onclick="() => _expandedActionRows.Add(app.Id)">
                 <i class="bi bi-three-dots" aria-hidden="true"></i>
             </button>
             <div class="inline-actions">
-                <button class="ia-btn ia-edit" type="button" aria-label="Edit" data-tooltip="Edit"
+                <button class="ia-btn ia-normal" type="button" aria-label="Edit" data-tooltip="Edit"
                         @onclick="() => OpenEditDialog(app)">
                     <i class="bi bi-pencil" aria-hidden="true"></i>
                 </button>
                 <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete">
                     <i class="bi bi-trash" aria-hidden="true"></i>
                 </button>
+                <button class="ia-btn @(isEnabled ? "ia-enable" : "ia-normal")" type="button" aria-label="Toggle" data-tooltip="Toggle">
+                    @if(isEnabled)
+                    {
+                        <i class="bi bi-toggle-off" aria-hidden="true"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-toggle-on" aria-hidden="true"></i>
+                    }
+                </button>
                 <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close"
                         @onclick="() => _expandedActionRows.Remove(app.Id)">
-                    <i class="bi bi-x-lg" style="font-size: 11px" aria-hidden="true"></i>
+                    <i class="bi bi-x-lg fs-11" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
     </RowActions>
 
     <DetailRow Context="app">
+         @{
+            var isEnabled = string.Compare(app.Status, "enabled", StringComparison.OrdinalIgnoreCase) == 0;
+        }
         <div class="detail-grid">
             <div>
                 <div class="detail-label">Application ID</div>
@@ -122,7 +138,7 @@
             </div>
             <div>
                 <div class="detail-label">Full URL</div>
-                <div class="detail-value" style="word-break:break-all">@app.BaseUrl</div>
+                <div class="detail-value text-break">@app.BaseUrl</div>
             </div>
             <div style="grid-column:1/-1">
                 <div class="detail-label">Description</div>
@@ -131,8 +147,8 @@
             <div>
                 <div class="detail-label">Status</div>
                 <div class="detail-value">
-                    <span class="status-badge @(app.Status == "enabled" ? "status-enabled" : "status-disabled")">
-                        @(app.Status == "enabled" ? "Enabled" : "Disabled")
+                    <span class="status-badge @(isEnabled ? "status-enabled" : "status-disabled")">
+                        @(isEnabled ? "Enabled" : "Disabled")
                     </span>
                 </div>
             </div>
@@ -142,14 +158,14 @@
             </div>
 
             <div style="grid-column:1/-1;border-top:1px solid var(--sh-border);padding-top:8px;margin-top:4px">
-                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sh-text-faint);margin-bottom:8px">
-                    <i class="bi bi-shield-lock" style="margin-right:4px"></i>Authentication
+                <div class="fs-10 fw-semibold text-uppercase ls-06 text-sh-faint mb-2">
+                    <i class="bi bi-shield-lock me-1"></i>Authentication
                 </div>
             </div>
             <div>
                 <div class="detail-label">Auth Type</div>
                 <div class="detail-value">
-                    <span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;font-size:10px;font-weight:600;background:var(--sh-accent-soft);color:var(--sh-accent);border:1px solid var(--sh-border)">
+                    <span class="d-inline-flex align-items-center fs-10 fw-semibold text-sh-accent" style="height:20px;padding:0 7px;background:var(--sh-accent-soft);border:1px solid var(--sh-border)">
                         @(app.AuthType switch
                         {
                             "none" => "None",
@@ -174,14 +190,14 @@
                     })
                     @if (app.AuthType == "ntlm" && !string.IsNullOrEmpty(app.AuthExtra))
                     {
-                        <span style="color:var(--sh-text-faint)">(@app.AuthExtra)</span>
+                        <span class="text-sh-faint">(@app.AuthExtra)</span>
                     }
                 </div>
             </div>
 
             <div style="grid-column:1/-1;border-top:1px solid var(--sh-border);padding-top:8px;margin-top:4px">
-                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sh-text-faint);margin-bottom:8px">
-                    <i class="bi bi-diagram-3" style="margin-right:4px"></i>SOAP APIs (@app.ApisCount)
+                <div class="fs-10 fw-semibold text-uppercase ls-06 text-sh-faint mb-2">
+                    <i class="bi bi-diagram-3 me-1"></i>SOAP APIs (@app.ApisCount)
                 </div>
             </div>
             @if (app.Apis.Length > 0)
@@ -190,11 +206,11 @@
                     <div style="display:flex;flex-direction:column;gap:4px">
                         @foreach (var api in app.Apis)
                         {
-                            <div style="display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--sh-surface-2);border:1px solid var(--sh-border)">
-                                <span style="font-weight:500;font-size:12px;color:var(--sh-text);white-space:nowrap">@api.Name</span>
+                            <div class="d-flex align-items-center gap-8px" style="padding:5px 10px;background:var(--sh-surface-2);border:1px solid var(--sh-border)">
+                                <span class="fw-medium fs-12 text-nowrap" style="color:var(--sh-text)">@api.Name</span>
                                 @if (!string.IsNullOrEmpty(api.Description))
                                 {
-                                    <span style="color:var(--sh-text-soft);font-size:11px">— @api.Description</span>
+                                    <span class="text-sh-soft fs-11">— @api.Description</span>
                                 }
                             </div>
                         }
@@ -204,7 +220,7 @@
             else
             {
                 <div style="grid-column:1/-1">
-                    <div class="detail-value" style="color:var(--sh-text-faint);font-style:italic">No APIs configured</div>
+                    <div class="detail-value text-sh-faint fst-italic">No APIs configured</div>
                 </div>
             }
         </div>
@@ -249,24 +265,42 @@
 
 @if (_showAddModal)
 {
-    <div class="modal-overlay" @onclick="() => _showAddModal = false">
+    <div class="modal-overlay" @onclick="() => { _validationErrors = []; _showAddModal = false; }">
         <div class="modal-content-dg" @onclick:stopPropagation="true">
             <div class="modal-header-dg">
                 <h3>@(_editingApp is null ? "Add" : "Edit") SOAP Application</h3>
-                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showAddModal = false" type="button" aria-label="Close">
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" type="button" aria-label="Close" @onclick="() => { _validationErrors = []; _showAddModal = false; }">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <div class="modal-body-dg">
+                @if (_validationErrors.Count > 0)
+                {
+                    <div class="alert-validation">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Please fix the following:
+                        <ul class="mt-1 mb-0 ps-20">
+                            @foreach (var err in _validationErrors)
+                            {
+                                <li>@err</li>
+                            }
+                        </ul>
+                    </div>
+                }
                 <div class="form-group">
-                    <label>App Name</label>
+                    <label>App Name <span class="text-sh-error">*</span></label>
                     <input type="text" class="form-control-dg" placeholder="Enter application name..."
                            @bind="_newAppName" @bind:event="oninput" />
                 </div>
                 <div class="form-group">
-                    <label>Base URL</label>
+                    <label>Base URL <span class="text-sh-error">*</span></label>
                     <input type="text" class="form-control-dg" placeholder="https://soap.example.com/Service"
                            @bind="_newAppUrl" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label>WSDL Path</label>
+                    <input type="text" class="form-control-dg" placeholder="?wsdl"
+                           @bind="_newAppWsdlPath" @bind:event="oninput" />
                 </div>
                 <div class="form-group">
                     <label>Description</label>
@@ -281,9 +315,9 @@
                     </select>
                 </div>
 
-                <div style="border-top:1px solid var(--sh-border);margin:4px 0 8px"></div>
-                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sh-text-soft);margin-bottom:8px">
-                    Authentication Details
+                <div class="border-sh-top my-1 mb-2"></div>
+                <div class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft mb-2">
+                    Authentication Details <span class="text-sh-error">*</span>
                 </div>
                 <div class="form-group">
                     <label>Auth Type</label>
@@ -349,12 +383,12 @@
                     </div>
                 }
 
-                <div style="border-top:1px solid var(--sh-border);margin:4px 0 8px"></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                    <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sh-text-soft)">
-                        SOAP APIs
+                <div class="border-sh-top my-1 mb-2"></div>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft">
+                        SOAP APIs <span class="text-sh-error">*</span>
                     </span>
-                    <button class="btn btn-dg" style="height:30px;font-size:11px" @onclick="AddApiEntry" type="button">
+                    <button class="btn btn-dg fs-11" style="height:30px" @onclick="AddApiEntry" type="button">
                         <i class="bi bi-plus-lg"></i>
                         Add API
                     </button>
@@ -362,8 +396,8 @@
                 @for (var i = 0; i < _newApis.Count; i++)
                 {
                     var idx = i;
-                    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px">
-                        <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                    <div class="d-flex gap-8px align-items-start mb-2">
+                        <div class="d-flex flex-column" style="flex:1;gap:6px">
                             <input type="text" class="form-control-dg" placeholder="API name..."
                                    @bind="_newApis[idx].Name" @bind:event="oninput" />
                             <input type="text" class="form-control-dg" placeholder="API description..."
@@ -383,7 +417,7 @@
                 }
             </div>
             <div class="modal-footer-dg">
-                <button class="btn btn-dg" @onclick="() => _showAddModal = false" type="button">Cancel</button>
+                <button class="btn btn-dg" @onclick="() => { _validationErrors = []; _showAddModal = false; }" type="button">Cancel</button>
                 <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleAddApplication" type="button">
                     <i class="bi @(_editingApp is null ? "bi-plus-lg" : "bi-check-lg")"></i>
                     @(_editingApp is null ? "Add" : "Save Changes") Application
@@ -466,8 +500,11 @@
     private int _currentPage = 1;
     private bool _showFilterModal = false;
     private bool _showAddModal = false;
+    private List<string> _validationErrors = [];
     private string _newAppName = "";
     private string _newAppUrl = "";
+    private string _newAppWsdlPath = "";
+    private string _newAppSoapAction = "";
     private string _newAppDescription = "";
     private string _newAppStatus = "enabled";
     private string _newAuthType = "basic";
@@ -538,6 +575,7 @@
         _editingApp = app;
         _newAppName = app.Name;
         _newAppUrl = app.BaseUrl;
+        _newAppWsdlPath = app.WsdlPath;
         _newAppDescription = app.Description;
         _newAppStatus = app.Status;
         _newAuthType = app.AuthType;
@@ -546,12 +584,22 @@
         _newAuthExtra = app.AuthExtra;
         _newApis = [..app.Apis];
         _expandedActionRows.Remove(app.Id);
+        _validationErrors = [];
         _showAddModal = true;
     }
 
     private void HandleAddApplication()
     {
-        if (string.IsNullOrWhiteSpace(_newAppName) || string.IsNullOrWhiteSpace(_newAppUrl))
+        _validationErrors = [];
+
+        if (string.IsNullOrWhiteSpace(_newAppName))
+            _validationErrors.Add("App name is required.");
+        if (string.IsNullOrWhiteSpace(_newAppUrl))
+            _validationErrors.Add("Base URL is required.");
+        if (_newApis.Count == 0)
+            _validationErrors.Add("At least one SOAP API must be added.");
+
+        if (_validationErrors.Count > 0)
             return;
 
         if (_editingApp is not null)
@@ -560,6 +608,7 @@
                 _editingApp.Id,
                 _newAppName.Trim(),
                 _newAppUrl.Trim(),
+                _newAppWsdlPath.Trim(),
                 _newAppDescription.Trim(),
                 _newAppStatus,
                 _editingApp.UpdatedBy,
@@ -580,6 +629,7 @@
                 newId,
                 _newAppName.Trim(),
                 _newAppUrl.Trim(),
+                _newAppWsdlPath.Trim(),
                 _newAppDescription.Trim(),
                 _newAppStatus,
                 "Anonymous",
@@ -612,8 +662,10 @@
 
     private void ResetAddForm()
     {
+        _validationErrors = [];
         _newAppName = "";
         _newAppUrl = "";
+        _newAppWsdlPath = "";
         _newAppDescription = "";
         _newAppStatus = "enabled";
         _newAuthType = "basic";

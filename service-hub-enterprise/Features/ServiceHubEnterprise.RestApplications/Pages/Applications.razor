@@ -92,8 +92,8 @@
                             <td><span class="cell-id">@app.BaseUrl</span></td>
                             <td><span class="status-badge @badgeClass">@(app.Status == "enabled" ? "Enabled" :
                                                                                                                                                                                                                "Disabled")</span></td>
-                                <td style="color:var(--sh-text-soft)">@app.UpdatedBy</td>
-                                <td style="color:var(--sh-text-soft)">@app.CreatedDate</td>
+                                <td class="text-sh-soft">@app.UpdatedBy</td>
+                                <td class="text-sh-soft">@app.CreatedDate</td>
                                 <td><span class="fw-semibold">@app.ApisCount</span></td>
                                 <td>
                                     <div class="action-icons">

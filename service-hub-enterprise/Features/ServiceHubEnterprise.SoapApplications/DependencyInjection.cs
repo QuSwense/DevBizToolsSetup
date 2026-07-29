@@ -14,6 +14,7 @@ public static class DependencyInjection
     public static IServiceCollection AddSoapApplicationsFeature(this IServiceCollection services)
     {
         services.AddSingleton<SoapAppStore>();
+        services.AddSingleton<WsdlSyncStore>();
         return services;
     }
 }

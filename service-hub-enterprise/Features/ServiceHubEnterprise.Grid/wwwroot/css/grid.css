@@ -532,12 +532,20 @@ th.sortable:hover .sort-indicator {
     color: var(--sh-text);
 }
 
-.ia-btn.ia-edit:hover {
+.ia-btn.ia-normal:hover {
     color: var(--sh-accent);
 }
 
-.ia-btn.ia-danger:hover {
+.ia-btn.ia-enable:hover {
+    color: var(--sh-success);
+}
+
+.ia-btn.ia-danger {
     color: var(--sh-error);
+}
+
+.ia-btn.ia-danger:hover {
+    color: var(--sh-error-hover);
 }
 
 .ia-btn.ia-close:hover {

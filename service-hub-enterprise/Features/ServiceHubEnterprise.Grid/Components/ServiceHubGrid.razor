@@ -107,7 +107,7 @@
                 @if (Items is null || !Items.Any())
                 {
                     <tr>
-                        <td colspan="@_totalColumns" class="text-center" style="padding:32px 14px;color:var(--sh-text-faint)">
+                        <td colspan="@_totalColumns" class="text-center text-sh-faint" style="padding:32px 14px">
                             @EmptyText
                         </td>
                     </tr>
@@ -169,7 +169,7 @@
                             }
                             @if (RowActions is not null)
                             {
-                                <td class="text-end" role="gridcell" style="padding-right:10px;">
+                                <td class="text-end pe-2" role="gridcell">
                                     @RowActions(item)
                                 </td>
                             }
@@ -179,7 +179,7 @@
                         @if (isExpanded && DetailRow is not null)
                         {
                             <tr>
-                                <td colspan="@_totalColumns" class="p-0" style="background:var(--sh-surface-2)">
+                                <td colspan="@_totalColumns" class="p-0 bg-sh-surface-2">
                                     @DetailRow(item)
                                 </td>
                             </tr>
