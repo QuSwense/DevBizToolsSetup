@@ -111,11 +111,11 @@ class ServiceHubPagination {
         range.forEach(page => {
             const btn = document.createElement('button');
             btn.className = 'pagination-btn pagination-num';
+            if (page === this.currentPage) {
+                btn.classList.add('is-current');
+            }
             btn.setAttribute('data-page', page);
             btn.textContent = page;
-            if (page === this.currentPage) {
-                btn.innerHTML = `<span style="font-weight:700">${page}</span>`;
-            }
             btn.addEventListener('click', () => this.goToPage(page));
             controlsEl.insertBefore(btn, nextBtn || null);
         });

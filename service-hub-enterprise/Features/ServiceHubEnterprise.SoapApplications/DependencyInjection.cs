@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications;
 
@@ -12,7 +13,7 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddSoapApplicationsFeature(this IServiceCollection services)
     {
-        // Register SOAP Applications-specific services here
+        services.AddSingleton<SoapAppStore>();
         return services;
     }
 }

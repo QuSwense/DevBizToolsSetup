@@ -1,5 +1,5 @@
 @page "/soap/applications"
-@using Microsoft.AspNetCore.Components.Web
+@inject SoapAppStore _appStore
 
 <ServiceHubGrid TItem="SoapApp"
                 Id="soapAppsGrid"
@@ -92,19 +92,22 @@
         </div>
     </ToolbarRight>
 
-    <RowActions>
-        <div class="row-actions-wrap">
-            <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions">
+    <RowActions Context="app">
+        <div class="row-actions-wrap blazor-managed@(_expandedActionRows.Contains(app.Id) ? " is-open" : "")">
+            <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions"
+                    @onclick="() => _expandedActionRows.Add(app.Id)">
                 <i class="bi bi-three-dots" aria-hidden="true"></i>
             </button>
             <div class="inline-actions">
-                <button class="ia-btn ia-edit" type="button" aria-label="Edit" data-tooltip="Edit">
+                <button class="ia-btn ia-edit" type="button" aria-label="Edit" data-tooltip="Edit"
+                        @onclick="() => OpenEditDialog(app)">
                     <i class="bi bi-pencil" aria-hidden="true"></i>
                 </button>
                 <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete">
                     <i class="bi bi-trash" aria-hidden="true"></i>
                 </button>
-                <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close">
+                <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close"
+                        @onclick="() => _expandedActionRows.Remove(app.Id)">
                     <i class="bi bi-x-lg" style="font-size: 11px" aria-hidden="true"></i>
                 </button>
             </div>
@@ -121,14 +124,89 @@
                 <div class="detail-label">Full URL</div>
                 <div class="detail-value" style="word-break:break-all">@app.BaseUrl</div>
             </div>
+            <div style="grid-column:1/-1">
+                <div class="detail-label">Description</div>
+                <div class="detail-value">@(string.IsNullOrEmpty(app.Description) ? "—" : app.Description)</div>
+            </div>
             <div>
-                <div class="detail-label">API Endpoints</div>
-                <div class="detail-value">@app.ApisCount endpoints configured</div>
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                    <span class="status-badge @(app.Status == "enabled" ? "status-enabled" : "status-disabled")">
+                        @(app.Status == "enabled" ? "Enabled" : "Disabled")
+                    </span>
+                </div>
             </div>
             <div>
                 <div class="detail-label">Last Modified</div>
                 <div class="detail-value">@app.CreatedDate by @app.UpdatedBy</div>
             </div>
+
+            <div style="grid-column:1/-1;border-top:1px solid var(--sh-border);padding-top:8px;margin-top:4px">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sh-text-faint);margin-bottom:8px">
+                    <i class="bi bi-shield-lock" style="margin-right:4px"></i>Authentication
+                </div>
+            </div>
+            <div>
+                <div class="detail-label">Auth Type</div>
+                <div class="detail-value">
+                    <span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;font-size:10px;font-weight:600;background:var(--sh-accent-soft);color:var(--sh-accent);border:1px solid var(--sh-border)">
+                        @(app.AuthType switch
+                        {
+                            "none" => "None",
+                            "basic" => "Basic",
+                            "api-key" => "API Key",
+                            "bearer" => "Bearer",
+                            "ntlm" => "NTLM",
+                            _ => app.AuthType
+                        })
+                    </span>
+                </div>
+            </div>
+            <div>
+                <div class="detail-label">Credentials</div>
+                <div class="detail-value">
+                    @(app.AuthType switch
+                    {
+                        "none" => "—",
+                        "api-key" => app.AuthUsername,
+                        "bearer" => "Token configured",
+                        _ => string.IsNullOrEmpty(app.AuthUsername) ? "—" : app.AuthUsername
+                    })
+                    @if (app.AuthType == "ntlm" && !string.IsNullOrEmpty(app.AuthExtra))
+                    {
+                        <span style="color:var(--sh-text-faint)">(@app.AuthExtra)</span>
+                    }
+                </div>
+            </div>
+
+            <div style="grid-column:1/-1;border-top:1px solid var(--sh-border);padding-top:8px;margin-top:4px">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sh-text-faint);margin-bottom:8px">
+                    <i class="bi bi-diagram-3" style="margin-right:4px"></i>SOAP APIs (@app.ApisCount)
+                </div>
+            </div>
+            @if (app.Apis.Length > 0)
+            {
+                <div style="grid-column:1/-1">
+                    <div style="display:flex;flex-direction:column;gap:4px">
+                        @foreach (var api in app.Apis)
+                        {
+                            <div style="display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--sh-surface-2);border:1px solid var(--sh-border)">
+                                <span style="font-weight:500;font-size:12px;color:var(--sh-text);white-space:nowrap">@api.Name</span>
+                                @if (!string.IsNullOrEmpty(api.Description))
+                                {
+                                    <span style="color:var(--sh-text-soft);font-size:11px">— @api.Description</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div style="grid-column:1/-1">
+                    <div class="detail-value" style="color:var(--sh-text-faint);font-style:italic">No APIs configured</div>
+                </div>
+            }
         </div>
     </DetailRow>
 
@@ -174,7 +252,7 @@
     <div class="modal-overlay" @onclick="() => _showAddModal = false">
         <div class="modal-content-dg" @onclick:stopPropagation="true">
             <div class="modal-header-dg">
-                <h3>Add SOAP Application</h3>
+                <h3>@(_editingApp is null ? "Add" : "Edit") SOAP Application</h3>
                 <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="() => _showAddModal = false" type="button" aria-label="Close">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -307,8 +385,8 @@
             <div class="modal-footer-dg">
                 <button class="btn btn-dg" @onclick="() => _showAddModal = false" type="button">Cancel</button>
                 <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleAddApplication" type="button">
-                    <i class="bi bi-plus-lg"></i>
-                    Add Application
+                    <i class="bi @(_editingApp is null ? "bi-plus-lg" : "bi-check-lg")"></i>
+                    @(_editingApp is null ? "Add" : "Save Changes") Application
                 </button>
             </div>
         </div>
@@ -316,13 +394,6 @@
 }
 
 @code {
-    private class SoapApiEntry
-    {
-        public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
-    }
-    private record SoapApp(string Id, string Name, string BaseUrl, string Description, string Status, string UpdatedBy, string CreatedDate, int ApisCount, string AuthType, string AuthUsername, string AuthPassword, string AuthExtra, SoapApiEntry[] Apis);
-
     private List<GridColumn<SoapApp>> _columns = [];
 
     protected override void OnInitialized()
@@ -385,18 +456,6 @@
         ];
     }
 
-    private static SoapApp[] _allApps =
-    [
-        new("s1", "LegacyBilling", "https://soap.billing.com/BillingService", "Enterprise billing service", "enabled", "Suresh Kumar", "2023-08-12", 3, "basic", "billing_user", "", "", [new SoapApiEntry { Name = "SubmitInvoice", Description = "Submit billing invoices" }, new SoapApiEntry { Name = "GetInvoiceStatus", Description = "Check invoice status" }, new SoapApiEntry { Name = "GenerateReport", Description = "Generate billing reports" }]),
-        new("s2", "ShippingSOAP", "https://soap.shipping.com/ShipService", "Global shipping and tracking", "disabled", "Priya Sharma", "2023-09-01", 2, "basic", "shipping_admin", "", "", [new SoapApiEntry { Name = "TrackShipment", Description = "Track package location" }, new SoapApiEntry { Name = "CreateLabel", Description = "Generate shipping labels" }]),
-        new("s3", "CustomerPortal", "https://soap.customer.com/PortalService", "Customer self-service portal", "enabled", "Anita Desai", "2023-07-05", 5, "basic", "portal_api", "", "", [new SoapApiEntry { Name = "GetProfile", Description = "Fetch customer profile" }, new SoapApiEntry { Name = "UpdateProfile", Description = "Update customer details" }, new SoapApiEntry { Name = "GetOrders", Description = "List customer orders" }, new SoapApiEntry { Name = "SubmitTicket", Description = "Submit support ticket" }, new SoapApiEntry { Name = "GetTicketStatus", Description = "Check ticket status" }]),
-        new("s4", "InventorySync", "https://soap.inventory.com/SyncService", "Real-time inventory sync", "disabled", "Vikram Singh", "2024-01-15", 1, "api-key", "sync_user", "sk-sync-abc123", "", [new SoapApiEntry { Name = "SyncInventory", Description = "Synchronize inventory data" }]),
-        new("s5", "PaymentGateway", "https://soap.payment.com/Gateway", "Payment processing gateway", "enabled", "Priya Sharma", "2023-11-20", 4, "bearer", "", "eyJhbGciOiJIUzI1NiJ9.eyJ...", "", [new SoapApiEntry { Name = "ProcessPayment", Description = "Process customer payment" }, new SoapApiEntry { Name = "RefundTransaction", Description = "Issue refund" }, new SoapApiEntry { Name = "GetTransactionLog", Description = "Retrieve transaction log" }, new SoapApiEntry { Name = "ValidateCard", Description = "Validate credit card" }]),
-        new("s6", "OrderProcessing", "https://soap.orders.com/OrderService", "Order management system", "enabled", "Rahul Patel", "2024-03-10", 6, "ntlm", "ORDERS\\svc_order", "p@ssw0rd", "ORDERS", [new SoapApiEntry { Name = "CreateOrder", Description = "Create new order" }, new SoapApiEntry { Name = "CancelOrder", Description = "Cancel existing order" }, new SoapApiEntry { Name = "GetOrderDetails", Description = "Get order details" }, new SoapApiEntry { Name = "UpdateOrderStatus", Description = "Update order status" }, new SoapApiEntry { Name = "ListOrders", Description = "List all orders" }, new SoapApiEntry { Name = "GetOrderHistory", Description = "Get order history" }]),
-        new("s7", "NotificationHub", "https://soap.notify.com/NotifyService", "Centralized notification service", "enabled", "Suresh Kumar", "2024-02-28", 3, "none", "", "", "", [new SoapApiEntry { Name = "SendEmail", Description = "Send email notification" }, new SoapApiEntry { Name = "SendSms", Description = "Send SMS notification" }, new SoapApiEntry { Name = "GetDeliveryStatus", Description = "Check delivery status" }]),
-        new("s8", "ReportingEngine", "https://soap.report.com/ReportService", "Business reporting engine", "disabled", "Anita Desai", "2023-10-12", 2, "basic", "report_user", "", "", [new SoapApiEntry { Name = "GenerateReport", Description = "Generate business report" }, new SoapApiEntry { Name = "ExportReport", Description = "Export report as file" }])
-    ];
-
     private string _searchText = "";
     private string _filterName = "";
     private string _filterUrl = "";
@@ -417,6 +476,8 @@
     private string _newAuthExtra = "";
     private List<SoapApiEntry> _newApis = [];
     private bool _showDropdown = false;
+    private HashSet<string> _expandedActionRows = [];
+    private SoapApp? _editingApp = null;
     private string _sortColumn = "";
     private bool _sortAscending = true;
 
@@ -424,7 +485,7 @@
     {
         get
         {
-            var query = _allApps.AsEnumerable();
+            var query = _appStore.Apps.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(_searchText))
             {
@@ -472,30 +533,69 @@
         _currentPage = 1;
     }
 
+    private void OpenEditDialog(SoapApp app)
+    {
+        _editingApp = app;
+        _newAppName = app.Name;
+        _newAppUrl = app.BaseUrl;
+        _newAppDescription = app.Description;
+        _newAppStatus = app.Status;
+        _newAuthType = app.AuthType;
+        _newAuthUsername = app.AuthUsername;
+        _newAuthPassword = app.AuthPassword;
+        _newAuthExtra = app.AuthExtra;
+        _newApis = [..app.Apis];
+        _expandedActionRows.Remove(app.Id);
+        _showAddModal = true;
+    }
+
     private void HandleAddApplication()
     {
         if (string.IsNullOrWhiteSpace(_newAppName) || string.IsNullOrWhiteSpace(_newAppUrl))
             return;
 
-        var newId = $"s{_allApps.Length + 1}";
-        var newApp = new SoapApp(
-            newId,
-            _newAppName.Trim(),
-            _newAppUrl.Trim(),
-            _newAppDescription.Trim(),
-            _newAppStatus,
-            "Anonymous",
-            DateTime.Now.ToString("yyyy-MM-dd"),
-            _newApis.Count,
-            _newAuthType,
-            _newAuthUsername.Trim(),
-            _newAuthPassword.Trim(),
-            _newAuthExtra.Trim(),
-            [.._newApis]
-        );
-        _allApps = [.._allApps, newApp];
+        if (_editingApp is not null)
+        {
+            var updatedApp = new SoapApp(
+                _editingApp.Id,
+                _newAppName.Trim(),
+                _newAppUrl.Trim(),
+                _newAppDescription.Trim(),
+                _newAppStatus,
+                _editingApp.UpdatedBy,
+                _editingApp.CreatedDate,
+                _newApis.Count,
+                _newAuthType,
+                _newAuthUsername.Trim(),
+                _newAuthPassword.Trim(),
+                _newAuthExtra.Trim(),
+                [.._newApis]
+            );
+            _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != _editingApp.Id), updatedApp]);
+        }
+        else
+        {
+            var newId = $"s{_appStore.Apps.Length + 1}";
+            var newApp = new SoapApp(
+                newId,
+                _newAppName.Trim(),
+                _newAppUrl.Trim(),
+                _newAppDescription.Trim(),
+                _newAppStatus,
+                "Anonymous",
+                DateTime.Now.ToString("yyyy-MM-dd"),
+                _newApis.Count,
+                _newAuthType,
+                _newAuthUsername.Trim(),
+                _newAuthPassword.Trim(),
+                _newAuthExtra.Trim(),
+                [.._newApis]
+            );
+            _appStore.UpdateApps([.._appStore.Apps, newApp]);
+        }
 
         _showAddModal = false;
+        _editingApp = null;
         ResetAddForm();
         _currentPage = 1;
     }

@@ -717,6 +717,18 @@ th.sortable:hover .sort-indicator {
     justify-content: center;
 }
 
+.pagination-num.is-current {
+    background: var(--sh-primary);
+    border-color: var(--sh-primary);
+    color: var(--sh-primary-text);
+    font-weight: 600;
+}
+
+.pagination-num.is-current:hover {
+    background: var(--sh-primary-hover);
+    border-color: var(--sh-primary-hover);
+}
+
 .pagination-num span {
     color: var(--sh-accent);
 }

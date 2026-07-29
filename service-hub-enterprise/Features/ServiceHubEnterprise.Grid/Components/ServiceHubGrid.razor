@@ -216,16 +216,9 @@
                 </button>
                 @foreach (var pg in GetPageRange())
                 {
-                    <button class="pagination-btn pagination-num"
+                    <button class="pagination-btn pagination-num@(pg == CurrentPage ? " is-current" : "")"
                             @onclick="() => GoToPage(pg)">
-                        @if (pg == CurrentPage)
-                        {
-                            <span class="fw-bold">@pg</span>
-                        }
-                        else
-                        {
-                            @pg
-                        }
+                        @pg
                     </button>
                 }
                 <button class="pagination-btn"

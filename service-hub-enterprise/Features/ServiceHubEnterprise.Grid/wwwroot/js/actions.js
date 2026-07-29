@@ -60,6 +60,10 @@ class ServiceHubRowActions {
         this.container.addEventListener('click', (e) => {
             const trigger = e.target.closest(this.options.actionTriggerSelector);
             if (trigger) {
+                // Skip if Blazor manages this wrap
+                const wrap = trigger.closest('.row-actions-wrap, .header-actions-wrap, .footer-actions-wrap');
+                if (wrap && wrap.classList.contains('blazor-managed')) return;
+
                 e.stopPropagation();
                 const row = trigger.closest(this.options.rowSelector);
                 const actionsPanel = trigger.parentElement.querySelector(this.options.inlineActionsSelector);
@@ -68,6 +72,7 @@ class ServiceHubRowActions {
                     this._closeAllActionMenus();
                     if (!isOpen) {
                         actionsPanel.classList.add('visible');
+                        if (wrap) wrap.classList.add('is-open');
                     }
                 }
                 return;
@@ -79,6 +84,8 @@ class ServiceHubRowActions {
                 const actionsPanel = closeBtn.closest(this.options.inlineActionsSelector);
                 if (actionsPanel) {
                     actionsPanel.classList.remove('visible');
+                    const wrap = actionsPanel.closest('.row-actions-wrap, .header-actions-wrap, .footer-actions-wrap');
+                    if (wrap) wrap.classList.remove('is-open');
                 }
                 return;
             }
@@ -134,6 +141,9 @@ class ServiceHubRowActions {
     _closeAllActionMenus() {
         this.container.querySelectorAll(`${this.options.inlineActionsSelector}.visible`).forEach(el => {
             el.classList.remove('visible');
+        });
+        this.container.querySelectorAll('.row-actions-wrap.is-open, .header-actions-wrap.is-open, .footer-actions-wrap.is-open').forEach(el => {
+            el.classList.remove('is-open');
         });
     }
 
