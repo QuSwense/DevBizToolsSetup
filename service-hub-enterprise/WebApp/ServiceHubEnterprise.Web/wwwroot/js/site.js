@@ -96,17 +96,9 @@
         }
         checkMobile();
         window.addEventListener('resize', checkMobile);
-        applyActiveStates();
-    });
-
-    window.addEventListener('blazor.navigating', function () {
-        document.querySelectorAll('.sidebar-nav a, .submenu-item, .menu-item').forEach(function (el) {
-            el.classList.remove('active');
-        });
     });
 
     window.addEventListener('blazor.navigated', function () {
-        applyActiveStates();
         initGrids();
     });
 

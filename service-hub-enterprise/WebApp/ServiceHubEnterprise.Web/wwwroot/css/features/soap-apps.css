@@ -22,6 +22,10 @@
 
 /* Height utility */
 .h-30 { height: 30px; }
+.h-32 { height: 32px; }
+
+/* Width utility */
+.w-32 { width: 32px; }
 
 /* Padding utility */
 .p-10 { padding: 10px; }

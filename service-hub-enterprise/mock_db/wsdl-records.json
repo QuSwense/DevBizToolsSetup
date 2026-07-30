@@ -1,0 +1,62 @@
+[
+  {
+    "id": "wsdl-1",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "sourceType": "url",
+    "sourceUrl": "https://soap.billing.com/BillingService?singlewsdl",
+    "uploadedBy": "Suresh Kumar",
+    "uploadedAt": "2024-06-15 10:30:00",
+    "status": "synced",
+    "wsdlContentKey": "basic",
+    "versionCount": 2
+  },
+  {
+    "id": "wsdl-2",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "sourceType": "upload",
+    "sourceUrl": "billing_v2.wsdl",
+    "uploadedBy": "Priya Sharma",
+    "uploadedAt": "2024-08-01 14:15:00",
+    "status": "synced",
+    "wsdlContentKey": "basic",
+    "versionCount": 1
+  },
+  {
+    "id": "wsdl-3",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "sourceType": "url",
+    "sourceUrl": "https://soap.customer.com/PortalService?wsdl",
+    "uploadedBy": "Anita Desai",
+    "uploadedAt": "2024-05-20 09:00:00",
+    "status": "synced",
+    "wsdlContentKey": "customer",
+    "versionCount": 3
+  },
+  {
+    "id": "wsdl-4",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "sourceType": "url",
+    "sourceUrl": "https://soap.payment.com/Gateway?wsdl",
+    "uploadedBy": "Priya Sharma",
+    "uploadedAt": "2024-07-10 11:45:00",
+    "status": "parsing",
+    "wsdlContentKey": "basic",
+    "versionCount": 1
+  },
+  {
+    "id": "wsdl-5",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "sourceType": "upload",
+    "sourceUrl": "order_service_2024.wsdl",
+    "uploadedBy": "Rahul Patel",
+    "uploadedAt": "2024-04-05 16:30:00",
+    "status": "synced",
+    "wsdlContentKey": "orders",
+    "versionCount": 2
+  }
+]

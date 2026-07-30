@@ -1,7 +1,7 @@
 @inject NavigationManager Navigation
 @implements IDisposable
 
-<aside class="sidebar" id="mainSidebar">
+<aside class="sidebar@(_collapsed ? " collapsed" : "")" id="mainSidebar">
     <div class="sidebar-header">
         <div class="sidebar-brand">
             <div class="brand-mark">SH</div>
@@ -10,12 +10,13 @@
                 <span class="brand-sub">V8 Enterprise</span>
             </div>
         </div>
-        <button class="btn-collapse" aria-label="Collapse sidebar" onclick="toggleSidebar()">
-            <i class="bi bi-chevron-left"></i>
+        <button class="btn-collapse" aria-label="@(_collapsed ? "Expand sidebar" : "Collapse sidebar")" @onclick="ToggleCollapse">
+            <i class="bi @(_collapsed ? "bi-chevron-right" : "bi-chevron-left")"></i>
         </button>
     </div>
     <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
-        <a class="menu-item@(currentPage == "/" ? " active" : "")" href="/">
+        <a class="menu-item@(currentPage == "/" ? " active" : "")" href="/"
+           @onclick="@(() => NavigateTo("/"))" @onclick:preventDefault="true">
             <span class="menu-icon">
                 <i class="bi bi-grid-3x3-gap-fill"></i>
             </span>
@@ -23,8 +24,8 @@
         </a>
 
         <!-- SOAP Section -->
-        <div class="menu-item@(currentPage.StartsWith("/soap") ? " active" : "")" role="button" tabindex="0"
-             onclick="toggleSubmenu(this)">
+        <div class="@GetMenuSectionClass(currentPage.StartsWith("/soap"), IsExpanded(SoapSection))" role="button" tabindex="0"
+             @onclick="ToggleSoap">
             <span class="menu-icon">
                 <i class="bi bi-database"></i>
             </span>
@@ -33,33 +34,38 @@
                 <i class="bi bi-chevron-down"></i>
             </span>
         </div>
-        <div class="submenu @(currentPage.StartsWith("/soap") ? "submenu-open" : "")">
-            <a class="submenu-item@(currentPage == "/soap/applications" ? " active" : "")" href="/soap/applications">
+        <div class="@GetSubmenuClass(IsExpanded(SoapSection))">
+            <a class="submenu-item@(currentPage == "/soap/applications" ? " active" : "")" href="/soap/applications"
+               @onclick="@(() => NavigateTo("/soap/applications"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
                 <span class="sub-label">Applications</span>
             </a>
-            <a class="submenu-item@(currentPage == "/soap/request-files" ? " active" : "")" href="/soap/request-files">
+            <a class="submenu-item@(currentPage == "/soap/request-files" ? " active" : "")" href="/soap/request-files"
+               @onclick="@(() => NavigateTo("/soap/request-files"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
                 <span class="sub-label">Request Files</span>
             </a>
-            <a class="submenu-item@(currentPage == "/soap/templates" ? " active" : "")" href="/soap/templates">
+            <a class="submenu-item@(currentPage == "/soap/templates" ? " active" : "")" href="/soap/templates"
+               @onclick="@(() => NavigateTo("/soap/templates"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-download"></i></span>
                 <span class="sub-label">Templates</span>
             </a>
-            <a class="submenu-item@(currentPage == "/soap/wsdl-sync" ? " active" : "")" href="/soap/wsdl-sync">
+            <a class="submenu-item@(currentPage == "/soap/wsdl-sync" ? " active" : "")" href="/soap/wsdl-sync"
+               @onclick="@(() => NavigateTo("/soap/wsdl-sync"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-arrow-repeat"></i></span>
                 <span class="sub-label">WSDL Sync</span>
             </a>
             <a class="submenu-item@(currentPage == "/soap/execute-history" ? " active" : "")"
-               href="/soap/execute-history">
+               href="/soap/execute-history"
+               @onclick="@(() => NavigateTo("/soap/execute-history"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-clock-history"></i></span>
                 <span class="sub-label">Execute &amp; History</span>
             </a>
         </div>
 
         <!-- REST Section -->
-        <div class="menu-item@(currentPage.StartsWith("/rest") ? " active" : "")" role="button" tabindex="0"
-             onclick="toggleSubmenu(this)">
+        <div class="@GetMenuSectionClass(currentPage.StartsWith("/rest"), IsExpanded(RestSection))" role="button" tabindex="0"
+             @onclick="ToggleRest">
             <span class="menu-icon">
                 <i class="bi bi-window-stack"></i>
             </span>
@@ -68,33 +74,38 @@
                 <i class="bi bi-chevron-down"></i>
             </span>
         </div>
-        <div class="submenu @(currentPage.StartsWith("/rest") ? "submenu-open" : "")">
-            <a class="submenu-item@(currentPage == "/rest/applications" ? " active" : "")" href="/rest/applications">
+        <div class="@GetSubmenuClass(IsExpanded(RestSection))">
+            <a class="submenu-item@(currentPage == "/rest/applications" ? " active" : "")" href="/rest/applications"
+               @onclick="@(() => NavigateTo("/rest/applications"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
                 <span class="sub-label">Applications</span>
             </a>
-            <a class="submenu-item@(currentPage == "/rest/request-files" ? " active" : "")" href="/rest/request-files">
+            <a class="submenu-item@(currentPage == "/rest/request-files" ? " active" : "")" href="/rest/request-files"
+               @onclick="@(() => NavigateTo("/rest/request-files"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>
                 <span class="sub-label">Request Files</span>
             </a>
-            <a class="submenu-item@(currentPage == "/rest/templates" ? " active" : "")" href="/rest/templates">
+            <a class="submenu-item@(currentPage == "/rest/templates" ? " active" : "")" href="/rest/templates"
+               @onclick="@(() => NavigateTo("/rest/templates"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-download"></i></span>
                 <span class="sub-label">Templates</span>
             </a>
-            <a class="submenu-item@(currentPage == "/rest/swagger-sync" ? " active" : "")" href="/rest/swagger-sync">
+            <a class="submenu-item@(currentPage == "/rest/swagger-sync" ? " active" : "")" href="/rest/swagger-sync"
+               @onclick="@(() => NavigateTo("/rest/swagger-sync"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-arrow-repeat"></i></span>
                 <span class="sub-label">Swagger Sync</span>
             </a>
             <a class="submenu-item@(currentPage == "/rest/execute-history" ? " active" : "")"
-               href="/rest/execute-history">
+               href="/rest/execute-history"
+               @onclick="@(() => NavigateTo("/rest/execute-history"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-clock-history"></i></span>
                 <span class="sub-label">Execute &amp; History</span>
             </a>
         </div>
 
         <!-- File Management Section -->
-        <div class="menu-item@(currentPage.StartsWith("/file") ? " active" : "")" role="button" tabindex="0"
-             onclick="toggleSubmenu(this)">
+        <div class="@GetMenuSectionClass(currentPage.StartsWith("/file"), IsExpanded(FileSection))" role="button" tabindex="0"
+             @onclick="ToggleFile">
             <span class="menu-icon">
                 <i class="bi bi-folder"></i>
             </span>
@@ -103,28 +114,32 @@
                 <i class="bi bi-chevron-down"></i>
             </span>
         </div>
-        <div class="submenu @(currentPage.StartsWith("/file") ? "submenu-open" : "")">
-            <a class="submenu-item@(currentPage == "/file/library" ? " active" : "")" href="/file/library">
+        <div class="@GetSubmenuClass(IsExpanded(FileSection))">
+            <a class="submenu-item@(currentPage == "/file/library" ? " active" : "")" href="/file/library"
+               @onclick="@(() => NavigateTo("/file/library"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-earmark"></i></span>
                 <span class="sub-label">File Library</span>
             </a>
-            <a class="submenu-item@(currentPage == "/file/browser" ? " active" : "")" href="/file/browser">
+            <a class="submenu-item@(currentPage == "/file/browser" ? " active" : "")" href="/file/browser"
+               @onclick="@(() => NavigateTo("/file/browser"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-folder-open"></i></span>
                 <span class="sub-label">File Browser WebDAV</span>
             </a>
-            <a class="submenu-item@(currentPage == "/file/viewer" ? " active" : "")" href="/file/viewer">
+            <a class="submenu-item@(currentPage == "/file/viewer" ? " active" : "")" href="/file/viewer"
+               @onclick="@(() => NavigateTo("/file/viewer"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-eye"></i></span>
                 <span class="sub-label">File Viewer PDF</span>
             </a>
-            <a class="submenu-item@(currentPage == "/file/comparer" ? " active" : "")" href="/file/comparer">
+            <a class="submenu-item@(currentPage == "/file/comparer" ? " active" : "")" href="/file/comparer"
+               @onclick="@(() => NavigateTo("/file/comparer"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-diff"></i></span>
                 <span class="sub-label">Editor Comparer</span>
             </a>
         </div>
 
         <!-- Test Suite Section -->
-        <div class="menu-item@(currentPage.StartsWith("/test") ? " active" : "")" role="button" tabindex="0"
-             onclick="toggleSubmenu(this)">
+        <div class="@GetMenuSectionClass(currentPage.StartsWith("/test"), IsExpanded(TestSection))" role="button" tabindex="0"
+             @onclick="ToggleTest">
             <span class="menu-icon">
                 <i class="bi bi-check2-square"></i>
             </span>
@@ -133,39 +148,46 @@
                 <i class="bi bi-chevron-down"></i>
             </span>
         </div>
-        <div class="submenu @(currentPage.StartsWith("/test") ? "submenu-open" : "")">
-            <a class="submenu-item@(currentPage == "/test/cases" ? " active" : "")" href="/test/cases">
+        <div class="@GetSubmenuClass(IsExpanded(TestSection))">
+            <a class="submenu-item@(currentPage == "/test/cases" ? " active" : "")" href="/test/cases"
+               @onclick="@(() => NavigateTo("/test/cases"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-list-check"></i></span>
                 <span class="sub-label">Test Cases</span>
             </a>
-            <a class="submenu-item@(currentPage == "/test/suites" ? " active" : "")" href="/test/suites">
+            <a class="submenu-item@(currentPage == "/test/suites" ? " active" : "")" href="/test/suites"
+               @onclick="@(() => NavigateTo("/test/suites"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-collection"></i></span>
                 <span class="sub-label">Test Suites</span>
             </a>
-            <a class="submenu-item@(currentPage == "/test/criteria" ? " active" : "")" href="/test/criteria">
+            <a class="submenu-item@(currentPage == "/test/criteria" ? " active" : "")" href="/test/criteria"
+               @onclick="@(() => NavigateTo("/test/criteria"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-check2-square"></i></span>
                 <span class="sub-label">Success Criteria</span>
             </a>
-            <a class="submenu-item@(currentPage == "/test/executions" ? " active" : "")" href="/test/executions">
+            <a class="submenu-item@(currentPage == "/test/executions" ? " active" : "")" href="/test/executions"
+               @onclick="@(() => NavigateTo("/test/executions"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-clock-history"></i></span>
                 <span class="sub-label">Executions &amp; History</span>
             </a>
         </div>
 
         <!-- Flat items -->
-        <a class="menu-item@(currentPage == "/health" ? " active" : "")" href="/health">
+        <a class="menu-item@(currentPage == "/health" ? " active" : "")" href="/health"
+           @onclick="@(() => NavigateTo("/health"))" @onclick:preventDefault="true">
             <span class="menu-icon">
                 <i class="bi bi-heart-pulse"></i>
             </span>
             <span class="menu-label">Monitoring Health Dashboard</span>
         </a>
-        <a class="menu-item@(currentPage == "/adviewer" ? " active" : "")" href="/adviewer">
+        <a class="menu-item@(currentPage == "/adviewer" ? " active" : "")" href="/adviewer"
+           @onclick="@(() => NavigateTo("/adviewer"))" @onclick:preventDefault="true">
             <span class="menu-icon">
                 <i class="bi bi-people"></i>
             </span>
             <span class="menu-label">AD Viewer</span>
         </a>
-        <a class="menu-item@(currentPage == "/settings" ? " active" : "")" href="/settings">
+        <a class="menu-item@(currentPage == "/settings" ? " active" : "")" href="/settings"
+           @onclick="@(() => NavigateTo("/settings"))" @onclick:preventDefault="true">
             <span class="menu-icon">
                 <i class="bi bi-gear"></i>
             </span>
@@ -178,28 +200,4 @@
 </aside>
 
 @code {
-    private string currentPage = "/";
-
-    protected override void OnInitialized()
-    {
-        UpdateCurrentPage();
-        Navigation.LocationChanged += OnLocationChanged;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        UpdateCurrentPage();
-        StateHasChanged();
-    }
-
-    private void UpdateCurrentPage()
-    {
-        var path = Navigation.ToBaseRelativePath(Navigation.Uri);
-        currentPage = string.IsNullOrEmpty(path) ? "/" : "/" + path;
-    }
-
-    public void Dispose()
-    {
-        Navigation.LocationChanged -= OnLocationChanged;
-    }
 }

@@ -1,8 +1,9 @@
 @page "/soap/templates"
+@inject MockDbLoader _mockDbLoader
 
 <ServiceHubGrid TItem="Template"
                 Id="templatesGrid"
-                Items="TemplateItems"
+                Items="_templateItems"
                 PageSize="10"
                 EnableSelection="true"
                 EnablePagination="true"
@@ -70,62 +71,4 @@
 </ServiceHubGrid>
 
 @code {
-    private record Template(string Name, string Type, string Updated, string Created, int Usage);
-
-    private List<GridColumn<Template>> _columns = [];
-    private HashSet<string> _expandedActionRows = [];
-
-    protected override void OnInitialized()
-    {
-        _columns =
-        [
-            new()
-            {
-                Title = "Template Name",
-                Sortable = true,
-                Field = t => t.Name,
-                Template = context => builder =>
-                {
-                    builder.OpenElement(0, "span");
-                    builder.AddAttribute(1, "class", "mono-text");
-                    builder.AddContent(2, context.Name);
-                    builder.CloseElement();
-                }
-            },
-            new()
-            {
-                Title = "Updated",
-                Sortable = true,
-                Field = t => t.Updated,
-                Template = context => builder =>
-                {
-                    builder.OpenElement(0, "span");
-                    builder.AddAttribute(1, "class", "text-sh-soft");
-                    builder.AddContent(2, context.Updated);
-                    builder.CloseElement();
-                }
-            },
-            new()
-            {
-                Title = "Usage",
-                Sortable = true,
-                Field = t => t.Usage,
-                Template = context => builder =>
-                {
-                    builder.OpenElement(0, "span");
-                    builder.AddAttribute(1, "class", "text-sh-soft");
-                    builder.AddContent(2, context.Usage);
-                    builder.AddContent(3, " uses");
-                    builder.CloseElement();
-                }
-            }
-        ];
-    }
-
-    private static Template[] TemplateItems =
-    [
-        new("Billing Invoice Request", "XML", "2024-02-10", "2024-02-10", 15),
-        new("Shipping Track Envelope", "XML", "2024-02-10", "2024-02-22", 9),
-        new("Billing Cancel Envelope", "XML", "2024-02-10", "2024-03-05", 6)
-    ];
 }

@@ -44,7 +44,7 @@
             {
                 <div class="position-fixed" style="inset:0;z-index:50" @onclick="() => _showDropdown = false"></div>
                 <div class="dropdown-menu-dg">
-                    <div style="padding:4px 0">
+                    <div class="py-1">
                         <div class="dropdown-header-dg">Export</div>
                         <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
                             <i class="bi bi-download"></i>
@@ -140,7 +140,7 @@
                 <div class="detail-label">Full URL</div>
                 <div class="detail-value text-break">@app.BaseUrl</div>
             </div>
-            <div style="grid-column:1/-1">
+            <div class="grid-col-full">
                 <div class="detail-label">Description</div>
                 <div class="detail-value">@(string.IsNullOrEmpty(app.Description) ? "—" : app.Description)</div>
             </div>
@@ -157,7 +157,7 @@
                 <div class="detail-value">@app.CreatedDate by @app.UpdatedBy</div>
             </div>
 
-            <div style="grid-column:1/-1;border-top:1px solid var(--sh-border);padding-top:8px;margin-top:4px">
+            <div class="grid-col-full border-sh-top pt-2 mt-1">
                 <div class="fs-10 fw-semibold text-uppercase ls-06 text-sh-faint mb-2">
                     <i class="bi bi-shield-lock me-1"></i>Authentication
                 </div>
@@ -195,7 +195,7 @@
                 </div>
             </div>
 
-            <div style="grid-column:1/-1;border-top:1px solid var(--sh-border);padding-top:8px;margin-top:4px">
+            <div class="grid-col-full border-sh-top pt-2 mt-1">
                 <div class="fs-10 fw-semibold text-uppercase ls-06 text-sh-faint mb-2">
                     <i class="bi bi-diagram-3 me-1"></i>SOAP APIs (@app.ApisCount)
                 </div>
@@ -203,10 +203,10 @@
             @if (app.Apis.Length > 0)
             {
                 <div style="grid-column:1/-1">
-                    <div style="display:flex;flex-direction:column;gap:4px">
+                    <div class="d-flex flex-column gap-1">
                         @foreach (var api in app.Apis)
                         {
-                            <div class="d-flex align-items-center gap-8px" style="padding:5px 10px;background:var(--sh-surface-2);border:1px solid var(--sh-border)">
+                            <div class="d-flex align-items-center gap-8px bg-sh-surface-2 border-sh" style="padding:5px 10px">
                                 <span class="fw-medium fs-12 text-nowrap" style="color:var(--sh-text)">@api.Name</span>
                                 @if (!string.IsNullOrEmpty(api.Description))
                                 {
@@ -219,7 +219,7 @@
             }
             else
             {
-                <div style="grid-column:1/-1">
+                <div class="grid-col-full">
                     <div class="detail-value text-sh-faint fst-italic">No APIs configured</div>
                 </div>
             }
@@ -388,7 +388,7 @@
                     <span class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft">
                         SOAP APIs <span class="text-sh-error">*</span>
                     </span>
-                    <button class="btn btn-dg fs-11" style="height:30px" @onclick="AddApiEntry" type="button">
+                    <button class="btn btn-dg fs-11 h-30" @onclick="AddApiEntry" type="button">
                         <i class="bi bi-plus-lg"></i>
                         Add API
                     </button>
@@ -397,13 +397,13 @@
                 {
                     var idx = i;
                     <div class="d-flex gap-8px align-items-start mb-2">
-                        <div class="d-flex flex-column" style="flex:1;gap:6px">
+                        <div class="d-flex flex-column flex-fill" style="gap:6px">
                             <input type="text" class="form-control-dg" placeholder="API name..."
                                    @bind="_newApis[idx].Name" @bind:event="oninput" />
                             <input type="text" class="form-control-dg" placeholder="API description..."
                                    @bind="_newApis[idx].Description" @bind:event="oninput" />
                         </div>
-                        <button class="btn btn-dg btn-sh-ghost" style="height:36px;width:36px;padding:0;flex-shrink:0;color:var(--sh-error);border-color:transparent"
+                        <button class="btn btn-dg btn-sh-ghost btn-remove-file"
                                 @onclick="() => RemoveApiEntry(idx)" type="button" aria-label="Remove API">
                             <i class="bi bi-x-lg"></i>
                         </button>
@@ -411,7 +411,7 @@
                 }
                 @if (_newApis.Count == 0)
                 {
-                    <div style="font-size:12px;color:var(--sh-text-faint);padding:4px 0">
+                    <div class="fs-12 text-sh-faint py-1">
                         No APIs added yet. Click "Add API" to define SOAP endpoints.
                     </div>
                 }
@@ -425,273 +425,4 @@
             </div>
         </div>
     </div>
-}
-
-@code {
-    private List<GridColumn<SoapApp>> _columns = [];
-
-    protected override void OnInitialized()
-    {
-        _columns =
-        [
-            new()
-            {
-                Title = "App Name",
-                Sortable = true,
-                Field = a => a.Name,
-                Template = context => builder =>
-                {
-                    var app = context;
-                    var initials = app.Name.Length >= 2 ? app.Name[..2].ToUpper() : app.Name.ToUpper();
-                    builder.OpenElement(0, "div");
-                    builder.AddAttribute(1, "class", "name-stack");
-                    builder.OpenElement(2, "span");
-                    builder.AddAttribute(3, "class", "avatar-sm");
-                    builder.AddContent(4, initials);
-                    builder.CloseElement();
-                    builder.OpenElement(5, "span");
-                    builder.AddAttribute(6, "style", "font-weight:500");
-                    builder.AddContent(7, app.Name);
-                    builder.CloseElement();
-                    builder.CloseElement();
-                }
-            },
-            new()
-            {
-                Title = "Base URL",
-                Sortable = true,
-                Field = a => a.BaseUrl,
-                Template = context => builder =>
-                {
-                    builder.OpenElement(0, "span");
-                    builder.AddAttribute(1, "class", "cell-id");
-                    builder.AddContent(2, context.BaseUrl);
-                    builder.CloseElement();
-                }
-            },
-            new()
-            {
-                Title = "Status",
-                Sortable = true,
-                Field = a => a.Status,
-                Template = context => builder =>
-                {
-                    var badgeClass = context.Status == "enabled" ? "status-enabled" : "status-disabled";
-                    var label = context.Status == "enabled" ? "Enabled" : "Disabled";
-                    builder.OpenElement(0, "span");
-                    builder.AddAttribute(1, "class", $"status-badge {badgeClass}");
-                    builder.AddContent(2, label);
-                    builder.CloseElement();
-                }
-            },
-            new() { Title = "Last Updated By", Sortable = true, Field = a => a.UpdatedBy },
-            new() { Title = "Created Date", Sortable = true, Field = a => a.CreatedDate },
-            new() { Title = "Operations", Sortable = true, Field = a => a.ApisCount }
-        ];
-    }
-
-    private string _searchText = "";
-    private string _filterName = "";
-    private string _filterUrl = "";
-    private string _filterStatus = "";
-    private string _filterUpdatedBy = "";
-    private string _filterCreatedDate = "";
-    private string _filterOperations = "";
-    private int _currentPage = 1;
-    private bool _showFilterModal = false;
-    private bool _showAddModal = false;
-    private List<string> _validationErrors = [];
-    private string _newAppName = "";
-    private string _newAppUrl = "";
-    private string _newAppWsdlPath = "";
-    private string _newAppSoapAction = "";
-    private string _newAppDescription = "";
-    private string _newAppStatus = "enabled";
-    private string _newAuthType = "basic";
-    private string _newAuthUsername = "";
-    private string _newAuthPassword = "";
-    private string _newAuthExtra = "";
-    private List<SoapApiEntry> _newApis = [];
-    private bool _showDropdown = false;
-    private HashSet<string> _expandedActionRows = [];
-    private SoapApp? _editingApp = null;
-    private string _sortColumn = "";
-    private bool _sortAscending = true;
-
-    private SoapApp[] FilteredApps
-    {
-        get
-        {
-            var query = _appStore.Apps.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(_searchText))
-            {
-                var q = _searchText.ToLower();
-                query = query.Where(a =>
-                    a.Name.ToLower().Contains(q) ||
-                    a.BaseUrl.ToLower().Contains(q) ||
-                    a.UpdatedBy.ToLower().Contains(q) ||
-                    a.Status.ToLower().Contains(q));
-            }
-
-            if (!string.IsNullOrWhiteSpace(_filterName))
-                query = query.Where(a => a.Name.ToLower().Contains(_filterName.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterUrl))
-                query = query.Where(a => a.BaseUrl.ToLower().Contains(_filterUrl.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterStatus))
-                query = query.Where(a => a.Status == _filterStatus);
-            if (!string.IsNullOrWhiteSpace(_filterUpdatedBy))
-                query = query.Where(a => a.UpdatedBy.ToLower().Contains(_filterUpdatedBy.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterCreatedDate))
-                query = query.Where(a => a.CreatedDate.ToLower().Contains(_filterCreatedDate.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterOperations) && int.TryParse(_filterOperations, out var ops))
-                query = query.Where(a => a.ApisCount == ops);
-
-            if (!string.IsNullOrWhiteSpace(_sortColumn))
-            {
-                query = _sortColumn switch
-                {
-                    "Name" => _sortAscending ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name),
-                    "BaseUrl" => _sortAscending ? query.OrderBy(a => a.BaseUrl) : query.OrderByDescending(a => a.BaseUrl),
-                    "Status" => _sortAscending ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
-                    "UpdatedBy" => _sortAscending ? query.OrderBy(a => a.UpdatedBy) : query.OrderByDescending(a => a.UpdatedBy),
-                    "CreatedDate" => _sortAscending ? query.OrderBy(a => a.CreatedDate) : query.OrderByDescending(a => a.CreatedDate),
-                    "ApisCount" => _sortAscending ? query.OrderBy(a => a.ApisCount) : query.OrderByDescending(a => a.ApisCount),
-                    _ => query
-                };
-            }
-
-            return query.ToArray();
-        }
-    }
-
-    private void OnFilterApplied()
-    {
-        _currentPage = 1;
-    }
-
-    private void OpenEditDialog(SoapApp app)
-    {
-        _editingApp = app;
-        _newAppName = app.Name;
-        _newAppUrl = app.BaseUrl;
-        _newAppWsdlPath = app.WsdlPath;
-        _newAppDescription = app.Description;
-        _newAppStatus = app.Status;
-        _newAuthType = app.AuthType;
-        _newAuthUsername = app.AuthUsername;
-        _newAuthPassword = app.AuthPassword;
-        _newAuthExtra = app.AuthExtra;
-        _newApis = [..app.Apis];
-        _expandedActionRows.Remove(app.Id);
-        _validationErrors = [];
-        _showAddModal = true;
-    }
-
-    private void HandleAddApplication()
-    {
-        _validationErrors = [];
-
-        if (string.IsNullOrWhiteSpace(_newAppName))
-            _validationErrors.Add("App name is required.");
-        if (string.IsNullOrWhiteSpace(_newAppUrl))
-            _validationErrors.Add("Base URL is required.");
-        if (_newApis.Count == 0)
-            _validationErrors.Add("At least one SOAP API must be added.");
-
-        if (_validationErrors.Count > 0)
-            return;
-
-        if (_editingApp is not null)
-        {
-            var updatedApp = new SoapApp(
-                _editingApp.Id,
-                _newAppName.Trim(),
-                _newAppUrl.Trim(),
-                _newAppWsdlPath.Trim(),
-                _newAppDescription.Trim(),
-                _newAppStatus,
-                _editingApp.UpdatedBy,
-                _editingApp.CreatedDate,
-                _newApis.Count,
-                _newAuthType,
-                _newAuthUsername.Trim(),
-                _newAuthPassword.Trim(),
-                _newAuthExtra.Trim(),
-                [.._newApis]
-            );
-            _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != _editingApp.Id), updatedApp]);
-        }
-        else
-        {
-            var newId = $"s{_appStore.Apps.Length + 1}";
-            var newApp = new SoapApp(
-                newId,
-                _newAppName.Trim(),
-                _newAppUrl.Trim(),
-                _newAppWsdlPath.Trim(),
-                _newAppDescription.Trim(),
-                _newAppStatus,
-                "Anonymous",
-                DateTime.Now.ToString("yyyy-MM-dd"),
-                _newApis.Count,
-                _newAuthType,
-                _newAuthUsername.Trim(),
-                _newAuthPassword.Trim(),
-                _newAuthExtra.Trim(),
-                [.._newApis]
-            );
-            _appStore.UpdateApps([.._appStore.Apps, newApp]);
-        }
-
-        _showAddModal = false;
-        _editingApp = null;
-        ResetAddForm();
-        _currentPage = 1;
-    }
-
-    private void AddApiEntry()
-    {
-        _newApis.Add(new SoapApiEntry());
-    }
-
-    private void RemoveApiEntry(int index)
-    {
-        _newApis.RemoveAt(index);
-    }
-
-    private void ResetAddForm()
-    {
-        _validationErrors = [];
-        _newAppName = "";
-        _newAppUrl = "";
-        _newAppWsdlPath = "";
-        _newAppDescription = "";
-        _newAppStatus = "enabled";
-        _newAuthType = "basic";
-        _newAuthUsername = "";
-        _newAuthPassword = "";
-        _newAuthExtra = "";
-        _newApis = [];
-    }
-
-    private void HandleResetSort()
-    {
-        _showDropdown = false;
-        _sortColumn = "";
-        _sortAscending = true;
-        _currentPage = 1;
-    }
-
-    private void ResetAdvancedFilters()
-    {
-        _searchText = "";
-        _filterName = "";
-        _filterUrl = "";
-        _filterStatus = "";
-        _filterUpdatedBy = "";
-        _filterCreatedDate = "";
-        _filterOperations = "";
-        _currentPage = 1;
-    }
 }

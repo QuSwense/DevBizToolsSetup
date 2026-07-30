@@ -1,0 +1,26 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://example.com/customer" targetNamespace="http://example.com/customer">
+  <wsdl:types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema">
+      <element name="GetProfileRequest"><complexType><sequence><element name="CustomerId" type="string"/></sequence></complexType></element>
+      <element name="GetProfileResponse"><complexType><sequence><element name="Name" type="string"/><element name="Email" type="string"/><element name="Tier" type="string"/></sequence></complexType></element>
+      <element name="SubmitTicketRequest"><complexType><sequence><element name="Subject" type="string"/><element name="Description" type="string"/><element name="Priority" type="string"/></sequence></complexType></element>
+      <element name="SubmitTicketResponse"><complexType><sequence><element name="TicketId" type="string"/><element name="Status" type="string"/></sequence></complexType></element>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name="GetProfileRequest"><part name="parameters" element="tns:GetProfileRequest"/></wsdl:message>
+  <wsdl:message name="GetProfileResponse"><part name="parameters" element="tns:GetProfileResponse"/></wsdl:message>
+  <wsdl:message name="SubmitTicketRequest"><part name="parameters" element="tns:SubmitTicketRequest"/></wsdl:message>
+  <wsdl:message name="SubmitTicketResponse"><part name="parameters" element="tns:SubmitTicketResponse"/></wsdl:message>
+  <wsdl:portType name="CustomerPortType">
+    <operation name="GetProfile"><input message="tns:GetProfileRequest"/><output message="tns:GetProfileResponse"/></operation>
+    <operation name="SubmitTicket"><input message="tns:SubmitTicketRequest"/><output message="tns:SubmitTicketResponse"/></operation>
+  </wsdl:portType>
+  <wsdl:binding name="CustomerBinding" type="tns:CustomerPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="GetProfile"><soap:operation soapAction="getProfile"/><input><soap:body use="literal"/></input><output><soap:body use="literal"/></output></operation>
+    <operation name="SubmitTicket"><soap:operation soapAction="submitTicket"/><input><soap:body use="literal"/></input><output><soap:body use="literal"/></output></operation>
+  </wsdl:binding>
+  <wsdl:service name="CustomerService">
+    <port name="CustomerPort" binding="tns:CustomerBinding"><soap:address location="http://example.com/customer"/></port>
+  </wsdl:service>
+</wsdl:definitions>

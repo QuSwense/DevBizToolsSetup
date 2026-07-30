@@ -13,6 +13,7 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddSoapApplicationsFeature(this IServiceCollection services)
     {
+        services.AddSingleton<MockDbLoader>();
         services.AddSingleton<SoapAppStore>();
         services.AddSingleton<WsdlSyncStore>();
         return services;

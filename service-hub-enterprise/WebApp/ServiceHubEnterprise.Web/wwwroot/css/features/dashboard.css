@@ -204,6 +204,7 @@
 .border-sh-bottom { border-bottom: 1px solid var(--sh-border); }
 
 /* ── Custom font-size utilities ── */
+.fs-085 { font-size: 0.85rem; }
 .fs-9 { font-size: 9px; }
 .fs-10 { font-size: 10px; }
 .fs-11 { font-size: 11px; }

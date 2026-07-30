@@ -1,0 +1,164 @@
+[
+  {
+    "id": "s1",
+    "name": "LegacyBilling",
+    "baseUrl": "https://soap.billing.com/BillingService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Enterprise billing service",
+    "status": "enabled",
+    "updatedBy": "Suresh Kumar",
+    "createdDate": "2023-08-12",
+    "apisCount": 3,
+    "authType": "basic",
+    "authUsername": "billing_user",
+    "authPassword": "",
+    "authExtra": "",
+    "apis": [
+      { "name": "SubmitInvoice", "description": "Submit billing invoices" },
+      { "name": "GetInvoiceStatus", "description": "Check invoice status" },
+      { "name": "GenerateReport", "description": "Generate billing reports" }
+    ]
+  },
+  {
+    "id": "s2",
+    "name": "ShippingSOAP",
+    "baseUrl": "https://soap.shipping.com/ShipService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Global shipping and tracking",
+    "status": "disabled",
+    "updatedBy": "Priya Sharma",
+    "createdDate": "2023-09-01",
+    "apisCount": 2,
+    "authType": "basic",
+    "authUsername": "shipping_admin",
+    "authPassword": "",
+    "authExtra": "",
+    "apis": [
+      { "name": "TrackShipment", "description": "Track package location" },
+      { "name": "CreateLabel", "description": "Generate shipping labels" }
+    ]
+  },
+  {
+    "id": "s3",
+    "name": "CustomerPortal",
+    "baseUrl": "https://soap.customer.com/PortalService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Customer self-service portal",
+    "status": "enabled",
+    "updatedBy": "Anita Desai",
+    "createdDate": "2023-07-05",
+    "apisCount": 5,
+    "authType": "basic",
+    "authUsername": "portal_api",
+    "authPassword": "",
+    "authExtra": "",
+    "apis": [
+      { "name": "GetProfile", "description": "Fetch customer profile" },
+      { "name": "UpdateProfile", "description": "Update customer details" },
+      { "name": "GetOrders", "description": "List customer orders" },
+      { "name": "SubmitTicket", "description": "Submit support ticket" },
+      { "name": "GetTicketStatus", "description": "Check ticket status" }
+    ]
+  },
+  {
+    "id": "s4",
+    "name": "InventorySync",
+    "baseUrl": "https://soap.inventory.com/SyncService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Real-time inventory sync",
+    "status": "disabled",
+    "updatedBy": "Vikram Singh",
+    "createdDate": "2024-01-15",
+    "apisCount": 1,
+    "authType": "api-key",
+    "authUsername": "sync_user",
+    "authPassword": "sk-sync-abc123",
+    "authExtra": "",
+    "apis": [
+      { "name": "SyncInventory", "description": "Synchronize inventory data" }
+    ]
+  },
+  {
+    "id": "s5",
+    "name": "PaymentGateway",
+    "baseUrl": "https://soap.payment.com/Gateway",
+    "wsdlPath": "?singlewsdl",
+    "description": "Payment processing gateway",
+    "status": "enabled",
+    "updatedBy": "Priya Sharma",
+    "createdDate": "2023-11-20",
+    "apisCount": 4,
+    "authType": "bearer",
+    "authUsername": "",
+    "authPassword": "eyJhbGciOiJIUzI1NiJ9.eyJ...",
+    "authExtra": "",
+    "apis": [
+      { "name": "ProcessPayment", "description": "Process customer payment" },
+      { "name": "RefundTransaction", "description": "Issue refund" },
+      { "name": "GetTransactionLog", "description": "Retrieve transaction log" },
+      { "name": "ValidateCard", "description": "Validate credit card" }
+    ]
+  },
+  {
+    "id": "s6",
+    "name": "OrderProcessing",
+    "baseUrl": "https://soap.orders.com/OrderService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Order management system",
+    "status": "enabled",
+    "updatedBy": "Rahul Patel",
+    "createdDate": "2024-03-10",
+    "apisCount": 6,
+    "authType": "ntlm",
+    "authUsername": "ORDERS\\svc_order",
+    "authPassword": "p@ssw0rd",
+    "authExtra": "ORDERS",
+    "apis": [
+      { "name": "CreateOrder", "description": "Create new order" },
+      { "name": "CancelOrder", "description": "Cancel existing order" },
+      { "name": "GetOrderDetails", "description": "Get order details" },
+      { "name": "UpdateOrderStatus", "description": "Update order status" },
+      { "name": "ListOrders", "description": "List all orders" },
+      { "name": "GetOrderHistory", "description": "Get order history" }
+    ]
+  },
+  {
+    "id": "s7",
+    "name": "NotificationHub",
+    "baseUrl": "https://soap.notify.com/NotifyService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Centralized notification service",
+    "status": "enabled",
+    "updatedBy": "Suresh Kumar",
+    "createdDate": "2024-02-28",
+    "apisCount": 3,
+    "authType": "none",
+    "authUsername": "",
+    "authPassword": "",
+    "authExtra": "",
+    "apis": [
+      { "name": "SendEmail", "description": "Send email notification" },
+      { "name": "SendSms", "description": "Send SMS notification" },
+      { "name": "GetDeliveryStatus", "description": "Check delivery status" }
+    ]
+  },
+  {
+    "id": "s8",
+    "name": "ReportingEngine",
+    "baseUrl": "https://soap.report.com/ReportService",
+    "wsdlPath": "?singlewsdl",
+    "description": "Business reporting engine",
+    "status": "disabled",
+    "updatedBy": "Anita Desai",
+    "createdDate": "2023-10-12",
+    "apisCount": 2,
+    "authType": "basic",
+    "authUsername": "report_user",
+    "authPassword": "",
+    "authExtra": "",
+    "apis": [
+      { "name": "GenerateReport", "description": "Generate business report" },
+      { "name": "ExportReport", "description": "Export report as file" }
+    ]
+  }
+]

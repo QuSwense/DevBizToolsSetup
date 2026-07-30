@@ -57,7 +57,7 @@
                 <tr>
                     @if (EnableSelection)
                     {
-                        <th class="check-cell" style="width:32px">
+                        <th class="check-cell w-32">
                             <input type="checkbox"
                                    class="form-check-input"
                                    aria-label="Select all"
@@ -67,7 +67,7 @@
                     }
                     @if (EnableExpand)
                     {
-                        <th class="check-cell" style="width:32px" aria-label="Expand/Collapse"></th>
+                        <th class="check-cell w-32" aria-label="Expand/Collapse"></th>
                     }
                     @foreach (var col in Columns)
                     {
@@ -107,7 +107,7 @@
                 @if (Items is null || !Items.Any())
                 {
                     <tr>
-                        <td colspan="@_totalColumns" class="text-center text-sh-faint" style="padding:32px 14px">
+                        <td colspan="@_totalColumns" class="text-center text-sh-faint p-3">
                             @EmptyText
                         </td>
                     </tr>
@@ -131,7 +131,7 @@
                             data-row-id="@rowId">
                             @if (EnableSelection)
                             {
-                                <td class="check-cell" style="width:32px">
+                                <td class="check-cell w-32">
                                     <input type="checkbox"
                                            class="form-check-input"
                                            aria-label="Select row"
@@ -141,7 +141,7 @@
                             }
                             @if (EnableExpand)
                             {
-                                <td class="text-center" style="width:32px;padding:8px 4px">
+                                <td class="text-center w-32" style="padding:8px 4px">
                                     <button class="expand-btn" @onclick="() => ToggleExpand(rowId)" type="button">
                                         @if (isExpanded)
                                         {
