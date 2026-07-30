@@ -9,7 +9,7 @@
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.MonitoringHealth\ServiceHubEnterprise.MonitoringHealth.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.ADViewer\ServiceHubEnterprise.ADViewer.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Settings\ServiceHubEnterprise.Settings.csproj" />
-    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

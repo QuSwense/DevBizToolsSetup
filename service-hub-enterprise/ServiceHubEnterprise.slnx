@@ -3,7 +3,6 @@
     <Project Path="Features/ServiceHubEnterprise.ADViewer/ServiceHubEnterprise.ADViewer.csproj" />
     <Project Path="Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj" />
     <Project Path="Features/ServiceHubEnterprise.FileManagement/ServiceHubEnterprise.FileManagement.csproj" />
-    <Project Path="Features/ServiceHubEnterprise.Grid/ServiceHubEnterprise.Grid.csproj" />
     <Project Path="Features/ServiceHubEnterprise.MonitoringHealth/ServiceHubEnterprise.MonitoringHealth.csproj" />
     <Project Path="Features/ServiceHubEnterprise.RestApplications/ServiceHubEnterprise.RestApplications.csproj" />
     <Project Path="Features/ServiceHubEnterprise.Settings/ServiceHubEnterprise.Settings.csproj" />
@@ -12,5 +11,8 @@
   </Folder>
   <Folder Name="/WebApp/">
     <Project Path="WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj" />
+  </Folder>
+  <Folder Name="/Components/">
+    <Project Path="Components/ServiceHubEnterprise.Grid/ServiceHubEnterprise.Grid.csproj" />
   </Folder>
 </Solution>
