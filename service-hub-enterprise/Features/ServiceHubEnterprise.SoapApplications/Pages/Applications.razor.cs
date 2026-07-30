@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Services;
 
@@ -5,14 +7,54 @@ namespace ServiceHubEnterprise.SoapApplications.Pages;
 
 public partial class Applications
 {
+    // ── Skeleton loading renderer ──
+    private RenderFragment RenderSkeletonRows => builder =>
+    {
+        for (var i = 0; i < 5; i++)
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "skeleton-row");
+            BuildSkeletonCell(builder, "skeleton-check");
+            BuildSkeletonCell(builder, "skeleton-name", "w-70");
+            BuildSkeletonCell(builder, "skeleton-url", "w-50");
+            BuildSkeletonCell(builder, "skeleton-status", "w-60");
+            BuildSkeletonCell(builder, "skeleton-updatedby", "w-50");
+            BuildSkeletonCell(builder, "skeleton-date", "w-50");
+            BuildSkeletonCell(builder, "skeleton-actions", "w-40");
+            builder.CloseElement();
+        }
+    };
+
+    private static void BuildSkeletonCell(RenderTreeBuilder builder, string cellClass, string? barClass = null)
+    {
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", $"skeleton-cell {cellClass}");
+        if (barClass is not null)
+        {
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(3, "class", $"skeleton-bar {barClass}");
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+    }
+
     private List<GridColumn<SoapApp>> _columns = [];
+
+    // ── Loading / Error State ──
+    private bool _isLoading = true;
+    private bool _hasError;
+    private string? _errorMessage;
+    private SoapApp[] _allApps = [];
 
     private string _searchText = "";
     private string _filterName = "";
     private string _filterUrl = "";
     private string _filterStatus = "";
     private string _filterUpdatedBy = "";
-    private string _filterCreatedDate = "";
+    private DateTime? _filterUpdatedDateFrom;
+    private DateTime? _filterUpdatedDateTo;
+    private DateTime? _filterCreatedDateFrom;
+    private DateTime? _filterCreatedDateTo;
     private string _filterOperations = "";
     private int _currentPage = 1;
     private bool _showFilterModal = false;
@@ -34,8 +76,9 @@ public partial class Applications
     private string _sortColumn = "";
     private bool _sortAscending = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         _columns =
         [
             new()
@@ -88,17 +131,50 @@ public partial class Applications
                     builder.CloseElement();
                 }
             },
-            new() { Title = "Last Updated By", Sortable = true, Field = a => a.UpdatedBy },
-            new() { Title = "Created Date", Sortable = true, Field = a => a.CreatedDate },
+            new() { Title = "Last Updated", Sortable = true, Field = a => $"{a.UpdatedBy} ({(a.UpdatedAt.HasValue ? a.UpdatedAt.Value.ToString("yyyy-MM-dd") : "—")})" },
+            new() { Title = "Created", Sortable = true, Field = a => $"{a.CreatedBy} ({a.CreatedAt:yyyy-MM-dd})" },
             new() { Title = "Operations", Sortable = true, Field = a => a.ApisCount }
         ];
+
+        await LoadAppsAsync();
+    }
+
+    // ── Data Loading ──
+
+    private async Task LoadAppsAsync()
+    {
+        _isLoading = true;
+        _hasError = false;
+        _errorMessage = null;
+        try
+        {
+            // Simulate network/server delay so the loading skeleton is visible
+            await Task.Delay(1000);
+
+            _allApps = _appStore.Apps;
+        }
+        catch (Exception ex)
+        {
+            _hasError = true;
+            _errorMessage = $"Failed to load applications: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void DismissError()
+    {
+        _hasError = false;
+        _errorMessage = null;
     }
 
     private SoapApp[] FilteredApps
     {
         get
         {
-            var query = _appStore.Apps.AsEnumerable();
+            var query = _allApps.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(_searchText))
             {
@@ -106,7 +182,7 @@ public partial class Applications
                 query = query.Where(a =>
                     a.Name.ToLower().Contains(q) ||
                     a.BaseUrl.ToLower().Contains(q) ||
-                    a.UpdatedBy.ToLower().Contains(q) ||
+                    (a.UpdatedBy ?? "").ToLower().Contains(q) ||
                     a.Status.ToLower().Contains(q));
             }
 
@@ -117,9 +193,16 @@ public partial class Applications
             if (!string.IsNullOrWhiteSpace(_filterStatus))
                 query = query.Where(a => a.Status == _filterStatus);
             if (!string.IsNullOrWhiteSpace(_filterUpdatedBy))
-                query = query.Where(a => a.UpdatedBy.ToLower().Contains(_filterUpdatedBy.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterCreatedDate))
-                query = query.Where(a => a.CreatedDate.ToLower().Contains(_filterCreatedDate.ToLower()));
+                query = query.Where(a => a.UpdatedBy != null && 
+                             a.UpdatedBy.Contains(_filterUpdatedBy, StringComparison.CurrentCultureIgnoreCase));
+            if (_filterUpdatedDateFrom.HasValue)
+                query = query.Where(a => a.UpdatedAt.HasValue && a.UpdatedAt.Value >= _filterUpdatedDateFrom.Value);
+            if (_filterUpdatedDateTo.HasValue)
+                query = query.Where(a => a.UpdatedAt.HasValue && a.UpdatedAt.Value <= _filterUpdatedDateTo.Value);
+            if (_filterCreatedDateFrom.HasValue)
+                query = query.Where(a => a.CreatedAt >= _filterCreatedDateFrom.Value);
+            if (_filterCreatedDateTo.HasValue)
+                query = query.Where(a => a.CreatedAt <= _filterCreatedDateTo.Value);
             if (!string.IsNullOrWhiteSpace(_filterOperations) && int.TryParse(_filterOperations, out var ops))
                 query = query.Where(a => a.ApisCount == ops);
 
@@ -131,7 +214,7 @@ public partial class Applications
                     "BaseUrl" => _sortAscending ? query.OrderBy(a => a.BaseUrl) : query.OrderByDescending(a => a.BaseUrl),
                     "Status" => _sortAscending ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
                     "UpdatedBy" => _sortAscending ? query.OrderBy(a => a.UpdatedBy) : query.OrderByDescending(a => a.UpdatedBy),
-                    "CreatedDate" => _sortAscending ? query.OrderBy(a => a.CreatedDate) : query.OrderByDescending(a => a.CreatedDate),
+                    "CreatedDate" => _sortAscending ? query.OrderBy(a => a.CreatedAt) : query.OrderByDescending(a => a.CreatedAt),
                     "ApisCount" => _sortAscending ? query.OrderBy(a => a.ApisCount) : query.OrderByDescending(a => a.ApisCount),
                     _ => query
                 };
@@ -187,8 +270,10 @@ public partial class Applications
                 _newAppWsdlPath.Trim(),
                 _newAppDescription.Trim(),
                 _newAppStatus,
+                _editingApp.CreatedBy,
+                _editingApp.CreatedAt,
                 _editingApp.UpdatedBy,
-                _editingApp.CreatedDate,
+                _editingApp.UpdatedAt,
                 _newApis.Count,
                 _newAuthType,
                 _newAuthUsername.Trim(),
@@ -208,8 +293,10 @@ public partial class Applications
                 _newAppWsdlPath.Trim(),
                 _newAppDescription.Trim(),
                 _newAppStatus,
-                "Anonymous",
-                DateTime.Now.ToString("yyyy-MM-dd"),
+                "Current User",
+                DateTime.Now,
+                null,
+                null,
                 _newApis.Count,
                 _newAuthType,
                 _newAuthUsername.Trim(),
@@ -266,7 +353,10 @@ public partial class Applications
         _filterUrl = "";
         _filterStatus = "";
         _filterUpdatedBy = "";
-        _filterCreatedDate = "";
+        _filterUpdatedDateFrom = null;
+        _filterUpdatedDateTo = null;
+        _filterCreatedDateFrom = null;
+        _filterCreatedDateTo = null;
         _filterOperations = "";
         _currentPage = 1;
     }

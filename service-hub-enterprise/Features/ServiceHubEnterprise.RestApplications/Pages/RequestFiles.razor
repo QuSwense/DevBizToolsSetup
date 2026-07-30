@@ -1,18 +1,39 @@
 @page "/rest/request-files"
 
-@{
-    var files = new[]
-    {
-        new { FileName = "payment_create_001.json", AppName = "PaymentService", ApiPath = "/payments", Verb = "POST",
-Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-01" },
-        new { FileName = "user_list_filter.xml", AppName = "UserManagement", ApiPath = "/users", Verb = "GET", Description =
-"List active users filtered by role admin", Type = "xml", Created = "2024-04-02" },
-        new { FileName = "stock_update_003.json", AppName = "InventoryAPI", ApiPath = "/stock", Verb = "PUT", Description =
-"Update stock for SKU-889", Type = "json", Created = "2024-04-03" }
-    };
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="datagrid-card" style="padding:0">
+        <div class="skeleton-table">
+            <div class="skeleton-header">
+                <div class="skeleton-cell skeleton-check"></div>
+                <div class="skeleton-cell skeleton-filename"></div>
+                <div class="skeleton-cell skeleton-app"></div>
+                <div class="skeleton-cell skeleton-apipath"></div>
+                <div class="skeleton-cell skeleton-verb"></div>
+                <div class="skeleton-cell skeleton-description"></div>
+                <div class="skeleton-cell skeleton-type"></div>
+                <div class="skeleton-cell skeleton-created"></div>
+            </div>
+            @RenderSkeletonRows
+        </div>
+    </div>
 }
-
-<div class="datagrid-card">
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-sh-error"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadFilesAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else
+{
+    <div class="datagrid-card">
     <div class="grid-toolbar">
         <div class="toolbar-left">
             <div class="search-box">
@@ -22,7 +43,7 @@ Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-
                 <input type="text" placeholder="Search request files..." aria-label="Search request files" />
             </div>
             <div class="meta-group">
-                <span class="meta-pill">3 records</span>
+                <span class="meta-pill">@_allFiles.Length records</span>
             </div>
         </div>
         <div class="toolbar-right">
@@ -56,7 +77,7 @@ Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-
                 </tr>
             </thead>
             <tbody>
-                @foreach (var file in files)
+                @foreach (var file in _allFiles)
                 {
                     var verbColor = file.Verb == "POST" ? "var(--sh-success)" : file.Verb == "GET" ? "var(--sh-accent)" :
                 file.Verb == "DELETE" ? "var(--sh-error)" : "var(--sh-warning)";
@@ -87,3 +108,4 @@ Description = "Valid payment with card 4111", Type = "json", Created = "2024-04-
                 </table>
             </div>
         </div>
+}

@@ -2,28 +2,126 @@
 @inject SoapAppStore _appStore
 @inject MockDbLoader _mockDbLoader
 
-<ServiceHubGrid TItem="RequestFile"
-                Id="requestFilesGrid"
-                Items="_files"
-                PageSize="10"
-                EnableSelection="true"
-                EnablePagination="true"
-                EnableSearch="true"
-                EnableExpand="true"
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="datagrid-card" style="padding:0">
+        <div class="skeleton-table">
+            <div class="skeleton-header">
+                <div class="skeleton-cell skeleton-check"></div>
+                <div class="skeleton-cell skeleton-file-name"></div>
+                <div class="skeleton-cell skeleton-app-name"></div>
+                <div class="skeleton-cell skeleton-operation"></div>
+                <div class="skeleton-cell skeleton-updated"></div>
+                <div class="skeleton-cell skeleton-actions"></div>
+            </div>
+            @RenderSkeletonRows
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-sh-error"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadFilesAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else
+{
+    <ServiceHubGrid TItem="RequestFile"
+                    Id="requestFilesGrid"
+                    Items="FilteredFiles"
+                    PageSize="10"
+                    EnableSelection="true"
+                    EnablePagination="true"
+                    EnableSearch="true"
+                    EnableExpand="true"
+                    EnableContextMenu="true"
                 SearchPlaceholder="Search request files..."
-                EmptyText="No request files found."
-                RowIdSelector="@(f => f.FileName)"
-                Columns="@_columns">
+                EmptyText="No request files found matching the current filters."
+                FilterModalTitle="Filter Request Files"
+                    @bind-SortColumn="_sortColumn"
+                    @bind-SortAscending="_sortAscending"
+                    @bind-CurrentPage="_currentPage"
+                    @bind-SearchText="_searchText"
+                    @bind-ShowFilterModal="_showFilterModal"
+                    FilterApplied="OnFilterApplied"
+                    RowIdSelector="@(f => f.FileName)"
+                    Columns="@_columns">
+
+    <ToolbarCenter>
+        <button class="filter-btn" type="button" aria-label="Filter request files" @onclick="() => _showFilterModal = true">
+            <i class="bi bi-funnel"></i>
+            Filter
+        </button>
+    </ToolbarCenter>
 
     <ToolbarRight>
         <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => _showUploadModal = true" type="button" aria-label="Upload File">
             <i class="bi bi-plus-lg"></i>
             Upload File
         </button>
-        <button class="btn btn-outline-secondary btn-dg">
-            <i class="bi bi-download"></i>
-            Export
-        </button>
+        <div class="position-relative">
+            <button class="btn btn-outline-secondary btn-dg" @onclick="() => _showDropdown = !_showDropdown" type="button">
+                <i class="bi bi-three-dots-vertical"></i>
+                Actions
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            @if (_showDropdown)
+            {
+                <div class="position-fixed" style="inset:0;z-index:50" @onclick="() => _showDropdown = false"></div>
+                <div class="dropdown-menu-dg">
+                    <div class="py-1">
+                        <div class="dropdown-header-dg">Export</div>
+                        <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
+                            <i class="bi bi-download"></i>
+                            Export to CSV
+                        </button>
+                        <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
+                            <i class="bi bi-download"></i>
+                            Export to JSON
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <button class="btn dropdown-item-dg dropdown-item-sh-danger" @onclick="() => _showDropdown = false" type="button">
+                            <i class="bi bi-trash3"></i>
+                            Delete Selected
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <div class="dropdown-header-dg">View</div>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; ResetAdvancedFilters(); }"
+                                type="button">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Reset Filter
+                        </button>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="HandleResetSort"
+                                type="button">
+                            <i class="bi bi-arrow-up-short"></i>
+                            Reset Sort
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; }"
+                                type="button">
+                            <i class="bi bi-arrows-expand"></i>
+                            Expand Selected
+                        </button>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; }"
+                                type="button">
+                            <i class="bi bi-arrows-collapse"></i>
+                            Collapse Selected
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
     </ToolbarRight>
 
     <RowActions Context="file">
@@ -38,6 +136,9 @@
                 </button>
                 <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete">
                     <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+                <button class="ia-btn ia-normal" type="button" aria-label="Toggle" data-tooltip="Toggle">
+                    <i class="bi bi-toggle-on" aria-hidden="true"></i>
                 </button>
                 <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close"
                         @onclick="() => _expandedActionRows.Remove(file.FileName)">
@@ -69,16 +170,93 @@
                 <div class="detail-value">@(string.IsNullOrEmpty(file.Description) ? "—" : file.Description)</div>
             </div>
             <div>
-                <div class="detail-label">Created</div>
-                <div class="detail-value">@file.Created</div>
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                    <span class="status-badge @(file.Status == "active" ? "status-enabled" : "status-disabled")">
+                        @(file.Status == "active" ? "Active" : "Inactive")
+                    </span>
+                </div>
             </div>
             <div>
-                <div class="detail-label">Last Updated</div>
-                <div class="detail-value">@file.Updated</div>
+                <div class="detail-label">Created By</div>
+                <div class="detail-value">@file.CreatedBy</div>
+            </div>
+            <div>
+                <div class="detail-label">Created At</div>
+                <div class="detail-value">@file.CreatedAt.ToString("yyyy-MM-dd")</div>
+            </div>
+            <div>
+                <div class="detail-label">Last Updated By</div>
+                <div class="detail-value">@(file.UpdatedBy ?? "—")</div>
+            </div>
+            <div>
+                <div class="detail-label">Last Updated At</div>
+                <div class="detail-value">@(file.UpdatedAt?.ToString("yyyy-MM-dd") ?? "—")</div>
             </div>
         </div>
     </DetailRow>
+
+    <FilterModalBody>
+        <div class="form-group">
+            <label>File Name</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by file name..."
+                   @bind="_filterFileName" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Application</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by application..."
+                   @bind="_filterAppName" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Operation</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by operation..."
+                   @bind="_filterOperation" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Verb</label>
+            <select class="form-control-dg" @bind="_filterVerb">
+                <option value="">All</option>
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select class="form-control-dg" @bind="_filterStatus">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Created By</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by creator..."
+                   @bind="_filterCreatedBy" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Last Updated By</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by updater..."
+                   @bind="_filterUpdatedBy" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Last Updated Date</label>
+            <div class="d-flex gap-8px align-items-center">
+                <input type="date" class="form-control-dg" @bind="_filterUpdatedDateFrom" />
+                <span class="text-sh-faint">to</span>
+                <input type="date" class="form-control-dg" @bind="_filterUpdatedDateTo" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Created Date</label>
+            <div class="d-flex gap-8px align-items-center">
+                <input type="date" class="form-control-dg" @bind="_filterCreatedDateFrom" />
+                <span class="text-sh-faint">to</span>
+                <input type="date" class="form-control-dg" @bind="_filterCreatedDateTo" />
+            </div>
+        </div>
+    </FilterModalBody>
 </ServiceHubGrid>
+}
 
 @if (_showUploadModal)
 {

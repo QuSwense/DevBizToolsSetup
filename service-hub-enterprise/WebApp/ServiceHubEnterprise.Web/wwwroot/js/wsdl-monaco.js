@@ -230,6 +230,65 @@
             });
         },
 
+        /// Creates an editable Monaco editor for XML editing (used by Templates editor).
+        /// containerId: DOM element id
+        /// content: initial XML string content
+        /// dotNetRef: optional DotNetObjectReference for content change callback (must have OnMonacoContentChanged method)
+        /// returns: Promise that resolves when the editor is created
+        createXmlEditor: function (containerId, content, dotNetRef) {
+            return new Promise(function (resolve) {
+                onMonacoReady(function () {
+                    var container = document.getElementById(containerId);
+                    if (!container) { resolve(null); return; }
+
+                    // Dispose existing
+                    if (window.wsdlMonaco._editors[containerId]) {
+                        window.wsdlMonaco._editors[containerId].dispose();
+                    }
+
+                    var editor = monaco.editor.create(container, {
+                        value: content || '',
+                        language: 'xml',
+                        readOnly: false,
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        lineNumbers: 'on',
+                        renderLineHighlight: 'line',
+                        fontSize: 11,
+                        fontFamily: "'JetBrains Mono', 'Menlo', 'Consolas', monospace",
+                        wordWrap: 'on',
+                        automaticLayout: true,
+                        theme: 'vs-dark',
+                        padding: { top: 8, bottom: 8 },
+                        bracketPairColorization: { enabled: true },
+                        autoClosingBrackets: 'always',
+                        autoClosingQuotes: 'always',
+                        formatOnPaste: true,
+                        tabSize: 2
+                    });
+
+                    // Listen for content changes - call back to .NET if reference provided
+                    if (dotNetRef && typeof dotNetRef.invokeMethodAsync === 'function') {
+                        editor.getModel().onDidChangeContent(function () {
+                            var value = editor.getValue();
+                            dotNetRef.invokeMethodAsync('OnMonacoContentChanged', value);
+                        });
+                    }
+
+                    window.wsdlMonaco._editors[containerId] = editor;
+                    resolve(editor);
+                });
+            });
+        },
+
+        /// Gets the current content from an editor by container id.
+        getEditorContent: function (containerId) {
+            var ed = window.wsdlMonaco._editors[containerId];
+            if (ed && ed.getValue) return ed.getValue();
+            if (ed && ed.getModel && ed.getModel().getValue) return ed.getModel().getValue();
+            return null;
+        },
+
         /// Resizes all editors (call when container becomes visible or window resizes)
         resizeAll: function () {
             for (var key in window.wsdlMonaco._editors) {

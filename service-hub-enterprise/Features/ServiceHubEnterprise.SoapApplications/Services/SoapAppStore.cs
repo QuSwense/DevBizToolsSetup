@@ -8,7 +8,7 @@ public class SoapApiEntry
     public string Description { get; set; } = "";
 }
 
-public record SoapApp(string Id, string Name, string BaseUrl, string WsdlPath, string Description, string Status, string UpdatedBy, string CreatedDate, int ApisCount, string AuthType, string AuthUsername, string AuthPassword, string AuthExtra, SoapApiEntry[] Apis);
+public record SoapApp(string Id, string Name, string BaseUrl, string WsdlPath, string Description, string Status, string CreatedBy, DateTime CreatedAt, string? UpdatedBy, DateTime? UpdatedAt, int ApisCount, string AuthType, string AuthUsername, string AuthPassword, string AuthExtra, SoapApiEntry[] Apis);
 
 /// <summary>
 /// Singleton store that holds the SOAP application data,
@@ -79,7 +79,8 @@ public class WsdlTemplate
     public string[] Variables { get; set; } = [];
     public string CreatedBy { get; set; } = "";
     public string CreatedAt { get; set; } = "";
-    public string UpdatedAt { get; set; } = "";
+    public string? UpdatedBy { get; set; }
+    public string? UpdatedAt { get; set; }
     public int UsageCount { get; set; } = 0;
 }
 

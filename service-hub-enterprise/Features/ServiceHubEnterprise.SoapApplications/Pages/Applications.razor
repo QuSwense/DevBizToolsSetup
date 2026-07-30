@@ -1,9 +1,42 @@
 @page "/soap/applications"
 @inject SoapAppStore _appStore
 
-<ServiceHubGrid TItem="SoapApp"
-                Id="soapAppsGrid"
-                Items="FilteredApps"
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="datagrid-card" style="padding:0">
+        <div class="skeleton-table">
+            <div class="skeleton-header">
+                <div class="skeleton-cell skeleton-check"></div>
+                <div class="skeleton-cell skeleton-name"></div>
+                <div class="skeleton-cell skeleton-url"></div>
+                <div class="skeleton-cell skeleton-status"></div>
+                <div class="skeleton-cell skeleton-updatedby"></div>
+                <div class="skeleton-cell skeleton-date"></div>
+                <div class="skeleton-cell skeleton-actions"></div>
+            </div>
+            @RenderSkeletonRows
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-sh-error"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadAppsAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else
+{
+    @* ── Loading Grid ── *@
+    <ServiceHubGrid TItem="SoapApp"
+                    Id="soapAppsGrid"
+                    Items="FilteredApps"
                 PageSize="5"
                 EnableSelection="true"
                 EnablePagination="true"
@@ -119,8 +152,7 @@
                         <i class="bi bi-toggle-on" aria-hidden="true"></i>
                     }
                 </button>
-                <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close"
-                        @onclick="() => _expandedActionRows.Remove(app.Id)">
+                <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close" @onclick="() => _expandedActionRows.Remove(app.Id)" >
                     <i class="bi bi-x-lg fs-11" aria-hidden="true"></i>
                 </button>
             </div>
@@ -128,7 +160,7 @@
     </RowActions>
 
     <DetailRow Context="app">
-         @{
+        @{
             var isEnabled = string.Compare(app.Status, "enabled", StringComparison.OrdinalIgnoreCase) == 0;
         }
         <div class="detail-grid">
@@ -154,7 +186,7 @@
             </div>
             <div>
                 <div class="detail-label">Last Modified</div>
-                <div class="detail-value">@app.CreatedDate by @app.UpdatedBy</div>
+                <div class="detail-value">@(app.UpdatedAt?.ToString("yyyy-MM-dd") ?? "—") by @(app.UpdatedBy ?? "—")</div>
             </div>
 
             <div class="grid-col-full border-sh-top pt-2 mt-1">
@@ -251,17 +283,29 @@
                    @bind="_filterUpdatedBy" @bind:event="oninput" />
         </div>
         <div class="form-group">
+            <label>Last Updated Date</label>
+            <div class="d-flex gap-8px align-items-center">
+                <input type="date" class="form-control-dg" @bind="_filterUpdatedDateFrom" />
+                <span class="text-sh-faint">to</span>
+                <input type="date" class="form-control-dg" @bind="_filterUpdatedDateTo" />
+            </div>
+        </div>
+        <div class="form-group">
             <label>Created Date</label>
-            <input type="text" class="form-control-dg" placeholder="Filter by date..."
-                   @bind="_filterCreatedDate" @bind:event="oninput" />
+            <div class="d-flex gap-8px align-items-center">
+                <input type="date" class="form-control-dg" @bind="_filterCreatedDateFrom" />
+                <span class="text-sh-faint">to</span>
+                <input type="date" class="form-control-dg" @bind="_filterCreatedDateTo" />
+            </div>
         </div>
         <div class="form-group">
             <label>Operations</label>
-            <input type="text" class="form-control-dg" placeholder="Filter by operations count..."
+            <input type="text" class="form-control-dg" placeholder="Filter by operations..."
                    @bind="_filterOperations" @bind:event="oninput" />
         </div>
     </FilterModalBody>
 </ServiceHubGrid>
+}
 
 @if (_showAddModal)
 {
