@@ -1,0 +1,34 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="dashboard-metrics">
+    @foreach (var metric in Metrics)
+    {
+        <div class="metric-card">
+            <div class="metric-header">
+                <span class="metric-title">@metric.Label</span>
+                @if (!string.IsNullOrEmpty(metric.Icon))
+                {
+                    <span class="metric-icon">@metric.Icon</span>
+                }
+            </div>
+            <div class="metric-value" style="color:@metric.Color">@metric.Value</div>
+            @if (!string.IsNullOrEmpty(metric.Sub))
+            {
+                <div class="metric-sub">@metric.Sub</div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the collection of dashboard metrics to display.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<MetricItem> Metrics { get; set; } = Array.Empty<MetricItem>();
+
+    /// <summary>
+    /// Represents a single metric item displayed in the metrics row.
+    /// </summary>
+    public record MetricItem(string Label, string Value, string? Sub = null, string? Color = null, string? Icon = null);
+}

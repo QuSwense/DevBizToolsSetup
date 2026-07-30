@@ -1,6 +1,246 @@
-/* Dashboard Feature Styles */
+/* ─── Dashboard Layout ─── */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
 
-/* Placeholder empty-state card */
+/* ─── Metric Cards ─── */
+.dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.metric-card {
+    background: var(--sh-surface, #fff);
+    border: 1px solid var(--sh-border, #e0e0e0);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: var(--sh-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.metric-card:hover {
+    box-shadow: var(--sh-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+    transform: translateY(-2px);
+}
+
+.metric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.metric-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--sh-text-soft, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.metric-icon {
+    font-size: 1.25rem;
+    opacity: 0.7;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+}
+
+.metric-sub {
+    font-size: 0.8rem;
+    color: var(--sh-text-faint, #999);
+}
+
+/* ─── Recent Activity ─── */
+.recent-activity {
+    background: var(--sh-surface, #fff);
+    border: 1px solid var(--sh-border, #e0e0e0);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem;
+    color: var(--sh-text, #333);
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* ── Activity feed (avatar support) ── */
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--sh-border);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-avatar {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--sh-surface-3);
+    border: 1px solid var(--sh-border);
+    flex-shrink: 0;
+}
+
+.activity-user {
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.activity-action {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+    margin-left: 4px;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+    white-space: nowrap;
+}
+
+.activity-empty {
+    color: var(--sh-text-faint, #999);
+    font-style: italic;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+/* ─── Chart Widgets ─── */
+.chart-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.chart-card {
+    background: var(--sh-surface, #fff);
+    border: 1px solid var(--sh-border, #e0e0e0);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+.chart-header {
+    margin-bottom: 1rem;
+}
+
+.chart-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--sh-text, #333);
+}
+
+.chart-body {
+    /* reserved for chart rendering */
+}
+
+/* ─── Horizontal Bar Chart ─── */
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.bar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.bar-label {
+    width: 6rem;
+    font-size: 0.8rem;
+    color: var(--sh-text-soft, #666);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.bar-track {
+    flex: 1;
+    height: 1.25rem;
+    background: var(--sh-bg, #f5f5f5);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 0.25rem;
+    transition: width 0.4s ease;
+}
+
+.bar-value {
+    width: 2.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--sh-text, #333);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* ─── Status List ─── */
+.status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-label {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--sh-text, #333);
+}
+
+.status-count {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--sh-text-soft, #666);
+}
+
+/* ────────────────────────────────────────
+   Merged from WebApp dashboard.css
+   ──────────────────────────────────────── */
+
+/* ── Empty state card ── */
 .empty-state-card {
     display: flex;
     flex-direction: column;
@@ -36,7 +276,7 @@
     margin-top: 4px;
 }
 
-/* Dashboard cards */
+/* ── Dashboard card values ── */
 .dash-card-value {
     font-size: 32px;
     font-weight: 700;
@@ -49,69 +289,7 @@
     margin-top: 4px;
 }
 
-/* Bar chart */
-.bar-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    height: 60px;
-}
-
-.bar-chart-item {
-    flex: 1;
-}
-
-.bar-chart-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 4px;
-}
-
-.bar-chart-label {
-    font-size: 10px;
-    color: var(--sh-text-faint);
-}
-
-/* Activity feed */
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--sh-border);
-}
-
-.activity-avatar {
-    width: 26px;
-    height: 26px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 600;
-    background: var(--sh-surface-3);
-    border: 1px solid var(--sh-border);
-    flex-shrink: 0;
-}
-
-.activity-user {
-    font-weight: 500;
-    font-size: 12px;
-}
-
-.activity-action {
-    font-size: 12px;
-    color: var(--sh-text-soft);
-    margin-left: 4px;
-}
-
-.activity-time {
-    font-size: 11px;
-    color: var(--sh-text-faint);
-    white-space: nowrap;
-}
-
-/* Quick actions */
+/* ── Quick actions ── */
 .quick-actions {
     display: flex;
     flex-direction: column;
@@ -124,7 +302,7 @@
     text-decoration: none;
 }
 
-/* Test suite progress */
+/* ── Test suite progress ── */
 .suite-progress {
     display: flex;
     flex-direction: column;
@@ -157,7 +335,7 @@
     font-weight: 500;
 }
 
-/* Service health list */
+/* ── Service health list ── */
 .health-row {
     display: flex;
     align-items: center;
@@ -169,7 +347,7 @@
     color: var(--sh-text);
 }
 
-/* Status badge inline icons */
+/* ── Status badge inline icons ── */
 .status-icon-sm {
     width: 10px;
     height: 10px;
@@ -462,7 +640,7 @@
     margin-left: 2px;
 }
 
-/* ── Merged Files Card breakdown ── */
+/* ── Files breakdown card ── */
 .files-breakdown {
     display: flex;
     flex-direction: column;

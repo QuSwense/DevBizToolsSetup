@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Dashboard.Application.Services;
 
 namespace ServiceHubEnterprise.Dashboard;
 
@@ -12,8 +13,7 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddDashboardFeature(this IServiceCollection services)
     {
-        // Register Dashboard-specific services here
-        // e.g., services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IDashboardService, DashboardService>();
         return services;
     }
 }

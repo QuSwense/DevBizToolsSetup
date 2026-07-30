@@ -1,0 +1,57 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="dash-card">
+    <div class="card-header">
+        <span class="card-title">@Title</span>
+    </div>
+    <div class="d-flex align-items-baseline gap-2 mt-1">
+        <span class="card-value text-sh-accent fs-2">@TotalCount</span>
+        <span class="card-sub fs-085">@UnitLabel</span>
+    </div>
+    <div class="files-breakdown mt-2">
+        @foreach (var ft in FileTypes)
+        {
+            var pct = TotalCount > 0 ? (double)ft.Count / TotalCount * 100 : 0;
+            <div class="files-breakdown-item">
+                <div class="d-flex align-items-center gap-6px">
+                    <span class="flex-shrink-0 d-inline-block"
+                          style="width:10px;height:10px;border-radius:50%;background:@ft.Color"></span>
+                    <span class="fw-medium fs-12 text-sh-soft">@ft.Type</span>
+                </div>
+                <div class="files-breakdown-bar">
+                    <div class="files-breakdown-fill"
+                         style="width:@(pct)%;background:@ft.Color"></div>
+                </div>
+                <div class="d-flex align-items-center gap-4px flex-shrink-0">
+                    <span class="fs-14 fw-bold" style="color:@ft.Color">@ft.Count</span>
+                    <span class="fs-11 text-sh-faint">@pct.ToString("0")%</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the card title.
+    /// </summary>
+    [Parameter] public string Title { get; set; } = "Files";
+
+    /// <summary>
+    /// Gets or sets the label for the total count unit (e.g. "request files").
+    /// </summary>
+    [Parameter] public string UnitLabel { get; set; } = "items";
+
+    /// <summary>
+    /// Gets or sets the list of file type entries.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<FileTypeItem> FileTypes { get; set; } = Array.Empty<FileTypeItem>();
+
+    private int TotalCount => FileTypes.Sum(f => f.Count);
+
+    /// <summary>
+    /// Represents a single file type entry in the breakdown.
+    /// </summary>
+    public record FileTypeItem(string Type, int Count, string Color);
+}

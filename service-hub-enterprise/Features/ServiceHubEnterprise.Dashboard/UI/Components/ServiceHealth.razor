@@ -1,0 +1,64 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="dash-card">
+    <div class="card-header">
+        <span class="card-title">@Title</span>
+        <small class="text-sh-faint">@OperationalCount operational</small>
+    </div>
+    <div class="donut-body">
+        <div class="donut-chart-wrapper">
+            <svg viewBox="0 0 42 42" width="100" height="100">
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-border)" stroke-width="3" />
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-success)" stroke-width="3"
+                        stroke-dasharray="@($"{OperationalPct} {DownPct}")"
+                        stroke-dashoffset="25"
+                        transform="rotate(-90 21 21)" />
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-warning)" stroke-width="3"
+                        stroke-dasharray="@($"{DownPct} {OperationalPct}")"
+                        stroke-dashoffset="@(25 + OperationalPct)"
+                        transform="rotate(-90 21 21)" />
+            </svg>
+            <div class="donut-center">
+                <span class="donut-value">@(OperationalPct)%</span>
+                <span class="donut-sub">up</span>
+            </div>
+        </div>
+        <div class="donut-legend">
+            <div class="donut-legend-item">
+                <span class="legend-dot bg-sh-success"></span>
+                <span class="legend-label">Operational</span>
+                <span class="legend-count">@OperationalCount</span>
+            </div>
+            <div class="donut-legend-item">
+                <span class="legend-dot bg-sh-warning"></span>
+                <span class="legend-label">Down</span>
+                <span class="legend-count">@DownCount</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the card title.
+    /// </summary>
+    [Parameter] public string Title { get; set; } = "Service Health";
+
+    /// <summary>
+    /// Gets or sets the list of services with their health status.
+    /// Expected status values: "ok" or "down".
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<HealthServiceItem> Services { get; set; } = Array.Empty<HealthServiceItem>();
+
+    private int TotalCount => Services.Count;
+    private int OperationalCount => Services.Count(s => s.Status == "ok");
+    private int DownCount => Services.Count(s => s.Status == "down");
+    private int OperationalPct => TotalCount > 0 ? OperationalCount * 100 / TotalCount : 0;
+    private int DownPct => TotalCount > 0 ? DownCount * 100 / TotalCount : 0;
+
+    /// <summary>
+    /// Represents a single service with a health status.
+    /// </summary>
+    public record HealthServiceItem(string Name, string Status);
+}

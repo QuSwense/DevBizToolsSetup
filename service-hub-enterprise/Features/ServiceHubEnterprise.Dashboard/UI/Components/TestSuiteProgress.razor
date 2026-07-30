@@ -1,0 +1,49 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="dash-card">
+    <div class="card-header">
+        <span class="card-title">@Title</span>
+        @if (!string.IsNullOrEmpty(PassingSummary))
+        {
+            <small class="text-sh-faint">@PassingSummary</small>
+        }
+    </div>
+    <div class="suite-progress">
+        @foreach (var suite in Suites)
+        {
+            var pct = suite.Files > 0 ? (suite.Cases * 100 / suite.Files) : 0;
+            var barColor = pct >= 50 ? "var(--sh-success)" : "var(--sh-warning)";
+            <div class="d-flex align-items-center gap-2">
+                <span class="suite-name">@suite.Name</span>
+                <div class="suite-bar">
+                    <div style="width:@(pct)%;height:100%;background:@barColor;transition:width .3s">
+                    </div>
+                </div>
+                <span class="suite-stats">@suite.Cases / @suite.Files</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the card title.
+    /// </summary>
+    [Parameter] public string Title { get; set; } = "Test Suites";
+
+    /// <summary>
+    /// Gets or sets the passing summary text (e.g. "25 / 84 passing").
+    /// </summary>
+    [Parameter] public string? PassingSummary { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of test suites.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<TestSuiteItem> Suites { get; set; } = Array.Empty<TestSuiteItem>();
+
+    /// <summary>
+    /// Represents a single test suite entry.
+    /// </summary>
+    public record TestSuiteItem(string Name, int Cases, int Files);
+}
