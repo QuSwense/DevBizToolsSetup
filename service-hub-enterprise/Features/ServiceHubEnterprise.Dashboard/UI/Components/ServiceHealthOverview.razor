@@ -1,6 +1,42 @@
 @namespace ServiceHubEnterprise.Dashboard.UI.Components
 
-<SectionCard Title="Service Health" Icon="🩺" Subtitle="Current status & uptime over range" Filter="@_range" OnFilterChanged="ApplyRange">
+<SectionCard Title="Service Health" Icon="🩺" Subtitle="Current status & uptime over range" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🖥️</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Services</span>
+                <span class="summary-chip-value">@TotalNow</span>
+                <span class="summary-chip-sub">monitored</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">✅</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Operational</span>
+                <span class="summary-chip-value summary-chip-value--success">@OperationalNow</span>
+                <span class="summary-chip-sub">right now</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">⚠️</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Degraded</span>
+                <span class="summary-chip-value summary-chip-value--warning">@DegradedNow</span>
+                <span class="summary-chip-sub">right now</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">⛔</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Down</span>
+                <span class="summary-chip-value summary-chip-value--danger">@DownNow</span>
+                <span class="summary-chip-sub">right now</span>
+            </div>
+        </div>
+    </Summary>
+    <ChildContent>
     <div class="kpi-grid">
         <KpiTile Label="Services" Value="@TotalNow.ToString()" Icon="🖥️" />
         <KpiTile Label="Operational" Value="@OperationalNow.ToString()" Sub="right now" Color="var(--sh-success)" Icon="✅" />
@@ -30,4 +66,5 @@
             <div class="activity-empty">No services configured.</div>
         }
     </div>
+    </ChildContent>
 </SectionCard>

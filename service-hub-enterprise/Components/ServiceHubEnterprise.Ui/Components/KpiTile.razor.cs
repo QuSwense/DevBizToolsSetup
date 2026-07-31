@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace ServiceHubEnterprise.Dashboard.UI.Components;
+namespace ServiceHubEnterprise.Ui.Components;
 
 /// <summary>
 /// Code-behind for the KpiTile component.

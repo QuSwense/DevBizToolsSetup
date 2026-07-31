@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using ServiceHubEnterprise.Dashboard.UI.Models;
+using ServiceHubEnterprise.Ui.Models;
 
-namespace ServiceHubEnterprise.Dashboard.UI.Components;
+namespace ServiceHubEnterprise.Ui.Components;
 
 /// <summary>
 /// Code-behind for the DateRangeFilter dialog.

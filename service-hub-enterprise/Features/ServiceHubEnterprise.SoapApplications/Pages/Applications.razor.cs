@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using ServiceHubEnterprise.Grid.Components;
@@ -7,6 +8,11 @@ namespace ServiceHubEnterprise.SoapApplications.Pages;
 
 public partial class Applications
 {
+    [Inject]
+    private Microsoft.Extensions.Configuration.IConfiguration Config { get; set; } = default!;
+
+    private string CurrentUser => Config["Users:CurrentUser"] ?? "Current User";
+
     // ── Skeleton loading renderer ──
     private RenderFragment RenderSkeletonRows => builder =>
     {
@@ -75,6 +81,22 @@ public partial class Applications
     private SoapApp? _editingApp = null;
     private string _sortColumn = "";
     private bool _sortAscending = true;
+
+    private static readonly Regex AppNameRegex = new(@"^[A-Za-z0-9äöüßÄÖÜ ]+$");
+    private static readonly Regex WsdlPathRegex = new(@"^[A-Za-z0-9/?.&=_\-]+$");
+    private static readonly Regex CSharpIdentifierRegex = new(@"^[A-Za-z_][A-Za-z0-9_]*$");
+
+    private static readonly HashSet<string> CSharpKeywords = new(StringComparer.Ordinal)
+    {
+        "abstract","as","base","bool","break","byte","case","catch","char","checked","class",
+        "const","continue","decimal","default","delegate","do","double","else","enum","event",
+        "explicit","extern","false","finally","fixed","float","for","foreach","goto","if",
+        "implicit","in","int","interface","internal","is","lock","long","namespace","new",
+        "null","object","operator","out","override","params","private","protected","public",
+        "readonly","ref","return","sbyte","sealed","short","sizeof","stackalloc","static",
+        "string","struct","switch","this","throw","true","try","typeof","uint","ulong",
+        "unchecked","unsafe","ushort","using","virtual","void","volatile","while"
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -252,11 +274,53 @@ public partial class Applications
         _validationErrors = [];
 
         if (string.IsNullOrWhiteSpace(_newAppName))
+        {
             _validationErrors.Add("App name is required.");
+        }
+        else if (!AppNameRegex.IsMatch(_newAppName.Trim()))
+        {
+            _validationErrors.Add("App name may only contain letters (incl. German characters ä ö ü ß), digits and spaces.");
+        }
+
         if (string.IsNullOrWhiteSpace(_newAppUrl))
+        {
             _validationErrors.Add("Base URL is required.");
+        }
+        else if (!Uri.TryCreate(_newAppUrl.Trim(), UriKind.Absolute, out var url)
+             || (url.Scheme != Uri.UriSchemeHttp && url.Scheme != Uri.UriSchemeHttps)
+             || string.IsNullOrEmpty(url.Host))
+        {
+            _validationErrors.Add("Base URL must be a valid absolute http(s) URL, e.g. https://example.com/service.");
+        }
+
+        if (string.IsNullOrWhiteSpace(_newAppWsdlPath))
+        {
+            _validationErrors.Add("WSDL path is required.");
+        }
+        else if (_newAppWsdlPath.Contains("http", StringComparison.OrdinalIgnoreCase)
+             || _newAppWsdlPath.Contains("://")
+             || !WsdlPathRegex.IsMatch(_newAppWsdlPath.Trim()))
+        {
+            _validationErrors.Add("WSDL path must be a partial path (e.g. '?wsdl', '/service?wsdl') and must not contain a URL.");
+        }
+
         if (_newApis.Count == 0)
+        {
             _validationErrors.Add("At least one SOAP API must be added.");
+        }
+        else
+        {
+            foreach (var api in _newApis)
+            {
+                var name = api.Name.Trim();
+                if (string.IsNullOrWhiteSpace(name)
+                    || !CSharpIdentifierRegex.IsMatch(name)
+                    || CSharpKeywords.Contains(name))
+                {
+                    _validationErrors.Add($"API name '{api.Name}' is not a valid C# method name.");
+                }
+            }
+        }
 
         if (_validationErrors.Count > 0)
             return;
@@ -293,7 +357,7 @@ public partial class Applications
                 _newAppWsdlPath.Trim(),
                 _newAppDescription.Trim(),
                 _newAppStatus,
-                "Current User",
+                CurrentUser,
                 DateTime.Now,
                 null,
                 null,

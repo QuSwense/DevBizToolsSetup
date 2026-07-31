@@ -1,0 +1,14 @@
+@namespace ServiceHubEnterprise.SoapApplications.UI.Components
+
+<SectionCard Title="Templates" Icon="📝" Subtitle="Request file templates (extends-chain)">
+    <div class="kpi-grid">
+        <KpiTile Label="Templates" Value="@Templates.Count.ToString()" Sub="total" Icon="📝" />
+        <KpiTile Label="Extending" Value="@ExtendingCount.ToString()" Sub="inherit a parent" Color="var(--sh-accent)" Icon="🔗" />
+        <KpiTile Label="Variables" Value="@TotalVariables.ToString()" Sub="across templates" Icon="🏷️" />
+        <KpiTile Label="Usage" Value="@TotalUsage.ToString()" Sub="total uses" Icon="🔁" />
+    </div>
+    <div class="section-divider"></div>
+    <div class="kpi-donut-tile">
+        <MiniDonut Value="@ExtendingCount" Total="@Templates.Count" Label="extending" ValueColor="var(--sh-accent)" />
+    </div>
+</SectionCard>

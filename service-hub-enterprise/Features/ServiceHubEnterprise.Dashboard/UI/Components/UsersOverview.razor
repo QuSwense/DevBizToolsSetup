@@ -1,6 +1,33 @@
 @namespace ServiceHubEnterprise.Dashboard.UI.Components
 
-<SectionCard Title="Users" Icon="👥" Subtitle="Who is using the platform" Filter="@_range" OnFilterChanged="ApplyRange">
+<SectionCard Title="Users" Icon="👥" Subtitle="Who is using the platform" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">👤</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Users</span>
+                <span class="summary-chip-value">@Users.Count</span>
+                <span class="summary-chip-sub">@UserTypes.Count types</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🟢</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Active</span>
+                <span class="summary-chip-value">@ActiveCount</span>
+                <span class="summary-chip-sub">in range</span>
+            </div>
+        </div>
+        <div class="summary-chip summary-chip-donut">
+            <MiniDonut Value="@ActiveCount" Total="@Users.Count" Label="active" ValueColor="var(--sh-accent)" Size="56" />
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Active share</span>
+                <span class="summary-chip-value">@ActiveSharePct%</span>
+            </div>
+        </div>
+    </Summary>
+    <ChildContent>
     <div class="kpi-grid">
         <KpiTile Label="Total Users" Value="@Users.Count.ToString()" Icon="👤" />
         <KpiTile Label="User Types" Value="@UserTypes.Count.ToString()" Sub="@string.Join(", ", UserTypes)" Icon="🏷️" />
@@ -30,4 +57,5 @@
             }
         </div>
     }
+    </ChildContent>
 </SectionCard>

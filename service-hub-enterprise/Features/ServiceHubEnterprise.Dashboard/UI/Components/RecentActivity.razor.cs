@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using ServiceHubEnterprise.Dashboard.UI.Models;
+using ServiceHubEnterprise.Ui.Models;
 
 namespace ServiceHubEnterprise.Dashboard.UI.Components;
 
@@ -49,6 +49,16 @@ public partial class RecentActivity
     /// </summary>
     [Parameter] public int MaxItems { get; set; } = 10;
 
+    /// <summary>
+    /// Gets or sets whether the card is collapsed to its summary view.
+    /// </summary>
+    [Parameter] public bool Collapsed { get; set; }
+
+    /// <summary>
+    /// Invoked when the card's collapse state is toggled.
+    /// </summary>
+    [Parameter] public EventCallback<bool> OnToggle { get; set; }
+
     private DateRange _range = DateRange.LastDays(7);
     private string _userFilter = string.Empty;
 
@@ -60,4 +70,19 @@ public partial class RecentActivity
             .Where(a => string.IsNullOrEmpty(_userFilter) || a.User.Equals(_userFilter, StringComparison.OrdinalIgnoreCase))
             .OrderByDescending(a => a.Timestamp)
             .Take(MaxItems);
+
+    // ── Summary (collapsed view) computed props ────────────────────────
+
+    private IEnumerable<ActivityEntry> InRangeActivities =>
+        Activities.Where(a => _range.Includes(a.Timestamp));
+
+    private int RangeActivityCount => InRangeActivities.Count();
+
+    private int RangeActiveUsers =>
+        InRangeActivities.Select(a => a.User).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+
+    private string LatestActivityTime =>
+        InRangeActivities.Any()
+            ? InRangeActivities.Max(a => a.Timestamp).ToString("MMM dd, HH:mm")
+            : "—";
 }

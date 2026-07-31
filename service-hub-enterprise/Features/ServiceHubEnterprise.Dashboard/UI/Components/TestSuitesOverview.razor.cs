@@ -19,6 +19,16 @@ public partial class TestSuitesOverview
     /// </summary>
     [Parameter] public IReadOnlyList<TestSuiteHistoryDto> History { get; set; } = Array.Empty<TestSuiteHistoryDto>();
 
+    /// <summary>
+    /// Gets or sets whether the card is collapsed to its summary view.
+    /// </summary>
+    [Parameter] public bool Collapsed { get; set; }
+
+    /// <summary>
+    /// Invoked when the card's collapse state is toggled.
+    /// </summary>
+    [Parameter] public EventCallback<bool> OnToggle { get; set; }
+
     private string? _selectedSuite;
 
     private IReadOnlyList<string> SuiteNames => Suites.Select(s => s.Name).ToList();

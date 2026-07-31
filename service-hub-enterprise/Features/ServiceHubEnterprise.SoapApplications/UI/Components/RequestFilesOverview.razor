@@ -1,0 +1,28 @@
+@namespace ServiceHubEnterprise.SoapApplications.UI.Components
+
+<SectionCard Title="Request Files" Icon="📄" Subtitle="SOAP request files per application" Filter="@_range" OnFilterChanged="ApplyRange">
+    <div class="kpi-grid">
+        <KpiTile Label="Total Files" Value="@Files.Count.ToString()" Sub="request files" Icon="📄" />
+        <KpiTile Label="Active" Value="@ActiveCount.ToString()" Sub="files" Color="var(--sh-success)" Icon="✅" />
+        <KpiTile Label="Inactive" Value="@InactiveCount.ToString()" Sub="files" Color="var(--sh-warning)" Icon="⛔" />
+        <KpiTile Label="Applications" Value="@AppNames.Count.ToString()" Sub="with files" Icon="📦" />
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-heading">
+        <i class="bi bi-bar-chart me-1"></i>
+        Files per application
+        <span class="meta-pill ms-2">@_range.Label</span>
+    </div>
+    <div class="files-breakdown">
+        @foreach (var row in PerAppRows)
+        {
+            <div class="files-breakdown-item">
+                <span class="fs-12 fw-medium" style="min-width:130px;color:var(--sh-text)">@row.AppName</span>
+                <div class="files-breakdown-bar">
+                    <div class="files-breakdown-fill" style="width:@row.ActivePct%;background:var(--sh-success)"></div>
+                </div>
+                <span class="fs-11 text-sh-soft" style="min-width:58px;text-align:right">@row.Active / @row.Total</span>
+            </div>
+        }
+    </div>
+</SectionCard>

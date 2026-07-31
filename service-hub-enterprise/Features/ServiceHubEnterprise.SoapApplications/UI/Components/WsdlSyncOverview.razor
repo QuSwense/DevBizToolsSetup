@@ -1,0 +1,18 @@
+@namespace ServiceHubEnterprise.SoapApplications.UI.Components
+
+<SectionCard Title="WSDL Sync" Icon="🧾" Subtitle="Sync records, versions & history" Filter="@_range" OnFilterChanged="ApplyRange">
+    <div class="kpi-grid">
+        <KpiTile Label="Records" Value="@Records.Count.ToString()" Sub="sync records" Icon="🧾" />
+        <KpiTile Label="Synced" Value="@SyncedCount.ToString()" Sub="records" Color="var(--sh-success)" Icon="✅" />
+        <KpiTile Label="Failed" Value="@FailedCount.ToString()" Sub="records" Color="var(--sh-danger)" Icon="⛔" />
+        <KpiTile Label="Parsing" Value="@ParsingCount.ToString()" Sub="records" Color="var(--sh-warning)" Icon="⏳" />
+        <KpiTile Label="Versions" Value="@Versions.Count.ToString()" Sub="snapshots" Icon="🔢" />
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-heading">
+        <i class="bi bi-graph-up me-1"></i>
+        Sync status over range
+        <span class="meta-pill ms-2">@_range.Label</span>
+    </div>
+    <TimelineStrip Segments="@TimelineSegments" />
+</SectionCard>

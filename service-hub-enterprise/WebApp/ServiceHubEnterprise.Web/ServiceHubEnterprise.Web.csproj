@@ -10,6 +10,7 @@
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.ADViewer\ServiceHubEnterprise.ADViewer.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Settings\ServiceHubEnterprise.Settings.csproj" />
     <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Ui\ServiceHubEnterprise.Ui.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,0 +1,38 @@
+@page "/soap/overview"
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading SOAP overview...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="dashboard-stack">
+        <div class="row g-3">
+            <!-- Row 1: two quarters + a half -->
+            <div class="col-12 col-lg-3">
+                <ApplicationsOverview Apps="@Apps" />
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <RequestFilesOverview Files="@Files" />
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <ExecutionsOverview Executions="@Executions" />
+            </div>
+
+            <!-- Row 2: two halves -->
+            <div class="col-12 col-lg-6">
+                <WsdlSyncOverview Records="@Records" Versions="@Versions" SyncHistory="@SyncHistory" />
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <TemplatesOverview Templates="@Templates" />
+            </div>
+        </div>
+    </div>
+}

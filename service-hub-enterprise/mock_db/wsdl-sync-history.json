@@ -1,0 +1,362 @@
+[
+  {
+    "id": "wsh-1",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-04-28",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-2",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-05-10",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-3",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-05-22",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-4",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-06-03",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-5",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-06-15",
+    "status": "failed",
+    "details": "Connection timeout while fetching WSDL"
+  },
+  {
+    "id": "wsh-6",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-06-20",
+    "status": "synced",
+    "details": "Retry after timeout succeeded"
+  },
+  {
+    "id": "wsh-7",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-07-02",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-8",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-07-12",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-9",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-07-27",
+    "status": "failed",
+    "details": "Endpoint returned HTTP 503"
+  },
+  {
+    "id": "wsh-10",
+    "appId": "s1",
+    "appName": "LegacyBilling",
+    "syncRecordId": "wsdl-1",
+    "date": "2026-07-28",
+    "status": "synced",
+    "details": "Recovered on next attempt"
+  },
+  {
+    "id": "wsh-11",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-04-30",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-12",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-05-12",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-13",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-05-26",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-14",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-06-08",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-15",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-06-18",
+    "status": "parsing",
+    "details": "New operations detected, parsing in progress"
+  },
+  {
+    "id": "wsh-16",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-06-25",
+    "status": "synced",
+    "details": "Parsing completed successfully"
+  },
+  {
+    "id": "wsh-17",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-07-05",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-18",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-07-15",
+    "status": "failed",
+    "details": "Schema validation error"
+  },
+  {
+    "id": "wsh-19",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-07-22",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-20",
+    "appId": "s3",
+    "appName": "CustomerPortal",
+    "syncRecordId": "wsdl-3",
+    "date": "2026-07-29",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-21",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-05-02",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-22",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-05-15",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-23",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-05-29",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-24",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-06-12",
+    "status": "parsing",
+    "details": "Large WSDL, parser still running"
+  },
+  {
+    "id": "wsh-25",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-06-22",
+    "status": "synced",
+    "details": "Parsing completed successfully"
+  },
+  {
+    "id": "wsh-26",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-07-01",
+    "status": "failed",
+    "details": "Certificate verification failed"
+  },
+  {
+    "id": "wsh-27",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-07-08",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-28",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-07-18",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-29",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-07-29",
+    "status": "parsing",
+    "details": "New endpoints added, parsing in progress"
+  },
+  {
+    "id": "wsh-30",
+    "appId": "s5",
+    "appName": "PaymentGateway",
+    "syncRecordId": "wsdl-4",
+    "date": "2026-07-30",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-31",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-05-05",
+    "status": "synced",
+    "details": "Manual upload"
+  },
+  {
+    "id": "wsh-32",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-05-18",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-33",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-06-01",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-34",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-06-15",
+    "status": "failed",
+    "details": "DNS resolution failed"
+  },
+  {
+    "id": "wsh-35",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-06-24",
+    "status": "synced",
+    "details": "Recovered on next attempt"
+  },
+  {
+    "id": "wsh-36",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-07-04",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-37",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-07-14",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-38",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-07-21",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-39",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-07-27",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  },
+  {
+    "id": "wsh-40",
+    "appId": "s6",
+    "appName": "OrderProcessing",
+    "syncRecordId": "wsdl-5",
+    "date": "2026-07-30",
+    "status": "synced",
+    "details": "Auto-sync from URL"
+  }
+]

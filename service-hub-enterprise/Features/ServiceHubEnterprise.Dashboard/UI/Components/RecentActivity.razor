@@ -1,6 +1,33 @@
 @namespace ServiceHubEnterprise.Dashboard.UI.Components
 
-<SectionCard Title="@Title" Icon="🕘" Filter="@_range" OnFilterChanged="ApplyRange">
+<SectionCard Title="@Title" Icon="🕘" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🕘</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Activities</span>
+                <span class="summary-chip-value">@RangeActivityCount</span>
+                <span class="summary-chip-sub">in range</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">👥</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Active users</span>
+                <span class="summary-chip-value">@RangeActiveUsers</span>
+                <span class="summary-chip-sub">in range</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🕛</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Latest</span>
+                <span class="summary-chip-value">@LatestActivityTime</span>
+                <span class="summary-chip-sub">last activity</span>
+            </div>
+        </div>
+    </Summary>
     <HeaderActions>
         @if (Users.Count > 0)
         {

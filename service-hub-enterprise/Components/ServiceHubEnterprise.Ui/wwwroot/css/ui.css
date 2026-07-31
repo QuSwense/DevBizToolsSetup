@@ -1,0 +1,465 @@
+/* ═══════════════════════════════════════════
+   ServiceHubEnterprise.Ui — shared widget styles
+   SectionCard · KpiTile · MiniDonut · TimelineStrip · DateRangeFilter
+   Self-contained: relies only on the global --sh-* design tokens and Bootstrap.
+   ═══════════════════════════════════════════ */
+
+/* ── Base card (SectionCard) ──────────────── */
+
+.dash-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sh-text);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ── Stack / row layout ───────────────────── */
+
+.dashboard-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.dashboard-row {
+    width: 100%;
+}
+
+/* ── Section card header ──────────────────── */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.section-subtitle {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--sh-text-faint);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 1px;
+}
+
+/* ── Filter pill (SectionCard) ────────────── */
+
+.filter-pill {
+    padding: 3px 8px;
+    border: 1px solid var(--sh-border);
+    border-radius: 999px;
+    background: var(--sh-input-bg);
+    font-size: 11px;
+    color: var(--sh-text-soft);
+    transition: background 0.15s, color 0.15s;
+}
+
+.filter-pill:hover {
+    background: var(--sh-hover);
+    color: var(--sh-accent);
+}
+
+.filter-pill-label {
+    font-weight: 500;
+}
+
+.filter-pill-icon {
+    font-size: 12px;
+}
+
+/* ── Section body / footer ────────────────── */
+
+.section-body {
+    margin-top: 4px;
+}
+
+.section-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sh-border);
+}
+
+/* ── KPI tile ─────────────────────────────── */
+
+.kpi-tile {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: box-shadow 0.2s;
+}
+
+.kpi-tile:hover {
+    box-shadow: var(--sh-shadow-sm);
+}
+
+.kpi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.kpi-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sh-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.kpi-icon {
+    font-size: 14px;
+    color: var(--sh-text-faint);
+}
+
+.kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--sh-text);
+}
+
+.kpi-sub {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Mini donut ───────────────────────────── */
+
+.donut-chart-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.donut-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.donut-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sh-text);
+    line-height: 1.1;
+}
+
+.donut-sub {
+    font-size: 10px;
+    color: var(--sh-text-faint);
+    text-transform: uppercase;
+}
+
+/* ── Date range dialog (DateRangeFilter) ──── */
+
+.datepicker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+.datepicker-popup {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 220px;
+    box-shadow: var(--sh-shadow-md);
+}
+
+.datepicker-popup label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sh-text-soft);
+    margin-bottom: 6px;
+}
+
+.datepicker-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--sh-border);
+    border-radius: 4px;
+    font-size: 13px;
+    background: var(--sh-input-bg);
+    color: var(--sh-text);
+}
+
+.daterange-popup {
+    min-width: 260px;
+}
+
+.daterange-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.daterange-fields {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.daterange-fields > div {
+    flex: 1;
+}
+
+.daterange-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-date-apply {
+    flex: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--sh-accent);
+    color: var(--sh-on-accent);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-date-clear {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--sh-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--sh-text-soft);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-date-clear:hover {
+    background: var(--sh-hover);
+}
+
+/* ── Preset buttons (DateRangeFilter) ─────── */
+
+.seg-btn {
+    border: none;
+    background: transparent;
+    color: var(--sh-text-soft);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.seg-btn:hover {
+    background: var(--sh-hover);
+}
+
+.seg-btn.active {
+    background: var(--sh-accent);
+    color: var(--sh-on-accent);
+}
+
+/* ── Timeline strip (TimelineStrip) ───────── */
+
+.timeline-strip {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--sh-border);
+}
+
+.timeline-seg {
+    height: 100%;
+    transition: flex-basis 0.3s;
+}
+
+/* ── Utility ──────────────────────────────── */
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* ── Expand / collapse (SectionCard) ──────── */
+
+/* Compact summary strip shown while a collapsible section is collapsed */
+
+.section-summary {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.summary-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    background: var(--sh-surface);
+    min-width: 96px;
+    flex: 1 1 auto;
+}
+
+.summary-chip-icon {
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.summary-chip-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.summary-chip-label {
+    font-size: 10px;
+    color: var(--sh-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.summary-chip-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sh-text);
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.summary-chip-value--success { color: var(--sh-success, #10b981); }
+.summary-chip-value--warning { color: var(--sh-warning, #f59e0b); }
+.summary-chip-value--danger { color: var(--sh-danger, #ef4444); }
+
+.summary-chip-sub {
+    font-size: 10px;
+    color: var(--sh-text-faint);
+    white-space: nowrap;
+}
+
+/* Donut chip variant (compact pass-rate / active-share) */
+
+.summary-chip-donut {
+    align-items: center;
+    gap: 12px;
+    padding: 7px 14px;
+}
+
+.summary-chip-donut .donut-chart-wrapper {
+    width: 56px;
+    height: 56px;
+}
+
+.summary-chip-donut .donut-chart-wrapper svg {
+    width: 56px;
+    height: 56px;
+}
+
+.summary-chip-donut .donut-value {
+    font-size: 13px;
+}
+
+.summary-chip-donut .donut-sub {
+    font-size: 9px;
+}
+
+/* Toggle pill at the bottom of a collapsible section */
+
+.section-toggle-wrap {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sh-border);
+    display: flex;
+    justify-content: center;
+}
+
+.section-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border: 1px solid var(--sh-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sh-text-soft);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.section-toggle:hover {
+    background: var(--sh-hover);
+    color: var(--sh-accent);
+    border-color: var(--sh-accent);
+}
+
+/* Subtle fade on content switch (fade only — height animation is brittle) */
+
+@keyframes sectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.section-fade {
+    animation: sectionFadeIn 0.18s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-fade {
+        animation: none;
+    }
+}

@@ -35,6 +35,11 @@
             </span>
         </div>
         <div class="@GetSubmenuClass(IsExpanded(SoapSection))">
+            <a class="submenu-item@(currentPage == "/soap/overview" ? " active" : "")" href="/soap/overview"
+               @onclick="@(() => NavigateTo("/soap/overview"))" @onclick:preventDefault="true">
+                <span class="sub-icon"><i class="bi bi-speedometer2"></i></span>
+                <span class="sub-label">Overview</span>
+            </a>
             <a class="submenu-item@(currentPage == "/soap/applications" ? " active" : "")" href="/soap/applications"
                @onclick="@(() => NavigateTo("/soap/applications"))" @onclick:preventDefault="true">
                 <span class="sub-icon"><i class="bi bi-file-earmark-code"></i></span>

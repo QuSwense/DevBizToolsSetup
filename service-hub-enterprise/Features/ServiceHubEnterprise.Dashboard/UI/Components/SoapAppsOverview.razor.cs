@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using ServiceHubEnterprise.Dashboard.Application.DTOs;
-using ServiceHubEnterprise.Dashboard.UI.Models;
+using ServiceHubEnterprise.Ui.Models;
 
 namespace ServiceHubEnterprise.Dashboard.UI.Components;
 
@@ -29,6 +29,16 @@ public partial class SoapAppsOverview
     /// Gets or sets the request-file execution history.
     /// </summary>
     [Parameter] public IReadOnlyList<RequestExecutionDto> Executions { get; set; } = Array.Empty<RequestExecutionDto>();
+
+    /// <summary>
+    /// Gets or sets whether the card is collapsed to its summary view.
+    /// </summary>
+    [Parameter] public bool Collapsed { get; set; }
+
+    /// <summary>
+    /// Invoked when the card's collapse state is toggled.
+    /// </summary>
+    [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
     private DateRange _range = DateRange.LastDays(7);
 

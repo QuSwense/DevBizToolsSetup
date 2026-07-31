@@ -1,0 +1,21 @@
+@namespace ServiceHubEnterprise.SoapApplications.UI.Components
+
+<SectionCard Title="Executions" Icon="▶️" Subtitle="SOAP request-file executions over range" Filter="@_range" OnFilterChanged="ApplyRange">
+    <div class="kpi-grid">
+        <KpiTile Label="Executions" Value="@InRangeExecutions.Count.ToString()" Sub="in selected range" Icon="▶️" />
+        <KpiTile Label="Success" Value="@SuccessCount.ToString()" Sub="runs" Color="var(--sh-success)" Icon="✅" />
+        <KpiTile Label="Failed" Value="@FailCount.ToString()" Sub="runs" Color="var(--sh-danger)" Icon="⛔" />
+        <KpiTile Label="Avg Duration" Value="@AvgDurationText" Sub="per run" Icon="⏱️" />
+    </div>
+    <div class="section-divider"></div>
+    <div class="kpi-donut-tile">
+        <MiniDonut Value="@SuccessCount" Total="@InRangeExecutions.Count" Label="success" ValueColor="var(--sh-success)" />
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-heading">
+        <i class="bi bi-graph-up me-1"></i>
+        Success / failure over range
+        <span class="meta-pill ms-2">@_range.Label</span>
+    </div>
+    <TimelineStrip Segments="@TimelineSegments" />
+</SectionCard>

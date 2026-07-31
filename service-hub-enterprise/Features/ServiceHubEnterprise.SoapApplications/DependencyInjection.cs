@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddSingleton<MockDbLoader>();
         services.AddSingleton<SoapAppStore>();
         services.AddSingleton<WsdlSyncStore>();
+        services.AddSingleton<RequestExecutionStore>();
         return services;
     }
 }

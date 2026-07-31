@@ -8,6 +8,11 @@ namespace ServiceHubEnterprise.SoapApplications.Pages;
 
 public partial class RequestFiles
 {
+    [Inject]
+    private Microsoft.Extensions.Configuration.IConfiguration Config { get; set; } = default!;
+
+    private string CurrentUser => Config["Users:CurrentUser"] ?? "Current User";
+
     // ── Skeleton loading renderer ──
     private RenderFragment RenderSkeletonRows => builder =>
     {
@@ -261,7 +266,7 @@ public partial class RequestFiles
             verb,
             _uploadDescription.Trim(),
             "active",
-            "Current User",
+            CurrentUser,
             now,
             null,
             null

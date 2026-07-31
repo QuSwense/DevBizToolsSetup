@@ -898,5 +898,85 @@
         "executedAt":  "2026-07-05 16:15:14",
         "durationMs":  2082,
         "triggeredBy":  "Vikram Singh"
+    },
+    {
+        "id":  "re-91",
+        "appName":  "LegacyBilling",
+        "appType":  "soap",
+        "fileName":  "invoice_create.xml",
+        "status":  "success",
+        "executedAt":  "2026-07-26 09:12:40",
+        "durationMs":  1287,
+        "triggeredBy":  "Suresh Kumar"
+    },
+    {
+        "id":  "re-92",
+        "appName":  "PaymentGateway",
+        "appType":  "soap",
+        "fileName":  "process_payment.xml",
+        "status":  "success",
+        "executedAt":  "2026-07-27 14:03:11",
+        "durationMs":  2143,
+        "triggeredBy":  "Priya Sharma"
+    },
+    {
+        "id":  "re-93",
+        "appName":  "CustomerPortal",
+        "appType":  "soap",
+        "fileName":  "update_customer_profile.xml",
+        "status":  "failed",
+        "executedAt":  "2026-07-26 18:47:52",
+        "durationMs":  2341,
+        "triggeredBy":  "Rahul Patel"
+    },
+    {
+        "id":  "re-94",
+        "appName":  "ShippingSOAP",
+        "appType":  "soap",
+        "fileName":  "track_shipment.xml",
+        "status":  "success",
+        "executedAt":  "2026-07-28 07:21:09",
+        "durationMs":  640,
+        "triggeredBy":  "Vikram Singh"
+    },
+    {
+        "id":  "re-95",
+        "appName":  "OrderProcessing",
+        "appType":  "soap",
+        "fileName":  "order_submit.xml",
+        "status":  "success",
+        "executedAt":  "2026-07-29 11:35:27",
+        "durationMs":  1520,
+        "triggeredBy":  "Anita Desai"
+    },
+    {
+        "id":  "re-96",
+        "appName":  "InventorySync",
+        "appType":  "soap",
+        "fileName":  "sync_inventory.xml",
+        "status":  "failed",
+        "executedAt":  "2026-07-29 16:58:03",
+        "durationMs":  2518,
+        "triggeredBy":  "System"
+    },
+    {
+        "id":  "re-97",
+        "appName":  "NotificationHub",
+        "appType":  "soap",
+        "fileName":  "get_delivery_status.xml",
+        "status":  "success",
+        "executedAt":  "2026-07-30 08:44:31",
+        "durationMs":  512,
+        "triggeredBy":  "Suresh Kumar"
+    },
+    {
+        "id":  "re-98",
+        "appName":  "ReportingEngine",
+        "appType":  "soap",
+        "fileName":  "generate_report.xml",
+        "status":  "success",
+        "executedAt":  "2026-07-31 03:27:45",
+        "durationMs":  1893,
+        "triggeredBy":  "Priya Sharma"
     }
 ]

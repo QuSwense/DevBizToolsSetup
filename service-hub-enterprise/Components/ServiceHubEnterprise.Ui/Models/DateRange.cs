@@ -1,4 +1,4 @@
-namespace ServiceHubEnterprise.Dashboard.UI.Models;
+namespace ServiceHubEnterprise.Ui.Models;
 
 /// <summary>
 /// Represents an inclusive date range used to filter dashboard sections.

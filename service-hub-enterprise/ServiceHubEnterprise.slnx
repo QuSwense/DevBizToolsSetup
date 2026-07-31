@@ -14,5 +14,6 @@
   </Folder>
   <Folder Name="/Components/">
     <Project Path="Components/ServiceHubEnterprise.Grid/ServiceHubEnterprise.Grid.csproj" />
+    <Project Path="Components/ServiceHubEnterprise.Ui/ServiceHubEnterprise.Ui.csproj" />
   </Folder>
 </Solution>

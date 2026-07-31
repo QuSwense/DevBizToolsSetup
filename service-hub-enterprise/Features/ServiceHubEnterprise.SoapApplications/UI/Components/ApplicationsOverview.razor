@@ -1,0 +1,14 @@
+@namespace ServiceHubEnterprise.SoapApplications.UI.Components
+
+<SectionCard Title="Applications" Icon="📦" Subtitle="SOAP applications, auth & operations">
+    <div class="kpi-grid">
+        <KpiTile Label="Total Apps" Value="@TotalApps.ToString()" Sub="applications" Icon="📦" />
+        <KpiTile Label="Enabled" Value="@EnabledApps.ToString()" Sub="active" Color="var(--sh-success)" Icon="🟢" />
+        <KpiTile Label="Disabled" Value="@DisabledApps.ToString()" Sub="inactive" Color="var(--sh-warning)" Icon="⛔" />
+        <KpiTile Label="Operations" Value="@TotalOperations.ToString()" Sub="SOAP APIs" Icon="🔁" />
+    </div>
+    <div class="section-divider"></div>
+    <div class="kpi-donut-tile">
+        <MiniDonut Value="@EnabledApps" Total="@TotalApps" Label="enabled" ValueColor="var(--sh-success)" />
+    </div>
+</SectionCard>

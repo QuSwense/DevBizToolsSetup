@@ -17,39 +17,64 @@ else if (!string.IsNullOrEmpty(_errorMessage))
 else if (_viewModel.IsLoaded)
 {
     <div class="dashboard-stack">
-        <!-- Users -->
-        <UsersOverview Users="@_viewModel.Users"
-                       Activities="@_viewModel.UserActivities" />
+        <div class="row g-3">
+            <!-- Row 1: two quarters + a half -->
+            <div class="col-12 col-lg-3">
+                <UsersOverview Users="@_viewModel.Users"
+                               Activities="@_viewModel.UserActivities"
+                               Collapsed="@IsCollapsed(CardKey.Users)"
+                               OnToggle="OnUsersToggle" />
+            </div>
 
-        <!-- REST Applications -->
-        <RestAppsOverview Apps="@_viewModel.RestApps"
-                          RequestFiles="@_viewModel.RestRequestFiles"
-                          Executions="@_viewModel.RequestExecutions" />
+            <div class="col-12 col-lg-3">
+                <TestSuitesOverview Suites="@_viewModel.TestSuites"
+                                    History="@_viewModel.TestSuiteHistory"
+                                    Collapsed="@IsCollapsed(CardKey.TestSuites)"
+                                    OnToggle="OnTestSuitesToggle" />
+            </div>
 
-        <!-- SOAP Applications -->
-        <SoapAppsOverview Apps="@_viewModel.SoapApps"
-                          RequestFiles="@_viewModel.RequestFiles"
-                          WsdlRecords="@_viewModel.WsdlRecords"
-                          Executions="@_viewModel.RequestExecutions" />
+            <div class="col-12 col-lg-6">
+                <ServiceHealthOverview Services="@_viewModel.HealthServices"
+                                            Uptime="@_viewModel.ServiceUptime"
+                                            Collapsed="@IsCollapsed(CardKey.ServiceHealth)"
+                                            OnToggle="OnServiceHealthToggle" />
+            </div>
 
-        <!-- Test Suites -->
-        <TestSuitesOverview Suites="@_viewModel.TestSuites"
-                            History="@_viewModel.TestSuiteHistory" />
+            <!-- Row 2: two halves -->
+            <div class="col-12 col-lg-6">
+                <RestAppsOverview Apps="@_viewModel.RestApps"
+                                    RequestFiles="@_viewModel.RestRequestFiles"
+                                    Executions="@_viewModel.RequestExecutions"
+                                    Collapsed="@IsCollapsed(CardKey.Rest)"
+                                    OnToggle="OnRestToggle" />
+            </div>
 
-        <!-- Service Health -->
-        <ServiceHealthOverview Services="@_viewModel.HealthServices"
-                               Uptime="@_viewModel.ServiceUptime" />
+            <div class="col-12 col-lg-6">
+                <SoapAppsOverview Apps="@_viewModel.SoapApps"
+                                    RequestFiles="@_viewModel.RequestFiles"
+                                    WsdlRecords="@_viewModel.WsdlRecords"
+                                    Executions="@_viewModel.RequestExecutions"
+                                    Collapsed="@IsCollapsed(CardKey.Soap)"
+                                    OnToggle="OnSoapToggle" />
+            </div>
 
-        <!-- Recent Activity -->
-        <RecentActivity Title="Recent Activity"
-                        ShowViewAll="true"
-                        ViewAllHref="#"
-                        Activities="@BuildActivityLog()"
-                        Users="@BuildUserNames()" />
+            <!-- Row 3: full width -->
+            <div class="col-12">
+                <RecentActivity Title="Recent Activity"
+                                    ShowViewAll="true"
+                                    ViewAllHref="#"
+                                    Activities="@BuildActivityLog()"
+                                    Users="@BuildUserNames()"
+                                    Collapsed="@IsCollapsed(CardKey.RecentActivity)"
+                                    OnToggle="OnRecentActivityToggle" />
+            </div>
 
-        <!-- Quick Actions -->
-        <div class="dashboard-grid">
-            <QuickActions Actions="@QuickActionItems" />
+            <!-- Row 4: full width -->
+            <div class="col-12">
+                <div class="dashboard-grid">
+                    <QuickActions Actions="@QuickActionItems" />
+                </div>
+            </div>
         </div>
     </div>
 }

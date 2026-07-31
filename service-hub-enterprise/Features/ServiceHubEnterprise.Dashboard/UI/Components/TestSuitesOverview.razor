@@ -1,6 +1,31 @@
 @namespace ServiceHubEnterprise.Dashboard.UI.Components
 
-<SectionCard Title="Test Suites" Icon="🧪" Subtitle="Current status & run history">
+<SectionCard Title="Test Suites" Icon="🧪" Subtitle="Current status & run history"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🧪</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Suites</span>
+                <span class="summary-chip-value">@TotalSuites</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🔢</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Cases</span>
+                <span class="summary-chip-value">@TotalCases</span>
+                <span class="summary-chip-sub">@PassingCases passing</span>
+            </div>
+        </div>
+        <div class="summary-chip summary-chip-donut">
+            <MiniDonut Value="@PassingCases" Total="@TotalCases" Label="pass" ValueColor="var(--sh-success)" Size="56" />
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Pass rate</span>
+                <span class="summary-chip-value">@PassingCases / @TotalCases</span>
+            </div>
+        </div>
+    </Summary>
     <HeaderActions>
         @if (SuiteNames.Count > 0)
         {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using ServiceHubEnterprise.Dashboard.UI.Models;
+using ServiceHubEnterprise.Ui.Models;
 
-namespace ServiceHubEnterprise.Dashboard.UI.Components;
+namespace ServiceHubEnterprise.Ui.Components;
 
 /// <summary>
 /// Code-behind for the SectionCard component.
@@ -49,6 +49,28 @@ public partial class SectionCard
     /// </summary>
     [Parameter] public RenderFragment? Footer { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether the section supports expand/collapse.
+    /// When false (default) the section renders exactly as before and no toggle is shown.
+    /// </summary>
+    [Parameter] public bool Collapsible { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the section is currently collapsed (summary view).
+    /// Only applies when <see cref="Collapsible"/> is true.
+    /// </summary>
+    [Parameter] public bool Collapsed { get; set; }
+
+    /// <summary>
+    /// Invoked when the user toggles the collapse state; receives the new collapsed value.
+    /// </summary>
+    [Parameter] public EventCallback<bool> OnToggle { get; set; }
+
+    /// <summary>
+    /// Gets or sets the compact summary content shown while the section is collapsed.
+    /// </summary>
+    [Parameter] public RenderFragment? Summary { get; set; }
+
     private bool _showFilter;
 
     private void ToggleFilter() => _showFilter = !_showFilter;
@@ -60,4 +82,6 @@ public partial class SectionCard
         _showFilter = false;
         await OnFilterChanged.InvokeAsync(range);
     }
+
+    private async Task Toggle() => await OnToggle.InvokeAsync(!Collapsed);
 }

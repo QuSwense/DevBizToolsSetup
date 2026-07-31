@@ -11,6 +11,11 @@ public class SoapApiEntry
 public record SoapApp(string Id, string Name, string BaseUrl, string WsdlPath, string Description, string Status, string CreatedBy, DateTime CreatedAt, string? UpdatedBy, DateTime? UpdatedAt, int ApisCount, string AuthType, string AuthUsername, string AuthPassword, string AuthExtra, SoapApiEntry[] Apis);
 
 /// <summary>
+/// A SOAP request file associated with an application (from mock_db/request-files.json).
+/// </summary>
+public record SoapRequestFile(string FileName, string AppName, string ApiPath, string Verb, string Description, string Status, string CreatedBy, DateTime CreatedAt, string? UpdatedBy, DateTime? UpdatedAt);
+
+/// <summary>
 /// Singleton store that holds the SOAP application data,
 /// shared between Applications.razor and RequestFiles.razor.
 /// </summary>
@@ -97,6 +102,27 @@ public class TemplateVariableDef
 }
 
 /// <summary>
+/// A single WSDL sync status point used for time-series timeline visualization.
+/// Dates are stored as "yyyy-MM-dd" strings (relative to today in mock data).
+/// </summary>
+public class WsdlSyncHistoryPoint
+{
+    public string Id { get; set; } = "";
+    public string AppId { get; set; } = "";
+    public string AppName { get; set; } = "";
+    public string SyncRecordId { get; set; } = "";
+    public string Date { get; set; } = ""; // "yyyy-MM-dd"
+    public string Status { get; set; } = "synced"; // "synced" | "failed" | "parsing"
+    public string Details { get; set; } = "";
+
+    /// <summary>
+    /// Attempts to parse the stored date into a DateTime.
+    /// </summary>
+    public DateTime? TryGetDate()
+        => DateTime.TryParseExact(Date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt) ? dt : null;
+}
+
+/// <summary>
 /// Singleton store for WSDL sync records, versions, and templates.
 /// </summary>
 public class WsdlSyncStore
@@ -104,12 +130,14 @@ public class WsdlSyncStore
     public List<WsdlSyncRecord> Records { get; private set; }
     public List<WsdlVersionEntry> Versions { get; private set; }
     public List<WsdlTemplate> Templates { get; private set; }
+    public List<WsdlSyncHistoryPoint> SyncHistory { get; private set; }
 
     public WsdlSyncStore(MockDbLoader loader)
     {
         Records = loader.LoadJsonAsync<List<WsdlSyncRecord>>("wsdl-records.json").GetAwaiter().GetResult();
         Versions = loader.LoadJsonAsync<List<WsdlVersionEntry>>("wsdl-versions.json").GetAwaiter().GetResult();
         Templates = loader.LoadJsonAsync<List<WsdlTemplate>>("wsdl-templates.json").GetAwaiter().GetResult();
+        SyncHistory = loader.LoadJsonAsync<List<WsdlSyncHistoryPoint>>("wsdl-sync-history.json").GetAwaiter().GetResult() ?? [];
 
         // Preload and resolve WSDL content references
         loader.PreloadAllWsdlContentAsync().GetAwaiter().GetResult();

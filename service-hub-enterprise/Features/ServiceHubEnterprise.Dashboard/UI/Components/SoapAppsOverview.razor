@@ -1,6 +1,49 @@
 @namespace ServiceHubEnterprise.Dashboard.UI.Components
 
-<SectionCard Title="SOAP Applications" Icon="🔁" Subtitle="Apps, WSDL sync, request files & executions" Filter="@_range" OnFilterChanged="ApplyRange">
+<SectionCard Title="SOAP Applications" Icon="🔁" Subtitle="Apps, WSDL sync, request files & executions" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">📦</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Apps</span>
+                <span class="summary-chip-value">@TotalApps</span>
+                <span class="summary-chip-sub">@EnabledApps enabled</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🧾</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">WSDL synced</span>
+                <span class="summary-chip-value">@WsdlSynced</span>
+                <span class="summary-chip-sub">@WsdlTotal records</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">📄</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Request files</span>
+                <span class="summary-chip-value">@FilesActive</span>
+                <span class="summary-chip-sub">@FilesTotal total</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">▶️</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Executions</span>
+                <span class="summary-chip-value">@ExecCount</span>
+                <span class="summary-chip-sub">@SuccessCount succeeded</span>
+            </div>
+        </div>
+        <div class="summary-chip summary-chip-donut">
+            <MiniDonut Value="@SuccessCount" Total="@ExecCount" Label="pass" ValueColor="var(--sh-success)" Size="56" />
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Pass rate</span>
+                <span class="summary-chip-value">@SuccessCount / @ExecCount</span>
+            </div>
+        </div>
+    </Summary>
+    <ChildContent>
     <div class="kpi-grid">
         <KpiTile Label="Total Apps" Value="@TotalApps.ToString()" Sub="@($"{EnabledApps} enabled")" Icon="📦" />
         <KpiTile Label="Enabled" Value="@EnabledApps.ToString()" Sub="applications" Color="var(--sh-success)" Icon="🟢" />
@@ -32,4 +75,5 @@
             </div>
         }
     </div>
+    </ChildContent>
 </SectionCard>
