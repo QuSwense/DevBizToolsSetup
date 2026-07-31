@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using ServiceHubEnterprise.Grid.Components;
-using ServiceHubEnterprise.SoapApplications.Services;
+using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.Ui.Models;
 
-namespace ServiceHubEnterprise.SoapApplications.UI.Components;
+namespace ServiceHubEnterprise.SoapApplications.Components;
 
 /// <summary>
 /// Code-behind for the Request Files overview section card.

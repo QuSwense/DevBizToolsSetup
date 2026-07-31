@@ -1,19 +1,7 @@
 using System.Text.RegularExpressions;
+using ServiceHubEnterprise.SoapApplications.Models;
 
 namespace ServiceHubEnterprise.SoapApplications.Services;
-
-public class SoapApiEntry
-{
-    public string Name { get; set; } = "";
-    public string Description { get; set; } = "";
-}
-
-public record SoapApp(string Id, string Name, string BaseUrl, string WsdlPath, string Description, string Status, string CreatedBy, DateTime CreatedAt, string? UpdatedBy, DateTime? UpdatedAt, int ApisCount, string AuthType, string AuthUsername, string AuthPassword, string AuthExtra, SoapApiEntry[] Apis);
-
-/// <summary>
-/// A SOAP request file associated with an application (from mock_db/request-files.json).
-/// </summary>
-public record SoapRequestFile(string FileName, string AppName, string ApiPath, string Verb, string Description, string Status, string CreatedBy, DateTime CreatedAt, string? UpdatedBy, DateTime? UpdatedAt);
 
 /// <summary>
 /// Singleton store that holds the SOAP application data,
@@ -32,94 +20,6 @@ public class SoapAppStore
     {
         Apps = apps;
     }
-}
-
-// ── WSDL Sync Models ──
-
-/// <summary>
-/// Represents a WSDL sync record linking a SOAP application to its WSDL source.
-/// </summary>
-public class WsdlSyncRecord
-{
-    public string Id { get; set; } = "";
-    public string AppId { get; set; } = "";
-    public string AppName { get; set; } = "";
-    public string SourceType { get; set; } = "url"; // "url" | "upload"
-    public string SourceUrl { get; set; } = "";
-    public string UploadedBy { get; set; } = "";
-    public string UploadedAt { get; set; } = "";
-    public string Status { get; set; } = "synced"; // "synced" | "failed" | "parsing"
-    public string WsdlContent { get; set; } = "";
-    public string WsdlContentKey { get; set; } = "";
-    public int VersionCount { get; set; } = 1;
-}
-
-/// <summary>
-/// A specific version snapshot of a WSDL sync record.
-/// </summary>
-public class WsdlVersionEntry
-{
-    public string Id { get; set; } = "";
-    public string SyncRecordId { get; set; } = "";
-    public int VersionNumber { get; set; } = 1;
-    public string Label { get; set; } = "v1";
-    public string UploadedBy { get; set; } = "";
-    public string UploadedAt { get; set; } = "";
-    public string Status { get; set; } = "active"; // "active" | "archived"
-    public string Notes { get; set; } = "";
-}
-
-/// <summary>
-/// A template for generating SOAP request files with {{var_name}} placeholders.
-/// A template can extend another template to inherit its content and variables.
-/// </summary>
-public class WsdlTemplate
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Description { get; set; } = "";
-    public string Content { get; set; } = "";
-    public string? ExtendsTemplateId { get; set; }
-    public string? ExtendsTemplateName { get; set; }
-    public string[] Variables { get; set; } = [];
-    public string CreatedBy { get; set; } = "";
-    public string CreatedAt { get; set; } = "";
-    public string? UpdatedBy { get; set; }
-    public string? UpdatedAt { get; set; }
-    public int UsageCount { get; set; } = 0;
-}
-
-/// <summary>
-/// Describes a variable extracted from a template for the dynamic form.
-/// </summary>
-public class TemplateVariableDef
-{
-    public string Name { get; set; } = "";
-    public string Label { get; set; } = "";
-    public string DefaultValue { get; set; } = "";
-    public string InputType { get; set; } = "text"; // "text" | "textarea" | "select"
-    public string[] Options { get; set; } = [];
-}
-
-/// <summary>
-/// A single WSDL sync status point used for time-series timeline visualization.
-/// Dates are stored as "yyyy-MM-dd" strings (relative to today in mock data).
-/// </summary>
-public class WsdlSyncHistoryPoint
-{
-    public string Id { get; set; } = "";
-    public string AppId { get; set; } = "";
-    public string AppName { get; set; } = "";
-    public string SyncRecordId { get; set; } = "";
-    public string Date { get; set; } = ""; // "yyyy-MM-dd"
-    public string Status { get; set; } = "synced"; // "synced" | "failed" | "parsing"
-    public string Details { get; set; } = "";
-
-    /// <summary>
-    /// Attempts to parse the stored date into a DateTime.
-    /// </summary>
-    public DateTime? TryGetDate()
-        => DateTime.TryParseExact(Date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt) ? dt : null;
 }
 
 /// <summary>

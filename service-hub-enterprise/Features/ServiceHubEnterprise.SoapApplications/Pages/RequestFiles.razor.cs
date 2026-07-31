@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using ServiceHubEnterprise.Grid.Components;
+using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;

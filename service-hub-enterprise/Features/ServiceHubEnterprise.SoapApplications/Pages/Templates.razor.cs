@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using ServiceHubEnterprise.Grid.Components;
+using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;

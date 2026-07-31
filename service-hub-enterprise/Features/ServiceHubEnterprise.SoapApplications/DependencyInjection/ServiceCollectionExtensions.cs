@@ -6,7 +6,7 @@ namespace ServiceHubEnterprise.SoapApplications;
 /// <summary>
 /// Extension methods for registering SOAP Applications feature services.
 /// </summary>
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Adds the SOAP Applications feature services to the service collection.

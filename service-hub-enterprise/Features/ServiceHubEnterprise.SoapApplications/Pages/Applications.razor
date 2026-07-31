@@ -127,7 +127,7 @@ else
 
     <RowActions Context="app">
         @{
-            var isEnabled = string.Compare(app.Status, "enabled", StringComparison.OrdinalIgnoreCase) == 0;
+            var isEnabled = app.Status == AppStatus.Enabled;
         }
         <div class="row-actions-wrap blazor-managed@(_expandedActionRows.Contains(app.Id) ? " is-open" : "")">
             <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions"
@@ -161,7 +161,7 @@ else
 
     <DetailRow Context="app">
         @{
-            var isEnabled = string.Compare(app.Status, "enabled", StringComparison.OrdinalIgnoreCase) == 0;
+            var isEnabled = app.Status == AppStatus.Enabled;
         }
         <div class="detail-grid">
             <div>
@@ -198,14 +198,14 @@ else
                 <div class="detail-label">Auth Type</div>
                 <div class="detail-value">
                     <span class="d-inline-flex align-items-center fs-10 fw-semibold text-sh-accent" style="height:20px;padding:0 7px;background:var(--sh-accent-soft);border:1px solid var(--sh-border)">
-                        @(app.AuthType switch
+                        @(app.Auth.Type switch
                         {
-                            "none" => "None",
-                            "basic" => "Basic",
-                            "api-key" => "API Key",
-                            "bearer" => "Bearer",
-                            "ntlm" => "NTLM",
-                            _ => app.AuthType
+                            AuthType.None => "None",
+                            AuthType.Basic => "Basic",
+                            AuthType.ApiKey => "API Key",
+                            AuthType.Bearer => "Bearer",
+                            AuthType.Ntlm => "NTLM",
+                            _ => app.Auth.Type.ToString()
                         })
                     </span>
                 </div>
@@ -213,16 +213,16 @@ else
             <div>
                 <div class="detail-label">Credentials</div>
                 <div class="detail-value">
-                    @(app.AuthType switch
+                    @(app.Auth.Type switch
                     {
-                        "none" => "—",
-                        "api-key" => app.AuthUsername,
-                        "bearer" => "Token configured",
-                        _ => string.IsNullOrEmpty(app.AuthUsername) ? "—" : app.AuthUsername
+                        AuthType.None => "—",
+                        AuthType.ApiKey => app.Auth.KeyName,
+                        AuthType.Bearer => "Token configured",
+                        _ => string.IsNullOrEmpty(app.Auth.Username) ? "—" : app.Auth.Username
                     })
-                    @if (app.AuthType == "ntlm" && !string.IsNullOrEmpty(app.AuthExtra))
+                    @if (app.Auth.Type == AuthType.Ntlm && !string.IsNullOrEmpty(app.Auth.Domain))
                     {
-                        <span class="text-sh-faint">(@app.AuthExtra)</span>
+                        <span class="text-sh-faint">(@app.Auth.Domain)</span>
                     }
                 </div>
             </div>
@@ -354,8 +354,8 @@ else
                 <div class="form-group">
                     <label>Status</label>
                     <select class="form-control-dg" @bind="_newAppStatus">
-                        <option value="enabled">Enabled</option>
-                        <option value="disabled">Disabled</option>
+                        <option value="@AppStatus.Enabled">Enabled</option>
+                        <option value="@AppStatus.Disabled">Disabled</option>
                     </select>
                 </div>
 
@@ -365,65 +365,65 @@ else
                 </div>
                 <div class="form-group">
                     <label>Auth Type</label>
-                    <select class="form-control-dg" @bind="_newAuthType">
-                        <option value="none">No Authentication</option>
-                        <option value="basic">Basic Auth</option>
-                        <option value="api-key">API Key</option>
-                        <option value="bearer">Bearer Token</option>
-                        <option value="ntlm">NTLM</option>
+                    <select class="form-control-dg" @bind="_newAuth.Type">
+                        <option value="@AuthType.None">No Authentication</option>
+                        <option value="@AuthType.Basic">Basic Auth</option>
+                        <option value="@AuthType.ApiKey">API Key</option>
+                        <option value="@AuthType.Bearer">Bearer Token</option>
+                        <option value="@AuthType.Ntlm">NTLM</option>
                     </select>
                 </div>
 
-                @if (_newAuthType == "basic")
+                @if (_newAuth.Type == AuthType.Basic)
                 {
                     <div class="form-group">
                         <label>Username</label>
                         <input type="text" class="form-control-dg" placeholder="Authentication username..."
-                               @bind="_newAuthUsername" @bind:event="oninput" />
+                               @bind="_newAuth.Username" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
                         <label>Password</label>
                         <input type="password" class="form-control-dg" placeholder="Authentication password..."
-                               @bind="_newAuthPassword" @bind:event="oninput" />
+                               @bind="_newAuth.Password" @bind:event="oninput" />
                     </div>
                 }
-                else if (_newAuthType == "api-key")
+                else if (_newAuth.Type == AuthType.ApiKey)
                 {
                     <div class="form-group">
                         <label>Key Name</label>
                         <input type="text" class="form-control-dg" placeholder="e.g. X-API-Key"
-                               @bind="_newAuthUsername" @bind:event="oninput" />
+                               @bind="_newAuth.KeyName" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
                         <label>Key Value</label>
                         <input type="text" class="form-control-dg" placeholder="API key value..."
-                               @bind="_newAuthPassword" @bind:event="oninput" />
+                               @bind="_newAuth.KeyValue" @bind:event="oninput" />
                     </div>
                 }
-                else if (_newAuthType == "bearer")
+                else if (_newAuth.Type == AuthType.Bearer)
                 {
                     <div class="form-group">
                         <label>Token</label>
                         <input type="password" class="form-control-dg" placeholder="Bearer token..."
-                               @bind="_newAuthPassword" @bind:event="oninput" />
+                               @bind="_newAuth.Token" @bind:event="oninput" />
                     </div>
                 }
-                else if (_newAuthType == "ntlm")
+                else if (_newAuth.Type == AuthType.Ntlm)
                 {
                     <div class="form-group">
                         <label>Username</label>
                         <input type="text" class="form-control-dg" placeholder="DOMAIN\\Username"
-                               @bind="_newAuthUsername" @bind:event="oninput" />
+                               @bind="_newAuth.Username" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
                         <label>Password</label>
                         <input type="password" class="form-control-dg" placeholder="NTLM password..."
-                               @bind="_newAuthPassword" @bind:event="oninput" />
+                               @bind="_newAuth.Password" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
                         <label>Domain</label>
                         <input type="text" class="form-control-dg" placeholder="NTLM domain..."
-                               @bind="_newAuthExtra" @bind:event="oninput" />
+                               @bind="_newAuth.Domain" @bind:event="oninput" />
                     </div>
                 }
 

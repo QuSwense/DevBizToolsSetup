@@ -11,10 +11,15 @@
     "createdAt": "2025-03-12",
     "updatedAt": "2026-07-15",
     "apisCount": 3,
-    "authType": "basic",
-    "authUsername": "billing_user",
-    "authPassword": "",
-    "authExtra": "",
+    "auth": {
+      "type": "basic",
+      "username": "billing_user",
+      "password": "",
+      "keyName": null,
+      "keyValue": null,
+      "token": null,
+      "domain": null
+    },
     "apis": [
       { "name": "SubmitInvoice", "description": "Submit billing invoices" },
       { "name": "GetInvoiceStatus", "description": "Check invoice status" },
@@ -33,10 +38,15 @@
     "createdAt": "2025-04-01",
     "updatedAt": "2026-07-15",
     "apisCount": 2,
-    "authType": "basic",
-    "authUsername": "shipping_admin",
-    "authPassword": "",
-    "authExtra": "",
+    "auth": {
+      "type": "basic",
+      "username": "shipping_admin",
+      "password": "",
+      "keyName": null,
+      "keyValue": null,
+      "token": null,
+      "domain": null
+    },
     "apis": [
       { "name": "TrackShipment", "description": "Track package location" },
       { "name": "CreateLabel", "description": "Generate shipping labels" }
@@ -54,10 +64,15 @@
     "createdAt": "2025-02-05",
     "updatedAt": "2026-07-15",
     "apisCount": 5,
-    "authType": "basic",
-    "authUsername": "portal_api",
-    "authPassword": "",
-    "authExtra": "",
+    "auth": {
+      "type": "basic",
+      "username": "portal_api",
+      "password": "",
+      "keyName": null,
+      "keyValue": null,
+      "token": null,
+      "domain": null
+    },
     "apis": [
       { "name": "GetProfile", "description": "Fetch customer profile" },
       { "name": "UpdateProfile", "description": "Update customer details" },
@@ -78,10 +93,15 @@
     "createdAt": "2025-11-15",
     "updatedAt": "2026-07-15",
     "apisCount": 1,
-    "authType": "api-key",
-    "authUsername": "sync_user",
-    "authPassword": "sk-sync-abc123",
-    "authExtra": "",
+    "auth": {
+      "type": "api-key",
+      "username": null,
+      "password": null,
+      "keyName": "sync_user",
+      "keyValue": "sk-sync-abc123",
+      "token": null,
+      "domain": null
+    },
     "apis": [
       { "name": "SyncInventory", "description": "Synchronize inventory data" }
     ]
@@ -98,10 +118,15 @@
     "createdAt": "2025-01-20",
     "updatedAt": "2026-07-15",
     "apisCount": 4,
-    "authType": "bearer",
-    "authUsername": "",
-    "authPassword": "eyJhbGciOiJIUzI1NiJ9.eyJ...",
-    "authExtra": "",
+    "auth": {
+      "type": "bearer",
+      "username": null,
+      "password": null,
+      "keyName": null,
+      "keyValue": null,
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJ...",
+      "domain": null
+    },
     "apis": [
       { "name": "ProcessPayment", "description": "Process customer payment" },
       { "name": "RefundTransaction", "description": "Issue refund" },
@@ -121,10 +146,15 @@
     "createdAt": "2025-03-10",
     "updatedAt": "2026-07-15",
     "apisCount": 6,
-    "authType": "ntlm",
-    "authUsername": "ORDERS\\svc_order",
-    "authPassword": "p@ssw0rd",
-    "authExtra": "ORDERS",
+    "auth": {
+      "type": "ntlm",
+      "username": "ORDERS\\svc_order",
+      "password": "p@ssw0rd",
+      "keyName": null,
+      "keyValue": null,
+      "token": null,
+      "domain": "ORDERS"
+    },
     "apis": [
       { "name": "CreateOrder", "description": "Create new order" },
       { "name": "CancelOrder", "description": "Cancel existing order" },
@@ -145,10 +175,15 @@
     "updatedBy": "Suresh Kumar",
     "createdAt": "2025-02-28",
     "apisCount": 3,
-    "authType": "none",
-    "authUsername": "",
-    "authPassword": "",
-    "authExtra": "",
+    "auth": {
+      "type": "none",
+      "username": null,
+      "password": null,
+      "keyName": null,
+      "keyValue": null,
+      "token": null,
+      "domain": null
+    },
     "apis": [
       { "name": "SendEmail", "description": "Send email notification" },
       { "name": "SendSms", "description": "Send SMS notification" },
@@ -167,10 +202,15 @@
     "createdAt": "2025-01-12",
     "updatedAt": "2026-07-15",
     "apisCount": 2,
-    "authType": "basic",
-    "authUsername": "report_user",
-    "authPassword": "",
-    "authExtra": "",
+    "auth": {
+      "type": "basic",
+      "username": "report_user",
+      "password": "",
+      "keyName": null,
+      "keyValue": null,
+      "token": null,
+      "domain": null
+    },
     "apis": [
       { "name": "GenerateReport", "description": "Generate business report" },
       { "name": "ExportReport", "description": "Export report as file" }

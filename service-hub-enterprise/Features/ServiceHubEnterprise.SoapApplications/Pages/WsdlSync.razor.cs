@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using ServiceHubEnterprise.Grid.Components;
-using ServiceHubEnterprise.SoapApplications.Services;
+using ServiceHubEnterprise.SoapApplications.Models;
 
-namespace ServiceHubEnterprise.SoapApplications.UI.Components;
+namespace ServiceHubEnterprise.SoapApplications.Components;
 
 /// <summary>
 /// Code-behind for the Templates overview section card.

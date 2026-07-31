@@ -2,6 +2,8 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using ServiceHubEnterprise.Grid.Components;
+using ServiceHubEnterprise.SoapApplications.Core.Enums;
+using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;
@@ -70,11 +72,8 @@ public partial class Applications
     private string _newAppUrl = "";
     private string _newAppWsdlPath = "";
     private string _newAppDescription = "";
-    private string _newAppStatus = "enabled";
-    private string _newAuthType = "basic";
-    private string _newAuthUsername = "";
-    private string _newAuthPassword = "";
-    private string _newAuthExtra = "";
+    private AppStatus _newAppStatus = AppStatus.Enabled;
+    private SoapAuthConfig _newAuth = new() { Type = AuthType.Basic };
     private List<SoapApiEntry> _newApis = [];
     private bool _showDropdown = false;
     private HashSet<string> _expandedActionRows = [];
@@ -145,8 +144,8 @@ public partial class Applications
                 Field = a => a.Status,
                 Template = context => builder =>
                 {
-                    var badgeClass = context.Status == "enabled" ? "status-enabled" : "status-disabled";
-                    var label = context.Status == "enabled" ? "Enabled" : "Disabled";
+                    var badgeClass = context.Status == AppStatus.Enabled ? "status-enabled" : "status-disabled";
+                    var label = context.Status == AppStatus.Enabled ? "Enabled" : "Disabled";
                     builder.OpenElement(0, "span");
                     builder.AddAttribute(1, "class", $"status-badge {badgeClass}");
                     builder.AddContent(2, label);
@@ -205,15 +204,15 @@ public partial class Applications
                     a.Name.ToLower().Contains(q) ||
                     a.BaseUrl.ToLower().Contains(q) ||
                     (a.UpdatedBy ?? "").ToLower().Contains(q) ||
-                    a.Status.ToLower().Contains(q));
+                    a.Status.ToString().ToLowerInvariant().Contains(q));
             }
 
             if (!string.IsNullOrWhiteSpace(_filterName))
                 query = query.Where(a => a.Name.ToLower().Contains(_filterName.ToLower()));
             if (!string.IsNullOrWhiteSpace(_filterUrl))
                 query = query.Where(a => a.BaseUrl.ToLower().Contains(_filterUrl.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterStatus))
-                query = query.Where(a => a.Status == _filterStatus);
+            if (!string.IsNullOrWhiteSpace(_filterStatus) && Enum.TryParse<AppStatus>(_filterStatus, true, out var statusFilter))
+                query = query.Where(a => a.Status == statusFilter);
             if (!string.IsNullOrWhiteSpace(_filterUpdatedBy))
                 query = query.Where(a => a.UpdatedBy != null && 
                              a.UpdatedBy.Contains(_filterUpdatedBy, StringComparison.CurrentCultureIgnoreCase));
@@ -259,10 +258,16 @@ public partial class Applications
         _newAppWsdlPath = app.WsdlPath;
         _newAppDescription = app.Description;
         _newAppStatus = app.Status;
-        _newAuthType = app.AuthType;
-        _newAuthUsername = app.AuthUsername;
-        _newAuthPassword = app.AuthPassword;
-        _newAuthExtra = app.AuthExtra;
+        _newAuth = new SoapAuthConfig
+        {
+            Type = app.Auth.Type,
+            Username = app.Auth.Username,
+            Password = app.Auth.Password,
+            KeyName = app.Auth.KeyName,
+            KeyValue = app.Auth.KeyValue,
+            Token = app.Auth.Token,
+            Domain = app.Auth.Domain
+        };
         _newApis = [..app.Apis];
         _expandedActionRows.Remove(app.Id);
         _validationErrors = [];
@@ -339,10 +344,7 @@ public partial class Applications
                 _editingApp.UpdatedBy,
                 _editingApp.UpdatedAt,
                 _newApis.Count,
-                _newAuthType,
-                _newAuthUsername.Trim(),
-                _newAuthPassword.Trim(),
-                _newAuthExtra.Trim(),
+                BuildAuthConfig(),
                 [.._newApis]
             );
             _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != _editingApp.Id), updatedApp]);
@@ -362,10 +364,7 @@ public partial class Applications
                 null,
                 null,
                 _newApis.Count,
-                _newAuthType,
-                _newAuthUsername.Trim(),
-                _newAuthPassword.Trim(),
-                _newAuthExtra.Trim(),
+                BuildAuthConfig(),
                 [.._newApis]
             );
             _appStore.UpdateApps([.._appStore.Apps, newApp]);
@@ -394,12 +393,40 @@ public partial class Applications
         _newAppUrl = "";
         _newAppWsdlPath = "";
         _newAppDescription = "";
-        _newAppStatus = "enabled";
-        _newAuthType = "basic";
-        _newAuthUsername = "";
-        _newAuthPassword = "";
-        _newAuthExtra = "";
+        _newAppStatus = AppStatus.Enabled;
+        _newAuth = new SoapAuthConfig { Type = AuthType.Basic };
         _newApis = [];
+    }
+
+    /// <summary>
+    /// Builds a <see cref="SoapAuthConfig"/> from the current form state,
+    /// populating only the fields relevant to the selected <see cref="AuthType"/>.
+    /// </summary>
+    private SoapAuthConfig BuildAuthConfig()
+    {
+        var auth = new SoapAuthConfig { Type = _newAuth.Type };
+        switch (_newAuth.Type)
+        {
+            case AuthType.Basic:
+                auth.Username = _newAuth.Username?.Trim();
+                auth.Password = _newAuth.Password?.Trim();
+                break;
+            case AuthType.ApiKey:
+                auth.KeyName = _newAuth.KeyName?.Trim();
+                auth.KeyValue = _newAuth.KeyValue?.Trim();
+                break;
+            case AuthType.Bearer:
+                auth.Token = _newAuth.Token?.Trim();
+                break;
+            case AuthType.Ntlm:
+                auth.Username = _newAuth.Username?.Trim();
+                auth.Password = _newAuth.Password?.Trim();
+                auth.Domain = _newAuth.Domain?.Trim();
+                break;
+            case AuthType.None:
+                break;
+        }
+        return auth;
     }
 
     private void HandleResetSort()
