@@ -261,6 +261,12 @@ public partial class Templates : IAsyncDisposable
         await LoadTemplatesAsync();
     }
 
+    private void OnActionRowClosed(string rowId)
+    {
+        _expandedActionRows.Remove(rowId);
+        StateHasChanged();
+    }
+
     // ── Data Loading ──
 
     private async Task LoadTemplatesAsync()

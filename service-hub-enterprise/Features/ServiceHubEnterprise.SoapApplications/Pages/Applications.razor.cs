@@ -83,6 +83,7 @@ public partial class Applications : IDisposable
     private List<SoapApiEntry> _newApis = [];
     private bool _showDropdown = false;
     private HashSet<string> _expandedActionRows = [];
+    private HashSet<string> _selectedIds = [];
     private SoapApp? _editingApp = null;
     private string _sortColumn = "";
     private bool _sortAscending = true;
@@ -282,6 +283,12 @@ public partial class Applications : IDisposable
         _expandedActionRows.Remove(app.Id);
         _validationErrors = [];
         _showAddModal = true;
+    }
+
+    private void OnActionRowClosed(string rowId)
+    {
+        _expandedActionRows.Remove(rowId);
+        StateHasChanged();
     }
 
     private void HandleAddApplication()
@@ -549,10 +556,10 @@ public partial class Applications : IDisposable
         }
     }
 
-    /// <summary>Serializes the row as JSON, redacting secret auth values.</summary>
-    private static string BuildJsonRow(SoapApp app)
+    /// <summary>Returns a copy of the app with secret auth values redacted.</summary>
+    private static SoapApp ToRedacted(SoapApp app)
     {
-        var safe = app with
+        return app with
         {
             Auth = new SoapAuthConfig
             {
@@ -565,8 +572,11 @@ public partial class Applications : IDisposable
                 Domain = app.Auth.Domain
             }
         };
-        return JsonSerializer.Serialize(safe, new JsonSerializerOptions { WriteIndented = true });
     }
+
+    /// <summary>Serializes the row as JSON, redacting secret auth values.</summary>
+    private static string BuildJsonRow(SoapApp app)
+        => JsonSerializer.Serialize(ToRedacted(app), new JsonSerializerOptions { WriteIndented = true });
 
     /// <summary>Builds a single CSV line from the safe (non-secret) row fields.</summary>
     private static string BuildCsvRow(SoapApp app)
@@ -585,6 +595,114 @@ public partial class Applications : IDisposable
     private static string CsvField(string value) => $"\"{(value ?? "").Replace("\"", "\"\"")}\"";
 
     private static string? Redact(string? value) => string.IsNullOrEmpty(value) ? value : "***";
+
+    // ── Export / Bulk Actions ──
+
+    private async Task DownloadTextFileAsync(string content, string fileName, string mimeType)
+    {
+        try
+        {
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/ServiceHubEnterprise.SoapApplications/js/download.js");
+            try
+            {
+                await module.InvokeVoidAsync("downloadTextFile", content, fileName, mimeType);
+            }
+            finally
+            {
+                await module.DisposeAsync();
+            }
+        }
+        catch
+        {
+            ShowToast("Export failed — file download unavailable", "danger");
+        }
+    }
+
+    private async Task ExportToCsvAsync()
+    {
+        _showDropdown = false;
+        var apps = FilteredApps;
+        if (apps.Length == 0)
+        {
+            ShowToast("No data to export", "danger");
+            return;
+        }
+
+        const string header = "Id,Name,BaseUrl,WsdlPath,Description,Status,CreatedBy,CreatedAt,UpdatedBy,UpdatedAt,ApisCount,AuthType";
+        var lines = new List<string>(apps.Length + 1) { header };
+        lines.AddRange(apps.Select(BuildCsvRow));
+        await DownloadTextFileAsync(string.Join("\r\n", lines), "soap-applications.csv", "text/csv");
+        ShowToast($"{apps.Length} application(s) exported as CSV");
+    }
+
+    private async Task ExportToJsonAsync()
+    {
+        _showDropdown = false;
+        var apps = FilteredApps;
+        if (apps.Length == 0)
+        {
+            ShowToast("No data to export", "danger");
+            return;
+        }
+
+        var json = JsonSerializer.Serialize(apps.Select(ToRedacted).ToArray(), new JsonSerializerOptions { WriteIndented = true });
+        await DownloadTextFileAsync(json, "soap-applications.json", "application/json");
+        ShowToast($"{apps.Length} application(s) exported as JSON");
+    }
+
+    private async Task DeleteSelectedAsync()
+    {
+        _showDropdown = false;
+        if (_selectedIds.Count == 0)
+        {
+            ShowToast("Select at least one application to delete", "danger");
+            return;
+        }
+
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete {_selectedIds.Count} selected application(s)? This cannot be undone.");
+        if (!confirmed) return;
+
+        _appStore.UpdateApps([.._appStore.Apps.Where(a => !_selectedIds.Contains(a.Id))]);
+        _allApps = _appStore.Apps;
+
+        _expandedActionRows.RemoveWhere(_selectedIds.Contains);
+        _selectedIds.Clear();
+        if (_editingApp is not null && _allApps.All(a => a.Id != _editingApp.Id))
+        {
+            _showAddModal = false;
+            _editingApp = null;
+        }
+
+        // PageSize is 5 (see ServiceHubGrid PageSize="5"); clamp to the new last page.
+        var totalPages = Math.Max(1, (int)Math.Ceiling(FilteredApps.Length / 5.0));
+        if (_currentPage > totalPages) _currentPage = totalPages;
+
+        ShowToast("Selected application(s) deleted", "danger");
+    }
+
+    private void ExpandSelected()
+    {
+        _showDropdown = false;
+        if (_selectedIds.Count == 0)
+        {
+            ShowToast("Select at least one row to expand", "danger");
+            return;
+        }
+        _grid?.SetRowsExpanded(_selectedIds, expanded: true);
+        ShowToast($"{_selectedIds.Count} row(s) expanded");
+    }
+
+    private void CollapseSelected()
+    {
+        _showDropdown = false;
+        if (_selectedIds.Count == 0)
+        {
+            ShowToast("Select at least one row to collapse", "danger");
+            return;
+        }
+        _grid?.SetRowsExpanded(_selectedIds, expanded: false);
+        ShowToast($"{_selectedIds.Count} row(s) collapsed");
+    }
 
     // ── Toast ──
 

@@ -217,6 +217,12 @@ public partial class RequestFiles
         _errorMessage = null;
     }
 
+    private void OnActionRowClosed(string rowId)
+    {
+        _expandedActionRows.Remove(rowId);
+        StateHasChanged();
+    }
+
     private void AddUploadFileEntry()
     {
         _uploadFiles = [.._uploadFiles, new UploadFileEntry()];

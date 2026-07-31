@@ -52,6 +52,7 @@ else
                     @bind-ShowFilterModal="_showFilterModal"
                     FilterApplied="OnFilterApplied"
                     RowIdSelector="@(f => f.FileName)"
+                    ActionRowClosed="OnActionRowClosed"
                     Columns="@_columns">
 
     <ToolbarCenter>

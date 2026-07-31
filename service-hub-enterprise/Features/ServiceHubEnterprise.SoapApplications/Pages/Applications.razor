@@ -52,10 +52,12 @@ else
                 @bind-CurrentPage="_currentPage"
                 @bind-SearchText="_searchText"
                 @bind-ShowFilterModal="_showFilterModal"
+                @bind-SelectedIds="_selectedIds"
                 FilterApplied="OnFilterApplied"
                 RowIdSelector="@(app => app.Id)"
                 ContextMenuItemsProvider="@GetAppContextMenuItems"
                 ContextMenuItemClicked="@HandleContextMenuAction"
+                ActionRowClosed="OnActionRowClosed"
                 Columns="@_columns">
 
     <ToolbarCenter>
@@ -82,16 +84,16 @@ else
                 <div class="dropdown-menu-dg">
                     <div class="py-1">
                         <div class="dropdown-header-dg">Export</div>
-                        <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
+                        <button class="btn dropdown-item-dg" @onclick="ExportToCsvAsync" type="button">
                             <i class="bi bi-download"></i>
                             Export to CSV
                         </button>
-                        <button class="btn dropdown-item-dg" @onclick="() => _showDropdown = false" type="button">
+                        <button class="btn dropdown-item-dg" @onclick="ExportToJsonAsync" type="button">
                             <i class="bi bi-download"></i>
                             Export to JSON
                         </button>
                         <div class="dropdown-divider-dg"></div>
-                        <button class="btn dropdown-item-dg dropdown-item-sh-danger" @onclick="() => _showDropdown = false" type="button">
+                        <button class="btn dropdown-item-dg dropdown-item-sh-danger" @onclick="DeleteSelectedAsync" type="button">
                             <i class="bi bi-trash3"></i>
                             Delete Selected
                         </button>
@@ -111,13 +113,13 @@ else
                         </button>
                         <div class="dropdown-divider-dg"></div>
                         <button class="btn dropdown-item-dg"
-                                @onclick="() => { _showDropdown = false; }"
+                                @onclick="ExpandSelected"
                                 type="button">
                             <i class="bi bi-arrows-expand"></i>
                             Expand Selected
                         </button>
                         <button class="btn dropdown-item-dg"
-                                @onclick="() => { _showDropdown = false; }"
+                                @onclick="CollapseSelected"
                                 type="button">
                             <i class="bi bi-arrows-collapse"></i>
                             Collapse Selected

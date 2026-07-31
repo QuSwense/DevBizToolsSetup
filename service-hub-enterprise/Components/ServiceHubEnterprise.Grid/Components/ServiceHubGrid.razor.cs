@@ -66,6 +66,13 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
     [Parameter] public EventCallback<(string action, TItem item)> ContextMenuItemClicked { get; set; }
 
     /// <summary>
+    /// Invoked when a Blazor-managed row action menu is dismissed by an outside
+    /// click (see actions.js). Receives the row id so the consumer can clear its
+    /// own open-state (e.g. _expandedActionRows) and keep it in sync with the DOM.
+    /// </summary>
+    [Parameter] public EventCallback<string> ActionRowClosed { get; set; }
+
+    /// <summary>
     /// Optional function that returns context menu items for a given row dynamically.
     /// Each item: { action, label, icon?, danger?, disabled?, type? }
     /// Return null/empty to show no menu for that row.
@@ -327,13 +334,13 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
 
         try
         {
-            // Register this grid's DotNet reference so JS (grid.js) can drive a Blazor-managed
-            // right-click context menu. JS looks the reference up lazily at right-click time.
-            if (EnableContextMenu)
-            {
-                _dotNetRef = DotNetObjectReference.Create(this);
-                await JS.InvokeVoidAsync("ServiceHubContextMenuRegistry.set", GridId, _dotNetRef, _instanceId);
-            }
+            // Register this grid's DotNet reference so JS (grid.js / actions.js) can drive a
+            // Blazor-managed right-click context menu and keep Blazor-managed row action menus
+            // in sync with the DOM. JS looks the reference up lazily at interaction time to avoid
+            // initialization timing races. Registered unconditionally so grids that don't enable
+            // the context menu still get the action-menu close-sync bridge.
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("ServiceHubContextMenuRegistry.set", GridId, _dotNetRef, _instanceId);
 
             // Ensure the JS grid (and context menu) is attached even when this grid renders
             // after site.js's DOMContentLoaded / blazor.navigated scan has already run.
@@ -371,6 +378,13 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
         await ContextMenuItemClicked.InvokeAsync((action, item));
     }
 
+    /// <summary>
+    /// Called from JS (actions.js) when a Blazor-managed row action menu is closed
+    /// by an outside click, so the consumer can clear its open-row state.
+    /// </summary>
+    [JSInvokable]
+    public Task CloseBlazorActionRow(string rowId) => ActionRowClosed.InvokeAsync(rowId);
+
     private TItem? FindItem(string rowId)
     {
         if (Items is null) return default;
@@ -385,6 +399,18 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
     public void ExpandRow(string rowId)
     {
         _expandedIds.Add(rowId);
+        StateHasChanged();
+    }
+
+    /// <summary>Expands or collapses the detail rows for the given row ids (used by bulk menu actions).</summary>
+    public void SetRowsExpanded(IEnumerable<string> rowIds, bool expanded)
+    {
+        if (rowIds is null) return;
+        foreach (var rowId in rowIds)
+        {
+            if (expanded) _expandedIds.Add(rowId);
+            else _expandedIds.Remove(rowId);
+        }
         StateHasChanged();
     }
 

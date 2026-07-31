@@ -126,7 +126,7 @@ class ServiceHubRowActions {
             // Close any open action wrap (row, header, or footer)
             const actionWraps = '.row-actions-wrap, .header-actions-wrap, .footer-actions-wrap';
             if (!e.target.closest(actionWraps)) {
-                document.querySelectorAll(actionWraps + '.is-open').forEach(el => el.classList.remove('is-open'));
+                document.querySelectorAll(actionWraps + '.is-open').forEach(el => this._closeActionWrap(el));
             }
             if (!e.target.closest('#' + this.container.id + '-contextMenu')) {
                 this.hideContextMenu();
@@ -137,14 +137,40 @@ class ServiceHubRowActions {
         document.addEventListener('click', this._boundCloseAllActions);
     }
 
+    /**
+     * Close a single action wrap (row/header/footer). For Blazor-managed wraps this
+     * also notifies the owning grid component so its Blazor-side open-state
+     * (e.g. a page's _expandedActionRows) stays in sync with the DOM. Without this,
+     * an outside click that dismisses the menu leaves stale Blazor state behind, so
+     * the next trigger click would be a no-op and the menu would never reopen.
+     */
+    _closeActionWrap(wrap) {
+        if (!wrap) return;
+        const wasOpen = wrap.classList.contains('is-open');
+        wrap.classList.remove('is-open');
+        const panel = wrap.querySelector(this.options.inlineActionsSelector);
+        if (panel) panel.classList.remove('visible');
+
+        if (wasOpen && wrap.classList.contains('blazor-managed')) {
+            const row = wrap.closest('tr[data-row-id]');
+            const rowId = row ? row.dataset.rowId : null;
+            const gridEl = wrap.closest('.datagrid-card');
+            const gridId = gridEl ? (gridEl.dataset.gridId || gridEl.id) : null;
+            const ref = gridId && window.ServiceHubContextMenuRegistry
+                ? window.ServiceHubContextMenuRegistry.get(gridId)
+                : null;
+            if (ref && rowId && typeof ref.invokeMethodAsync === 'function') {
+                ref.invokeMethodAsync('CloseBlazorActionRow', rowId).catch(() => {});
+            }
+        }
+    }
+
     /** Close all visible action panels. */
     _closeAllActionMenus() {
-        this.container.querySelectorAll(`${this.options.inlineActionsSelector}.visible`).forEach(el => {
-            el.classList.remove('visible');
-        });
-        this.container.querySelectorAll('.row-actions-wrap.is-open, .header-actions-wrap.is-open, .footer-actions-wrap.is-open').forEach(el => {
-            el.classList.remove('is-open');
-        });
+        this.container.querySelectorAll('.row-actions-wrap.is-open, .header-actions-wrap.is-open, .footer-actions-wrap.is-open')
+            .forEach(el => this._closeActionWrap(el));
+        this.container.querySelectorAll(`${this.options.inlineActionsSelector}.visible`)
+            .forEach(el => el.classList.remove('visible'));
     }
 
     /** Hide the context menu associated with this grid, if one is open. */
