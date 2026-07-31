@@ -1,0 +1,71 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<SectionCard Title="Test Suites" Icon="🧪" Subtitle="Current status & run history">
+    <HeaderActions>
+        @if (SuiteNames.Count > 0)
+        {
+            <select class="datepicker-input suite-select" @bind="_selectedSuite">
+                @foreach (var name in SuiteNames)
+                {
+                    <option value="@name">@name</option>
+                }
+            </select>
+        }
+    </HeaderActions>
+    <ChildContent>
+    <div class="kpi-grid">
+        <KpiTile Label="Total Suites" Value="@TotalSuites.ToString()" Icon="🧪" />
+        <KpiTile Label="Total Cases" Value="@TotalCases.ToString()" Icon="🔢" />
+        <KpiTile Label="Passing" Value="@PassingCases.ToString()" Sub="@($"{TotalCases - PassingCases} failing")" Color="var(--sh-success)" Icon="✅" />
+        <div class="kpi-tile kpi-donut-tile">
+            <div class="kpi-header"><span class="kpi-title">Pass Rate</span></div>
+            <div class="kpi-donut">
+                <MiniDonut Value="@PassingCases" Total="@TotalCases" Label="pass" ValueColor="var(--sh-success)" />
+            </div>
+        </div>
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-heading">Current status</div>
+    <div class="suite-progress">
+        @foreach (var suite in Suites)
+        {
+            var pct = PctFor(suite);
+            <div class="d-flex align-items-center gap-2">
+                <span class="suite-name">@suite.Name</span>
+                <div class="suite-bar">
+                    <div style="width:@(pct)%;height:100%;background:@(pct >= 50 ? "var(--sh-success)" : "var(--sh-warning)");border-radius:4px"></div>
+                </div>
+                <span class="sb-badge @StatusBadgeClass(StatusFor(suite))">@StatusFor(suite)</span>
+                <span class="suite-stats">@suite.PassingCases / @suite.TotalCases</span>
+            </div>
+        }
+    </div>
+    @if (SelectedRuns.Count > 0)
+    {
+        <div class="section-divider"></div>
+        <div class="sub-heading">History — @SelectedSuite</div>
+        <div class="suite-history-meta">
+            <div class="suite-history-chip"><span class="shc-label">Runs</span><span class="shc-value">@RunsCount</span></div>
+            <div class="suite-history-chip"><span class="shc-label">Avg duration</span><span class="shc-value">@AvgDuration</span></div>
+            <div class="suite-history-chip"><span class="shc-label">Last result</span><span class="shc-value"><span class="sb-badge @SelectedRunBadge(LastResult)">@LastResult</span></span></div>
+            <div class="suite-history-chip"><span class="shc-label">Last run</span><span class="shc-value">@LastRunDate</span></div>
+        </div>
+        <div class="app-table suite-runs">
+            <div class="app-table-head">
+                <span>Run</span><span>Date</span><span>Status</span><span>Passed / Total</span><span>Duration</span>
+            </div>
+            @foreach (var run in SelectedRuns.Take(10))
+            {
+                var dt = TryParseTimestamp(run.ExecutedAt);
+                <div class="app-table-row">
+                    <span class="app-table-name">@run.Id</span>
+                    <span class="app-table-muted">@(dt.HasValue ? dt.Value.ToString("MMM dd, HH:mm") : "—")</span>
+                    <span class="sb-badge @SelectedRunBadge(run.Status)">@run.Status</span>
+                    <span class="app-table-muted">@run.PassingCases / @run.TotalCases</span>
+                    <span class="app-table-muted">@FormatDuration(run.DurationMs)</span>
+                </div>
+            }
+        </div>
+    }
+    </ChildContent>
+</SectionCard>

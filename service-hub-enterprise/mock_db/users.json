@@ -1,0 +1,8 @@
+[
+  { "name": "Priya Sharma", "role": "Superuser" },
+  { "name": "Rahul Patel", "role": "User" },
+  { "name": "Anita Desai", "role": "User" },
+  { "name": "Vikram Singh", "role": "User" },
+  { "name": "Suresh Kumar", "role": "User" },
+  { "name": "System", "role": "System" }
+]

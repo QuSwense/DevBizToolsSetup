@@ -1,0 +1,17 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="donut-chart-wrapper" style="width:@(Size)px;height:@(Size)px">
+    <svg viewBox="0 0 42 42" width="@Size" height="@Size">
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-border)" stroke-width="3" />
+        @if (Pct > 0)
+        {
+            <circle cx="21" cy="21" r="15.9155" fill="none" stroke="@ValueColor" stroke-width="3"
+                    stroke-dasharray="@($"{Pct} {100 - Pct}")"
+                    stroke-dashoffset="25" transform="rotate(-90 21 21)" />
+        }
+    </svg>
+    <div class="donut-center">
+        <span class="donut-value">@Pct%</span>
+        <span class="donut-sub">@Label</span>
+    </div>
+</div>

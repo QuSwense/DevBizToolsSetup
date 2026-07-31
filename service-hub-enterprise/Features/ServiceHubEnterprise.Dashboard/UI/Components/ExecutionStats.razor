@@ -3,7 +3,13 @@
 <div class="dash-card position-relative">
     <div class="card-header">
         <span class="card-title">@Title</span>
-        <div class="position-relative">
+        <div class="position-relative d-flex align-items-center gap-2">
+            <button class="meta-pill cursor-pointer border-0 bg-transparent"
+                    style="font-size:16px;padding:2px 6px;line-height:1"
+                    title="@SuiteBreakdownTitle"
+                    @onclick="ToggleSuiteBreakdown">
+                📊
+            </button>
             <button class="meta-pill cursor-pointer border-0 bg-transparent"
                     style="font-size:16px;padding:2px 6px;line-height:1"
                     @onclick="ToggleDatePicker">
@@ -66,37 +72,24 @@
             </div>
         }
     </div>
+    @if (ShowSuiteBreakdown && SuiteStats.Count > 0)
+    {
+        <div class="suite-progress mt-3 border-sh-top pt-3">
+            @foreach (var suite in SuiteStats)
+            {
+                var pct = suite.Total > 0 ? suite.Passing * 100 / suite.Total : 0;
+                var barColor = pct >= 50 ? "var(--sh-success)" : "var(--sh-warning)";
+                <div class="d-flex align-items-center gap-2">
+                    <span class="suite-name">@suite.Name</span>
+                    <div class="suite-bar">
+                        <div style="width:@(pct)%;height:100%;background:@barColor;transition:width .3s">
+                        </div>
+                    </div>
+                    <span class="suite-stats">@suite.Passing / @suite.Total</span>
+                </div>
+            }
+        </div>
+    }
 </div>
 
-@code {
-    private bool _showDatePicker;
-    private DateTime? _selectedDate;
 
-    /// <summary>
-    /// Gets or sets the card title.
-    /// </summary>
-    [Parameter] public string Title { get; set; } = "Executions";
-
-    /// <summary>
-    /// Gets or sets the total number of executions.
-    /// </summary>
-    [Parameter] public int TotalExecutions { get; set; }
-
-    /// <summary>
-    /// Gets or sets the pass rate percentage.
-    /// </summary>
-    [Parameter] public int PassRate { get; set; }
-
-    /// <summary>
-    /// Gets or sets the number of failed executions.
-    /// </summary>
-    [Parameter] public int FailCount { get; set; }
-
-    private void ToggleDatePicker() => _showDatePicker = !_showDatePicker;
-    private void CloseDatePicker() => _showDatePicker = false;
-    private void ClearDateFilter()
-    {
-        _selectedDate = null;
-        _showDatePicker = false;
-    }
-}

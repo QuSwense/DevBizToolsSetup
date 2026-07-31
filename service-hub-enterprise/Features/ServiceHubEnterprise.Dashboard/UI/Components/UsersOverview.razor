@@ -1,0 +1,33 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<SectionCard Title="Users" Icon="👥" Subtitle="Who is using the platform" Filter="@_range" OnFilterChanged="ApplyRange">
+    <div class="kpi-grid">
+        <KpiTile Label="Total Users" Value="@Users.Count.ToString()" Icon="👤" />
+        <KpiTile Label="User Types" Value="@UserTypes.Count.ToString()" Sub="@string.Join(", ", UserTypes)" Icon="🏷️" />
+        <KpiTile Label="Active in Range" Value="@ActiveCount.ToString()" Sub="users with activity" Icon="🟢" />
+        <div class="kpi-tile kpi-donut-tile">
+            <div class="kpi-header"><span class="kpi-title">Active Share</span></div>
+            <div class="kpi-donut">
+                <MiniDonut Value="@ActiveCount" Total="@Users.Count" Label="active" ValueColor="var(--sh-accent)" />
+            </div>
+        </div>
+    </div>
+    @if (TopActiveUsers.Count > 0)
+    {
+        <div class="section-divider"></div>
+        <div class="sub-heading">Top active users</div>
+        <div class="top-users">
+            @foreach (var (user, count) in TopActiveUsers)
+            {
+                var pct = MaxActivityCount > 0 ? count * 100 / MaxActivityCount : 0;
+                <div class="d-flex align-items-center gap-2">
+                    <span class="top-user-name">@user</span>
+                    <div class="suite-bar">
+                        <div style="width:@(pct)%;height:100%;background:var(--sh-accent);border-radius:4px"></div>
+                    </div>
+                    <span class="suite-stats">@count</span>
+                </div>
+            }
+        </div>
+    }
+</SectionCard>

@@ -1,0 +1,6 @@
+[
+  { "name": "Smoke Suite", "totalCases": 6, "passingCases": 2, "totalFiles": 18 },
+  { "name": "Regression Core", "totalCases": 12, "passingCases": 8, "totalFiles": 42 },
+  { "name": "Payment Full", "totalCases": 4, "passingCases": 3, "totalFiles": 15 },
+  { "name": "SOAP Billing", "totalCases": 3, "passingCases": 2, "totalFiles": 9 }
+]

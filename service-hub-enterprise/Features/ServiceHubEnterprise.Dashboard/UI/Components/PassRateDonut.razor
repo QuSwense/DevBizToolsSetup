@@ -1,0 +1,39 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="dash-card">
+    <div class="card-header">
+        <span class="card-title">@Title</span>
+        <small class="text-sh-faint">@Passing / @Total cases</small>
+    </div>
+    <div class="donut-body">
+        <div class="donut-chart-wrapper">
+            <svg viewBox="0 0 42 42" width="100" height="100">
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-border)" stroke-width="3" />
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-success)" stroke-width="3"
+                        stroke-dasharray="@($"{PassPct} {FailPct}")"
+                        stroke-dashoffset="25"
+                        transform="rotate(-90 21 21)" />
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--sh-warning)" stroke-width="3"
+                        stroke-dasharray="@($"{FailPct} {PassPct}")"
+                        stroke-dashoffset="@(25 + PassPct)"
+                        transform="rotate(-90 21 21)" />
+            </svg>
+            <div class="donut-center">
+                <span class="donut-value">@PassPct%</span>
+                <span class="donut-sub">pass</span>
+            </div>
+        </div>
+        <div class="donut-legend">
+            <div class="donut-legend-item">
+                <span class="legend-dot bg-sh-success"></span>
+                <span class="legend-label">Passing</span>
+                <span class="legend-count">@Passing</span>
+            </div>
+            <div class="donut-legend-item">
+                <span class="legend-dot bg-sh-warning"></span>
+                <span class="legend-label">Failing</span>
+                <span class="legend-count">@Failing</span>
+            </div>
+        </div>
+    </div>
+</div>

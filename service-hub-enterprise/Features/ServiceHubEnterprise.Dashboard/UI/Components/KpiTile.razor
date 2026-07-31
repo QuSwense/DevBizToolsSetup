@@ -1,0 +1,16 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="kpi-tile">
+    <div class="kpi-header">
+        <span class="kpi-title">@Label</span>
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <span class="kpi-icon">@Icon</span>
+        }
+    </div>
+    <div class="kpi-value" style="@(string.IsNullOrEmpty(Color) ? string.Empty : $"color:{Color}")">@Value</div>
+    @if (!string.IsNullOrEmpty(Sub))
+    {
+        <div class="kpi-sub">@Sub</div>
+    }
+</div>

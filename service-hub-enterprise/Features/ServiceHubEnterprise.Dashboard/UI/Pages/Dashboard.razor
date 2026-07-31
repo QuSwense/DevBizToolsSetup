@@ -1,85 +1,57 @@
 @page "/"
 
-<div class="dashboard-grid">
-    <!-- Stats Cards Row -->
-    <DashboardMetrics Metrics="@StatsCards" />
-
-    <!-- Files Breakdown -->
-    <FileTypeBreakdown Title="📁 Files"
-                       UnitLabel="request files"
-                       FileTypes="@FileTypes" />
-
-    <!-- Test Suites Progress -->
-    <TestSuiteProgress PassingSummary="25 / 84 passing"
-                       Suites="@TestSuites" />
-
-    <!-- Executions Stats -->
-    <ExecutionStats TotalExecutions="516"
-                    PassRate="87"
-                    FailCount="77" />
-
-    <!-- Service Health -->
-    <ServiceHealth Services="@HealthServices" />
-</div>
-
-<!-- Recent Activity - Full width -->
-<RecentActivity Title="Recent Activity"
-                ShowViewAll="true"
-                ViewAllHref="#"
-                Activities="@ActivityLog" />
-
-<!-- Quick Actions - Full width row -->
-<div class="dashboard-grid">
-    <QuickActions Actions="@QuickActionItems" />
-</div>
-
-@code {
-    private static readonly IReadOnlyList<DashboardMetrics.MetricItem> StatsCards = new[]
-    {
-        new DashboardMetrics.MetricItem("REST Apps", "4", "3 enabled, 1 disabled", "var(--sh-accent)"),
-        new DashboardMetrics.MetricItem("SOAP Apps", "2", "1 enabled, 1 disabled", "var(--sh-text)"),
-        new DashboardMetrics.MetricItem("Test Suites", "4", "25 / 84 cases passing", "var(--sh-success)")
-    };
-
-    private static readonly IReadOnlyList<FileTypeBreakdown.FileTypeItem> FileTypes = new[]
-    {
-        new FileTypeBreakdown.FileTypeItem("JSON", 2, "#3b82f6"),
-        new FileTypeBreakdown.FileTypeItem("XML", 2, "#8b5cf6"),
-        new FileTypeBreakdown.FileTypeItem("REST", 3, "#10b981"),
-        new FileTypeBreakdown.FileTypeItem("SOAP", 1, "#f59e0b")
-    };
-
-    private static readonly IReadOnlyList<TestSuiteProgress.TestSuiteItem> TestSuites = new[]
-    {
-        new TestSuiteProgress.TestSuiteItem("Smoke Suite", 6, 18),
-        new TestSuiteProgress.TestSuiteItem("Regression Core", 12, 42),
-        new TestSuiteProgress.TestSuiteItem("Payment Full", 4, 15),
-        new TestSuiteProgress.TestSuiteItem("SOAP Billing", 3, 9)
-    };
-
-    private static readonly IReadOnlyList<ServiceHealth.HealthServiceItem> HealthServices = new[]
-    {
-        new ServiceHealth.HealthServiceItem("Payment Gateway", "ok"),
-        new ServiceHealth.HealthServiceItem("User API", "ok"),
-        new ServiceHealth.HealthServiceItem("Billing SOAP", "down"),
-        new ServiceHealth.HealthServiceItem("Inventory", "ok"),
-        new ServiceHealth.HealthServiceItem("Shipping SOAP", "down")
-    };
-
-    private static readonly IReadOnlyList<RecentActivity.ActivityEntry> ActivityLog = new[]
-    {
-        new RecentActivity.ActivityEntry("Priya Sharma", "created application PaymentService", "2 hours ago"),
-        new RecentActivity.ActivityEntry("Rahul Patel", "executed Test Suite Smoke Suite and 12 files passed", "2 hours ago"),
-        new RecentActivity.ActivityEntry("Anita Desai", "disabled application InventoryAPI", "5 hours ago"),
-        new RecentActivity.ActivityEntry("Vikram Singh", "added 3 new APIs to OrderService", "yesterday"),
-        new RecentActivity.ActivityEntry("Suresh Kumar", "imported WSDL for LegacyBilling and 3 operations synced", "yesterday"),
-        new RecentActivity.ActivityEntry("Priya Sharma", "created template Payment Success Template", "1 day ago"),
-        new RecentActivity.ActivityEntry("System", "detected Billing SOAP service down", "2 hours ago")
-    };
-
-    private static readonly IReadOnlyList<QuickActions.QuickActionItem> QuickActionItems = new[]
-    {
-        new QuickActions.QuickActionItem("File Library", "/File/Library", "bi bi-file-earmark"),
-        new QuickActions.QuickActionItem("Execute History", "/Rest/ExecuteHistory", "bi bi-clock-history")
-    };
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading dashboard...</span>
+        </div>
+    </div>
 }
+else if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Failed to load dashboard:</strong> @_errorMessage
+    </div>
+}
+else if (_viewModel.IsLoaded)
+{
+    <div class="dashboard-stack">
+        <!-- Users -->
+        <UsersOverview Users="@_viewModel.Users"
+                       Activities="@_viewModel.UserActivities" />
+
+        <!-- REST Applications -->
+        <RestAppsOverview Apps="@_viewModel.RestApps"
+                          RequestFiles="@_viewModel.RestRequestFiles"
+                          Executions="@_viewModel.RequestExecutions" />
+
+        <!-- SOAP Applications -->
+        <SoapAppsOverview Apps="@_viewModel.SoapApps"
+                          RequestFiles="@_viewModel.RequestFiles"
+                          WsdlRecords="@_viewModel.WsdlRecords"
+                          Executions="@_viewModel.RequestExecutions" />
+
+        <!-- Test Suites -->
+        <TestSuitesOverview Suites="@_viewModel.TestSuites"
+                            History="@_viewModel.TestSuiteHistory" />
+
+        <!-- Service Health -->
+        <ServiceHealthOverview Services="@_viewModel.HealthServices"
+                               Uptime="@_viewModel.ServiceUptime" />
+
+        <!-- Recent Activity -->
+        <RecentActivity Title="Recent Activity"
+                        ShowViewAll="true"
+                        ViewAllHref="#"
+                        Activities="@BuildActivityLog()"
+                        Users="@BuildUserNames()" />
+
+        <!-- Quick Actions -->
+        <div class="dashboard-grid">
+            <QuickActions Actions="@QuickActionItems" />
+        </div>
+    </div>
+}
+
+

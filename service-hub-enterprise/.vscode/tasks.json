@@ -1,53 +1,83 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build-webapp",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "build",
-        "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
-      ],
-      "group": "build",
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "run-webapp",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "isBackground": true,
-      "problemMatcher": []
-    },
-    {
-      "label": "watch-webapp",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "watch",
-        "run",
-        "--project",
-        "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build-webapp",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
+			],
+			"group": "build",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "run-webapp",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "watch-webapp",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"watch",
+				"run",
+				"--project",
+				"${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			}
+		},
+		{
+			"label": "build-dashboard",
+			"type": "shell",
+			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
+			"group": "build"
+		},
+		{
+			"label": "build-webapp-full",
+			"type": "shell",
+			"command": "dotnet build WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj",
+			"group": "build"
+		},
+		{
+			"label": "build-dashboard-final",
+			"type": "shell",
+			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
+			"group": "build"
+		},
+		{
+			"label": "build-solution-final",
+			"type": "shell",
+			"command": "dotnet build WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj",
+			"group": "build"
+		},
+		{
+			"label": "build-dashboard",
+			"type": "shell",
+			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
+			"group": "build"
+		}
+	]
 }

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "r1",
+    "name": "PaymentService",
+    "baseUrl": "https://api.payments.com/v1",
+    "description": "Payment processing REST API",
+    "status": "enabled",
+    "createdBy": "Priya Sharma",
+    "createdAt": "2024-02-10",
+    "updatedBy": "Rahul Patel",
+    "updatedAt": "2024-06-20",
+    "apisCount": 8
+  },
+  {
+    "id": "r2",
+    "name": "InventoryAPI",
+    "baseUrl": "https://api.inventory.com/v2",
+    "description": "Inventory management REST API",
+    "status": "disabled",
+    "createdBy": "Vikram Singh",
+    "createdAt": "2024-03-05",
+    "updatedBy": "Anita Desai",
+    "updatedAt": "2024-05-18",
+    "apisCount": 5
+  },
+  {
+    "id": "r3",
+    "name": "OrderService",
+    "baseUrl": "https://api.orders.com/v1",
+    "description": "Order lifecycle REST API",
+    "status": "enabled",
+    "createdBy": "Suresh Kumar",
+    "createdAt": "2024-01-22",
+    "updatedBy": "Priya Sharma",
+    "updatedAt": "2024-06-10",
+    "apisCount": 6
+  },
+  {
+    "id": "r4",
+    "name": "UserService",
+    "baseUrl": "https://api.users.com/v1",
+    "description": "User profile and auth REST API",
+    "status": "enabled",
+    "createdBy": "Rahul Patel",
+    "createdAt": "2024-04-12",
+    "updatedBy": "Anita Desai",
+    "updatedAt": "2024-06-25",
+    "apisCount": 4
+  }
+]

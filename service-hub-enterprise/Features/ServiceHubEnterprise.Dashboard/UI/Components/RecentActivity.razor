@@ -1,20 +1,28 @@
 @namespace ServiceHubEnterprise.Dashboard.UI.Components
 
-<div class="dash-card activity-row">
-    <div class="card-header">
-        <span class="card-title">@Title</span>
+<SectionCard Title="@Title" Icon="🕘" Filter="@_range" OnFilterChanged="ApplyRange">
+    <HeaderActions>
+        @if (Users.Count > 0)
+        {
+            <select class="datepicker-input user-select" @bind="_userFilter">
+                <option value="">All users</option>
+                @foreach (var user in Users)
+                {
+                    <option value="@user">@user</option>
+                }
+            </select>
+        }
         @if (ShowViewAll)
         {
             <a href="@ViewAllHref" class="quick-action-link fs-11">View All</a>
         }
-    </div>
+    </HeaderActions>
+    <ChildContent>
     <div class="activity-body">
-        @foreach (var entry in Activities)
+        @foreach (var entry in Filtered)
         {
             <div class="activity-item">
-                <div class="activity-avatar">
-                    @entry.User.Substring(0, Math.Min(2, entry.User.Length)).ToUpper()
-                </div>
+                <div class="activity-avatar">@entry.User.Substring(0, Math.Min(2, entry.User.Length)).ToUpper()</div>
                 <div class="flex-fill" style="min-width:0">
                     <span class="activity-user">@entry.User</span>
                     <span class="activity-action">@entry.Action</span>
@@ -22,37 +30,12 @@
                 <span class="activity-time">@entry.Time</span>
             </div>
         }
+        @if (!Filtered.Any())
+        {
+            <div class="activity-empty">No recent activity.</div>
+        }
     </div>
-    @if (Activities.Count == 0)
-    {
-        <div class="activity-empty">No recent activity.</div>
-    }
-</div>
+    </ChildContent>
+</SectionCard>
 
-@code {
-    /// <summary>
-    /// Gets or sets the card title.
-    /// </summary>
-    [Parameter] public string Title { get; set; } = "Recent Activity";
 
-    /// <summary>
-    /// Gets or sets whether to show the "View All" link.
-    /// </summary>
-    [Parameter] public bool ShowViewAll { get; set; }
-
-    /// <summary>
-    /// Gets or sets the "View All" link href.
-    /// </summary>
-    [Parameter] public string ViewAllHref { get; set; } = "#";
-
-    /// <summary>
-    /// Gets or sets the list of recent activity entries to display.
-    /// </summary>
-    [Parameter]
-    public IReadOnlyList<ActivityEntry> Activities { get; set; } = Array.Empty<ActivityEntry>();
-
-    /// <summary>
-    /// Represents a single activity log entry.
-    /// </summary>
-    public record ActivityEntry(string User, string Action, string Time);
-}

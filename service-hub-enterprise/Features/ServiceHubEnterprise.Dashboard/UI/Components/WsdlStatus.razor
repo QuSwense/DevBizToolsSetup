@@ -1,0 +1,25 @@
+@namespace ServiceHubEnterprise.Dashboard.UI.Components
+
+<div class="dash-card">
+    <div class="card-header">
+        <span class="card-title">@Title</span>
+        <small class="text-sh-faint">@SyncedCount / @Items.Count synced</small>
+    </div>
+    <div class="wsdl-status-list">
+        @foreach (var item in Items)
+        {
+            <div class="wsdl-status-item">
+                <span class="status-dot" style="background:@(item.Synced ? "var(--sh-success)" : "var(--sh-warning)")"></span>
+                <div class="flex-fill" style="min-width:0">
+                    <span class="wsdl-app">@item.AppName</span>
+                    <span class="wsdl-meta">Last updated @item.LastUpdated · @item.VersionCount version@(item.VersionCount == 1 ? "" : "s")</span>
+                </div>
+                <span class="status-badge @(item.Synced ? "status-enabled" : "status-down")">@item.Status</span>
+            </div>
+        }
+    </div>
+    @if (Items.Count == 0)
+    {
+        <div class="activity-empty">No WSDL records.</div>
+    }
+</div>
