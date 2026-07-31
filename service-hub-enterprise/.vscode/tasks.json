@@ -50,6 +50,31 @@
 			}
 		},
 		{
+			"label": "test",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"${workspaceFolder}/tests/ServiceHubEnterprise.Tests/ServiceHubEnterprise.Tests.csproj"
+			],
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "test-coverage",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"${workspaceFolder}/tests/ServiceHubEnterprise.Tests/ServiceHubEnterprise.Tests.csproj",
+				"--collect:XPlat Code Coverage",
+				"--results-directory",
+				"${workspaceFolder}/coverage"
+			],
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
 			"label": "build-dashboard",
 			"type": "shell",
 			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",

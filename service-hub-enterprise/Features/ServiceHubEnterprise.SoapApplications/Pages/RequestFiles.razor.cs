@@ -188,6 +188,16 @@ public partial class RequestFiles
 
     // ── Data Loading ──
 
+    /// <summary>
+    /// Reads the simulated network delay for the loading skeleton from configuration
+    /// (MockDb:RequestFilesDelayMs, default 1500). Tests set it to 0 for fast runs.
+    /// </summary>
+    private int GetRequestFilesDelayMs()
+    {
+        var raw = Config["MockDb:RequestFilesDelayMs"];
+        return int.TryParse(raw, out var ms) ? ms : 1500;
+    }
+
     private async Task LoadFilesAsync()
     {
         _isLoading = true;
@@ -195,8 +205,13 @@ public partial class RequestFiles
         _errorMessage = null;
         try
         {
-            // Simulate network/server delay so the loading skeleton is visible
-            await Task.Delay(1500);
+            // Simulate network/server delay so the loading skeleton is visible.
+            // The delay is configurable (MockDb:RequestFilesDelayMs) so tests can run fast.
+            var delayMs = GetRequestFilesDelayMs();
+            if (delayMs > 0)
+            {
+                await Task.Delay(delayMs);
+            }
 
             _files = await _mockDbLoader.LoadJsonAsync<RequestFile[]>("request-files.json");
         }

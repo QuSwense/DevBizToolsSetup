@@ -9,6 +9,9 @@
     <Project Path="Features/ServiceHubEnterprise.SoapApplications/ServiceHubEnterprise.SoapApplications.csproj" />
     <Project Path="Features/ServiceHubEnterprise.TestSuite/ServiceHubEnterprise.TestSuite.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ServiceHubEnterprise.Tests/ServiceHubEnterprise.Tests.csproj" />
+  </Folder>
   <Folder Name="/WebApp/">
     <Project Path="WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj" />
   </Folder>
