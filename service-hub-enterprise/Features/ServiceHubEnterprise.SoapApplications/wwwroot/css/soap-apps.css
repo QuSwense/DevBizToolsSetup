@@ -1063,6 +1063,54 @@
     z-index: 10000;
 }
 
+/* ── Transient feedback toast ── */
+.sh-toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 360px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sh-text);
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    box-shadow: var(--sh-shadow-md);
+    cursor: pointer;
+    animation: sh-toast-in .18s ease-out;
+}
+
+.sh-toast i {
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.sh-toast-success {
+    border-color: var(--sh-success-border);
+}
+
+.sh-toast-success i {
+    color: var(--sh-success);
+}
+
+.sh-toast-danger {
+    border-color: var(--sh-error);
+}
+
+.sh-toast-danger i {
+    color: var(--sh-error);
+}
+
+@keyframes sh-toast-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .upload-progress-fill {
     height: 100%;
     background: var(--sh-accent);

@@ -1,6 +1,9 @@
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.JSInterop;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
@@ -8,10 +11,13 @@ using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;
 
-public partial class Applications
+public partial class Applications : IDisposable
 {
     [Inject]
     private Microsoft.Extensions.Configuration.IConfiguration Config { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
 
     private string CurrentUser => Config["Users:CurrentUser"] ?? "Current User";
 
@@ -80,6 +86,10 @@ public partial class Applications
     private SoapApp? _editingApp = null;
     private string _sortColumn = "";
     private bool _sortAscending = true;
+    private ServiceHubGrid<SoapApp>? _grid;
+    private string? _toastMessage;
+    private string _toastType = "success";
+    private CancellationTokenSource? _toastCts;
 
     private static readonly Regex AppNameRegex = new(@"^[A-Za-z0-9äöüßÄÖÜ ]+$");
     private static readonly Regex WsdlPathRegex = new(@"^[A-Za-z0-9/?.&=_\-]+$");
@@ -451,4 +461,169 @@ public partial class Applications
         _filterOperations = "";
         _currentPage = 1;
     }
-}
+
+    // ── Context Menu ──
+
+    private Task<List<ContextMenuItem>> GetAppContextMenuItems(SoapApp app)
+    {
+        var isEnabled = app.Status == AppStatus.Enabled;
+        return Task.FromResult(new List<ContextMenuItem>
+        {
+            new() { Action = "view", Label = "View Details", Icon = "bi-eye" },
+            new() { Action = "edit", Label = "Edit", Icon = "bi-pencil" },
+            new() { Action = "toggle", Label = isEnabled ? "Disable" : "Enable", Icon = isEnabled ? "bi-toggle-off" : "bi-toggle-on" },
+            new() { Type = "divider" },
+            new() { Action = "copyJson", Label = "Copy Row as JSON", Icon = "bi-braces" },
+            new() { Action = "copyCsv", Label = "Copy Row as CSV", Icon = "bi-filetype-csv" },
+            new() { Type = "divider" },
+            new() { Action = "delete", Label = "Delete", Icon = "bi-trash", Danger = true }
+        });
+    }
+
+    private async Task HandleContextMenuAction((string action, SoapApp app) e)
+    {
+        switch (e.action)
+        {
+            case "view":
+                _grid?.ExpandRow(e.app.Id);
+                break;
+            case "edit":
+                OpenEditDialog(e.app);
+                break;
+            case "toggle":
+                ToggleAppStatus(e.app);
+                break;
+            case "delete":
+                await DeleteAppAsync(e.app);
+                break;
+            case "copyJson":
+                await CopyRowAsync(e.app, asCsv: false);
+                break;
+            case "copyCsv":
+                await CopyRowAsync(e.app, asCsv: true);
+                break;
+        }
+    }
+
+    private void ToggleAppStatus(SoapApp app)
+    {
+        var newStatus = app.Status == AppStatus.Enabled ? AppStatus.Disabled : AppStatus.Enabled;
+        var updated = app with
+        {
+            Status = newStatus,
+            UpdatedBy = CurrentUser,
+            UpdatedAt = DateTime.Now
+        };
+        _appStore.UpdateApps([.._appStore.Apps.Select(a => a.Id == app.Id ? updated : a)]);
+        _allApps = _appStore.Apps;
+        ShowToast(newStatus == AppStatus.Enabled ? "Application enabled" : "Application disabled");
+    }
+
+    private async Task DeleteAppAsync(SoapApp app)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete application '{app.Name}'? This cannot be undone.");
+        if (!confirmed) return;
+
+        _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != app.Id)]);
+        _allApps = _appStore.Apps;
+        _expandedActionRows.Remove(app.Id);
+        if (_editingApp?.Id == app.Id)
+        {
+            _showAddModal = false;
+            _editingApp = null;
+        }
+        ShowToast("Application deleted", "danger");
+    }
+
+    private async Task CopyRowAsync(SoapApp app, bool asCsv)
+    {
+        try
+        {
+            var text = asCsv ? BuildCsvRow(app) : BuildJsonRow(app);
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            ShowToast(asCsv ? "Row copied as CSV" : "Row copied as JSON");
+        }
+        catch
+        {
+            ShowToast("Copy failed — clipboard unavailable", "danger");
+        }
+    }
+
+    /// <summary>Serializes the row as JSON, redacting secret auth values.</summary>
+    private static string BuildJsonRow(SoapApp app)
+    {
+        var safe = app with
+        {
+            Auth = new SoapAuthConfig
+            {
+                Type = app.Auth.Type,
+                Username = app.Auth.Username,
+                Password = Redact(app.Auth.Password),
+                KeyName = app.Auth.KeyName,
+                KeyValue = Redact(app.Auth.KeyValue),
+                Token = Redact(app.Auth.Token),
+                Domain = app.Auth.Domain
+            }
+        };
+        return JsonSerializer.Serialize(safe, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    /// <summary>Builds a single CSV line from the safe (non-secret) row fields.</summary>
+    private static string BuildCsvRow(SoapApp app)
+    {
+        var fields = new[]
+        {
+            CsvField(app.Id), CsvField(app.Name), CsvField(app.BaseUrl), CsvField(app.WsdlPath),
+            CsvField(app.Description), CsvField(app.Status.ToString()),
+            CsvField(app.CreatedBy), CsvField(app.CreatedAt.ToString("yyyy-MM-dd HH:mm")),
+            CsvField(app.UpdatedBy ?? ""), CsvField(app.UpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? ""),
+            CsvField(app.ApisCount.ToString()), CsvField(app.Auth.Type.ToString())
+        };
+        return string.Join(",", fields);
+    }
+
+    private static string CsvField(string value) => $"\"{(value ?? "").Replace("\"", "\"\"")}\"";
+
+    private static string? Redact(string? value) => string.IsNullOrEmpty(value) ? value : "***";
+
+    // ── Toast ──
+
+    private void ShowToast(string message, string type = "success")
+    {
+        _toastMessage = message;
+        _toastType = type;
+        _toastCts?.Cancel();
+        _toastCts = new CancellationTokenSource();
+        var token = _toastCts.Token;
+        _ = AutoDismissToastAsync(token);
+        StateHasChanged();
+    }
+
+    private async Task AutoDismissToastAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(2500, token);
+            if (!token.IsCancellationRequested)
+            {
+                _toastMessage = null;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void DismissToast()
+    {
+        _toastCts?.Cancel();
+        _toastMessage = null;
+    }
+
+    public void Dispose()
+    {
+        _toastCts?.Cancel();
+        _toastCts?.Dispose();
+        GC.SuppressFinalize(this);
+    }}

@@ -2,12 +2,13 @@
 @typeparam TItem
 
 @{
-    var gridId = string.IsNullOrEmpty(Id) ? $"shg-{Guid.NewGuid():N}"[..20] : Id;
+    var gridId = GridId;
 }
 
 <div class="datagrid-card" data-grid-id="@gridId"
      data-page-size="@PageSize"
      data-total-records="@TotalItems"
+     data-blazor-context-menu="@(EnableContextMenu ? "true" : null)"
      id="@gridId"
      @attributes="AdditionalAttributes">
     <!-- ── Header / Toolbar ── -->

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -142,6 +143,13 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
 
     internal int _totalColumns;
     internal HashSet<string> _expandedIds = [];
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    private string? _gridId;
+    private DotNetObjectReference<ServiceHubGrid<TItem>>? _dotNetRef;
+    private readonly string _instanceId = Guid.NewGuid().ToString("N");
+
+    internal string GridId => _gridId ??= string.IsNullOrEmpty(Id) ? $"shg-{Guid.NewGuid():N}"[..20] : Id;
 
     internal int ResolvedTotal => TotalItems > 0 ? TotalItems : (Items?.Count() ?? 0);
 
@@ -312,6 +320,85 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
 
     // ── Context Menu ──
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (!firstRender) return;
+
+        try
+        {
+            // Register this grid's DotNet reference so JS (grid.js) can drive a Blazor-managed
+            // right-click context menu. JS looks the reference up lazily at right-click time.
+            if (EnableContextMenu)
+            {
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await JS.InvokeVoidAsync("ServiceHubContextMenuRegistry.set", GridId, _dotNetRef, _instanceId);
+            }
+
+            // Ensure the JS grid (and context menu) is attached even when this grid renders
+            // after site.js's DOMContentLoaded / blazor.navigated scan has already run.
+            await JS.InvokeVoidAsync("ServiceHubGridInit.ensure", GridId);
+        }
+        catch
+        {
+            // JS interop may be unavailable (e.g. during prerender); the default menu still applies.
+        }
+    }
+
+    /// <summary>
+    /// Called from JS at right-click time to obtain the menu items for the given row.
+    /// Returns an empty list when no <see cref="ContextMenuItemsProvider"/> is configured.
+    /// </summary>
+    [JSInvokable]
+    public async Task<List<ContextMenuItem>> GetContextMenuItems(string rowId)
+    {
+        if (ContextMenuItemsProvider is null) return [];
+        var item = FindItem(rowId);
+        if (item is null) return [];
+        var task = ContextMenuItemsProvider(item);
+        return task is null ? [] : await task ?? [];
+    }
+
+    /// <summary>
+    /// Called from JS when a context menu item is clicked on a Blazor-managed grid.
+    /// Resolves the row and forwards (action, item) to the consumer's callback.
+    /// </summary>
+    [JSInvokable]
+    public async Task HandleContextMenuAction(string rowId, string action)
+    {
+        var item = FindItem(rowId);
+        if (item is null) return;
+        await ContextMenuItemClicked.InvokeAsync((action, item));
+    }
+
+    private TItem? FindItem(string rowId)
+    {
+        if (Items is null) return default;
+        foreach (var item in Items)
+        {
+            if (GetRowId(item) == rowId) return item;
+        }
+        return default;
+    }
+
+    /// <summary>Expands the detail row for the given row id (used by the context menu "View Details").</summary>
+    public void ExpandRow(string rowId)
+    {
+        _expandedIds.Add(rowId);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (_dotNetRef is not null)
+        {
+            try { JS.InvokeVoidAsync("ServiceHubContextMenuRegistry.delete", GridId, _instanceId); } catch { }
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Invoked from JS via DotNet.invokeMethodAsync when a context menu item is clicked.
     /// </summary>
@@ -331,20 +418,26 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
 public class ContextMenuItem
 {
     /// <summary>Unique action identifier passed to the click callback.</summary>
+    [JsonPropertyName("action")]
     public string Action { get; set; } = "";
 
     /// <summary>Display label text.</summary>
+    [JsonPropertyName("label")]
     public string Label { get; set; } = "";
 
     /// <summary>Bootstrap Icons class (e.g., "bi-eye", "bi-trash").</summary>
+    [JsonPropertyName("icon")]
     public string? Icon { get; set; }
 
     /// <summary>When true, the item is rendered with danger/delete styling.</summary>
+    [JsonPropertyName("danger")]
     public bool Danger { get; set; }
 
     /// <summary>When true, the item is rendered as disabled.</summary>
+    [JsonPropertyName("disabled")]
     public bool Disabled { get; set; }
 
     /// <summary>Set to "divider" or "header" for non-clickable items.</summary>
+    [JsonPropertyName("type")]
     public string? Type { get; set; }
 }

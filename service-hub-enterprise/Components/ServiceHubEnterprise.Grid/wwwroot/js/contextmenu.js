@@ -141,6 +141,12 @@ class ServiceHubContextMenu {
                         this._renderMenu(items);
                         this._position(e.clientX, e.clientY);
                         this._show();
+                    } else {
+                        // No items from the provider -> fall back to defaults so the
+                        // menu is never empty (covers provider-less / Blazor-managed grids).
+                        this._renderMenu(this._getDefaultItems());
+                        this._position(e.clientX, e.clientY);
+                        this._show();
                     }
                 });
             } else if (result) {

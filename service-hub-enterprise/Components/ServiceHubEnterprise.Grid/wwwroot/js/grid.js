@@ -86,6 +86,54 @@
  *     onSelect: (ids) => { /* update UI *\/ }
  *   });
  */
+
+// Registry of Blazor-managed context menus: gridId -> { ref, instanceId }.
+// Populated by the ServiceHubGrid Blazor component (OnAfterRenderAsync) and read
+// lazily at right-click time to avoid initialization timing races. The instanceId
+// guards deletes so a disposed (old) page cannot remove the ref of a newly
+// navigated page.
+window.ServiceHubContextMenuRegistry = window.ServiceHubContextMenuRegistry || {
+    _map: new Map(),
+    set: function (gridId, ref, instanceId) {
+        this._map.set(gridId, { ref: ref, instanceId: instanceId });
+    },
+    get: function (gridId) {
+        const entry = this._map.get(gridId);
+        return entry ? entry.ref : undefined;
+    },
+    delete: function (gridId, instanceId) {
+        const entry = this._map.get(gridId);
+        if (entry && (!instanceId || entry.instanceId === instanceId)) {
+            this._map.delete(gridId);
+        }
+    }
+};
+
+/**
+ * Ensures the JS grid orchestrator (and thus the right-click context menu) is
+ * initialized for the given grid id. Safe to call any time — skips grids that are
+ * already initialized or not yet present in the DOM. Used by the Blazor
+ * ServiceHubGrid component so grids that render after site.js's DOMContentLoaded /
+ * blazor.navigated scan has already run still get their JS behaviors attached.
+ */
+window.ServiceHubGridInit = window.ServiceHubGridInit || {
+    ensure: function (gridId) {
+        if (typeof ServiceHubGrid === 'undefined') return;
+        const el = document.querySelector('.datagrid-card[data-grid-id="' + gridId + '"]');
+        if (!el || el.__serviceHubGrid) return;
+
+        const hasPagination = !!el.querySelector('.pagination-footer');
+        const pageSize = parseInt(el.getAttribute('data-page-size'), 10) || 10;
+        const totalRecords = parseInt(el.getAttribute('data-total-records'), 10) || 0;
+
+        el.__serviceHubGrid = new ServiceHubGrid(el, {
+            pageSize: pageSize,
+            totalRecords: hasPagination ? totalRecords : 0,
+            enablePagination: hasPagination
+        });
+    }
+};
+
 class ServiceHubGrid {
     /**
      * @param {string|HTMLElement} element - The datagrid-card element or its CSS selector.
@@ -155,11 +203,32 @@ class ServiceHubGrid {
         if (typeof ServiceHubContextMenu !== 'undefined') {
             const hasContextRows = this.el.querySelector('tbody tr.has-context-menu');
             if (hasContextRows) {
+                const gridId = this.el.dataset.gridId || this.el.id || 'shg-ctx';
+                const blazorManaged = this.el.dataset.blazorContextMenu === 'true';
+
+                // For Blazor-managed grids, fetch items from the component instance at
+                // right-click time (lazy lookup avoids init timing races).
+                const getBlazorRef = () =>
+                    window.ServiceHubContextMenuRegistry.get(gridId);
+
                 this.contextMenu = new ServiceHubContextMenu(this.el, {
                     rowSelector: 'tbody tr.has-context-menu',
+                    getItem: blazorManaged
+                        ? (rowId) => {
+                            const ref = getBlazorRef();
+                            return ref
+                                ? ref.invokeMethodAsync('GetContextMenuItems', rowId).catch(() => null)
+                                : null;
+                        }
+                        : undefined,
                     onItemClick: (action, rowId, itemElement) => {
-                        // Try Blazor interop first, then fall back to custom event
-                        if (window.DotNet && DotNet.invokeMethodAsync) {
+                        const ref = getBlazorRef();
+                        if (ref) {
+                            // Blazor-managed grid: notify the component instance
+                            ref.invokeMethodAsync('HandleContextMenuAction', rowId, action)
+                                .catch(() => {});
+                        } else if (window.DotNet && DotNet.invokeMethodAsync) {
+                            // Fallback for non-Blazor-managed grids (static entry point)
                             DotNet.invokeMethodAsync(
                                 'ServiceHubEnterprise.Grid',
                                 'OnContextMenuItemClicked',

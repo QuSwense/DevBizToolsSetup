@@ -35,6 +35,7 @@ else
 {
     @* ── Loading Grid ── *@
     <ServiceHubGrid TItem="SoapApp"
+                    @ref="_grid"
                     Id="soapAppsGrid"
                     Items="FilteredApps"
                 PageSize="5"
@@ -53,6 +54,8 @@ else
                 @bind-ShowFilterModal="_showFilterModal"
                 FilterApplied="OnFilterApplied"
                 RowIdSelector="@(app => app.Id)"
+                ContextMenuItemsProvider="@GetAppContextMenuItems"
+                ContextMenuItemClicked="@HandleContextMenuAction"
                 Columns="@_columns">
 
     <ToolbarCenter>
@@ -468,5 +471,17 @@ else
                 </button>
             </div>
         </div>
+    </div>
+}
+
+@* ── Transient feedback toast ── *@
+@if (_toastMessage is not null)
+{
+    <div class="sh-toast @(_toastType == "danger" ? "sh-toast-danger" : "sh-toast-success")"
+         @onclick="DismissToast"
+         role="status"
+         aria-live="polite">
+        <i class="bi @(_toastType == "danger" ? "bi-exclamation-circle" : "bi-check-circle")"></i>
+        <span>@_toastMessage</span>
     </div>
 }
