@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 
@@ -14,6 +15,7 @@ public partial class SoapOverview
     [Inject] private WsdlSyncStore WsdlStore { get; set; } = default!;
     [Inject] private RequestExecutionStore ExecutionStore { get; set; } = default!;
     [Inject] private MockDbLoader MockDb { get; set; } = default!;
+    [Inject] private IJSRuntime Js { get; set; } = default!;
 
     private bool _isLoading = true;
 
@@ -24,6 +26,11 @@ public partial class SoapOverview
     private WsdlTemplate[] Templates = [];
     private SoapExecution[] Executions = [];
     private SoapRequestFile[] Files = [];
+
+    // Per-card expand/collapse state, persisted to localStorage via JS interop.
+    // Cards default to collapsed (compact summary) so the page stays short.
+    private readonly Dictionary<string, bool> _cardCollapsed = new();
+    private IJSObjectReference? _collapseModule;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -39,7 +46,7 @@ public partial class SoapOverview
             Templates = WsdlStore.Templates.ToArray();
             Executions = ExecutionStore.SoapExecutions;
 
-            var filesTask = MockDb.LoadJsonAsync<SoapRequestFile[]>("request-files.json");
+            var filesTask = MockDb.LoadJsonAsync<SoapRequestFile[]>("Soap/Request/request-files.json");
             await Task.WhenAll(filesTask);
             Files = filesTask.Result ?? [];
         }
@@ -47,5 +54,71 @@ public partial class SoapOverview
         {
             _isLoading = false;
         }
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        // Hydrate the persisted per-card collapse state once the client circuit is live.
+        try
+        {
+            _collapseModule = await Js.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/ServiceHubEnterprise.Ui/js/collapse.js");
+            var saved = await _collapseModule.InvokeAsync<Dictionary<string, bool>>("getAll");
+            if (saved is not null)
+            {
+                foreach (var (key, collapsed) in saved)
+                {
+                    _cardCollapsed[key] = collapsed;
+                }
+            }
+        }
+        catch
+        {
+            // Interop unavailable (e.g. prerender) — fall back to default (collapsed) state.
+        }
+
+        StateHasChanged();
+    }
+
+    private bool IsCollapsed(string key) =>
+        _cardCollapsed.TryGetValue(key, out var collapsed) ? collapsed : true;
+
+    private async Task ToggleCard(string key, bool collapsed)
+    {
+        _cardCollapsed[key] = collapsed;
+        if (_collapseModule is not null)
+        {
+            await _collapseModule.InvokeVoidAsync("set", key, collapsed);
+        }
+    }
+
+    private Task OnApplicationsToggle(bool collapsed) => ToggleCard(CardKey.Applications, collapsed);
+    private Task OnRequestFilesToggle(bool collapsed) => ToggleCard(CardKey.RequestFiles, collapsed);
+    private Task OnExecutionsToggle(bool collapsed) => ToggleCard(CardKey.Executions, collapsed);
+    private Task OnWsdlSyncToggle(bool collapsed) => ToggleCard(CardKey.WsdlSync, collapsed);
+    private Task OnTemplatesToggle(bool collapsed) => ToggleCard(CardKey.Templates, collapsed);
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (_collapseModule is not null)
+        {
+            await _collapseModule.DisposeAsync();
+        }
+    }
+
+    private static class CardKey
+    {
+        public const string Applications = "soap-apps";
+        public const string RequestFiles = "soap-request-files";
+        public const string Executions = "soap-executions";
+        public const string WsdlSync = "soap-wsdl-sync";
+        public const string Templates = "soap-templates";
     }
 }

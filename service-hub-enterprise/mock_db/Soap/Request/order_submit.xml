@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:ord="http://www.orderprocessing.com/services/">
+   <soapenv:Header>
+      <ord:clientId>CLT-2026-001</ord:clientId>
+      <ord:sessionId>SESS-20260802-A1B2C3</ord:sessionId>
+   </soapenv:Header>
+   <soapenv:Body>
+      <ord:SubmitOrderResponse>
+         <ord:orderId>ORD-2026-0842</ord:orderId>
+         <ord:orderNumber>PO-2026-10042</ord:orderNumber>
+         <ord:status>CONFIRMED</ord:status>
+         <ord:submissionDate>2026-08-02T10:30:00Z</ord:submissionDate>
+         <ord:estimatedDelivery>2026-08-09T10:30:00Z</ord:estimatedDelivery>
+         <ord:totalAmount>847.50</ord:totalAmount>
+         <ord:currency>USD</ord:currency>
+         <ord:lineItems>
+            <ord:item>
+               <ord:sku>SKU-1001</ord:sku>
+               <ord:quantity>2</ord:quantity>
+               <ord:unitPrice>299.99</ord:unitPrice>
+               <ord:totalPrice>599.98</ord:totalPrice>
+            </ord:item>
+            <ord:item>
+               <ord:sku>SKU-1002</ord:sku>
+               <ord:quantity>1</ord:quantity>
+               <ord:unitPrice>247.52</ord:unitPrice>
+               <ord:totalPrice>247.52</ord:totalPrice>
+            </ord:item>
+         </ord:lineItems>
+         <ord:shippingInfo>
+            <ord:carrier>FedEx</ord:carrier>
+            <ord:service>Express</ord:service>
+            <ord:trackingNumber>FX-1234567890</ord:trackingNumber>
+            <ord:shippingCost>25.00</ord:shippingCost>
+         </ord:shippingInfo>
+         <ord:responseCode>200</ord:responseCode>
+         <ord:responseMessage>Order submitted successfully</ord:responseMessage>
+      </ord:SubmitOrderResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

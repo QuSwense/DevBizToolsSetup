@@ -17,6 +17,16 @@ public partial class ApplicationsOverview
     /// </summary>
     [Parameter] public IReadOnlyList<SoapApp> Apps { get; set; } = [];
 
+    /// <summary>
+    /// Gets or sets whether the card is collapsed to its summary view.
+    /// </summary>
+    [Parameter] public bool Collapsed { get; set; }
+
+    /// <summary>
+    /// Invoked when the card's collapse state is toggled.
+    /// </summary>
+    [Parameter] public EventCallback<bool> OnToggle { get; set; }
+
     private int TotalApps => Apps.Count;
     private int EnabledApps => Apps.Count(a => a.Status == AppStatus.Enabled);
     private int DisabledApps => TotalApps - EnabledApps;

@@ -63,8 +63,8 @@ public class MockDbLoaderTests : BunitTestBase
     public async Task LoadWsdlContentResolvesAndCachesByKey()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-content-map.json", """{"basic":"wsdl_basic.wsdl"}"""),
-            ("wsdl_basic.wsdl", "<wsdl>hello</wsdl>"));
+            ("Wsdl/wsdl-content-map.json", """{"basic":"Wsdl/wsdl_basic.wsdl"}"""),
+            ("Wsdl/wsdl_basic.wsdl", "<wsdl>hello</wsdl>"));
         var loader = new MockDbLoader(db.BuildConfiguration());
 
         var content = await loader.LoadWsdlContentAsync("basic");
@@ -72,7 +72,7 @@ public class MockDbLoaderTests : BunitTestBase
         content.Should().Be("<wsdl>hello</wsdl>");
 
         // Cached: modify the file and confirm the cache is returned.
-        db.WriteFile("wsdl_basic.wsdl", "CHANGED");
+        db.WriteFile("Wsdl/wsdl_basic.wsdl", "CHANGED");
         var cached = await loader.LoadWsdlContentAsync("basic");
         cached.Should().Be("<wsdl>hello</wsdl>");
     }
@@ -81,8 +81,8 @@ public class MockDbLoaderTests : BunitTestBase
     public async Task LoadWsdlContentReturnsEmptyForUnknownKey()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-content-map.json", """{"basic":"wsdl_basic.wsdl"}"""),
-            ("wsdl_basic.wsdl", "<wsdl/>"));
+            ("Wsdl/wsdl-content-map.json", """{"basic":"Wsdl/wsdl_basic.wsdl"}"""),
+            ("Wsdl/wsdl_basic.wsdl", "<wsdl/>"));
         var loader = new MockDbLoader(db.BuildConfiguration());
 
         var content = await loader.LoadWsdlContentAsync("missing");
@@ -94,9 +94,9 @@ public class MockDbLoaderTests : BunitTestBase
     public async Task PreloadAllWsdlContentCachesAllEntries()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-content-map.json", """{"a":"a.wsdl","b":"b.wsdl"}"""),
-            ("a.wsdl", "<a/>"),
-            ("b.wsdl", "<b/>"));
+            ("Wsdl/wsdl-content-map.json", """{"a":"Wsdl/a.wsdl","b":"Wsdl/b.wsdl"}"""),
+            ("Wsdl/a.wsdl", "<a/>"),
+            ("Wsdl/b.wsdl", "<b/>"));
         var loader = new MockDbLoader(db.BuildConfiguration());
 
         await loader.PreloadAllWsdlContentAsync();

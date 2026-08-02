@@ -1,7 +1,0 @@
-{
-  "basic": "wsdl_basic.wsdl",
-  "customer": "wsdl_customer.wsdl",
-  "orders": "wsdl_orders.wsdl",
-  "previous": "wsdl_previous.wsdl",
-  "changed": "wsdl_changed.wsdl"
-}

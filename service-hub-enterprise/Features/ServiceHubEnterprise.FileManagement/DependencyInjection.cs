@@ -12,7 +12,7 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddFileManagementFeature(this IServiceCollection services)
     {
-        // Register File Management-specific services here
+        // FileManagementDbContext is registered in Program.cs (shared SQLite database)
         return services;
     }
 }

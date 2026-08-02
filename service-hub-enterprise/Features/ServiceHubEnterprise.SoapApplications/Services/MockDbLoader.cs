@@ -30,7 +30,7 @@ public class MockDbLoader
     {
         // Resolve mock_db path from configuration, with fallback
         _mockDbPath = ResolveMockDbPath(configuration);
-        _wsdlContentMap = LoadJsonAsync<Dictionary<string, string>>("wsdl-content-map.json")
+        _wsdlContentMap = LoadJsonAsync<Dictionary<string, string>>("Wsdl/wsdl-content-map.json")
             .GetAwaiter().GetResult();
     }
 
@@ -83,7 +83,7 @@ public class MockDbLoader
 
     /// <summary>
     /// Loads a WSDL content file by its logical key (e.g. "basic", "customer", "orders").
-    /// Uses the wsdl-content-map.json to resolve key -> file name.
+    /// Uses the Wsdl/wsdl-content-map.json to resolve key -> file name.
     /// Results are cached in memory after first load.
     /// </summary>
     public async Task<string> LoadWsdlContentAsync(string key)
@@ -101,6 +101,49 @@ public class MockDbLoader
         var content = await File.ReadAllTextAsync(path).ConfigureAwait(false);
         _wsdlContentCache[key] = content;
         return content;
+    }
+
+    /// <summary>
+    /// Loads a WSDL file by its file name (e.g. "wsdl_basic.wsdl") from the Wsdl/ folder.
+    /// Returns an empty string when the file does not exist.
+    /// </summary>
+    public async Task<string> LoadWsdlFileAsync(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+            return "";
+
+        var path = Path.Combine(_mockDbPath, "Wsdl", fileName);
+        if (!File.Exists(path))
+            return "";
+
+        return await File.ReadAllTextAsync(path).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Persists WSDL content to a file in the Wsdl/ folder (e.g. "wsdl_basic.wsdl").
+    /// </summary>
+    public async Task SaveWsdlFileAsync(string fileName, string content)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+            throw new ArgumentException("A WSDL file name is required.", nameof(fileName));
+
+        var path = Path.Combine(_mockDbPath, "Wsdl", fileName);
+        await File.WriteAllTextAsync(path, content).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Returns the file names of all .wsdl files available in the Wsdl/ folder.
+    /// </summary>
+    public string[] GetWsdlFileNames()
+    {
+        var dir = Path.Combine(_mockDbPath, "Wsdl");
+        if (!Directory.Exists(dir))
+            return [];
+
+        return Directory.GetFiles(dir, "*.wsdl")
+            .Select(path => Path.GetFileName(path) ?? "")
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
     }
 
     /// <summary>

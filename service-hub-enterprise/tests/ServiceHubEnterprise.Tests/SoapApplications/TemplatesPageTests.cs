@@ -80,8 +80,8 @@ public class TemplatesPageTests : BunitTestBase
     public void LoadsAndRendersTemplates()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("soap-apps.json", AppsJson),
-            ("templates-page.json", TemplatesJson));
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/templates-page.json", TemplatesJson));
         Setup(db);
 
         var cut = Render<Templates>();

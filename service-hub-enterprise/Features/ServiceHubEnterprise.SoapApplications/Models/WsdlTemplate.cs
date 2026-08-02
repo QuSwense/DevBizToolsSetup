@@ -9,6 +9,10 @@ public class WsdlTemplate
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
+    /// <summary>
+    /// The WSDL file name (e.g. "wsdl_basic.wsdl") referenced by this template.
+    /// The actual WSDL content is loaded from the file via <c>MockDbLoader</c>.
+    /// </summary>
     public string Content { get; set; } = "";
     public string? ExtendsTemplateId { get; set; }
     public string? ExtendsTemplateName { get; set; }

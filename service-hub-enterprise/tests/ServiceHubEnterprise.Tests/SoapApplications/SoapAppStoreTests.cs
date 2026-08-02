@@ -45,7 +45,7 @@ public class SoapAppStoreTests : BunitTestBase
     [Fact]
     public void LoadsAppsAndDeserializesStatusAndAuth()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", SoapAppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", SoapAppsJson));
         var store = new SoapAppStore(new MockDbLoader(db.BuildConfiguration()));
 
         store.Apps.Should().HaveCount(2);
@@ -68,7 +68,7 @@ public class SoapAppStoreTests : BunitTestBase
     [Fact]
     public void UpdateAppsReplacesApps()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", "[]"));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", "[]"));
         var store = new SoapAppStore(new MockDbLoader(db.BuildConfiguration()));
 
         store.UpdateApps(new[] { TestData.SoapApp(id: "x", name: "NewApp") });

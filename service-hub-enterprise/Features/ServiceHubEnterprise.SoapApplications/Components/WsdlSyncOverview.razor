@@ -1,12 +1,69 @@
 @namespace ServiceHubEnterprise.SoapApplications.Components
 
-<SectionCard Title="WSDL Sync" Icon="🧾" Subtitle="Sync records, versions & history" Filter="@_range" OnFilterChanged="ApplyRange">
+<SectionCard Title="WSDL Sync" Icon="🧾" Subtitle="Sync records, versions & history" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🧾</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Records</span>
+                <span class="summary-chip-value">@Records.Count</span>
+                <span class="summary-chip-sub">sync records</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">✅</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Synced</span>
+                <span class="summary-chip-value summary-chip-value--success">@SyncedCount</span>
+                <span class="summary-chip-sub">records</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">⛔</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Failed</span>
+                <span class="summary-chip-value summary-chip-value--danger">@FailedCount</span>
+                <span class="summary-chip-sub">records</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">⏳</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Parsing</span>
+                <span class="summary-chip-value summary-chip-value--warning">@ParsingCount</span>
+                <span class="summary-chip-sub">records</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🔢</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Versions</span>
+                <span class="summary-chip-value">@Versions.Count</span>
+                <span class="summary-chip-sub">snapshots</span>
+            </div>
+        </div>
+        <div class="summary-chip summary-chip-donut">
+            <MiniDonut Value="@SyncedCount" Total="@Records.Count" Label="synced" ValueColor="var(--sh-success)" Size="56" />
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Synced share</span>
+                <span class="summary-chip-value">@(Records.Count > 0 ? SyncedCount * 100 / Records.Count : 0)%</span>
+            </div>
+        </div>
+    </Summary>
+    <ChildContent>
     <div class="kpi-grid">
         <KpiTile Label="Records" Value="@Records.Count.ToString()" Sub="sync records" Icon="🧾" />
         <KpiTile Label="Synced" Value="@SyncedCount.ToString()" Sub="records" Color="var(--sh-success)" Icon="✅" />
         <KpiTile Label="Failed" Value="@FailedCount.ToString()" Sub="records" Color="var(--sh-danger)" Icon="⛔" />
         <KpiTile Label="Parsing" Value="@ParsingCount.ToString()" Sub="records" Color="var(--sh-warning)" Icon="⏳" />
         <KpiTile Label="Versions" Value="@Versions.Count.ToString()" Sub="snapshots" Icon="🔢" />
+        <div class="kpi-tile kpi-donut-tile">
+            <div class="kpi-header"><span class="kpi-title">Synced Share</span></div>
+            <div class="kpi-donut">
+                <MiniDonut Value="@SyncedCount" Total="@Records.Count" Label="synced" ValueColor="var(--sh-success)" />
+            </div>
+        </div>
     </div>
     <div class="section-divider"></div>
     <div class="sub-heading">
@@ -15,4 +72,5 @@
         <span class="meta-pill ms-2">@_range.Label</span>
     </div>
     <TimelineStrip Segments="@TimelineSegments" />
+    </ChildContent>
 </SectionCard>

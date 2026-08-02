@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:rep="http://www.reportingengine.com/services/">
+   <soapenv:Header>
+      <rep:reportId>RPT-20260802-001</rep:reportId>
+      <rep:generatedBy>Anita Desai</rep:generatedBy>
+   </soapenv:Header>
+   <soapenv:Body>
+      <rep:GenerateReportResponse>
+         <rep:report>
+            <rep:reportId>RPT-20260802-001</rep:reportId>
+            <rep:reportName>Monthly_Sales_Report_July_2026</rep:reportName>
+            <rep:format>PDF</rep:format>
+            <rep:status>GENERATED</rep:status>
+            <rep:generatedDate>2026-08-02T10:30:00Z</rep:generatedDate>
+            <rep:fileSize>2456789</rep:fileSize>
+            <rep:fileUrl>https://reporting.com/reports/RPT-20260802-001.pdf</rep:fileUrl>
+            <rep:downloadLink>https://reporting.com/download/RPT-20260802-001</rep:downloadLink>
+            <rep:expiryDate>2026-09-01T10:30:00Z</rep:expiryDate>
+         </rep:report>
+         <rep:summary>
+            <rep:totalSales>125000.00</rep:totalSales>
+            <rep:totalOrders>1560</rep:totalOrders>
+            <rep:averageOrderValue>80.13</rep:averageOrderValue>
+            <rep:topPerformingCategory>Electronics</rep:topPerformingCategory>
+            <rep:growthPercentage>12.5</rep:growthPercentage>
+            <rep:comparisonPeriod>June 2026</rep:comparisonPeriod>
+         </rep:summary>
+         <rep:charts>
+            <rep:chart>
+               <rep:chartId>CHART-001</rep:chartId>
+               <rep:chartType>LINE</rep:chartType>
+               <rep:chartUrl>https://reporting.com/charts/RPT-20260802-001-line.png</rep:chartUrl>
+            </rep:chart>
+            <rep:chart>
+               <rep:chartId>CHART-002</rep:chartId>
+               <rep:chartType>BAR</rep:chartType>
+               <rep:chartUrl>https://reporting.com/charts/RPT-20260802-001-bar.png</rep:chartUrl>
+            </rep:chart>
+         </rep:charts>
+         <rep:responseCode>200</rep:responseCode>
+         <rep:responseMessage>Report generated successfully</rep:responseMessage>
+      </rep:GenerateReportResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

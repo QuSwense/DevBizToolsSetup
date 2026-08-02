@@ -1,4 +1,9 @@
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
+using ServiceHubEnterprise.Data.Entities;
+using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
 
 namespace ServiceHubEnterprise.SoapApplications.Services;
@@ -6,49 +11,305 @@ namespace ServiceHubEnterprise.SoapApplications.Services;
 /// <summary>
 /// Singleton store that holds the SOAP application data,
 /// shared between Applications.razor and RequestFiles.razor.
+/// Loaded from the SQLite database via SoapDbContext.
 /// </summary>
 public class SoapAppStore
 {
-    public SoapApp[] Apps { get; private set; }
+    private readonly IServiceProvider _serviceProvider;
+    private SoapApp[]? _cached;
 
-    public SoapAppStore(MockDbLoader loader)
+    public SoapAppStore(IServiceProvider serviceProvider)
     {
-        Apps = loader.LoadJsonAsync<SoapApp[]>("soap-apps.json").GetAwaiter().GetResult();
+        _serviceProvider = serviceProvider;
     }
 
+    /// <summary>Retrieves all SOAP applications, loading from DB on first access.</summary>
+    public SoapApp[] Apps
+    {
+        get
+        {
+            if (_cached is not null)
+                return _cached;
+
+            using var scope = _serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
+            var entities = db.SoapApps.Include(a => a.Apis).AsNoTracking().ToList();
+            _cached = entities.Select(MapToModel).ToArray();
+            return _cached;
+        }
+    }
+
+    /// <summary>Invalidates the cache so the next access refreshes from DB.</summary>
+    public void InvalidateCache()
+    {
+        _cached = null;
+    }
+
+    /// <summary>
+    /// Updates the cached apps list. Use after add/edit/delete operations.
+    /// Invalidates the cache so the next access refreshes from DB.
+    /// </summary>
     public void UpdateApps(SoapApp[] apps)
     {
-        Apps = apps;
+        _cached = apps;
+    }
+
+    private static SoapApp MapToModel(SoapAppEntity entity)
+    {
+        return new SoapApp(
+            entity.Id,
+            entity.Name,
+            entity.BaseUrl,
+            entity.WsdlPath,
+            entity.Description,
+            entity.Status == "enabled" ? AppStatus.Enabled : AppStatus.Disabled,
+            entity.CreatedBy,
+            DateTime.TryParse(entity.CreatedAt, out var ca) ? ca : DateTime.MinValue,
+            entity.UpdatedBy,
+            entity.UpdatedAt is not null && DateTime.TryParse(entity.UpdatedAt, out var ua) ? ua : null,
+            entity.ApisCount,
+            MapAuthConfig(entity),
+            entity.Apis.Select(a => new SoapApiEntry { Name = a.Name, Description = a.Description }).ToArray()
+        );
+    }
+
+    private static SoapAuthConfig MapAuthConfig(SoapAppEntity entity)
+    {
+        var authType = entity.AuthType switch
+        {
+            "None" => AuthType.None,
+            "Basic" => AuthType.Basic,
+            "ApiKey" => AuthType.ApiKey,
+            "Bearer" => AuthType.Bearer,
+            "Ntlm" => AuthType.Ntlm,
+            _ => AuthType.None
+        };
+
+        return new SoapAuthConfig
+        {
+            Type = authType,
+            Username = entity.AuthUsername,
+            Password = entity.AuthPassword,
+            KeyName = entity.AuthKeyName,
+            KeyValue = entity.AuthKeyValue,
+            Token = entity.AuthToken,
+            Domain = entity.AuthDomain
+        };
     }
 }
 
 /// <summary>
 /// Singleton store for WSDL sync records, versions, and templates.
+/// Loaded from the SQLite database via WsdlDbContext on first access.
+/// In-memory caching with SaveChanges persistence.
 /// </summary>
 public class WsdlSyncStore
 {
-    public List<WsdlSyncRecord> Records { get; private set; }
-    public List<WsdlVersionEntry> Versions { get; private set; }
-    public List<WsdlTemplate> Templates { get; private set; }
-    public List<WsdlSyncHistoryPoint> SyncHistory { get; private set; }
+    private readonly IServiceProvider _serviceProvider;
+    private List<WsdlSyncRecord>? _records;
+    private List<WsdlVersionEntry>? _versions;
+    private List<WsdlTemplate>? _templates;
+    private List<WsdlSyncHistoryPoint>? _syncHistory;
 
-    public WsdlSyncStore(MockDbLoader loader)
+    public WsdlSyncStore(IServiceProvider serviceProvider)
     {
-        Records = loader.LoadJsonAsync<List<WsdlSyncRecord>>("wsdl-records.json").GetAwaiter().GetResult();
-        Versions = loader.LoadJsonAsync<List<WsdlVersionEntry>>("wsdl-versions.json").GetAwaiter().GetResult();
-        Templates = loader.LoadJsonAsync<List<WsdlTemplate>>("wsdl-templates.json").GetAwaiter().GetResult();
-        SyncHistory = loader.LoadJsonAsync<List<WsdlSyncHistoryPoint>>("wsdl-sync-history.json").GetAwaiter().GetResult() ?? [];
+        _serviceProvider = serviceProvider;
+    }
 
-        // Preload and resolve WSDL content references
-        loader.PreloadAllWsdlContentAsync().GetAwaiter().GetResult();
-        foreach (var record in Records)
+    /// <summary>All WSDL sync records, lazy-loaded from DB.</summary>
+    public List<WsdlSyncRecord> Records
+    {
+        get
         {
-            if (!string.IsNullOrEmpty(record.WsdlContentKey))
-            {
-                record.WsdlContent = loader.LoadWsdlContentAsync(record.WsdlContentKey).GetAwaiter().GetResult();
-            }
+            if (_records is null) LoadFromDb();
+            return _records!;
         }
     }
+
+    /// <summary>All WSDL versions, lazy-loaded from DB.</summary>
+    public List<WsdlVersionEntry> Versions
+    {
+        get
+        {
+            if (_versions is null) LoadFromDb();
+            return _versions!;
+        }
+    }
+
+    /// <summary>All WSDL templates, lazy-loaded from DB.</summary>
+    public List<WsdlTemplate> Templates
+    {
+        get
+        {
+            if (_templates is null) LoadFromDb();
+            return _templates!;
+        }
+    }
+
+    /// <summary>All WSDL sync history, lazy-loaded from DB.</summary>
+    public List<WsdlSyncHistoryPoint> SyncHistory
+    {
+        get
+        {
+            if (_syncHistory is null) LoadFromDb();
+            return _syncHistory!;
+        }
+    }
+
+    private void LoadFromDb()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
+
+        _records = db.WsdlRecords.AsNoTracking().Select(r => new WsdlSyncRecord
+        {
+            Id = r.Id,
+            AppId = r.AppId,
+            AppName = r.AppName,
+            SourceType = r.SourceType,
+            SourceUrl = r.SourceUrl,
+            UploadedBy = r.UploadedBy,
+            UploadedAt = r.UploadedAt,
+            Status = r.Status,
+            WsdlContentKey = r.WsdlContentKey ?? "",
+            VersionCount = r.VersionCount
+        }).ToList();
+
+        _versions = db.WsdlVersions.AsNoTracking().Select(v => new WsdlVersionEntry
+        {
+            Id = v.Id,
+            SyncRecordId = v.SyncRecordId,
+            VersionNumber = v.VersionNumber,
+            Label = v.Label,
+            UploadedBy = v.UploadedBy,
+            UploadedAt = v.UploadedAt,
+            Status = v.Status,
+            Notes = v.Notes ?? ""
+        }).ToList();
+
+        _templates = db.WsdlTemplates.AsNoTracking().ToList()
+            .Select(t => new WsdlTemplate
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                Content = t.Content,
+                ExtendsTemplateId = t.ExtendsTemplateId,
+                Variables = t.Variables is not null
+                    ? System.Text.Json.JsonSerializer.Deserialize<string[]>(t.Variables) ?? []
+                    : [],
+                CreatedBy = t.CreatedBy,
+                CreatedAt = t.CreatedAt,
+                UpdatedAt = t.UpdatedAt,
+                UsageCount = t.UsageCount
+            }).ToList();
+
+        _syncHistory = db.WsdlSyncHistory.AsNoTracking().ToList()
+            .Select(h => new WsdlSyncHistoryPoint
+        {
+            Id = h.Id,
+            AppId = h.AppId,
+            AppName = h.AppName,
+            SyncRecordId = h.SyncRecordId,
+            Date = h.Date,
+            Status = h.Status,
+            Details = h.Details ?? ""
+        }).ToList();
+    }
+
+    /// <summary>Persists all in-memory changes back to the database.</summary>
+    public async Task SaveChangesAsync()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
+
+        db.WsdlRecords.RemoveRange(db.WsdlRecords);
+        db.WsdlVersions.RemoveRange(db.WsdlVersions);
+        db.WsdlTemplates.RemoveRange(db.WsdlTemplates);
+        db.WsdlSyncHistory.RemoveRange(db.WsdlSyncHistory);
+
+        if (_records is not null)
+        {
+            foreach (var r in _records)
+            {
+                db.WsdlRecords.Add(new WsdlRecordEntity
+                {
+                    Id = r.Id,
+                    AppId = r.AppId,
+                    AppName = r.AppName,
+                    SourceType = r.SourceType,
+                    SourceUrl = r.SourceUrl,
+                    UploadedBy = r.UploadedBy,
+                    UploadedAt = r.UploadedAt,
+                    Status = r.Status,
+                    WsdlContentKey = string.IsNullOrEmpty(r.WsdlContentKey) ? null : r.WsdlContentKey,
+                    VersionCount = r.VersionCount
+                });
+            }
+        }
+
+        if (_versions is not null)
+        {
+            foreach (var v in _versions)
+            {
+                db.WsdlVersions.Add(new WsdlVersionEntity
+                {
+                    Id = v.Id,
+                    SyncRecordId = v.SyncRecordId,
+                    VersionNumber = v.VersionNumber,
+                    Label = v.Label,
+                    UploadedBy = v.UploadedBy,
+                    UploadedAt = v.UploadedAt,
+                    Status = v.Status,
+                    Notes = v.Notes,
+                    Content = ""
+                });
+            }
+        }
+
+        if (_templates is not null)
+        {
+            foreach (var t in _templates)
+            {
+                db.WsdlTemplates.Add(new WsdlTemplateEntity
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Description = t.Description,
+                    Content = t.Content,
+                    ExtendsTemplateId = t.ExtendsTemplateId,
+                    Variables = t.Variables is not null
+                        ? System.Text.Json.JsonSerializer.Serialize(t.Variables)
+                        : null,
+                    CreatedBy = t.CreatedBy,
+                    CreatedAt = t.CreatedAt,
+                    UpdatedAt = t.UpdatedAt,
+                    UsageCount = t.UsageCount
+                });
+            }
+        }
+
+        if (_syncHistory is not null)
+        {
+            foreach (var h in _syncHistory)
+            {
+                db.WsdlSyncHistory.Add(new WsdlSyncHistoryEntity
+                {
+                    Id = h.Id,
+                    AppId = h.AppId,
+                    AppName = h.AppName,
+                    SyncRecordId = h.SyncRecordId,
+                    Date = h.Date,
+                    Status = h.Status,
+                    Details = h.Details
+                });
+            }
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    // ── Convenience methods for backward compatibility ──
 
     public WsdlSyncRecord[] GetRecordsForApp(string appId) =>
         Records.Where(r => r.AppId == appId).OrderByDescending(r => r.UploadedAt).ToArray();
@@ -67,17 +328,13 @@ public class WsdlSyncStore
         return GetTemplate(template.ExtendsTemplateId);
     }
 
-    /// <summary>
-    /// Resolves all variables for a template, including inherited ones from parent templates.
-    /// </summary>
     public TemplateVariableDef[] ResolveVariables(WsdlTemplate template)
     {
         var allVars = new List<TemplateVariableDef>();
         var seen = new HashSet<string>();
 
-        // Walk the inheritance chain
         var current = template;
-        while (current != null)
+        while (current is not null)
         {
             foreach (var varName in current.Variables)
             {
@@ -96,22 +353,14 @@ public class WsdlSyncStore
                 ? null
                 : GetTemplate(current.ExtendsTemplateId);
         }
-
         return allVars.ToArray();
     }
 
-    /// <summary>
-    /// Parses WSDL content to extract variable names between XML tags or in attribute values.
-    /// Only looks into values between opening/closing tags and attribute values.
-    /// </summary>
     public static string[] ParseWsdlVariables(string wsdlContent)
     {
-        if (string.IsNullOrWhiteSpace(wsdlContent))
-            return [];
-
+        if (string.IsNullOrWhiteSpace(wsdlContent)) return [];
         var vars = new HashSet<string>();
 
-        // Match content between XML tags: <tag>value</tag>
         var tagContentMatches = Regex.Matches(wsdlContent, @">([^<]+)<");
         foreach (Match m in tagContentMatches)
         {
@@ -120,7 +369,6 @@ public class WsdlSyncStore
                 AddVariablesFromText(content, vars);
         }
 
-        // Match attribute values: name="value" or name='value'
         var attrValueMatches = Regex.Matches(wsdlContent, @"=\s*""([^""]*)""");
         foreach (Match m in attrValueMatches)
         {
@@ -143,7 +391,6 @@ public class WsdlSyncStore
     private static void AddVariablesFromText(string text, HashSet<string> vars)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
-
         var candidates = text.Split([' ', '\t', '\n', '\r', ',', ';'], StringSplitOptions.RemoveEmptyEntries);
         foreach (var candidate in candidates)
         {
@@ -158,9 +405,6 @@ public class WsdlSyncStore
         }
     }
 
-    /// <summary>
-    /// Converts arbitrary text to a {{var_name}} compatible variable name.
-    /// </summary>
     public static string ToVariableName(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return "";
@@ -170,9 +414,6 @@ public class WsdlSyncStore
         return string.Join("_", parts.Select(p => p.ToLower())).Trim('_');
     }
 
-    /// <summary>
-    /// Converts a variable name like "customer_id" to a display label like "Customer ID".
-    /// </summary>
     public static string ToLabel(string varName)
     {
         if (string.IsNullOrWhiteSpace(varName)) return "";
@@ -180,15 +421,10 @@ public class WsdlSyncStore
             w.Length > 0 ? char.ToUpper(w[0]) + w[1..] : w));
     }
 
-    /// <summary>
-    /// Applies {{var_name}} substitutions to a template content string.
-    /// Only supports simple variable paths like {{var_name}}, no complex paths.
-    /// </summary>
     public static string ApplyVariables(string content, Dictionary<string, string> values)
     {
-        if (string.IsNullOrWhiteSpace(content) || values == null || values.Count == 0)
+        if (string.IsNullOrWhiteSpace(content) || values is null || values.Count == 0)
             return content;
-
         return Regex.Replace(content, @"\{\{(\w+)\}\}", match =>
         {
             var varName = match.Groups[1].Value;
@@ -196,6 +432,78 @@ public class WsdlSyncStore
         });
     }
 
-    // ── Seed data moved to mock_db/ JSON files ──
-    // Loaded dynamically via MockDbLoader.
+    public WsdlSyncHistoryPoint[] GetSyncHistoryForApp(string appId) =>
+        SyncHistory.Where(h => h.AppId == appId).OrderByDescending(h => h.Date).ToArray();
+
+    public async Task<string?> GetVersionContentAsync(string versionId)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
+        return await db.WsdlVersions.AsNoTracking()
+            .Where(v => v.Id == versionId)
+            .Select(v => v.Content)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<string?> GetRecordContentAsync(string? contentKey)
+    {
+        if (string.IsNullOrEmpty(contentKey)) return null;
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
+        var version = await db.WsdlVersions
+            .Join(db.WsdlRecords, v => v.SyncRecordId, r => r.Id, (v, r) => new { v, r })
+            .Where(x => x.r.WsdlContentKey == contentKey)
+            .OrderByDescending(x => x.v.VersionNumber)
+            .Select(x => x.v.Content)
+            .FirstOrDefaultAsync();
+        return version;
+    }
+
+    public async Task AddVersionAsync(string syncRecordId, string label, string content, string uploadedBy)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
+
+        var record = await db.WsdlRecords.FirstOrDefaultAsync(r => r.Id == syncRecordId);
+        if (record is null) return;
+
+        var maxVersion = await db.WsdlVersions
+            .Where(v => v.SyncRecordId == syncRecordId)
+            .MaxAsync(v => (int?)v.VersionNumber) ?? 0;
+
+        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        var newVersion = new WsdlVersionEntity
+        {
+            Id = $"wv-{Guid.NewGuid():N}"[..12],
+            SyncRecordId = syncRecordId,
+            VersionNumber = maxVersion + 1,
+            Label = label,
+            UploadedBy = uploadedBy,
+            UploadedAt = now,
+            Status = "active",
+            Content = content
+        };
+        db.WsdlVersions.Add(newVersion);
+        record.VersionCount = maxVersion + 1;
+        await db.SaveChangesAsync();
+
+        // Reload in-memory cache
+        _versions = null;
+        _records = null;
+    }
+
+    public async Task RollbackToVersionAsync(string versionId, string uploadedBy)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
+
+        var sourceVersion = await db.WsdlVersions.FirstOrDefaultAsync(v => v.Id == versionId);
+        if (sourceVersion is null) return;
+
+        await AddVersionAsync(
+            sourceVersion.SyncRecordId,
+            $"Rollback to {sourceVersion.Label}",
+            sourceVersion.Content,
+            uploadedBy);
+    }
 }

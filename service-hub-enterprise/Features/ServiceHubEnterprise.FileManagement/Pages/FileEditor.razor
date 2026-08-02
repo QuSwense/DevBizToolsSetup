@@ -1,0 +1,159 @@
+@page "/file/editor"
+@inject NavigationManager _nav
+@inject IJSRuntime _js
+@inject IConfiguration _config
+@inject SoapAppStore _appStore
+@inject SoapDbContext _soapDb
+@inject RestDbContext _restDb
+@inject FileManagementDbContext _fmDb
+
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="min-height:300px">
+        <div class="spinner-border text-sh-accent" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="InitializeAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+    </div>
+}
+else
+{
+    <div class="editor-page">
+        @* ── Toolbar ── *@
+        <div class="editor-toolbar">
+            <div class="d-flex align-items-center gap-8px">
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="GoBack" type="button" aria-label="Back" title="Go back">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <h5 class="m-0 mono-text">@_fileName</h5>
+                <span class="file-type-badge @GetTypeBadgeClass()">@GetFileExtension()</span>
+                @if (_isSoapFile)
+                {
+                    <span class="text-sh-faint fs-11">— @_appName / @_operation</span>
+                }
+            </div>
+            <div class="d-flex align-items-center gap-8px">
+                <span class="fs-12 text-sh-faint" title="Last saved">@_lastSavedLabel</span>
+                @if (_hasUnsavedChanges)
+                {
+                    <span class="unsaved-badge">Unsaved</span>
+                }
+                <button class="btn btn-outline-secondary btn-dg" @onclick="FormatDocumentAsync" type="button" title="Format document" disabled="@(!_monacoReady)">
+                    <i class="bi bi-file-indent"></i>
+                    Format
+                </button>
+                <button class="btn btn-outline-secondary btn-dg" @onclick="ValidateDocumentAsync" type="button" title="Validate XML/JSON" disabled="@(!_monacoReady)">
+                    <i class="bi bi-check-circle"></i>
+                    Validate
+                </button>
+                <button class="btn btn-outline-secondary btn-dg" @onclick="DownloadFileAsync" type="button" title="Download file">
+                    <i class="bi bi-download"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-dg" @onclick="OpenComparer" type="button" title="Compare with saved version" disabled="@(!_hasPreviousVersion)">
+                    <i class="bi bi-file-diff"></i>
+                    Diff
+                </button>
+                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="SaveAsync" type="button" disabled="@_isSaving">
+                    @if (_isSaving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                    }
+                    <i class="bi bi-check-lg"></i>
+                    Save
+                </button>
+            </div>
+        </div>
+
+        <div class="editor-layout">
+            @* ── Properties Panel (left) ── *@
+            <div class="editor-properties">
+                <div class="properties-section">
+                    <div class="properties-section-title">File Properties</div>
+
+                    <div class="form-group">
+                        <label class="form-label">File Name</label>
+                        <input type="text" class="form-control-dg" @bind="_editFileName" @bind:event="oninput" />
+                    </div>
+
+                    @if (_isSoapFile || _isRestFile)
+                    {
+                        <div class="form-group">
+                            <label class="form-label">Application</label>
+                            <input type="text" class="form-control-dg" value="@_appName" disabled readonly />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Operation</label>
+                            <input type="text" class="form-control-dg" value="@_operation" disabled readonly />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Verb</label>
+                            <input type="text" class="form-control-dg" value="@_verb" disabled readonly />
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control-dg textarea" rows="3" @bind="_editDescription" @bind:event="oninput"></textarea>
+                    </div>
+
+                    @if (_isSoapFile || _isRestFile)
+                    {
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control-dg" @bind="_editStatus">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    }
+
+                    <div class="border-sh-top my-2"></div>
+
+                    <div class="properties-meta">
+                        <div class="meta-row">
+                            <span class="meta-label">Created</span>
+                            <span class="meta-value">@_createdBy on @_createdAt</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Updated</span>
+                            <span class="meta-value">@_lastUpdatedBy @_lastUpdatedAt</span>
+                        </div>
+                        @if (_versionNumber > 0)
+                        {
+                            <div class="meta-row">
+                                <span class="meta-label">Version</span>
+                                <span class="meta-value mono-text">v@(_versionNumber)</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* ── Monaco Editor (right) ── *@
+            <div class="editor-main">
+                <div id="file-editor-monaco" class="monaco-editor-host"></div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Validation toast ── *@
+    @if (_validationMessage is not null)
+    {
+        <div class="sh-toast @(_validationIsError ? "sh-toast-danger" : "sh-toast-success")"
+             @onclick="DismissValidation" role="status" aria-live="polite">
+            <i class="bi @(_validationIsError ? "bi-exclamation-circle" : "bi-check-circle")"></i>
+            <span>@_validationMessage</span>
+        </div>
+    }
+}

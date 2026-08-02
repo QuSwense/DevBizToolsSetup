@@ -630,6 +630,27 @@
     width: 100%;
 }
 
+/* ── Equal-height section cards ───────────── */
+
+/* Bootstrap already stretches each row's columns to equal height; make the
+   .section-card fill its column so all cards in a row match height. */
+
+.dashboard-stack .row > [class*="col-"] {
+    display: flex;
+}
+
+.dashboard-stack .section-card {
+    flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-stack .section-card > .section-body,
+.dashboard-stack .section-card > .section-summary {
+    flex: 1 1 auto;
+}
+
 /* ── Section Card Header ──────────────────── */
 
 .section-title {

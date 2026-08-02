@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:pay="http://www.paymentgateway.com/services/">
+   <soapenv:Header>
+      <pay:merchantId>MER-2026-001</pay:merchantId>
+      <pay:validationId>VAL-20260802-001</pay:validationId>
+   </soapenv:Header>
+   <soapenv:Body>
+      <pay:ValidateCardResponse>
+         <pay:cardValidation>
+            <pay:cardNumber>************1234</pay:cardNumber>
+            <pay:cardType>VISA</pay:cardType>
+            <pay:valid>true</pay:valid>
+            <pay:expiryValid>true</pay:expiryValid>
+            <pay:expiryDate>12/2028</pay:expiryDate>
+            <pay:bin>123456</pay:bin>
+            <pay:issuer>Chase Bank</pay:issuer>
+            <pay:issuerCountry>US</pay:issuerCountry>
+            <pay:cardLevel>STANDARD</pay:cardLevel>
+            <pay:isCorporate>false</pay:isCorporate>
+            <pay:validationTimestamp>2026-08-02T10:30:00Z</pay:validationTimestamp>
+         </pay:cardValidation>
+         <pay:responseCode>200</pay:responseCode>
+         <pay:responseMessage>Card validation successful</pay:responseMessage>
+      </pay:ValidateCardResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

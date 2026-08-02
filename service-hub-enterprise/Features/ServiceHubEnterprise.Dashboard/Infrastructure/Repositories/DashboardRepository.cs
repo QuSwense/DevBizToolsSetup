@@ -36,49 +36,49 @@ internal sealed class DashboardRepository : IDashboardRepository
     /// <inheritdoc />
     public async Task<IReadOnlyList<ServiceHealthEntity>> GetServiceHealthAsync()
     {
-        return await LoadJsonAsync<ServiceHealthEntity[]>("dashboard-health.json")
+        return await LoadJsonAsync<ServiceHealthEntity[]>("Dashboard/dashboard-health.json")
                ?? Array.Empty<ServiceHealthEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<TestSuiteEntity>> GetTestSuitesAsync()
     {
-        return await LoadJsonAsync<TestSuiteEntity[]>("dashboard-test-suites.json")
+        return await LoadJsonAsync<TestSuiteEntity[]>("Dashboard/dashboard-test-suites.json")
                ?? Array.Empty<TestSuiteEntity>();
     }
 
     /// <inheritdoc />
     public async Task<DashboardMetricsEntity> GetMetricsAsync()
     {
-        return await LoadJsonAsync<DashboardMetricsEntity>("dashboard-metrics.json")
+        return await LoadJsonAsync<DashboardMetricsEntity>("Dashboard/dashboard-metrics.json")
                ?? new DashboardMetricsEntity();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<RecentActivityEntity>> GetRecentActivityAsync()
     {
-        return await LoadJsonAsync<RecentActivityEntity[]>("dashboard-recent-activity.json")
+        return await LoadJsonAsync<RecentActivityEntity[]>("Dashboard/dashboard-recent-activity.json")
                ?? Array.Empty<RecentActivityEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<RequestFileEntity>> GetRequestFilesAsync()
     {
-        return await LoadJsonAsync<RequestFileEntity[]>("request-files.json")
+        return await LoadJsonAsync<RequestFileEntity[]>("Soap/Request/request-files.json")
                ?? Array.Empty<RequestFileEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<WsdlRecordEntity>> GetWsdlRecordsAsync()
     {
-        return await LoadJsonAsync<WsdlRecordEntity[]>("wsdl-records.json")
+        return await LoadJsonAsync<WsdlRecordEntity[]>("Wsdl/wsdl-records.json")
                ?? Array.Empty<WsdlRecordEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<UserEntity>> GetUsersAsync()
     {
-        return await LoadJsonAsync<UserEntity[]>("users.json")
+        return await LoadJsonAsync<UserEntity[]>("Dashboard/users.json")
                ?? Array.Empty<UserEntity>();
     }
 
@@ -99,49 +99,49 @@ internal sealed class DashboardRepository : IDashboardRepository
     /// <inheritdoc />
     public async Task<IReadOnlyList<RestAppEntity>> GetRestAppsAsync()
     {
-        return await LoadJsonAsync<RestAppEntity[]>("rest-apps.json")
+        return await LoadJsonAsync<RestAppEntity[]>("Rest/rest-apps.json")
                ?? Array.Empty<RestAppEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<SoapAppEntity>> GetSoapAppsAsync()
     {
-        return await LoadJsonAsync<SoapAppEntity[]>("soap-apps.json")
+        return await LoadJsonAsync<SoapAppEntity[]>("Soap/soap-apps.json")
                ?? Array.Empty<SoapAppEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<RequestFileEntity>> GetRestRequestFilesAsync()
     {
-        return await LoadJsonAsync<RequestFileEntity[]>("rest-request-files.json")
+        return await LoadJsonAsync<RequestFileEntity[]>("Rest/rest-request-files.json")
                ?? Array.Empty<RequestFileEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<UserActivityEntity>> GetUserActivitiesAsync()
     {
-        return await LoadJsonAsync<UserActivityEntity[]>("user-activity.json")
+        return await LoadJsonAsync<UserActivityEntity[]>("Dashboard/user-activity.json")
                ?? Array.Empty<UserActivityEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<RequestExecutionEntity>> GetRequestExecutionsAsync()
     {
-        return await LoadJsonAsync<RequestExecutionEntity[]>("request-executions.json")
+        return await LoadJsonAsync<RequestExecutionEntity[]>("Soap/Request/request-executions.json")
                ?? Array.Empty<RequestExecutionEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<TestSuiteHistoryEntity>> GetTestSuiteHistoryAsync()
     {
-        return await LoadJsonAsync<TestSuiteHistoryEntity[]>("test-suite-history.json")
+        return await LoadJsonAsync<TestSuiteHistoryEntity[]>("Dashboard/test-suite-history.json")
                ?? Array.Empty<TestSuiteHistoryEntity>();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<ServiceUptimeEntity>> GetServiceUptimeAsync()
     {
-        return await LoadJsonAsync<ServiceUptimeEntity[]>("service-uptime.json")
+        return await LoadJsonAsync<ServiceUptimeEntity[]>("Dashboard/service-uptime.json")
                ?? Array.Empty<ServiceUptimeEntity>();
     }
 

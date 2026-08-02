@@ -281,6 +281,72 @@
             });
         },
 
+        /// Creates an editable Monaco code editor with configurable language.
+        /// containerId: DOM element id
+        /// content: initial code content
+        /// language: 'xml' | 'json' | 'plaintext' (default: 'xml')
+        /// dotNetRef: optional DotNetObjectReference for content change callback (must have OnMonacoContentChanged method)
+        /// returns: Promise that resolves when the editor is created
+        createCodeEditor: function (containerId, content, language, dotNetRef) {
+            return new Promise(function (resolve) {
+                onMonacoReady(function () {
+                    var container = document.getElementById(containerId);
+                    if (!container) { resolve(null); return; }
+
+                    // Dispose existing
+                    if (window.wsdlMonaco._editors[containerId]) {
+                        window.wsdlMonaco._editors[containerId].dispose();
+                    }
+
+                    var lang = language || 'xml';
+                    if (lang === 'text') lang = 'plaintext';
+
+                    var editor = monaco.editor.create(container, {
+                        value: content || '',
+                        language: lang,
+                        readOnly: false,
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        lineNumbers: 'on',
+                        renderLineHighlight: 'line',
+                        fontSize: 11,
+                        fontFamily: "'JetBrains Mono', 'Menlo', 'Consolas', monospace",
+                        wordWrap: 'on',
+                        automaticLayout: true,
+                        theme: 'vs-dark',
+                        padding: { top: 8, bottom: 8 },
+                        bracketPairColorization: { enabled: true },
+                        autoClosingBrackets: 'always',
+                        autoClosingQuotes: 'always',
+                        formatOnPaste: true,
+                        tabSize: 2
+                    });
+
+                    // Listen for content changes - call back to .NET if reference provided
+                    if (dotNetRef && typeof dotNetRef.invokeMethodAsync === 'function') {
+                        editor.getModel().onDidChangeContent(function () {
+                            var value = editor.getValue();
+                            dotNetRef.invokeMethodAsync('OnMonacoContentChanged', value);
+                        });
+                    }
+
+                    window.wsdlMonaco._editors[containerId] = editor;
+                    resolve(editor);
+                });
+            });
+        },
+
+        /// Sets the language of an existing editor.
+        setEditorLanguage: function (containerId, language) {
+            var ed = window.wsdlMonaco._editors[containerId];
+            if (ed && ed.getModel) {
+                var model = ed.getModel();
+                if (model) {
+                    monaco.editor.setModelLanguage(model, language === 'text' ? 'plaintext' : (language || 'xml'));
+                }
+            }
+        },
+
         /// Gets the current content from an editor by container id.
         getEditorContent: function (containerId) {
             var ed = window.wsdlMonaco._editors[containerId];

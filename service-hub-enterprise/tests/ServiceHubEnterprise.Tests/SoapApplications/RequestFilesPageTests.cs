@@ -1,10 +1,54 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.SoapApplications.Core.Enums;
+using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Pages;
 using ServiceHubEnterprise.SoapApplications.Services;
+using ServiceHubEnterprise.SoapApplications.Services.Execution;
 using ServiceHubEnterprise.Tests.Fixtures;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
+
+/// <summary>
+/// Deterministic engine double that completes synchronously, so the page-level
+/// execute test verifies the wiring (group created → persisted → navigated)
+/// without depending on bUnit's async event handling. The real engine's stage
+/// logic is covered by <see cref="SimulatedSoapExecutionEngineTests"/>.
+/// </summary>
+internal sealed class StubExecutionEngine : IExecutionEngine
+{
+    public SoapExecutionGroup CreateGroup(IReadOnlyList<SoapRequestFile> files, string triggeredBy)
+    {
+        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        return new SoapExecutionGroup
+        {
+            Id = "exg-stub",
+            StartedAt = now,
+            FinishedAt = now,
+            TriggeredBy = triggeredBy,
+            Status = "completed",
+            Files = files.Select(f => new SoapExecutionFile
+            {
+                FileName = f.FileName,
+                AppName = f.AppName,
+                Operation = f.ApiPath,
+                Status = "success",
+                Stage = ExecutionStage.Complete,
+                StagesCompleted = 7,
+                StagesTotal = 7
+            }).ToList()
+        };
+    }
+
+    public Task RunAsync(
+        SoapExecutionGroup group,
+        IProgress<SoapExecutionGroup>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        progress?.Report(group);
+        return Task.CompletedTask;
+    }
+}
 
 public class RequestFilesPageTests : BunitTestBase
 {
@@ -36,13 +80,28 @@ public class RequestFilesPageTests : BunitTestBase
 ]
 """;
 
-    private void Setup(TempMockDb db)
+    private SoapExecutionStore Setup(TempMockDb db)
     {
-        var config = db.BuildConfiguration(requestFilesDelayMs: 0);
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["MockDb:Path"] = db.Path,
+                ["Users:CurrentUser"] = "Priya Sharma",
+                ["MockDb:RequestFilesDelayMs"] = "0",
+                ["MockDb:ExecutionStageDelayMs"] = "0"
+            })
+            .Build();
         var loader = new MockDbLoader(config);
+        var appStore = new SoapAppStore(loader);
+        var testCaseStore = new SoapTestCaseStore(loader);
+        var executionStore = new SoapExecutionStore(loader);
         Services.AddSingleton(loader);
-        Services.AddSingleton(new SoapAppStore(loader));
+        Services.AddSingleton(appStore);
+        Services.AddSingleton(testCaseStore);
+        Services.AddSingleton(executionStore);
+        Services.AddSingleton<IExecutionEngine>(new SimulatedSoapExecutionEngine(config, appStore, testCaseStore));
         Services.AddSingleton<IConfiguration>(config);
+        return executionStore;
     }
 
     private static IRenderedComponent<RequestFiles> RenderAndWait(RequestFilesPageTests owner)
@@ -56,8 +115,8 @@ public class RequestFilesPageTests : BunitTestBase
     public void LoadsAndRendersRequestFiles()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("soap-apps.json", AppsJson),
-            ("request-files.json", FilesJson));
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/Request/request-files.json", FilesJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -70,8 +129,8 @@ public class RequestFilesPageTests : BunitTestBase
     public void UploadModalShowsValidationErrors()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("soap-apps.json", AppsJson),
-            ("request-files.json", FilesJson));
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/Request/request-files.json", FilesJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -91,8 +150,8 @@ public class RequestFilesPageTests : BunitTestBase
     public void SearchFiltersRows()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("soap-apps.json", AppsJson),
-            ("request-files.json", FilesJson));
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/Request/request-files.json", FilesJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -101,5 +160,51 @@ public class RequestFilesPageTests : BunitTestBase
         cut.WaitForAssertion(() => cut.FindAll("tbody tr").Should().HaveCount(1));
         cut.Markup.Should().Contain("GetInvoice.xml");
         cut.Markup.Should().NotContain("CreateInvoice.xml");
+    }
+
+    [Fact]
+    public void ExecuteRowAction_CreatesAndPersistsExecutionGroup()
+    {
+        using var db = MockDbFixture.CreateTempMockDb(
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/Request/request-files.json", FilesJson));
+        var executionStore = Setup(db);
+        // Override the engine with a synchronous stub for a deterministic test.
+        Services.AddSingleton<IExecutionEngine>(new StubExecutionEngine());
+
+        var cut = RenderAndWait(this);
+        cut.FindAll("button[aria-label=\"Execute\"]").First().Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            executionStore.Groups.Should().ContainSingle();
+            var group = executionStore.Groups[0];
+            group.Id.Should().Be("exg-stub");
+            group.Files.Should().ContainSingle(f => f.FileName == "GetInvoice.xml");
+            group.Files[0].Status.Should().Be("success");
+            group.Status.Should().Be("completed");
+        }, TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public void UploadModal_RejectsDuplicateFileNameForApplication()
+    {
+        using var db = MockDbFixture.CreateTempMockDb(
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/Request/request-files.json", FilesJson));
+        Setup(db);
+
+        var cut = RenderAndWait(this);
+        cut.Find("button[aria-label=\"Upload File\"]").Click();
+        cut.WaitForAssertion(() => cut.Find(".modal-footer-dg button.btn-sh-primary").Should().NotBeNull(), TimeSpan.FromSeconds(3));
+
+        cut.FindAll(".modal-content-dg select")[0].Input("BillingService");
+        cut.FindAll(".modal-content-dg select")[1].Input("GetInvoice");
+        cut.FindAll("button").First(b => b.TextContent.Contains("Add File")).Click();
+        cut.Find("input[placeholder=\"File name (e.g. invoice_create.xml)\"]").Input("GetInvoice.xml");
+        cut.FindAll(".modal-footer-dg button").Last().Click();
+
+        cut.WaitForAssertion(() => cut.Find(".alert-validation").TextContent
+            .Should().Contain("File(s) already exist for this application"), TimeSpan.FromSeconds(3));
     }
 }

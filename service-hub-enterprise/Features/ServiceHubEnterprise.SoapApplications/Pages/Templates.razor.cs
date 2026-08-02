@@ -279,7 +279,7 @@ public partial class Templates : IAsyncDisposable
             // Simulate network/server delay so the loading skeleton is visible
             await Task.Delay(1500);
 
-            _allTemplates = await _mockDbLoader.LoadJsonAsync<Template[]>("templates-page.json") ?? [];
+            _allTemplates = await _mockDbLoader.LoadJsonAsync<Template[]>("Soap/templates-page.json") ?? [];
             ApplyFilters();
         }
         catch (Exception ex)

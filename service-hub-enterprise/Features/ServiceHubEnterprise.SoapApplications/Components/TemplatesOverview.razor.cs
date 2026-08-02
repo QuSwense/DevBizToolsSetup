@@ -16,6 +16,16 @@ public partial class TemplatesOverview
     /// </summary>
     [Parameter] public IReadOnlyList<WsdlTemplate> Templates { get; set; } = [];
 
+    /// <summary>
+    /// Gets or sets whether the card is collapsed to its summary view.
+    /// </summary>
+    [Parameter] public bool Collapsed { get; set; }
+
+    /// <summary>
+    /// Invoked when the card's collapse state is toggled.
+    /// </summary>
+    [Parameter] public EventCallback<bool> OnToggle { get; set; }
+
     private List<GridColumn<WsdlTemplate>> _columns = [];
 
     private int ExtendingCount => Templates.Count(t => !string.IsNullOrEmpty(t.ExtendsTemplateId));

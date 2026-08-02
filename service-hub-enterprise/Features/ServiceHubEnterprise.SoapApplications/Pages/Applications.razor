@@ -1,5 +1,9 @@
 @page "/soap/applications"
 @inject SoapAppStore _appStore
+@inject MockDbLoader _mockDbLoader
+@inject SoapTestCaseStore _testCaseStore
+@inject WsdlSyncStore _wsdlStore
+@inject SoapExecutionStore _executionStore
 
 @* ── Loading Skeleton ── *@
 @if (_isLoading)
@@ -29,6 +33,18 @@ else if (_hasError)
             Retry
         </button>
         <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else if (_allApps.Length == 0)
+{
+    <div class="datagrid-card empty-state-card">
+        <i class="bi bi-database-empty" style="font-size:36px;color:var(--sh-text-faint)"></i>
+        <h4 class="empty-state-title">No SOAP applications yet</h4>
+        <p class="empty-state-desc">Create your first SOAP application to get started with request files, WSDL sync and executions.</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark mt-2" @onclick="() => { _validationErrors = []; _showAddModal = true; }" type="button" aria-label="Add Application">
+            <i class="bi bi-plus-lg"></i>
+            Add Application
+        </button>
     </div>
 }
 else
@@ -147,7 +163,7 @@ else
                 <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete">
                     <i class="bi bi-trash" aria-hidden="true"></i>
                 </button>
-                <button class="ia-btn @(isEnabled ? "ia-enable" : "ia-normal")" type="button" aria-label="Toggle" data-tooltip="Toggle">
+                <button class="ia-btn @(isEnabled ? "ia-enable" : "ia-normal")" type="button" aria-label="Toggle" data-tooltip="@(isEnabled ? "Disable" : "Enable")">
                     @if(isEnabled)
                     {
                         <i class="bi bi-toggle-off" aria-hidden="true"></i>

@@ -1,0 +1,7 @@
+{
+  "basic": "Wsdl/wsdl_basic.wsdl",
+  "customer": "Wsdl/wsdl_customer.wsdl",
+  "orders": "Wsdl/wsdl_orders.wsdl",
+  "previous": "Wsdl/wsdl_previous.wsdl",
+  "changed": "Wsdl/wsdl_changed.wsdl"
+}

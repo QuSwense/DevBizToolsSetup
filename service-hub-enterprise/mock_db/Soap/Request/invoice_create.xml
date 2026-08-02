@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:bil="http://www.legacybilling.com/services/">
+   <soapenv:Header>
+      <bil:requestId>REQ-INV-20260802-001</bil:requestId>
+      <bil:timestamp>2026-08-02T10:30:00Z</bil:timestamp>
+   </soapenv:Header>
+   <soapenv:Body>
+      <bil:CreateInvoiceResponse>
+         <bil:invoiceId>INV-2026-0842</bil:invoiceId>
+         <bil:status>CREATED</bil:status>
+         <bil:invoiceNumber>INV-10042</bil:invoiceNumber>
+         <bil:invoiceDate>2026-08-02</bil:invoiceDate>
+         <bil:dueDate>2026-09-01</bil:dueDate>
+         <bil:totalAmount>1245.67</bil:totalAmount>
+         <bil:taxAmount>149.48</bil:taxAmount>
+         <bil:taxRate>13.65</bil:taxRate>
+         <bil:currency>USD</bil:currency>
+         <bil:customerId>CUST-5678</bil:customerId>
+         <bil:customerName>Acme Corporation</bil:customerName>
+         <bil:responseCode>201</bil:responseCode>
+         <bil:responseMessage>Invoice created successfully</bil:responseMessage>
+         <bil:responseTimestamp>2026-08-02T10:30:05Z</bil:responseTimestamp>
+      </bil:CreateInvoiceResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

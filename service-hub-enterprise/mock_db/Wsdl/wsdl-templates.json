@@ -1,0 +1,41 @@
+[
+  {
+    "id": "tpl-1",
+    "name": "Standard SOAP Envelope",
+    "description": "Basic SOAP envelope with header and body",
+    "content": "wsdl_basic.wsdl",
+    "extendsTemplateId": null,
+    "extendsTemplateName": null,
+    "variables": ["username", "password", "operation", "namespace", "request_id"],
+    "createdBy": "System",
+    "createdAt": "2026-01-15",
+    "updatedAt": "2026-01-15",
+    "usageCount": 24
+  },
+  {
+    "id": "tpl-2",
+    "name": "Billing Invoice Request",
+    "description": "Extends Standard SOAP Envelope for billing invoice operations",
+    "content": "wsdl_basic.wsdl",
+    "extendsTemplateId": "tpl-1",
+    "extendsTemplateName": "Standard SOAP Envelope",
+    "variables": ["username", "password", "operation", "invoice_id", "customer_id", "amount", "currency"],
+    "createdBy": "Suresh Kumar",
+    "createdAt": "2026-02-10",
+    "updatedAt": "2026-07-05",
+    "usageCount": 15
+  },
+  {
+    "id": "tpl-3",
+    "name": "Order Processing Template",
+    "description": "Extends Standard SOAP Envelope for order management",
+    "content": "wsdl_orders.wsdl",
+    "extendsTemplateId": "tpl-1",
+    "extendsTemplateName": "Standard SOAP Envelope",
+    "variables": ["username", "password", "operation", "order_id", "customer_id", "item_code", "quantity"],
+    "createdBy": "Rahul Patel",
+    "createdAt": "2026-03-10",
+    "updatedAt": "2026-07-01",
+    "usageCount": 9
+  }
+]

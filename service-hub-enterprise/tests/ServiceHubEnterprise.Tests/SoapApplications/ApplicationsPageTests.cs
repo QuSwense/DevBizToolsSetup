@@ -63,11 +63,15 @@ public class ApplicationsPageTests : BunitTestBase
 
     private SoapAppStore Setup(TempMockDb db)
     {
-        var loader = new MockDbLoader(db.BuildConfiguration());
+        var config = db.BuildConfiguration();
+        var loader = new MockDbLoader(config);
         var store = new SoapAppStore(loader);
         Services.AddSingleton(loader);
         Services.AddSingleton(store);
-        Services.AddSingleton<IConfiguration>(db.BuildConfiguration());
+        Services.AddSingleton(new SoapTestCaseStore(loader));
+        Services.AddSingleton(new SoapExecutionStore(loader));
+        Services.AddSingleton(new WsdlSyncStore(loader));
+        Services.AddSingleton<IConfiguration>(config);
         return store;
     }
 
@@ -82,7 +86,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public void RendersLoadingSkeletonInitially()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         Setup(db);
 
         var cut = Render<Applications>();
@@ -93,7 +97,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public void LoadsAndRendersApplicationsInGrid()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -106,7 +110,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public void AddModalShowsValidationErrorsForInvalidInput()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -125,7 +129,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public void AddApplicationPersistsToStore()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         var store = Setup(db);
 
         var cut = RenderAndWait(this);
@@ -148,7 +152,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public void EditDialogPrefillsValues()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -163,7 +167,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public async Task ContextMenuProviderReturnsMenuItems()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         Setup(db);
 
         var cut = RenderAndWait(this);
@@ -178,7 +182,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public async Task ContextMenuToggleUpdatesStatusAndShowsToast()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         var store = Setup(db);
 
         var cut = RenderAndWait(this);
@@ -193,7 +197,7 @@ public class ApplicationsPageTests : BunitTestBase
     [Fact]
     public void FilterModalFiltersByName()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("soap-apps.json", AppsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", AppsJson));
         Setup(db);
 
         var cut = RenderAndWait(this);

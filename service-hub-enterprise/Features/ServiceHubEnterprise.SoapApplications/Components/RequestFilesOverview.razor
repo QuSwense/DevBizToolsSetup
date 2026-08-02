@@ -1,11 +1,60 @@
 @namespace ServiceHubEnterprise.SoapApplications.Components
 
-<SectionCard Title="Request Files" Icon="📄" Subtitle="SOAP request files per application" Filter="@_range" OnFilterChanged="ApplyRange">
+<SectionCard Title="Request Files" Icon="📄" Subtitle="SOAP request files per application" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">📄</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Files</span>
+                <span class="summary-chip-value">@Files.Count</span>
+                <span class="summary-chip-sub">request files</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">✅</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Active</span>
+                <span class="summary-chip-value summary-chip-value--success">@ActiveCount</span>
+                <span class="summary-chip-sub">files</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">⛔</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Inactive</span>
+                <span class="summary-chip-value summary-chip-value--warning">@InactiveCount</span>
+                <span class="summary-chip-sub">files</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">📦</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Applications</span>
+                <span class="summary-chip-value">@AppNames.Count</span>
+                <span class="summary-chip-sub">with files</span>
+            </div>
+        </div>
+        <div class="summary-chip summary-chip-donut">
+            <MiniDonut Value="@ActiveCount" Total="@Files.Count" Label="active" ValueColor="var(--sh-success)" Size="56" />
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Active share</span>
+                <span class="summary-chip-value">@(Files.Count > 0 ? ActiveCount * 100 / Files.Count : 0)%</span>
+            </div>
+        </div>
+    </Summary>
+    <ChildContent>
     <div class="kpi-grid">
         <KpiTile Label="Total Files" Value="@Files.Count.ToString()" Sub="request files" Icon="📄" />
         <KpiTile Label="Active" Value="@ActiveCount.ToString()" Sub="files" Color="var(--sh-success)" Icon="✅" />
         <KpiTile Label="Inactive" Value="@InactiveCount.ToString()" Sub="files" Color="var(--sh-warning)" Icon="⛔" />
         <KpiTile Label="Applications" Value="@AppNames.Count.ToString()" Sub="with files" Icon="📦" />
+        <div class="kpi-tile kpi-donut-tile">
+            <div class="kpi-header"><span class="kpi-title">Active Share</span></div>
+            <div class="kpi-donut">
+                <MiniDonut Value="@ActiveCount" Total="@Files.Count" Label="active" ValueColor="var(--sh-success)" />
+            </div>
+        </div>
     </div>
     <div class="section-divider"></div>
     <div class="sub-heading">
@@ -25,4 +74,5 @@
             </div>
         }
     </div>
+    </ChildContent>
 </SectionCard>

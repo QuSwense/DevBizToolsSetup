@@ -13,7 +13,7 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void GetRecordsForAppFiltersAndOrdersNewestFirst()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json",
+            ("Wsdl/wsdl-records.json",
                 """[{"id":"r1","appId":"app-1","appName":"A","uploadedAt":"2024-01-01"},{"id":"r2","appId":"app-1","appName":"A","uploadedAt":"2024-06-01"},{"id":"r3","appId":"app-2","appName":"B","uploadedAt":"2024-03-01"}]"""));
         var store = CreateStore(db);
 
@@ -26,8 +26,8 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void GetVersionsForSyncOrdersByVersionDesc()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json", "[]"),
-            ("wsdl-versions.json",
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-versions.json",
                 """[{"id":"v1","syncRecordId":"s1","versionNumber":1},{"id":"v3","syncRecordId":"s1","versionNumber":3},{"id":"v2","syncRecordId":"s1","versionNumber":2}]"""));
         var store = CreateStore(db);
 
@@ -40,8 +40,8 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void GetTemplatesOrdersByName()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json", "[]"),
-            ("wsdl-templates.json",
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-templates.json",
                 """[{"id":"t2","name":"Zulu"},{"id":"t1","name":"Alpha"}]"""));
         var store = CreateStore(db);
 
@@ -54,8 +54,8 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void GetTemplateFindsByIdAndReturnsNullForMissing()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json", "[]"),
-            ("wsdl-templates.json",
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-templates.json",
                 """[{"id":"t1","name":"Alpha"}]"""));
         var store = CreateStore(db);
 
@@ -67,8 +67,8 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void ResolveEffectiveTemplateReturnsSelfWhenNoParent()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json", "[]"),
-            ("wsdl-templates.json",
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-templates.json",
                 """[{"id":"t1","name":"Alpha"}]"""));
         var store = CreateStore(db);
 
@@ -80,8 +80,8 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void ResolveEffectiveTemplateReturnsParent()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json", "[]"),
-            ("wsdl-templates.json",
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-templates.json",
                 """[{"id":"base","name":"Base"},{"id":"child","name":"Child","extendsTemplateId":"base"}]"""));
         var store = CreateStore(db);
 
@@ -93,8 +93,8 @@ public class WsdlSyncStoreTests : BunitTestBase
     public void ResolveVariablesWalksChainAndDeDuplicates()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("wsdl-records.json", "[]"),
-            ("wsdl-templates.json",
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-templates.json",
                 """[{"id":"base","name":"Base","variables":["customer_id","amount"]},{"id":"child","name":"Child","extendsTemplateId":"base","variables":["amount","currency"]}]"""));
         var store = CreateStore(db);
 

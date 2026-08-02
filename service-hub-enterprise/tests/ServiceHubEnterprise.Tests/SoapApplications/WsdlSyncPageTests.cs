@@ -42,16 +42,16 @@ public class WsdlSyncPageTests : BunitTestBase
     public void RendersWithoutErrorAndShowsFirstApp()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("soap-apps.json", AppsJson),
-            ("wsdl-records.json",
+            ("Soap/soap-apps.json", AppsJson),
+            ("Wsdl/wsdl-records.json",
                 """[{"id":"rec-1","appId":"app-1","appName":"BillingService","sourceType":"url","sourceUrl":"https://soap.example.com/billing?wsdl","uploadedBy":"Priya Sharma","uploadedAt":"2024-06-01","status":"synced","versionCount":1}]"""),
-            ("wsdl-versions.json",
+            ("Wsdl/wsdl-versions.json",
                 """[{"id":"ver-1","syncRecordId":"rec-1","versionNumber":1,"label":"v1","uploadedBy":"Priya Sharma","uploadedAt":"2024-06-01","status":"active"}]"""),
-            ("wsdl-templates.json", "[]"),
-            ("wsdl-sync-history.json", "[]"),
-            ("wsdl-content-map.json", """{"previous":"prev.wsdl","changed":"changed.wsdl"}"""),
-            ("prev.wsdl", "<wsdl>previous</wsdl>"),
-            ("changed.wsdl", "<wsdl>changed</wsdl>"));
+            ("Wsdl/wsdl-templates.json", "[]"),
+            ("Wsdl/wsdl-sync-history.json", "[]"),
+            ("Wsdl/wsdl-content-map.json", """{"previous":"prev.wsdl","changed":"changed.wsdl"}"""),
+            ("Wsdl/prev.wsdl", "<wsdl>previous</wsdl>"),
+            ("Wsdl/changed.wsdl", "<wsdl>changed</wsdl>"));
         Setup(db);
 
         var cut = Render<WsdlSync>();

@@ -528,9 +528,18 @@ public partial class Applications : IDisposable
 
     private async Task DeleteAppAsync(SoapApp app)
     {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete application '{app.Name}'? This cannot be undone.");
+        var files = await _mockDbLoader.LoadJsonAsync<SoapRequestFile[]>("Soap/Request/request-files.json") ?? [];
+        var fileCount = files.Count(f => f.AppName == app.Name);
+        var testCaseCount = _testCaseStore.TestCases.Count(t => t.AppName == app.Name);
+        var wsdlRecordCount = _wsdlStore.Records.Count(r => r.AppId == app.Id);
+
+        var message = $"Delete application '{app.Name}'? This will also remove {fileCount} request file(s), " +
+                      $"{testCaseCount} test case(s) and {wsdlRecordCount} WSDL sync record(s). " +
+                      "Historical executions remain. This cannot be undone.";
+        var confirmed = await JS.InvokeAsync<bool>("confirm", message);
         if (!confirmed) return;
 
+        await CascadeDeleteAppAsync(app);
         _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != app.Id)]);
         _allApps = _appStore.Apps;
         _expandedActionRows.Remove(app.Id);
@@ -540,6 +549,31 @@ public partial class Applications : IDisposable
             _editingApp = null;
         }
         ShowToast("Application deleted", "danger");
+    }
+
+    /// <summary>
+    /// Removes the application's dependent data: request files (persisted), test
+    /// cases (persisted) and WSDL sync records + versions. Execution history is
+    /// intentionally kept as a historical record.
+    /// </summary>
+    private async Task CascadeDeleteAppAsync(SoapApp app)
+    {
+        // Request files
+        var files = await _mockDbLoader.LoadJsonAsync<SoapRequestFile[]>("Soap/Request/request-files.json") ?? [];
+        var remainingFiles = files.Where(f => f.AppName != app.Name).ToArray();
+        await _mockDbLoader.SaveJsonAsync("Soap/Request/request-files.json", remainingFiles);
+
+        // Test cases
+        var tcToRemove = _testCaseStore.TestCases.Where(t => t.AppName == app.Name).Select(t => t.Id).ToArray();
+        foreach (var id in tcToRemove)
+        {
+            await _testCaseStore.DeleteTestCaseAsync(id);
+        }
+
+        // WSDL records + their versions
+        var recordsToRemove = _wsdlStore.Records.Where(r => r.AppId == app.Id).Select(r => r.Id).ToArray();
+        _wsdlStore.Records.RemoveAll(r => r.AppId == app.Id);
+        _wsdlStore.Versions.RemoveAll(v => recordsToRemove.Contains(v.SyncRecordId));
     }
 
     private async Task CopyRowAsync(SoapApp app, bool asCsv)
@@ -659,8 +693,14 @@ public partial class Applications : IDisposable
             return;
         }
 
-        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete {_selectedIds.Count} selected application(s)? This cannot be undone.");
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete {_selectedIds.Count} selected application(s) and their request files, test cases and WSDL records? This cannot be undone.");
         if (!confirmed) return;
+
+        var appsToDelete = _appStore.Apps.Where(a => _selectedIds.Contains(a.Id)).ToArray();
+        foreach (var app in appsToDelete)
+        {
+            await CascadeDeleteAppAsync(app);
+        }
 
         _appStore.UpdateApps([.._appStore.Apps.Where(a => !_selectedIds.Contains(a.Id))]);
         _allApps = _appStore.Apps;

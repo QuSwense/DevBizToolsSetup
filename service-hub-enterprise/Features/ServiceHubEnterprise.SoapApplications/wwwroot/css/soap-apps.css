@@ -1238,6 +1238,196 @@
     to { transform: rotate(360deg); }
 }
 
+/* ── Execution Progress Modal ── */
+.modal-w-760 { width: 760px; max-width: 94vw; }
+
+.exec-file-row {
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    background: var(--sh-surface);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+
+.exec-stage-strip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.exec-stage {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--sh-border);
+    color: var(--sh-text-faint);
+    background: var(--sh-surface-2);
+    white-space: nowrap;
+}
+
+.exec-stage-done {
+    color: var(--sh-success);
+    border-color: color-mix(in srgb, var(--sh-success) 30%, transparent);
+    background: color-mix(in srgb, var(--sh-success) 8%, transparent);
+}
+
+.exec-stage-active {
+    color: var(--sh-accent);
+    border-color: color-mix(in srgb, var(--sh-accent) 40%, transparent);
+    background: color-mix(in srgb, var(--sh-accent) 8%, transparent);
+    font-weight: 600;
+}
+
+.exec-stage-done i,
+.exec-stage-active i {
+    font-size: 11px;
+}
+
+/* Spin animation for the active stage icon */
+.spin {
+    display: inline-block;
+    animation: spinnerRotate 1s linear infinite;
+}
+
+/* ── Execute & History page ── */
+.exec-group-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    background: var(--sh-surface);
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--sh-text);
+}
+
+.exec-group-file:hover {
+    border-color: var(--sh-accent);
+}
+
+.exec-group-file.is-active {
+    border-color: var(--sh-accent);
+    background: color-mix(in srgb, var(--sh-accent) 6%, transparent);
+}
+
+.exec-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 20px 0;
+    border-bottom: 1px solid var(--sh-border);
+    flex-wrap: wrap;
+}
+
+.exec-tab {
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sh-text-soft);
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+}
+
+.exec-tab:hover {
+    color: var(--sh-accent);
+}
+
+.exec-tab.is-active {
+    color: var(--sh-accent);
+    border-color: var(--sh-border);
+    background: var(--sh-surface);
+    box-shadow: inset 0 -2px 0 var(--sh-accent);
+}
+
+.exec-viewer {
+    margin: 0;
+    background: var(--sh-surface-2);
+    border: 1px solid var(--sh-border);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    overflow: auto;
+    max-height: 420px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.exec-log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.exec-log-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 12px;
+    padding: 6px 10px;
+    border: 1px solid var(--sh-border);
+    border-radius: 6px;
+    background: var(--sh-surface);
+}
+
+.exec-log-type {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.log-info { color: var(--sh-text-soft); background: var(--sh-surface-2); }
+.log-warning { color: var(--sh-warning); background: color-mix(in srgb, var(--sh-warning) 12%, transparent); }
+.log-error { color: var(--sh-error); background: color-mix(in srgb, var(--sh-error) 12%, transparent); }
+.log-request { color: var(--sh-accent); background: color-mix(in srgb, var(--sh-accent) 12%, transparent); }
+.log-response { color: var(--sh-success); background: color-mix(in srgb, var(--sh-success) 12%, transparent); }
+.log-assertion { color: var(--sh-warning); background: color-mix(in srgb, var(--sh-warning) 12%, transparent); }
+
+.table-dg thead th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--sh-text-soft);
+    border-bottom: 1px solid var(--sh-border);
+}
+
+.table-dg tbody td {
+    font-size: 12px;
+    border-bottom: 1px solid var(--sh-border);
+    vertical-align: middle;
+}
+
+.text-sh-warn { color: var(--sh-warning); }
+
+/* ── Test Case Editor ── */
+.modal-w-640 { width: 640px; max-width: 94vw; }
+.modal-w-720 { width: 720px; max-width: 94vw; }
+
+.tc-extractor-row {
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    background: var(--sh-surface);
+    padding: 10px 12px;
+    margin-bottom: 8px;
+}
+
 /* ── Button Danger Variant ── */
 .btn-sh-danger.btn-dg {
     background: var(--sh-error);
@@ -1495,3 +1685,79 @@
 .tree-sync-indicator.synced { background: rgba(40,167,69,0.1); color: #28a745; }
 .tree-sync-indicator.pending { background: rgba(255,193,7,0.1); color: #d48c00; }
 .tree-sync-indicator.failed { background: rgba(220,53,69,0.1); color: #dc3545; }
+
+/* ============================================================
+   TOOLTIPS — data-tooltip attribute
+   Any element with a non-empty data-tooltip shows a styled bubble
+   on hover / keyboard focus. Matches the --sh-* design tokens.
+   ============================================================ */
+:root {
+    --sh-tooltip-bg: #0f172a;
+    --sh-tooltip-text: #f8fafc;
+    --sh-tooltip-border: rgba(148, 163, 184, .3);
+    --sh-tooltip-shadow: 0 4px 14px rgba(2, 6, 23, .35);
+}
+[data-theme="dark"] {
+    --sh-tooltip-bg: #22304a;
+    --sh-tooltip-text: #e6edf6;
+    --sh-tooltip-border: #33475f;
+    --sh-tooltip-shadow: 0 4px 14px rgba(0, 0, 0, .55);
+}
+
+/* The element carrying a tooltip becomes its positioning context */
+[data-tooltip]:not([data-tooltip=""]) {
+    position: relative;
+}
+
+/* Tooltip bubble */
+[data-tooltip]:not([data-tooltip=""])::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%) translateY(3px);
+    z-index: 120;
+    padding: 4px 9px;
+    border-radius: 4px;
+    background: var(--sh-tooltip-bg);
+    color: var(--sh-tooltip-text);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: .1px;
+    text-align: center;
+    white-space: normal;
+    max-width: 280px;
+    border: 1px solid var(--sh-tooltip-border);
+    box-shadow: var(--sh-tooltip-shadow);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .12s ease, transform .12s ease, visibility .12s;
+}
+
+[data-tooltip]:not([data-tooltip=""]):hover::after,
+[data-tooltip]:not([data-tooltip=""]):focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Row-action buttons live in the rightmost column — anchor the tooltip so it
+   grows leftward and never overflows the table's right edge. */
+.action-trigger[data-tooltip]:not([data-tooltip=""])::after,
+.ia-btn[data-tooltip]:not([data-tooltip=""])::after,
+.action-icon-btn[data-tooltip]:not([data-tooltip=""])::after {
+    left: auto;
+    right: 50%;
+    transform: translateX(50%) translateY(3px);
+}
+
+.action-trigger[data-tooltip]:not([data-tooltip=""]):hover::after,
+.ia-btn[data-tooltip]:not([data-tooltip=""]):hover::after,
+.action-icon-btn[data-tooltip]:not([data-tooltip=""]):hover::after,
+.action-trigger[data-tooltip]:not([data-tooltip=""]):focus-visible::after,
+.ia-btn[data-tooltip]:not([data-tooltip=""]):focus-visible::after,
+.action-icon-btn[data-tooltip]:not([data-tooltip=""]):focus-visible::after {
+    transform: translateX(50%) translateY(0);
+}

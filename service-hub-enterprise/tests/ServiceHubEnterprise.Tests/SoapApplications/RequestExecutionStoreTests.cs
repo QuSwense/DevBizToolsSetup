@@ -16,7 +16,7 @@ public class RequestExecutionStoreTests : BunitTestBase
     [Fact]
     public void FiltersToSoapAppTypeCaseInsensitiveAndOrdersNewestFirst()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("request-executions.json", ExecutionsJson));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/Request/request-executions.json", ExecutionsJson));
         var store = new RequestExecutionStore(new MockDbLoader(db.BuildConfiguration()));
 
         store.SoapExecutions.Should().HaveCount(2);
@@ -27,7 +27,7 @@ public class RequestExecutionStoreTests : BunitTestBase
     [Fact]
     public void HandlesEmptySource()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("request-executions.json", "[]"));
+        using var db = MockDbFixture.CreateTempMockDb(("Soap/Request/request-executions.json", "[]"));
         var store = new RequestExecutionStore(new MockDbLoader(db.BuildConfiguration()));
 
         store.SoapExecutions.Should().BeEmpty();

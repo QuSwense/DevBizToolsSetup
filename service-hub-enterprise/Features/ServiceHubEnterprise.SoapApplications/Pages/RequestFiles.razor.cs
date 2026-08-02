@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using ServiceHubEnterprise.Grid.Components;
+using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
+using ServiceHubEnterprise.SoapApplications.Services.Execution;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;
 
@@ -49,7 +51,6 @@ public partial class RequestFiles : IDisposable
         builder.CloseElement();
     }
 
-    private record RequestFile(string FileName, string AppName, string ApiPath, string Verb, string Description, string Status, string CreatedBy, DateTime CreatedAt, string? UpdatedBy, DateTime? UpdatedAt);
     private class UploadFileEntry
     {
         public string FileName { get; set; } = "";
@@ -61,7 +62,7 @@ public partial class RequestFiles : IDisposable
     private bool _hasError;
     private string? _errorMessage;
 
-    private List<GridColumn<RequestFile>> _columns = [];
+    private List<GridColumn<SoapRequestFile>> _columns = [];
     private HashSet<string> _expandedActionRows = [];
 
     private bool _showUploadModal = false;
@@ -94,12 +95,33 @@ public partial class RequestFiles : IDisposable
     private SoapApiEntry[] EditAvailableOperations =>
         _appStore.Apps.FirstOrDefault(a => a.Name == _editAppName)?.Apis ?? [];
 
-    private RequestFile[] _files = [];
-    private ServiceHubGrid<RequestFile>? _grid;
+    /// <summary>
+    /// Options rendered in the Edit dialog's Operation select. Includes the application's
+    /// operations plus the file's currently saved operation when it is no longer part of
+    /// the app's operation list, so the select always shows the bound value.
+    /// </summary>
+    private SoapApiEntry[] EditOperationOptions
+    {
+        get
+        {
+            var ops = EditAvailableOperations;
+            if (string.IsNullOrWhiteSpace(_editApiPath))
+            {
+                return ops;
+            }
+
+            return ops.Any(o => o.Name == _editApiPath)
+                ? ops
+                : [.. ops, new SoapApiEntry { Name = _editApiPath, Description = "Previously selected operation" }];
+        }
+    }
+
+    private SoapRequestFile[] _files = [];
+    private ServiceHubGrid<SoapRequestFile>? _grid;
     private HashSet<string> _selectedIds = [];
 
     private bool _showEditModal = false;
-    private RequestFile? _editingFile = null;
+    private SoapRequestFile? _editingFile = null;
     private string _editFileName = "";
     private string _editAppName = "";
     private string _editApiPath = "";
@@ -110,6 +132,24 @@ public partial class RequestFiles : IDisposable
     private string? _toastMessage;
     private string _toastType = "success";
     private CancellationTokenSource? _toastCts;
+
+    // ── Execution state ──
+    private bool _showExecutionProgress = false;
+    private SoapExecutionGroup? _activeGroup;
+    private bool _executionFinished = false;
+
+    // ── Test-case management state ──
+    private bool _showTestCasesModal = false;
+    private SoapRequestFile? _tcFile;
+    private SoapTestCase[] _fileTestCases = [];
+
+    private bool _showTestCaseModal = false;
+    private SoapTestCase? _editingTestCase;
+    private string _tcName = "";
+    private string _tcDescription = "";
+    private bool _tcEnabled = true;
+    private List<SoapExtractor> _tcExtractors = [];
+    private List<string> _tcValidationErrors = [];
 
     private static string GetVerbFromOperation(string operationName)
     {
@@ -235,7 +275,7 @@ public partial class RequestFiles : IDisposable
                 await Task.Delay(delayMs);
             }
 
-            _files = await _mockDbLoader.LoadJsonAsync<RequestFile[]>("request-files.json");
+            _files = await _mockDbLoader.LoadJsonAsync<SoapRequestFile[]>("Soap/Request/request-files.json");
         }
         catch (Exception ex)
         {
@@ -259,6 +299,266 @@ public partial class RequestFiles : IDisposable
         _expandedActionRows.Remove(rowId);
         StateHasChanged();
     }
+
+    /// <summary>
+    /// Navigates to the Applications page (used from the empty state when no
+    /// applications exist yet).
+    /// </summary>
+    private void NavigateToApplications()
+        => _nav.NavigateTo("/soap/applications");
+
+    // ── Execution ──
+
+    /// <summary>Executes a single request file (row action).</summary>
+    private async Task ExecuteFileAsync(SoapRequestFile file)
+        => await ExecuteFilesAsync([file]);
+
+    /// <summary>Executes all selected request files (Actions dropdown).</summary>
+    private async Task ExecuteSelectedAsync()
+    {
+        _showDropdown = false;
+        var selected = _files.Where(f => _selectedIds.Contains(f.FileName)).ToArray();
+        if (selected.Length == 0)
+        {
+            ShowToast("Select at least one request file to execute", "danger");
+            return;
+        }
+        await ExecuteFilesAsync(selected);
+    }
+
+    /// <summary>
+    /// Creates an execution group (unique id even for a single file), runs the
+    /// simulated engine while showing per-file stage progress, persists the group
+    /// and navigates to the Execute &amp; History page with the group selected.
+    /// </summary>
+    private async Task ExecuteFilesAsync(IReadOnlyList<SoapRequestFile> files)
+    {
+        if (files.Count == 0)
+        {
+            ShowToast("No request files to execute", "danger");
+            return;
+        }
+
+        var blocked = files.Where(f =>
+            _appStore.Apps.FirstOrDefault(a => a.Name == f.AppName)?.Status == AppStatus.Disabled).ToArray();
+        if (blocked.Length > 0)
+        {
+            ShowToast($"Execution blocked — {blocked.Length} file(s) belong to a disabled application", "danger");
+            return;
+        }
+
+        var group = _engine.CreateGroup(files, CurrentUser);
+        _activeGroup = group;
+        _executionFinished = false;
+        _showExecutionProgress = true;
+
+        var progress = new Progress<SoapExecutionGroup>(g =>
+        {
+            _activeGroup = g;
+            _executionFinished = g.Status != "running";
+            _ = InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await _engine.RunAsync(group, progress);
+        }
+        finally
+        {
+            await _executionStore.AddGroupAsync(group);
+            _showExecutionProgress = false;
+            StateHasChanged();
+        }
+
+        ShowToast("Execution completed");
+        _nav.NavigateTo($"/soap/execute-history?group={Uri.EscapeDataString(group.Id)}");
+    }
+
+    /// <summary>Navigates to the per-file execution history for a request file.</summary>
+    private void NavigateToFileHistory(SoapRequestFile file)
+        => _nav.NavigateTo($"/soap/execute-history?file={Uri.EscapeDataString(file.FileName)}&app={Uri.EscapeDataString(file.AppName)}");
+
+    /// <summary>Navigates to the generic file editor for a request file.</summary>
+    private void NavigateToEditor(SoapRequestFile file)
+        => _nav.NavigateTo($"/file/editor?app={Uri.EscapeDataString(file.AppName)}&file={Uri.EscapeDataString(file.FileName)}");
+
+    // ── Test cases ──
+
+    /// <summary>Opens the test-case list modal for a request file.</summary>
+    private void OpenTestCasesModal(SoapRequestFile file)
+    {
+        _tcFile = file;
+        _fileTestCases = _testCaseStore.GetForFile(file.AppName, file.FileName).ToArray();
+        _showTestCasesModal = true;
+    }
+
+    private void CloseTestCasesModal()
+    {
+        _showTestCasesModal = false;
+        _tcFile = null;
+    }
+
+    private void OpenCreateTestCase()
+    {
+        _editingTestCase = null;
+        _tcName = "";
+        _tcDescription = "";
+        _tcEnabled = true;
+        _tcExtractors = [NewExtractor()];
+        _tcValidationErrors = [];
+        _showTestCaseModal = true;
+    }
+
+    private void OpenEditTestCase(SoapTestCase testCase)
+    {
+        _editingTestCase = testCase;
+        _tcName = testCase.Name;
+        _tcDescription = testCase.Description;
+        _tcEnabled = testCase.Enabled;
+        _tcExtractors = testCase.Extractors.Select(e => new SoapExtractor
+        {
+            Id = e.Id,
+            Name = e.Name,
+            Source = e.Source,
+            Type = e.Type,
+            Path = e.Path,
+            ExpectedValue = e.ExpectedValue
+        }).ToList();
+        _tcValidationErrors = [];
+        _showTestCaseModal = true;
+    }
+
+    private static SoapExtractor NewExtractor() => new()
+    {
+        Id = $"ex-{Guid.NewGuid():N}"[..10],
+        Name = "",
+        Source = "response",
+        Type = "xpath",
+        Path = ""
+    };
+
+    private void AddExtractor() => _tcExtractors.Add(NewExtractor());
+
+    private void RemoveExtractor(int index) => _tcExtractors.RemoveAt(index);
+
+    /// <summary>Validates and saves the test case being edited, then persists it.</summary>
+    private async Task SaveTestCaseAsync()
+    {
+        _tcValidationErrors = [];
+        if (_tcFile is null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(_tcName))
+        {
+            _tcValidationErrors.Add("Test case name is required.");
+        }
+        else if (_testCaseStore.TestCases.Any(t =>
+                     t.AppName == _tcFile.AppName &&
+                     t.FileName == _tcFile.FileName &&
+                     t.Name == _tcName.Trim() &&
+                     t.Id != _editingTestCase?.Id))
+        {
+            _tcValidationErrors.Add("A test case with this name already exists for this request file.");
+        }
+
+        foreach (var ex in _tcExtractors)
+        {
+            if (string.IsNullOrWhiteSpace(ex.Name))
+            {
+                ex.Name = string.IsNullOrWhiteSpace(ex.Path) ? "extraction" : ex.Path;
+            }
+            if (string.IsNullOrWhiteSpace(ex.Path))
+            {
+                _tcValidationErrors.Add($"Extractor '{ex.Name}' requires a path/expression.");
+            }
+        }
+
+        if (_tcValidationErrors.Count > 0)
+            return;
+
+        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        if (_editingTestCase is not null)
+        {
+            _editingTestCase.Name = _tcName.Trim();
+            _editingTestCase.Description = _tcDescription.Trim();
+            _editingTestCase.Enabled = _tcEnabled;
+            _editingTestCase.Extractors = _tcExtractors;
+            _editingTestCase.UpdatedBy = CurrentUser;
+            _editingTestCase.UpdatedAt = now;
+            await _testCaseStore.UpdateTestCaseAsync(_editingTestCase);
+        }
+        else
+        {
+            var testCase = new SoapTestCase
+            {
+                Id = $"tc-{Guid.NewGuid():N}"[..12],
+                Name = _tcName.Trim(),
+                Description = _tcDescription.Trim(),
+                AppName = _tcFile.AppName,
+                FileName = _tcFile.FileName,
+                Enabled = _tcEnabled,
+                CreatedBy = CurrentUser,
+                CreatedAt = now,
+                UpdatedBy = CurrentUser,
+                UpdatedAt = now,
+                Extractors = _tcExtractors
+            };
+            await _testCaseStore.AddTestCaseAsync(testCase);
+        }
+
+        _fileTestCases = _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName).ToArray();
+        _showTestCaseModal = false;
+        ShowToast(_editingTestCase is null ? "Test case created" : "Test case updated");
+    }
+
+    private async Task ToggleTestCase(SoapTestCase testCase)
+    {
+        testCase.Enabled = !testCase.Enabled;
+        testCase.UpdatedBy = CurrentUser;
+        testCase.UpdatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        await _testCaseStore.UpdateTestCaseAsync(testCase);
+        if (_tcFile is not null)
+        {
+            _fileTestCases = _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName).ToArray();
+        }
+    }
+
+    private async Task DeleteTestCaseAsync(SoapTestCase testCase)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete test case '{testCase.Name}'?");
+        if (!confirmed)
+            return;
+        await _testCaseStore.DeleteTestCaseAsync(testCase.Id);
+        if (_tcFile is not null)
+        {
+            _fileTestCases = _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName).ToArray();
+        }
+        ShowToast("Test case deleted", "danger");
+    }
+
+    // ── Progress stage helpers ──
+
+    private static string GetStageState(SoapExecutionFile file, ExecutionStage stage)
+    {
+        var index = (int)stage;
+        if (file.StagesCompleted > index)
+            return "done";
+        if (file.Status is "success" or "failed")
+            return "pending";
+        return (int)file.Stage == index ? "active" : "pending";
+    }
+
+    private static string GetStageLabel(ExecutionStage stage) => stage switch
+    {
+        ExecutionStage.Queued => "Queued",
+        ExecutionStage.BuildingRequest => "Building",
+        ExecutionStage.SendingRequest => "Sending",
+        ExecutionStage.AwaitingResponse => "Awaiting",
+        ExecutionStage.ParsingResponse => "Parsing",
+        ExecutionStage.RunningTestCases => "Tests",
+        ExecutionStage.Complete => "Complete",
+        _ => stage.ToString()
+    };
 
     private void AddUploadFileEntry()
     {
@@ -297,13 +597,42 @@ public partial class RequestFiles : IDisposable
         if (validFiles.Length == 0)
             _validationErrors.Add("At least one file with a file name is required.");
 
+        // Duplicate-file validation (same application + file name).
+        if (validFiles.Length > 0 && !string.IsNullOrWhiteSpace(_uploadAppName))
+        {
+            var batchDuplicates = validFiles
+                .Select(f => f.FileName.Trim())
+                .GroupBy(n => n, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToArray();
+            if (batchDuplicates.Length > 0)
+            {
+                _validationErrors.Add($"Duplicate file name(s) in the upload batch: {string.Join(", ", batchDuplicates)}.");
+            }
+
+            var existing = _files
+                .Where(f => f.AppName == _uploadAppName.Trim())
+                .Select(f => f.FileName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var existingDuplicates = validFiles
+                .Select(f => f.FileName.Trim())
+                .Where(existing.Contains)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            if (existingDuplicates.Length > 0)
+            {
+                _validationErrors.Add($"File(s) already exist for this application: {string.Join(", ", existingDuplicates)}.");
+            }
+        }
+
         if (_validationErrors.Count > 0)
             return;
 
         var verb = GetVerbFromOperation(_uploadApiPath);
         var now = DateTime.Now;
 
-        var newFiles = validFiles.Select(f => new RequestFile(
+        var newFiles = validFiles.Select(f => new SoapRequestFile(
             f.FileName.Trim(),
             _uploadAppName.Trim(),
             _uploadApiPath.Trim(),
@@ -313,7 +642,8 @@ public partial class RequestFiles : IDisposable
             CurrentUser,
             now,
             null,
-            null
+            null,
+            f.Content
         )).ToArray();
 
         _files = [.._files, ..newFiles];
@@ -332,13 +662,13 @@ public partial class RequestFiles : IDisposable
     // ── Persistence ──
 
     /// <summary>
-    /// Persists the in-memory file list back to mock_db/request-files.json.
+    /// Persists the in-memory file list back to mock_db/Soap/Request/request-files.json.
     /// </summary>
     private async Task PersistFilesAsync()
     {
         try
         {
-            await _mockDbLoader.SaveJsonAsync("request-files.json", _files);
+            await _mockDbLoader.SaveJsonAsync("Soap/Request/request-files.json", _files);
         }
         catch
         {
@@ -349,7 +679,7 @@ public partial class RequestFiles : IDisposable
     // ── Row Actions ──
 
 
-    private void OpenEditDialog(RequestFile file)
+    private void OpenEditDialog(SoapRequestFile file)
     {
         _editingFile = file;
         _editFileName = file.FileName;
@@ -359,20 +689,33 @@ public partial class RequestFiles : IDisposable
         _editStatus = file.Status;
         _editValidationErrors = [];
         _expandedActionRows.Remove(file.FileName);
-
-        StateHasChanged();
+        _showEditModal = true;
     }
 
     private async Task SaveEditDialogAsync()
     {
         _editValidationErrors = [];
-
         if (string.IsNullOrWhiteSpace(_editFileName))
-            _editValidationErrors.Add("File Name is required.");
+            _editValidationErrors.Add("File name is required.");
         if (string.IsNullOrWhiteSpace(_editAppName))
             _editValidationErrors.Add("Application is required.");
         if (string.IsNullOrWhiteSpace(_editApiPath))
             _editValidationErrors.Add("Operation is required.");
+        else if (EditAvailableOperations.All(o => o.Name != _editApiPath))
+            _editValidationErrors.Add("Operation must belong to the selected application.");
+
+        if (!string.IsNullOrWhiteSpace(_editFileName) && !string.IsNullOrWhiteSpace(_editAppName))
+        {
+            var currentName = _editingFile?.FileName ?? "";
+            var duplicate = _files.Any(f =>
+                f.AppName == _editAppName.Trim() &&
+                f.FileName == _editFileName.Trim() &&
+                f.FileName != currentName);
+            if (duplicate)
+            {
+                _editValidationErrors.Add("A request file with this name already exists for this application.");
+            }
+        }
 
         if (_editValidationErrors.Count > 0)
             return;
@@ -382,7 +725,7 @@ public partial class RequestFiles : IDisposable
 
         _files = [.._files.Select(f =>
             f.FileName == originalName
-                ? new RequestFile(
+                ? new SoapRequestFile(
                     _editFileName.Trim(),
                     _editAppName.Trim(),
                     _editApiPath.Trim(),
@@ -392,7 +735,8 @@ public partial class RequestFiles : IDisposable
                     f.CreatedBy,
                     f.CreatedAt,
                     CurrentUser,
-                    now)
+                    now,
+                    f.Content)  // ← preserve content, don't drop
                 : f)];
 
         _showEditModal = false;
@@ -402,7 +746,7 @@ public partial class RequestFiles : IDisposable
         ShowToast("Request file updated");
     }
 
-    private async Task ToggleFileStatus(RequestFile file)
+    private async Task ToggleFileStatus(SoapRequestFile file)
     {
         var newStatus = file.Status == "active" ? "inactive" : "active";
         _files = [.._files.Select(f =>
@@ -414,7 +758,7 @@ public partial class RequestFiles : IDisposable
         ShowToast(newStatus == "active" ? "Request file enabled" : "Request file disabled");
     }
 
-    private async Task DeleteFileAsync(RequestFile file)
+    private async Task DeleteFileAsync(SoapRequestFile file)
     {
         var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete request file '{file.FileName}'? This cannot be undone.");
         if (!confirmed) return;
@@ -481,7 +825,7 @@ public partial class RequestFiles : IDisposable
         ShowToast($"{files.Length} request file(s) exported as JSON");
     }
 
-    private static string BuildCsvRow(RequestFile f)
+    private static string BuildCsvRow(SoapRequestFile f)
     {
         var fields = new[]
         {
@@ -585,7 +929,7 @@ public partial class RequestFiles : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private RequestFile[] FilteredFiles
+    private SoapRequestFile[] FilteredFiles
     {
         get
         {

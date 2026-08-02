@@ -1,8 +1,11 @@
 @page "/soap/wsdl-sync"
+@using Microsoft.Extensions.Configuration
 @inject SoapAppStore _appStore
 @inject WsdlSyncStore _wsdlStore
 @inject MockDbLoader _mockDbLoader
 @inject IJSRuntime _js
+@inject NavigationManager _nav
+@inject IConfiguration _config
 
 @* ── Page Header ── *@
 <div class="datagrid-card" style="padding:18px 22px;margin-bottom:12px">
@@ -39,7 +42,23 @@
     </div>
 </div>
 
-@if (string.IsNullOrEmpty(_selectedAppId))
+@if (_appStore.Apps.Length == 0)
+{
+    @* Empty state when no applications exist at all (first-run) *@
+    <div class="datagrid-card empty-state-card gap-10px" style="padding:48px 20px">
+        <i class="bi bi-globe2 fs-36 text-sh-faint"></i>
+        <h4 class="empty-state-title">No applications yet</h4>
+        <p class="empty-state-desc">
+            WSDL sync requires a SOAP application. Add one from the Applications page to start syncing WSDL versions.
+        </p>
+        <a class="btn btn-sh-primary btn-dg btn-dark mt-2" href="/soap/applications"
+           @onclick="NavigateToApplications" @onclick:preventDefault="true">
+            <i class="bi bi-arrow-right-circle"></i>
+            Go to Applications
+        </a>
+    </div>
+}
+else if (string.IsNullOrEmpty(_selectedAppId))
 {
     @* Empty state when no app selected *@
     <div class="datagrid-card empty-state-card gap-10px" style="padding:48px 20px">
@@ -345,7 +364,7 @@ else
                                             <td class="text-sh-soft" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@ver.Notes</td>
                                             <td>
                                                 <div class="action-icons">
-                                                    <button class="action-icon-btn" @onclick:stopPropagation @onclick="() => SelectVersion(ver.Id)" title="View details">
+                                                    <button class="action-icon-btn" @onclick:stopPropagation @onclick="() => SelectVersion(ver.Id)" data-tooltip="View version details">
                                                         <i class="bi bi-eye"></i> View
                                                     </button>
                                                 </div>
@@ -430,10 +449,10 @@ else
                                 <td class="text-sh-soft">@tpl.UpdatedAt</td>
                                 <td>
                                     <div class="action-icons">
-                                        <button class="action-icon-btn" @onclick="() => OpenTemplateEditor(tpl.Id)" title="Edit">
+                                        <button class="action-icon-btn" @onclick="() => OpenTemplateEditor(tpl.Id)" data-tooltip="Edit template">
                                             <i class="bi bi-pencil"></i> Edit
                                         </button>
-                                        <button class="action-icon-btn" @onclick="() => OpenCreateFromTemplate(tpl.Id)" title="Create Request File">
+                                        <button class="action-icon-btn" @onclick="() => OpenCreateFromTemplate(tpl.Id)" data-tooltip="Create request file from template">
                                             <i class="bi bi-file-earmark-plus"></i> Use
                                         </button>
                                     </div>
@@ -685,8 +704,22 @@ else
                 }
 
                 <div class="form-group">
-                    <label>Template Content</label>
-                    <textarea class="form-control-dg textarea" placeholder="Paste SOAP envelope XML with {{var_name}} placeholders..."
+                    <label>WSDL File</label>
+                    <select class="form-control-dg" value="@_editTplWsdlFile" @onchange="OnTemplateWsdlFileChanged">
+                        @foreach (var wsdlFile in _mockDbLoader.GetWsdlFileNames())
+                        {
+                            <option value="@wsdlFile">@wsdlFile</option>
+                        }
+                    </select>
+                    <div class="fs-11 text-sh-faint mt-1">
+                        <i class="bi bi-info-circle"></i>
+                        The template references a WSDL file. Its content is loaded from — and saved back to — the selected file.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>WSDL Content</label>
+                    <textarea class="form-control-dg textarea" placeholder="WSDL content loaded from the selected file. Edit then save to update the file."
                               style="min-height:180px;font-family:'JetBrains Mono','Menlo',monospace;font-size:12px;line-height:1.6"
                               @bind="_editTplContent" @bind:event="oninput"></textarea>
                 </div>
@@ -736,6 +769,7 @@ else
     if (template is not null)
     {
         var allVars = _wsdlStore.ResolveVariables(template);
+        var templateContent = _createRequestTemplateContent;
 
         <div class="modal-overlay" @onclick="() => _showCreateRequestModal = false">
             <div class="modal-content-dg" style="width:620px" @onclick:stopPropagation="true">
@@ -803,7 +837,7 @@ else
 
                     @* Preview of the generated request file *@
                     @{
-                        var previewContent = WsdlSyncStore.ApplyVariables(template.Content, _requestVarValues);
+                        var previewContent = WsdlSyncStore.ApplyVariables(templateContent, _requestVarValues);
                     }
                     <div class="border-sh-top" style="margin-top:12px;padding-top:12px">
                         <div class="d-flex align-items-center justify-content-between" style="margin-bottom:6px">

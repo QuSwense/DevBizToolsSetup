@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\ServiceHubEnterprise.Data\ServiceHubEnterprise.Data.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.Dashboard\ServiceHubEnterprise.Dashboard.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.RestApplications\ServiceHubEnterprise.RestApplications.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.SoapApplications\ServiceHubEnterprise.SoapApplications.csproj" />

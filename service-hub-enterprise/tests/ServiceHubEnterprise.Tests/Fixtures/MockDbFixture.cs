@@ -57,9 +57,9 @@ public sealed class TempMockDb : IDisposable
 
         // MockDbLoader's ctor loads wsdl-content-map.json synchronously and throws if the
         // directory is missing, so always provide an (empty) map unless the caller supplies one.
-        if (!files.Any(f => f.Name == "wsdl-content-map.json"))
+        if (!files.Any(f => f.Name == "Wsdl/wsdl-content-map.json"))
         {
-            WriteFile("wsdl-content-map.json", "{}");
+            WriteFile("Wsdl/wsdl-content-map.json", "{}");
         }
 
         foreach (var (name, content) in files)
@@ -69,7 +69,15 @@ public sealed class TempMockDb : IDisposable
     }
 
     public void WriteFile(string name, string content)
-        => File.WriteAllText(System.IO.Path.Combine(Path, name), content);
+    {
+        var fullPath = System.IO.Path.Combine(Path, name);
+        var directory = System.IO.Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            System.IO.Directory.CreateDirectory(directory);
+        }
+        File.WriteAllText(fullPath, content);
+    }
 
     public void WriteJson<T>(string name, T value, JsonSerializerOptions? options = null)
     {

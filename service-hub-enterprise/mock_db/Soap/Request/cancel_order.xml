@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:ord="http://www.orderprocessing.com/services/">
+   <soapenv:Header>
+      <ord:clientId>CLT-2026-001</ord:clientId>
+      <ord:cancelId>CAN-20260802-001</ord:cancelId>
+   </soapenv:Header>
+   <soapenv:Body>
+      <ord:CancelOrderResponse>
+         <ord:orderId>ORD-2026-0842</ord:orderId>
+         <ord:orderNumber>PO-2026-10042</ord:orderNumber>
+         <ord:status>CANCELLED</ord:status>
+         <ord:cancellationDate>2026-08-02T10:30:00Z</ord:cancellationDate>
+         <ord:cancelReason>Customer requested cancellation</ord:cancelReason>
+         <ord:refundStatus>PENDING</ord:refundStatus>
+         <ord:refundAmount>847.50</ord:refundAmount>
+         <ord:refundReference>REF-20260802-001</ord:refundReference>
+         <ord:responseCode>200</ord:responseCode>
+         <ord:responseMessage>Order cancelled successfully</ord:responseMessage>
+      </ord:CancelOrderResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

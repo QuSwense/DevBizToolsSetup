@@ -31,6 +31,7 @@ public partial class WsdlSync
     private string _editTplName = "";
     private string _editTplDescription = "";
     private string _editTplExtendsId = "";
+    private string _editTplWsdlFile = "";
     private string _editTplContent = "";
 
     // Create request file from template
@@ -38,6 +39,7 @@ public partial class WsdlSync
     private string _selectedTemplateId = "";
     private string _requestFileName = "";
     private Dictionary<string, string> _requestVarValues = [];
+    private string _createRequestTemplateContent = "";
 
     // Version details panel
     private bool _expandedWsdlView = true;
@@ -52,6 +54,12 @@ public partial class WsdlSync
         if (!_treeExpandedApps.Remove(appId))
             _treeExpandedApps.Add(appId);
     }
+
+    /// <summary>
+    /// Navigates to the Applications page (used from the first-run empty state).
+    /// </summary>
+    private void NavigateToApplications()
+        => _nav.NavigateTo("/soap/applications");
 
     private void ToggleTreeSync(string syncId)
     {
@@ -120,8 +128,7 @@ public partial class WsdlSync
         var app = _appStore.Apps.FirstOrDefault(a => a.Id == appId);
         if (app is null) return;
 
-        var recordId = $"wsdl-{Guid.NewGuid():N}"[..10];
-        var versionId = $"wv-{Guid.NewGuid():N}"[..10];
+        var currentUser = _config["Users:CurrentUser"] ?? "Current User";
         var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
         // Determine the new WSDL content based on mode
@@ -130,44 +137,73 @@ public partial class WsdlSync
         // Determine source URL based on mode
         string sourceUrl = _syncMode == "auto-update" ? autoSourceUrl : _syncFileName;
 
-        // Create sync record with WSDL content stored
-        var record = new WsdlSyncRecord
+        // Version-append flow: reuse the app's most recent sync record (if any) so a
+        // new WSDL version is created; otherwise create a new record + version 1.
+        var existingRecord = _wsdlStore.Records
+            .Where(r => r.AppId == app.Id)
+            .OrderByDescending(r => r.UploadedAt)
+            .FirstOrDefault();
+
+        WsdlSyncRecord record;
+        int nextVersionNumber;
+        if (existingRecord is not null)
         {
-            Id = recordId,
-            AppId = app.Id,
-            AppName = app.Name,
-            SourceType = _syncMode == "auto-update" ? "url" : "upload",
-            SourceUrl = sourceUrl,
-            UploadedBy = "Current User",
-            UploadedAt = now,
-            Status = "synced",
-            WsdlContent = newWsdlContent,
-            VersionCount = 1
-        };
-        _wsdlStore.Records.Add(record);
+            record = existingRecord;
+            nextVersionNumber = _wsdlStore.Versions
+                .Where(v => v.SyncRecordId == record.Id)
+                .Select(v => v.VersionNumber)
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+
+            record.SourceType = _syncMode == "auto-update" ? "url" : "upload";
+            record.SourceUrl = sourceUrl;
+            record.UploadedBy = currentUser;
+            record.UploadedAt = now;
+            record.Status = "synced";
+            record.WsdlContent = newWsdlContent;
+            record.VersionCount = nextVersionNumber;
+        }
+        else
+        {
+            record = new WsdlSyncRecord
+            {
+                Id = $"wsdl-{Guid.NewGuid():N}"[..10],
+                AppId = app.Id,
+                AppName = app.Name,
+                SourceType = _syncMode == "auto-update" ? "url" : "upload",
+                SourceUrl = sourceUrl,
+                UploadedBy = currentUser,
+                UploadedAt = now,
+                Status = "synced",
+                WsdlContent = newWsdlContent,
+                VersionCount = 1
+            };
+            _wsdlStore.Records.Add(record);
+            nextVersionNumber = 1;
+        }
 
         // Create version with auto-generated label
         var version = new WsdlVersionEntry
         {
-            Id = versionId,
-            SyncRecordId = recordId,
-            VersionNumber = 1,
+            Id = $"wv-{Guid.NewGuid():N}"[..10],
+            SyncRecordId = record.Id,
+            VersionNumber = nextVersionNumber,
             Label = autoVersion,
-            UploadedBy = "Current User",
+            UploadedBy = currentUser,
             UploadedAt = now,
             Status = "active",
             Notes = string.IsNullOrWhiteSpace(_syncDescription) ? "WSDL sync" : _syncDescription
         };
         _wsdlStore.Versions.Add(version);
 
-        _selectedSyncId = recordId;
-        _selectedVersionId = versionId;
+        _selectedSyncId = record.Id;
+        _selectedVersionId = version.Id;
         _showSyncModal = false;
 
         if (!_treeExpandedApps.Contains(appId))
             _treeExpandedApps.Add(appId);
-        if (!_treeExpandedSyncs.Contains(recordId))
-            _treeExpandedSyncs.Add(recordId);
+        if (!_treeExpandedSyncs.Contains(record.Id))
+            _treeExpandedSyncs.Add(record.Id);
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -277,7 +313,7 @@ public partial class WsdlSync
         return $"{prefix}{maxMinor + 1}";
     }
 
-    private void OpenTemplateEditor(string? templateId)
+    private async Task OpenTemplateEditor(string? templateId)
     {
         _editingTemplateId = templateId;
         if (templateId is not null)
@@ -288,7 +324,9 @@ public partial class WsdlSync
                 _editTplName = tpl.Name;
                 _editTplDescription = tpl.Description;
                 _editTplExtendsId = tpl.ExtendsTemplateId ?? "";
-                _editTplContent = tpl.Content;
+                // Content stores the referenced WSDL file name — load its content from disk.
+                _editTplWsdlFile = tpl.Content;
+                _editTplContent = await _mockDbLoader.LoadWsdlFileAsync(tpl.Content);
             }
         }
         else
@@ -296,17 +334,31 @@ public partial class WsdlSync
             _editTplName = "";
             _editTplDescription = "";
             _editTplExtendsId = "";
-            _editTplContent = "";
+            _editTplWsdlFile = _mockDbLoader.GetWsdlFileNames().FirstOrDefault() ?? "";
+            _editTplContent = await _mockDbLoader.LoadWsdlFileAsync(_editTplWsdlFile);
         }
         _showTemplateEditor = true;
     }
 
-    private void HandleSaveTemplate()
+    private async Task OnTemplateWsdlFileChanged(ChangeEventArgs e)
+    {
+        _editTplWsdlFile = e.Value?.ToString() ?? "";
+        _editTplContent = await _mockDbLoader.LoadWsdlFileAsync(_editTplWsdlFile);
+        StateHasChanged();
+    }
+
+    private async Task HandleSaveTemplate()
     {
         if (string.IsNullOrWhiteSpace(_editTplName)) return;
 
         var vars = ExtractTemplateVars(_editTplContent);
         var now = DateTime.Now.ToString("yyyy-MM-dd");
+
+        // Content is a WSDL file reference — persist the edited content back to the file.
+        if (!string.IsNullOrWhiteSpace(_editTplWsdlFile))
+        {
+            await _mockDbLoader.SaveWsdlFileAsync(_editTplWsdlFile, _editTplContent);
+        }
 
         if (_editingTemplateId is not null)
         {
@@ -324,8 +376,12 @@ public partial class WsdlSync
                 existing.Description = _editTplDescription;
                 existing.ExtendsTemplateId = string.IsNullOrEmpty(_editTplExtendsId) ? null : _editTplExtendsId;
                 existing.ExtendsTemplateName = string.IsNullOrEmpty(parentName) ? null : parentName;
-                existing.Content = _editTplContent;
-                existing.Variables = vars;
+                existing.Content = _editTplWsdlFile;
+                // Keep the stored variables unless new ones were detected in the content.
+                if (vars.Length > 0)
+                {
+                    existing.Variables = vars;
+                }
                 existing.UpdatedAt = now;
             }
         }
@@ -345,7 +401,7 @@ public partial class WsdlSync
                 Description = _editTplDescription,
                 ExtendsTemplateId = string.IsNullOrEmpty(_editTplExtendsId) ? null : _editTplExtendsId,
                 ExtendsTemplateName = string.IsNullOrEmpty(parentName) ? null : parentName,
-                Content = _editTplContent,
+                Content = _editTplWsdlFile,
                 Variables = vars,
                 CreatedBy = "Current User",
                 CreatedAt = now,
@@ -357,7 +413,7 @@ public partial class WsdlSync
         _showTemplateEditor = false;
     }
 
-    private void OpenCreateFromTemplate(string templateId)
+    private async Task OpenCreateFromTemplate(string templateId)
     {
         _selectedTemplateId = templateId;
         var template = _wsdlStore.GetTemplate(templateId);
@@ -365,6 +421,8 @@ public partial class WsdlSync
         {
             _requestFileName = "";
             _requestVarValues = [];
+            // Content stores the referenced WSDL file name — load its content from disk.
+            _createRequestTemplateContent = await _mockDbLoader.LoadWsdlFileAsync(template.Content);
             var allVars = _wsdlStore.ResolveVariables(template);
             foreach (var v in allVars)
             {
@@ -553,39 +611,93 @@ public partial class WsdlSync
     }
 
     /// <summary>
-    /// Copies WSDL content to clipboard and shows confirmation.
+    /// Copies WSDL content to the clipboard and shows confirmation.
     /// </summary>
-    private void CopyWsdlContent(string content)
+    private async Task CopyWsdlContent(string content)
     {
-        _wsdlCopied = true;
+        try
+        {
+            await _js.InvokeVoidAsync("navigator.clipboard.writeText", content);
+            _wsdlCopied = true;
+        }
+        catch
+        {
+            _wsdlCopied = false;
+        }
+        StateHasChanged();
     }
 
     /// <summary>
     /// Opens the Create Request File modal using the first available template.
     /// </summary>
-    private void OpenCreateFromTemplateForVersion()
+    private async Task OpenCreateFromTemplateForVersion()
     {
         var templates = _wsdlStore.GetTemplates();
         if (templates.Length > 0)
         {
-            OpenCreateFromTemplate(templates[0].Id);
+            await OpenCreateFromTemplate(templates[0].Id);
         }
     }
 
     /// <summary>
-    /// Handles rollback by creating a new version entry with restored content.
+    /// Handles rollback by creating a new version entry that points back to the
+    /// selected version (content is stored at the sync-record level in the mock, so
+    /// the rollback is recorded as a labelled new version).
     /// </summary>
     private void HandleRollback()
     {
+        var current = _wsdlStore.Versions.FirstOrDefault(v => v.Id == _selectedVersionId);
+        var record = current is not null
+            ? _wsdlStore.Records.FirstOrDefault(r => r.Id == current.SyncRecordId)
+            : null;
+        if (current is not null && record is not null)
+        {
+            var maxVersion = _wsdlStore.Versions
+                .Where(v => v.SyncRecordId == record.Id)
+                .Select(v => v.VersionNumber)
+                .DefaultIfEmpty(0)
+                .Max();
+            var rollback = new WsdlVersionEntry
+            {
+                Id = $"wv-{Guid.NewGuid():N}"[..10],
+                SyncRecordId = record.Id,
+                VersionNumber = maxVersion + 1,
+                Label = $"{current.Label} (rollback)",
+                UploadedBy = _config["Users:CurrentUser"] ?? "Current User",
+                UploadedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = "active",
+                Notes = $"Rollback to version {current.Label}"
+            };
+            _wsdlStore.Versions.Add(rollback);
+            record.VersionCount = maxVersion + 1;
+            _selectedVersionId = rollback.Id;
+            if (!_treeExpandedSyncs.Contains(record.Id))
+                _treeExpandedSyncs.Add(record.Id);
+        }
         _showRollbackConfirm = false;
     }
 
     /// <summary>
-    /// Downloads the WSDL content as a file.
+    /// Downloads the WSDL content as a file via the shared download.js helper.
     /// </summary>
-    private void DownloadWsdl(string content, string fileName)
+    private async Task DownloadWsdl(string content, string fileName)
     {
-        // In a real implementation, this would trigger a file download via JS interop.
-        // For now, it's a placeholder that logs the action.
+        try
+        {
+            var module = await _js.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/ServiceHubEnterprise.SoapApplications/js/download.js");
+            try
+            {
+                await module.InvokeVoidAsync("downloadTextFile", content, fileName, "text/xml");
+            }
+            finally
+            {
+                await module.DisposeAsync();
+            }
+        }
+        catch
+        {
+            // Ignore download failures in the mock.
+        }
     }
 }

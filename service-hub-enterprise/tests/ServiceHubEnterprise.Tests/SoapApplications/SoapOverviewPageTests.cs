@@ -55,13 +55,13 @@ public class SoapOverviewPageTests : BunitTestBase
     public void RendersAllFiveOverviewCards()
     {
         using var db = MockDbFixture.CreateTempMockDb(
-            ("soap-apps.json", AppsJson),
-            ("request-files.json", FilesJson),
-            ("request-executions.json", ExecutionsJson),
-            ("wsdl-records.json", "[]"),
-            ("wsdl-versions.json", "[]"),
-            ("wsdl-templates.json", "[]"),
-            ("wsdl-sync-history.json", "[]"));
+            ("Soap/soap-apps.json", AppsJson),
+            ("Soap/Request/request-files.json", FilesJson),
+            ("Soap/Request/request-executions.json", ExecutionsJson),
+            ("Wsdl/wsdl-records.json", "[]"),
+            ("Wsdl/wsdl-versions.json", "[]"),
+            ("Wsdl/wsdl-templates.json", "[]"),
+            ("Wsdl/wsdl-sync-history.json", "[]"));
         Setup(db);
 
         var cut = Render<SoapOverview>();

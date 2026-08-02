@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:shp="http://www.shippingsoap.com/services/">
+   <soapenv:Header>
+      <shp:labelId>LBL-20260802-001</shp:labelId>
+      <shp:orderId>ORD-2026-0842</shp:orderId>
+   </soapenv:Header>
+   <soapenv:Body>
+      <shp:CreateLabelResponse>
+         <shp:label>
+            <shp:labelId>LBL-2026-0842</shp:labelId>
+            <shp:trackingNumber>1Z999AA10123456787</shp:trackingNumber>
+            <shp:carrier>UPS</shp:carrier>
+            <shp:serviceType>Next Day Air</shp:serviceType>
+            <shp:weight unit="lbs">2.5</shp:weight>
+            <shp:dimensions>
+               <shp:length unit="in">12</shp:length>
+               <shp:width unit="in">10</shp:length>
+               <shp:height unit="in">8</shp:length>
+            </shp:dimensions>
+            <shp:shippingCost>35.00</shp:shippingCost>
+            <shp:currency>USD</shp:currency>
+            <shp:labelFormat>PDF</shp:labelFormat>
+            <shp:labelUrl>https://shipping.com/labels/LBL-2026-0842.pdf</shp:labelUrl>
+            <shp:labelImage>base64EncodedImageDataHere...</shp:labelImage>
+            <shp:createdDate>2026-08-02T10:30:00Z</shp:createdDate>
+            <shp:expiryDate>2026-08-03T10:30:00Z</shp:expiryDate>
+         </shp:label>
+         <shp:responseCode>200</shp:responseCode>
+         <shp:responseMessage>Shipping label created successfully</shp:responseMessage>
+      </shp:CreateLabelResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

@@ -1,8 +1,4 @@
 @page "/soap/execute-history"
-@inject RequestExecutionStore ExecutionStore
-
-@* Executions are now served by the shared ExecutionsOverview section card,
-   reading real data from mock_db/request-executions.json (SOAP filter). *@
 
 @if (_isLoading)
 {
@@ -12,20 +8,127 @@
         </div>
     </div>
 }
+else if (_groups.Length == 0)
+{
+    @* ── First-run empty state ── *@
+    <div class="datagrid-card empty-state-card gap-10px" style="padding:48px 20px">
+        <i class="bi bi-play-circle fs-36 text-sh-faint"></i>
+        <h4 class="empty-state-title">No executions yet</h4>
+        <p class="empty-state-desc">
+            Execute request files from the Request Files page to see their progress, parsed fields and logs here.
+        </p>
+        <a class="btn btn-sh-primary btn-dg btn-dark mt-2" href="/soap/request-files"
+           @onclick="NavigateToRequestFiles" @onclick:preventDefault="true">
+            <i class="bi bi-file-earmark-code"></i>
+            Go to Request Files
+        </a>
+    </div>
+}
 else
 {
     <div class="dashboard-stack">
-        <ExecutionsOverview Executions="@_executions" />
+        @* ── Filter bar ── *@
+        <div class="datagrid-card" style="padding:16px 20px;margin-bottom:12px">
+            <div class="d-flex align-items-end gap-12px flex-wrap">
+                <div class="form-group" style="margin-bottom:0">
+                    <label>File</label>
+                    <select class="form-control-dg" style="max-width:240px" @bind="_filterFile" @bind:event="oninput">
+                        <option value="">All files</option>
+                        @foreach (var f in _files.OrderBy(f => f.FileName))
+                        {
+                            <option value="@f.FileName">@f.FileName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Application</label>
+                    <select class="form-control-dg" @bind="_filterApp" @bind:event="oninput">
+                        <option value="">All applications</option>
+                        @foreach (var app in AvailableApps)
+                        {
+                            <option value="@app">@app</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Status</label>
+                    <select class="form-control-dg" @bind="_filterStatus" @bind:event="oninput">
+                        <option value="">All statuses</option>
+                        <option value="running">Running</option>
+                        <option value="completed">Completed</option>
+                        <option value="partial">Partial</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>From</label>
+                    <input type="date" class="form-control-dg" @bind="_filterDateFrom" />
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>To</label>
+                    <input type="date" class="form-control-dg" @bind="_filterDateTo" />
+                </div>
+                <button class="btn btn-outline-secondary btn-dg" @onclick="ResetFilters" type="button">
+                    <i class="bi bi-arrow-repeat"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        @if (FilteredGroups.Length == 0)
+        {
+            <div class="datagrid-card empty-state-card gap-10px" style="padding:40px 20px">
+                <i class="bi bi-funnel fs-28 text-sh-faint"></i>
+                <p class="empty-state-desc">No executions match the current filters.</p>
+            </div>
+        }
+        else
+        {
+            <ServiceHubGrid TItem="SoapExecutionGroup"
+                            Id="execHistoryGrid"
+                            Items="FilteredGroups"
+                            @bind-SortColumn="_sortColumn"
+                            @bind-SortAscending="_sortAscending"
+                            @bind-CurrentPage="_currentPage"
+                            @bind-SearchText="_searchText"
+                            PageSize="8"
+                            EnablePagination="true"
+                            EnableSearch="true"
+                            EnableExpand="true"
+                            EnableSelection="false"
+                            SearchPlaceholder="Search executions..."
+                            EmptyText="No executions found matching the current filters."
+                            FilterApplied="OnFilterApplied"
+                            RowIdSelector="@(g => g.Id)"
+                            Columns="@_columns">
+                <DetailRow Context="group">
+                    <div class="detail-grid">
+                        <div class="grid-col-full">
+                            <div class="detail-label">Files in this group</div>
+                        </div>
+                        @foreach (var f in group.Files)
+                        {
+                            var fileBadge = GetFileStatusBadge(f.Status);
+                            var isSelected = _selectedFileId == f.FileName;
+                            <button class="exec-group-file @(isSelected ? "is-active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectFile(f.FileName)">
+                                <span class="d-flex flex-column align-items-start">
+                                    <span class="mono-text fw-semibold">@f.FileName</span>
+                                    <span class="text-sh-faint fs-11">@f.AppName · @f.Operation · @FormatDuration(f.DurationMs)</span>
+                                </span>
+                                <span class="ms-auto status-badge @(fileBadge.Css)">@fileBadge.Label</span>
+                            </button>
+                        }
+                    </div>
+                </DetailRow>
+            </ServiceHubGrid>
+        }
+
+        @if (SelectedGroup is not null && SelectedFile is not null)
+        {
+            <ExecutionFileDetails Group="SelectedGroup" File="SelectedFile" />
+        }
     </div>
 }
 
-@code {
-    private bool _isLoading = true;
-    private SoapExecution[] _executions = [];
-
-    protected override void OnInitialized()
-    {
-        _executions = ExecutionStore.SoapExecutions;
-        _isLoading = false;
-    }
-}

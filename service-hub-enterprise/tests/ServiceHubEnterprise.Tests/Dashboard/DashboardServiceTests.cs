@@ -11,7 +11,7 @@ public class DashboardServiceTests
     [Fact]
     public async Task MapsUsersAndResolvesCurrentUserFromFixture()
     {
-        using var db = MockDbFixture.CreateTempMockDb(("users.json", """
+        using var db = MockDbFixture.CreateTempMockDb(("Dashboard/users.json", """
 [
   { "name": "Priya Sharma", "role": "Superuser" },
   { "name": "Rahul Verma", "role": "User" }

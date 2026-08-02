@@ -14,24 +14,34 @@ else
         <div class="row g-3">
             <!-- Row 1: two quarters + a half -->
             <div class="col-12 col-lg-3">
-                <ApplicationsOverview Apps="@Apps" />
+                <ApplicationsOverview Apps="@Apps"
+                                      Collapsed="@IsCollapsed(CardKey.Applications)"
+                                      OnToggle="OnApplicationsToggle" />
             </div>
 
             <div class="col-12 col-lg-3">
-                <RequestFilesOverview Files="@Files" />
+                <RequestFilesOverview Files="@Files"
+                                      Collapsed="@IsCollapsed(CardKey.RequestFiles)"
+                                      OnToggle="OnRequestFilesToggle" />
             </div>
 
             <div class="col-12 col-lg-6">
-                <ExecutionsOverview Executions="@Executions" />
+                <ExecutionsOverview Executions="@Executions"
+                                    Collapsed="@IsCollapsed(CardKey.Executions)"
+                                    OnToggle="OnExecutionsToggle" />
             </div>
 
             <!-- Row 2: two halves -->
             <div class="col-12 col-lg-6">
-                <WsdlSyncOverview Records="@Records" Versions="@Versions" SyncHistory="@SyncHistory" />
+                <WsdlSyncOverview Records="@Records" Versions="@Versions" SyncHistory="@SyncHistory"
+                                  Collapsed="@IsCollapsed(CardKey.WsdlSync)"
+                                  OnToggle="OnWsdlSyncToggle" />
             </div>
 
             <div class="col-12 col-lg-6">
-                <TemplatesOverview Templates="@Templates" />
+                <TemplatesOverview Templates="@Templates"
+                                   Collapsed="@IsCollapsed(CardKey.Templates)"
+                                   OnToggle="OnTemplatesToggle" />
             </div>
         </div>
     </div>

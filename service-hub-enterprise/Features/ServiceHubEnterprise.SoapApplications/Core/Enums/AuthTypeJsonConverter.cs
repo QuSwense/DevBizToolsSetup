@@ -5,7 +5,7 @@ namespace ServiceHubEnterprise.SoapApplications.Core.Enums;
 
 /// <summary>
 /// Converts <see cref="AuthType"/> to/from the string values stored in
-/// mock_db/soap-apps.json (e.g. "api-key" maps to <see cref="AuthType.ApiKey"/>,
+/// mock_db/Soap/soap-apps.json (e.g. "api-key" maps to <see cref="AuthType.ApiKey"/>,
 /// which is not a valid C# enum member name).
 /// </summary>
 public sealed class AuthTypeJsonConverter : JsonConverter<AuthType>
