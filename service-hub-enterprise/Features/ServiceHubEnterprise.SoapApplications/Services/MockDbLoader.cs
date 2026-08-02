@@ -18,6 +18,14 @@ public class MockDbLoader
         PropertyNameCaseInsensitive = true
     };
 
+    private static readonly JsonSerializerOptions WriteJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DictionaryKeyPolicy = JsonNamingPolicy.CamelCase
+    };
+
     public MockDbLoader(IConfiguration configuration)
     {
         // Resolve mock_db path from configuration, with fallback
@@ -60,6 +68,17 @@ public class MockDbLoader
 
         var json = await File.ReadAllTextAsync(path).ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, JsonOptions) ?? default!;
+    }
+
+    /// <summary>
+    /// Serializes a value and writes it back to a JSON file in the mock_db folder.
+    /// Uses camelCase naming (matching the seed files) with indented formatting.
+    /// </summary>
+    public async Task SaveJsonAsync<T>(string fileName, T value)
+    {
+        var path = Path.Combine(_mockDbPath, fileName);
+        var json = JsonSerializer.Serialize(value, WriteJsonOptions);
+        await File.WriteAllTextAsync(path, json).ConfigureAwait(false);
     }
 
     /// <summary>

@@ -1,16 +1,21 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.JSInterop;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 
 namespace ServiceHubEnterprise.SoapApplications.Pages;
 
-public partial class RequestFiles
+public partial class RequestFiles : IDisposable
 {
     [Inject]
     private Microsoft.Extensions.Configuration.IConfiguration Config { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
 
     private string CurrentUser => Config["Users:CurrentUser"] ?? "Current User";
 
@@ -86,8 +91,25 @@ public partial class RequestFiles
     private string[] _availableApps => _appStore.Apps.Select(a => a.Name).OrderBy(a => a).ToArray();
     private SoapApiEntry[] _availableOperations =>
         _appStore.Apps.FirstOrDefault(a => a.Name == _uploadAppName)?.Apis ?? [];
+    private SoapApiEntry[] EditAvailableOperations =>
+        _appStore.Apps.FirstOrDefault(a => a.Name == _editAppName)?.Apis ?? [];
 
     private RequestFile[] _files = [];
+    private ServiceHubGrid<RequestFile>? _grid;
+    private HashSet<string> _selectedIds = [];
+
+    private bool _showEditModal = false;
+    private RequestFile? _editingFile = null;
+    private string _editFileName = "";
+    private string _editAppName = "";
+    private string _editApiPath = "";
+    private string _editDescription = "";
+    private string _editStatus = "active";
+    private List<string> _editValidationErrors = [];
+
+    private string? _toastMessage;
+    private string _toastType = "success";
+    private CancellationTokenSource? _toastCts;
 
     private static string GetVerbFromOperation(string operationName)
     {
@@ -262,7 +284,7 @@ public partial class RequestFiles
         }
     }
 
-    private void HandleUploadFiles()
+    private async Task HandleUploadFiles()
     {
         _validationErrors = [];
 
@@ -302,6 +324,265 @@ public partial class RequestFiles
         _uploadDescription = "";
         _uploadFiles = [];
         _showUploadModal = false;
+
+        await PersistFilesAsync();
+        ShowToast($"{newFiles.Length} request file(s) uploaded");
+    }
+
+    // ── Persistence ──
+
+    /// <summary>
+    /// Persists the in-memory file list back to mock_db/request-files.json.
+    /// </summary>
+    private async Task PersistFilesAsync()
+    {
+        try
+        {
+            await _mockDbLoader.SaveJsonAsync("request-files.json", _files);
+        }
+        catch
+        {
+            ShowToast("Failed to save changes to the mock database", "danger");
+        }
+    }
+
+    // ── Row Actions ──
+
+
+    private void OpenEditDialog(RequestFile file)
+    {
+        _editingFile = file;
+        _editFileName = file.FileName;
+        _editAppName = file.AppName;
+        _editApiPath = file.ApiPath;
+        _editDescription = file.Description;
+        _editStatus = file.Status;
+        _editValidationErrors = [];
+        _expandedActionRows.Remove(file.FileName);
+
+        StateHasChanged();
+    }
+
+    private async Task SaveEditDialogAsync()
+    {
+        _editValidationErrors = [];
+
+        if (string.IsNullOrWhiteSpace(_editFileName))
+            _editValidationErrors.Add("File Name is required.");
+        if (string.IsNullOrWhiteSpace(_editAppName))
+            _editValidationErrors.Add("Application is required.");
+        if (string.IsNullOrWhiteSpace(_editApiPath))
+            _editValidationErrors.Add("Operation is required.");
+
+        if (_editValidationErrors.Count > 0)
+            return;
+
+        var originalName = _editingFile?.FileName ?? "";
+        var now = DateTime.Now;
+
+        _files = [.._files.Select(f =>
+            f.FileName == originalName
+                ? new RequestFile(
+                    _editFileName.Trim(),
+                    _editAppName.Trim(),
+                    _editApiPath.Trim(),
+                    GetVerbFromOperation(_editApiPath.Trim()),
+                    _editDescription.Trim(),
+                    _editStatus,
+                    f.CreatedBy,
+                    f.CreatedAt,
+                    CurrentUser,
+                    now)
+                : f)];
+
+        _showEditModal = false;
+        _editingFile = null;
+
+        await PersistFilesAsync();
+        ShowToast("Request file updated");
+    }
+
+    private async Task ToggleFileStatus(RequestFile file)
+    {
+        var newStatus = file.Status == "active" ? "inactive" : "active";
+        _files = [.._files.Select(f =>
+            f.FileName == file.FileName
+                ? f with { Status = newStatus, UpdatedBy = CurrentUser, UpdatedAt = DateTime.Now }
+                : f)];
+
+        await PersistFilesAsync();
+        ShowToast(newStatus == "active" ? "Request file enabled" : "Request file disabled");
+    }
+
+    private async Task DeleteFileAsync(RequestFile file)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete request file '{file.FileName}'? This cannot be undone.");
+        if (!confirmed) return;
+
+        _files = [.._files.Where(f => f.FileName != file.FileName)];
+        _expandedActionRows.Remove(file.FileName);
+        _selectedIds.Remove(file.FileName);
+
+        await PersistFilesAsync();
+        ShowToast("Request file deleted", "danger");
+    }
+
+    // ── Export / Bulk Actions ──
+
+    private async Task DownloadTextFileAsync(string content, string fileName, string mimeType)
+    {
+        try
+        {
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/ServiceHubEnterprise.SoapApplications/js/download.js");
+            try
+            {
+                await module.InvokeVoidAsync("downloadTextFile", content, fileName, mimeType);
+            }
+            finally
+            {
+                await module.DisposeAsync();
+            }
+        }
+        catch
+        {
+            ShowToast("Export failed — file download unavailable", "danger");
+        }
+    }
+
+    private async Task ExportToCsvAsync()
+    {
+        _showDropdown = false;
+        var files = FilteredFiles;
+        if (files.Length == 0)
+        {
+            ShowToast("No data to export", "danger");
+            return;
+        }
+
+        const string header = "FileName,AppName,Operation,Verb,Description,Status,CreatedBy,CreatedAt,UpdatedBy,UpdatedAt";
+        var lines = new List<string>(files.Length + 1) { header };
+        lines.AddRange(files.Select(BuildCsvRow));
+        await DownloadTextFileAsync(string.Join("\r\n", lines), "request-files.csv", "text/csv");
+        ShowToast($"{files.Length} request file(s) exported as CSV");
+    }
+
+    private async Task ExportToJsonAsync()
+    {
+        _showDropdown = false;
+        var files = FilteredFiles;
+        if (files.Length == 0)
+        {
+            ShowToast("No data to export", "danger");
+            return;
+        }
+
+        var json = JsonSerializer.Serialize(files, new JsonSerializerOptions { WriteIndented = true });
+        await DownloadTextFileAsync(json, "request-files.json", "application/json");
+        ShowToast($"{files.Length} request file(s) exported as JSON");
+    }
+
+    private static string BuildCsvRow(RequestFile f)
+    {
+        var fields = new[]
+        {
+            CsvField(f.FileName), CsvField(f.AppName), CsvField(f.ApiPath), CsvField(f.Verb),
+            CsvField(f.Description), CsvField(f.Status),
+            CsvField(f.CreatedBy), CsvField(f.CreatedAt.ToString("yyyy-MM-dd HH:mm")),
+            CsvField(f.UpdatedBy ?? ""), CsvField(f.UpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "")
+        };
+        return string.Join(",", fields);
+    }
+
+    private static string CsvField(string value) => $"\"{(value ?? "").Replace("\"", "\"\"")}\"";
+
+    private async Task DeleteSelectedAsync()
+    {
+        _showDropdown = false;
+        if (_selectedIds.Count == 0)
+        {
+            ShowToast("Select at least one request file to delete", "danger");
+            return;
+        }
+
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete {_selectedIds.Count} selected request file(s)? This cannot be undone.");
+        if (!confirmed) return;
+
+        _files = [.._files.Where(f => !_selectedIds.Contains(f.FileName))];
+        _expandedActionRows.RemoveWhere(_selectedIds.Contains);
+        _selectedIds.Clear();
+
+        // PageSize is 10 (see ServiceHubGrid PageSize="10"); clamp to the new last page.
+        var totalPages = Math.Max(1, (int)Math.Ceiling(FilteredFiles.Length / 10.0));
+        if (_currentPage > totalPages) _currentPage = totalPages;
+
+        await PersistFilesAsync();
+        ShowToast("Selected request file(s) deleted", "danger");
+    }
+
+    private void ExpandSelected()
+    {
+        _showDropdown = false;
+        if (_selectedIds.Count == 0)
+        {
+            ShowToast("Select at least one row to expand", "danger");
+            return;
+        }
+        _grid?.SetRowsExpanded(_selectedIds, expanded: true);
+        ShowToast($"{_selectedIds.Count} row(s) expanded");
+    }
+
+    private void CollapseSelected()
+    {
+        _showDropdown = false;
+        if (_selectedIds.Count == 0)
+        {
+            ShowToast("Select at least one row to collapse", "danger");
+            return;
+        }
+        _grid?.SetRowsExpanded(_selectedIds, expanded: false);
+        ShowToast($"{_selectedIds.Count} row(s) collapsed");
+    }
+
+    // ── Toast ──
+
+    private void ShowToast(string message, string type = "success")
+    {
+        _toastMessage = message;
+        _toastType = type;
+        _toastCts?.Cancel();
+        _toastCts = new CancellationTokenSource();
+        var token = _toastCts.Token;
+        _ = AutoDismissToastAsync(token);
+        StateHasChanged();
+    }
+
+    private async Task AutoDismissToastAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(2500, token);
+            if (!token.IsCancellationRequested)
+            {
+                _toastMessage = null;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void DismissToast()
+    {
+        _toastCts?.Cancel();
+        _toastMessage = null;
+    }
+
+    public void Dispose()
+    {
+        _toastCts?.Cancel();
+        _toastCts?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private RequestFile[] FilteredFiles

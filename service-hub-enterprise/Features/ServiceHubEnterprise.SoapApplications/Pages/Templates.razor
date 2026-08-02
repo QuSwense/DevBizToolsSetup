@@ -45,7 +45,7 @@
 else if (_hasError)
 {
     <div class="datagrid-card error-state-card">
-        <i class="bi bi-exclamation-triangle fs-28 text-sh-error"></i>
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
         <p class="error-state-text">@_errorMessage</p>
         <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadTemplatesAsync" type="button">
             <i class="bi bi-arrow-repeat"></i>
@@ -212,7 +212,7 @@ else
         <div class="modal-content-dg modal-w-440" @onclick:stopPropagation="true" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
             <div class="modal-header-dg">
                 <h3 id="delete-dialog-title">
-                    <i class="bi bi-exclamation-triangle text-sh-error me-1"></i>
+                    <i class="bi bi-exclamation-triangle text-danger me-1"></i>
                     Confirm Delete
                 </h3>
                 <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="CancelDelete" type="button" aria-label="Close">
@@ -378,12 +378,12 @@ else
                             <div class="tab-panel details-tab" role="tabpanel">
                                 <div class="form-row">
                                     <div class="form-group flex-grow-1">
-                                        <label>Name <span class="text-sh-error">*</span></label>
+                                        <label>Name <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control-dg" placeholder="e.g. CreateUserRequest"
                                                value="@_formModel.Name" @oninput="HandleNameChange" />
                                     </div>
                                     <div class="form-group flex-grow-1">
-                                        <label>Application <span class="text-sh-error">*</span></label>
+                                        <label>Application <span class="text-danger">*</span></label>
                                         <select class="form-control-dg" value="@_formModel.Category" @onchange="HandleApplicationChange">
                                             <option value="">Select application...</option>
                                             @foreach (var app in _availableApps)
@@ -408,7 +408,7 @@ else
 
                                 <div class="form-row">
                                     <div class="form-group flex-grow-1">
-                                        <label>Operation <span class="text-sh-error">*</span></label>
+                                        <label>Operation <span class="text-danger">*</span></label>
                                         <select class="form-control-dg" value="@_formModel.Operation" @onchange="HandleOperationChange">
                                             <option value="">@GetOperationPlaceholder()</option>
                                             @foreach (var op in _formAvailableOperations)

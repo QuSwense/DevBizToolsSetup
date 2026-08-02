@@ -1,0 +1,39 @@
+# Build output directories
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+# Test coverage
+coverage/
+
+# Mock database
+mock_db/
+
+# Node modules and libraries
+**/node_modules/
+**/wwwroot/lib/
+
+# Logs and temp files
+*.log
+*.tmp
+*.cache
+
+# Documentation (unless you want it included)
+**/docs/
+*.md
+
+# Hidden files
+.*
+!.copilotignore
+!.copilot-standards.md
+
+# These are the critical ones for your workspace:
+**/Features/*/bin/
+**/Features/*/obj/
+**/Components/*/bin/
+**/Components/*/obj/
+**/WebApp/bin/
+**/WebApp/obj/
+**/tests/*/bin/
+**/tests/*/obj/

@@ -831,7 +831,7 @@ public partial class Templates : IAsyncDisposable
     private string GetValidationCheckClass(bool passed) =>
         passed ? "is-pass" : "is-fail";
     private string GetValidationCheckIcon(bool passed) =>
-        passed ? "bi-check-circle-fill text-sh-success" : "bi-x-circle-fill text-sh-error";
+        passed ? "bi-check-circle-fill text-sh-success" : "bi-x-circle-fill text-danger";
     private string GetOperationPlaceholder() =>
         _formSelectedApp is not null ? "Select operation..." : "Select application first";
     private string GetPreviewChevronIcon() =>

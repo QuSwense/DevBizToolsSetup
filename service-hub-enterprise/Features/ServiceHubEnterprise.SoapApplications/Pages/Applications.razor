@@ -22,7 +22,7 @@
 else if (_hasError)
 {
     <div class="datagrid-card error-state-card">
-        <i class="bi bi-exclamation-triangle fs-28 text-sh-error"></i>
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
         <p class="error-state-text">@_errorMessage</p>
         <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadAppsAsync" type="button">
             <i class="bi bi-arrow-repeat"></i>
@@ -265,12 +265,12 @@ else
 
     <FilterModalBody>
         <div class="form-group">
-            <label>App Name</label>
+            <label class="form-label">App Name</label>
             <input type="text" class="form-control-dg" placeholder="Filter by name..."
                    @bind="_filterName" @bind:event="oninput" />
         </div>
         <div class="form-group">
-            <label>Base URL</label>
+            <label class="form-label">Base URL</label>
             <input type="text" class="form-control-dg" placeholder="Filter by URL..."
                    @bind="_filterUrl" @bind:event="oninput" />
         </div>
@@ -337,27 +337,27 @@ else
                     </div>
                 }
                 <div class="form-group">
-                    <label>App Name <span class="text-sh-error">*</span></label>
+                    <label class="form-label">App Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control-dg" placeholder="Enter application name..."
                            @bind="_newAppName" @bind:event="oninput" />
                 </div>
                 <div class="form-group">
-                    <label>Base URL <span class="text-sh-error">*</span></label>
+                    <label class="form-label">Base URL <span class="text-danger">*</span></label>
                     <input type="text" class="form-control-dg" placeholder="https://soap.example.com/Service"
                            @bind="_newAppUrl" @bind:event="oninput" />
                 </div>
                 <div class="form-group">
-                    <label>WSDL Path</label>
+                    <label class="form-label">WSDL Path <span class="text-danger">*</span></label>
                     <input type="text" class="form-control-dg" placeholder="?wsdl"
                            @bind="_newAppWsdlPath" @bind:event="oninput" />
                 </div>
                 <div class="form-group">
-                    <label>Description</label>
+                    <label class="form-label">Description</label>
                     <textarea class="form-control-dg textarea" placeholder="Describe the SOAP application..."
                               @bind="_newAppDescription" @bind:event="oninput"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label class="form-label">Status</label>
                     <select class="form-control-dg" @bind="_newAppStatus">
                         <option value="@AppStatus.Enabled">Enabled</option>
                         <option value="@AppStatus.Disabled">Disabled</option>
@@ -366,10 +366,10 @@ else
 
                 <div class="border-sh-top my-1 mb-2"></div>
                 <div class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft mb-2">
-                    Authentication Details <span class="text-sh-error">*</span>
+                    Authentication Details <span class="text-danger">*</span>
                 </div>
                 <div class="form-group">
-                    <label>Auth Type</label>
+                    <label class="form-label">Auth Type</label>
                     <select class="form-control-dg" @bind="_newAuth.Type">
                         <option value="@AuthType.None">No Authentication</option>
                         <option value="@AuthType.Basic">Basic Auth</option>
@@ -382,12 +382,12 @@ else
                 @if (_newAuth.Type == AuthType.Basic)
                 {
                     <div class="form-group">
-                        <label>Username</label>
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
                         <input type="text" class="form-control-dg" placeholder="Authentication username..."
                                @bind="_newAuth.Username" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
-                        <label>Password</label>
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
                         <input type="password" class="form-control-dg" placeholder="Authentication password..."
                                @bind="_newAuth.Password" @bind:event="oninput" />
                     </div>
@@ -395,12 +395,12 @@ else
                 else if (_newAuth.Type == AuthType.ApiKey)
                 {
                     <div class="form-group">
-                        <label>Key Name</label>
+                        <label class="form-label">Key Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control-dg" placeholder="e.g. X-API-Key"
                                @bind="_newAuth.KeyName" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
-                        <label>Key Value</label>
+                        <label class="form-label">Key Value <span class="text-danger">*</span></label>
                         <input type="text" class="form-control-dg" placeholder="API key value..."
                                @bind="_newAuth.KeyValue" @bind:event="oninput" />
                     </div>
@@ -408,7 +408,7 @@ else
                 else if (_newAuth.Type == AuthType.Bearer)
                 {
                     <div class="form-group">
-                        <label>Token</label>
+                        <label class="form-label">Token <span class="text-danger">*</span></label>
                         <input type="password" class="form-control-dg" placeholder="Bearer token..."
                                @bind="_newAuth.Token" @bind:event="oninput" />
                     </div>
@@ -416,17 +416,17 @@ else
                 else if (_newAuth.Type == AuthType.Ntlm)
                 {
                     <div class="form-group">
-                        <label>Username</label>
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
                         <input type="text" class="form-control-dg" placeholder="DOMAIN\\Username"
                                @bind="_newAuth.Username" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
-                        <label>Password</label>
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
                         <input type="password" class="form-control-dg" placeholder="NTLM password..."
                                @bind="_newAuth.Password" @bind:event="oninput" />
                     </div>
                     <div class="form-group">
-                        <label>Domain</label>
+                        <label class="form-label">Domain <span class="text-danger">*</span></label>
                         <input type="text" class="form-control-dg" placeholder="NTLM domain..."
                                @bind="_newAuth.Domain" @bind:event="oninput" />
                     </div>
@@ -435,7 +435,7 @@ else
                 <div class="border-sh-top my-1 mb-2"></div>
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft">
-                        SOAP APIs <span class="text-sh-error">*</span>
+                        SOAP APIs <span class="text-danger">*</span>
                     </span>
                     <button class="btn btn-dg fs-11 h-30" @onclick="AddApiEntry" type="button">
                         <i class="bi bi-plus-lg"></i>

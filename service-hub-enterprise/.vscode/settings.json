@@ -2,5 +2,55 @@
     "github.copilot.chat.codeGeneration.useInstructionFiles": true,
     "chat.includeApplyingInstructions": true,
     "http.proxyStrictSSL": false,
-    "dotnet.defaultSolution": "ServiceHubEnterprise.slnx"
+    "dotnet.defaultSolution": "ServiceHubEnterprise.slnx",
+    // ===== COPILOT CHAT SETTINGS =====
+  
+    // Limit max prompt characters to reduce token usage
+    "github.copilot.chat.maxPromptChars": 100000,
+    
+    // Limit the number of files automatically included
+    "github.copilot.chat.maxPromptFiles": 10,
+    
+    // Disable automatic file inclusion - forces explicit mentions
+    "github.copilot.chat.autoIncludeFiles": false,
+    
+    // Don't automatically include entire workspace
+    "github.copilot.chat.contextualFileSelection": false,
+    
+    // Limit agent requests (prevents runaway conversations)
+    "github.copilot.chat.agent.maxRequests": 5,
+    
+    // ===== CUSTOM INSTRUCTIONS =====
+    // Load your standards file automatically in every chat
+    "github.copilot.chat.instructions": [
+        {
+        "file": ".copilot-standards.md",
+        "alwaysInclude": true
+        }
+    ],
+    
+    // ===== PERFORMANCE SETTINGS =====
+    // Exclude large folders from search
+    "search.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/node_modules": true,
+        "**/coverage": true,
+        "**/*.code-search": true,
+        "**/wwwroot/lib": true
+    },
+    
+    // Exclude from file watching
+    "files.watcherExclude": {
+        "**/bin/**": true,
+        "**/obj/**": true,
+        "**/coverage/**": true
+    },
+    
+    // ===== RECOMMENDED =====
+    // Enable improved token optimization (if available)
+    "github.copilot.chat.experimental.tokenOptimization": true,
+    
+    // Max tokens for code completion (reduces overhead)
+    "github.copilot.chat.maxCompletionTokens": 2048
 }
