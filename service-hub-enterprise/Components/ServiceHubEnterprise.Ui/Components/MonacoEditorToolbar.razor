@@ -44,13 +44,13 @@
         }
         @if (ShowWordWrapToggle)
         {
-            <button type="button" class="toolbar-btn @(WordWrapEnabled ? "is-active" : "")" @onclick="() => OnWordWrapToggled.InvokeAsync(!WordWrapEnabled)" title="Toggle word wrap">
+            <button type="button" class="toolbar-btn @(WordWrapEnabled ? "is-active" : "")" @onclick="() => OnWordWrapToggled.InvokeAsync(!WordWrapEnabled)" title="@(WordWrapEnabled ? "Disable word wrap" : "Enable word wrap")" aria-label="@(WordWrapEnabled ? "Disable word wrap" : "Enable word wrap")">
                 <i class="bi bi-text-wrap"></i>
             </button>
         }
         @if (ShowLineNumbersToggle)
         {
-            <button type="button" class="toolbar-btn @(LineNumbersEnabled ? "is-active" : "")" @onclick="() => OnLineNumbersToggled.InvokeAsync(!LineNumbersEnabled)" title="Toggle line numbers">
+            <button type="button" class="toolbar-btn @(LineNumbersEnabled ? "is-active" : "")" @onclick="() => OnLineNumbersToggled.InvokeAsync(!LineNumbersEnabled)" title="@(LineNumbersEnabled ? "Hide line numbers" : "Show line numbers")" aria-label="@(LineNumbersEnabled ? "Hide line numbers" : "Show line numbers")">
                 <i class="bi bi-list-ol"></i>
             </button>
         }
@@ -79,34 +79,34 @@
     <div class="toolbar-right">
         @if (ShowUndoRedo)
         {
-            <button type="button" class="toolbar-btn" @onclick="() => OnUndo.InvokeAsync()" title="Undo (Ctrl+Z)">
+            <button type="button" class="toolbar-btn" @onclick="() => OnUndo.InvokeAsync()" title="Undo (Ctrl+Z)" aria-label="Undo">
                 <i class="bi bi-arrow-counterclockwise"></i>
             </button>
-            <button type="button" class="toolbar-btn" @onclick="() => OnRedo.InvokeAsync()" title="Redo (Ctrl+Y)">
+            <button type="button" class="toolbar-btn" @onclick="() => OnRedo.InvokeAsync()" title="Redo (Ctrl+Y)" aria-label="Redo">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
         }
         @if (ShowFormatButton)
         {
-            <button type="button" class="toolbar-btn" @onclick="() => OnFormatClick.InvokeAsync()" title="Format document">
+            <button type="button" class="toolbar-btn" @onclick="() => OnFormatClick.InvokeAsync()" title="Format document" aria-label="Format document">
                 <i class="bi bi-file-indent"></i>
             </button>
         }
         @if (ShowValidateButton)
         {
-            <button type="button" class="toolbar-btn" @onclick="() => OnValidateClick.InvokeAsync()" title="Validate XML/JSON">
+            <button type="button" class="toolbar-btn" @onclick="() => OnValidateClick.InvokeAsync()" title="Validate XML/JSON" aria-label="Validate XML or JSON">
                 <i class="bi bi-check-circle"></i>
             </button>
         }
         @if (ShowCompareButton)
         {
-            <button type="button" class="toolbar-btn" @onclick="() => OnCompareClick.InvokeAsync()" title="Compare with saved version">
+            <button type="button" class="toolbar-btn" @onclick="() => OnCompareClick.InvokeAsync()" title="Compare with saved version" aria-label="Compare with saved version">
                 <i class="bi bi-file-diff"></i>
             </button>
         }
         @if (ShowDownloadButton)
         {
-            <button type="button" class="toolbar-btn" @onclick="() => OnDownloadClick.InvokeAsync()" title="Download file">
+            <button type="button" class="toolbar-btn" @onclick="() => OnDownloadClick.InvokeAsync()" title="Download file" aria-label="Download file">
                 <i class="bi bi-download"></i>
             </button>
         }
@@ -121,7 +121,7 @@
         }
         @if (ShowSaveButton)
         {
-            <button type="button" class="toolbar-btn toolbar-btn-primary" @onclick="() => OnSaveClick.InvokeAsync()" disabled="@IsSaving" title="Save (Ctrl+S)">
+            <button type="button" class="toolbar-btn toolbar-btn-primary" @onclick="() => OnSaveClick.InvokeAsync()" disabled="@IsSaving" title="Save (Ctrl+S)" aria-label="Save file">
                 @if (IsSaving)
                 {
                     <span class="spinner-border spinner-border-sm" role="status" style="width:12px;height:12px"></span>
@@ -135,7 +135,7 @@
         @if (ShowActionMenu)
         {
             <div class="toolbar-action-menu" @onclick="ToggleActionMenu" @onfocusout="HandleActionMenuFocusOut" tabindex="0" @ref="_actionMenuRef">
-                <button type="button" class="toolbar-btn" title="More actions">
+                <button type="button" class="toolbar-btn" title="More actions" aria-label="More actions">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 @if (_showActionMenuDropdown)

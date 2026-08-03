@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
+using ServiceHubEnterprise.Common;
 using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.Ui.Components;
 using ServiceHubEnterprise.Ui.Models;
@@ -278,14 +279,5 @@ public partial class EditorComparer
     }
 
     private static string GetLanguageFromExtension(string fileName)
-    {
-        var ext = Path.GetExtension(fileName)?.TrimStart('.').ToLowerInvariant();
-        return ext switch
-        {
-            "json" => "json",
-            "xml" => "xml",
-            "wsdl" => "xml",
-            _ => "plaintext"
-        };
-    }
+        => FileFormatHelper.GetLanguageFromExtension(fileName);
 }

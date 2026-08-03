@@ -234,6 +234,26 @@ public partial class MonacoEditor : IAsyncDisposable
         StateHasChanged();
     }
 
+    /// <summary>
+    /// JS-invokable callback for cursor/selection state changes.
+    /// </summary>
+    [JSInvokable]
+    public Task OnMonacoEditorStateChanged(EditorStats? stats)
+    {
+        if (stats is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        _totalChars = stats.TotalChars;
+        _nonEmptyLines = stats.NonEmptyLines;
+        _blankLines = stats.BlankLines;
+        _selectedChars = stats.SelectedChars;
+        CursorLine = stats.LineNumber;
+        CursorColumn = stats.ColumnNumber;
+        return InvokeAsync(StateHasChanged);
+    }
+
     private async Task RefreshStatsAsync()
     {
         if (!_editorCreated) return;
@@ -339,6 +359,299 @@ public partial class MonacoEditor : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Updates a single editor option value.
+    /// </summary>
+    public async Task SetEditorOptionAsync(string key, object value)
+    {
+        if (_editorCreated)
+        {
+            try { await JS.InvokeVoidAsync($"{MonacoModule}.setEditorOption", _containerId, key, value); }
+            catch { /* ignore */ }
+        }
+    }
+
+    /// <summary>
+    /// Opens Monaco find widget.
+    /// </summary>
+    public async Task OpenFindAsync()
+    {
+        await ExecuteCommandAsync("actions.find");
+    }
+
+    /// <summary>
+    /// Opens Monaco replace widget.
+    /// </summary>
+    public async Task OpenReplaceAsync()
+    {
+        await ExecuteCommandAsync("editor.action.startFindReplaceAction");
+    }
+
+    /// <summary>
+    /// Searches for text and jumps to the next match.
+    /// </summary>
+    public async Task<bool> SearchAsync(string query)
+    {
+        if (!_editorCreated || string.IsNullOrWhiteSpace(query))
+        {
+            return false;
+        }
+
+        try
+        {
+            return await JS.InvokeAsync<bool>($"{MonacoModule}.searchInEditor", _containerId, query);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Jumps to a specific line number.
+    /// </summary>
+    public async Task GoToLineAsync(int lineNumber)
+    {
+        if (!_editorCreated || lineNumber <= 0)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync($"{MonacoModule}.goToLine", _containerId, lineNumber);
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private async Task HandleBackClickAsync()
+    {
+        await OnBackClick.InvokeAsync();
+    }
+
+    private async Task HandleSaveClickAsync()
+    {
+        await OnSaveClick.InvokeAsync();
+    }
+
+    private async Task HandleFormatClickAsync()
+    {
+        await ExecuteCommandAsync("editor.action.formatDocument");
+        await OnFormatClick.InvokeAsync();
+    }
+
+    private async Task HandleValidateClickAsync()
+    {
+        await OnValidateClick.InvokeAsync();
+    }
+
+    private async Task HandleDownloadClickAsync()
+    {
+        await OnDownloadClick.InvokeAsync();
+    }
+
+    private async Task HandleCompareClickAsync()
+    {
+        await OnCompareClick.InvokeAsync();
+    }
+
+    private async Task HandleUndoAsync()
+    {
+        await ExecuteCommandAsync("undo");
+        await RefreshStatsAsync();
+        await OnUndo.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private async Task HandleRedoAsync()
+    {
+        await ExecuteCommandAsync("redo");
+        await RefreshStatsAsync();
+        await OnRedo.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private async Task HandleFontFamilyChangedAsync(string fontFamily)
+    {
+        FontFamily = fontFamily;
+        await SetEditorOptionAsync("fontFamily", fontFamily);
+        await OnFontFamilyChanged.InvokeAsync(fontFamily);
+        StateHasChanged();
+    }
+
+    private async Task HandleFontSizeChangedAsync(int fontSize)
+    {
+        FontSize = fontSize;
+        await SetEditorOptionAsync("fontSize", fontSize);
+        await OnFontSizeChanged.InvokeAsync(fontSize);
+        StateHasChanged();
+    }
+
+    private async Task HandleThemeChangedAsync(string theme)
+    {
+        Theme = theme;
+        await SetThemeAsync(theme);
+        await OnThemeChanged.InvokeAsync(theme);
+        StateHasChanged();
+    }
+
+    private async Task HandleWordWrapToggledAsync(bool enabled)
+    {
+        WordWrapEnabled = enabled;
+        await SetEditorOptionAsync("wordWrap", enabled);
+        await OnWordWrapToggled.InvokeAsync(enabled);
+        StateHasChanged();
+    }
+
+    private async Task HandleLineNumbersToggledAsync(bool enabled)
+    {
+        ShowLineNumbers = enabled;
+        await SetEditorOptionAsync("lineNumbers", enabled);
+        await OnLineNumbersToggled.InvokeAsync(enabled);
+        StateHasChanged();
+    }
+
+    private async Task HandleMinimapToggledAsync(bool enabled)
+    {
+        ShowMinimap = enabled;
+        await SetEditorOptionAsync("minimap", enabled);
+        await OnMinimapToggled.InvokeAsync(enabled);
+        StateHasChanged();
+    }
+
+    private async Task HandleSearchAsync(string query)
+    {
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var found = await SearchAsync(query);
+            if (!found)
+            {
+                ShowValidation($"No matches for '{query}'", true);
+            }
+        }
+
+        await OnSearch.InvokeAsync(query);
+    }
+
+    private async Task HandleGoToLineAsync(int lineNumber)
+    {
+        await GoToLineAsync(lineNumber);
+        await RefreshStatsAsync();
+        await OnGoToLine.InvokeAsync(lineNumber);
+        StateHasChanged();
+    }
+
+    private async Task HandleActionMenuItemAsync(string itemId)
+    {
+        if (OnActionMenuItem.HasDelegate)
+        {
+            await OnActionMenuItem.InvokeAsync(itemId);
+            return;
+        }
+
+        switch (itemId)
+        {
+            case "save":
+                await HandleSaveClickAsync();
+                break;
+            case "print":
+                await OnPrintClick.InvokeAsync();
+                break;
+            case "close":
+                await HandleBackClickAsync();
+                break;
+            case "undo":
+                await HandleUndoAsync();
+                break;
+            case "redo":
+                await HandleRedoAsync();
+                break;
+            case "cut":
+                await ExecuteCommandAsync("editor.action.clipboardCutAction");
+                break;
+            case "copy":
+                await ExecuteCommandAsync("editor.action.clipboardCopyAction");
+                break;
+            case "paste":
+                await ExecuteCommandAsync("editor.action.clipboardPasteAction");
+                break;
+            case "select-all":
+                await ExecuteCommandAsync("editor.action.selectAll");
+                break;
+            case "duplicate":
+                await ExecuteCommandAsync("editor.action.copyLinesDownAction");
+                break;
+            case "delete-line":
+                await ExecuteCommandAsync("editor.action.deleteLines");
+                break;
+            case "move-line-up":
+                await ExecuteCommandAsync("editor.action.moveLinesUpAction");
+                break;
+            case "move-line-down":
+                await ExecuteCommandAsync("editor.action.moveLinesDownAction");
+                break;
+            case "find":
+                await OpenFindAsync();
+                break;
+            case "find-next":
+                await ExecuteCommandAsync("editor.action.nextMatchFindAction");
+                break;
+            case "find-prev":
+                await ExecuteCommandAsync("editor.action.previousMatchFindAction");
+                break;
+            case "replace":
+            case "replace-all":
+                await OpenReplaceAsync();
+                break;
+            case "go-to-line":
+                await ExecuteCommandAsync("editor.action.gotoLine");
+                break;
+            case "go-to-symbol":
+                await ExecuteCommandAsync("editor.action.quickOutline");
+                break;
+            case "toggle-minimap":
+                await HandleMinimapToggledAsync(!ShowMinimap);
+                break;
+            case "toggle-word-wrap":
+                await HandleWordWrapToggledAsync(!WordWrapEnabled);
+                break;
+            case "theme-dark":
+                await HandleThemeChangedAsync("vs-dark");
+                break;
+            case "theme-light":
+                await HandleThemeChangedAsync("vs-light");
+                break;
+            case "theme-high-contrast":
+                await HandleThemeChangedAsync("hc-black");
+                break;
+            case "xml-validate":
+            case "validate":
+                await HandleValidateClickAsync();
+                break;
+            case "xml-format":
+                await HandleFormatClickAsync();
+                break;
+            case "xml-collapse":
+                await ExecuteCommandAsync("editor.foldAll");
+                break;
+            case "xml-expand":
+                await ExecuteCommandAsync("editor.unfoldAll");
+                break;
+            case "compare":
+                await HandleCompareClickAsync();
+                break;
+            case "reset":
+                await SetContentAsync(Content);
+                await RefreshStatsAsync();
+                break;
+            default:
+                break;
+        }
+    }
+
     // ── Toast helpers ──
 
     /// <summary>
@@ -400,7 +713,7 @@ public partial class MonacoEditor : IAsyncDisposable
 
     // ── Internal DTO for editor stats ──
 
-    private class EditorStats
+    public class EditorStats
     {
         public int TotalLines { get; set; }
         public int NonEmptyLines { get; set; }

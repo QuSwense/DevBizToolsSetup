@@ -1,9 +1,9 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
+using ServiceHubEnterprise.Common;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
@@ -92,21 +92,6 @@ public partial class Applications : IDisposable
     private string _toastType = "success";
     private CancellationTokenSource? _toastCts;
 
-    private static readonly Regex AppNameRegex = new(@"^[A-Za-z0-9äöüßÄÖÜ ]+$");
-    private static readonly Regex WsdlPathRegex = new(@"^[A-Za-z0-9/?.&=_\-]+$");
-    private static readonly Regex CSharpIdentifierRegex = new(@"^[A-Za-z_][A-Za-z0-9_]*$");
-
-    private static readonly HashSet<string> CSharpKeywords = new(StringComparer.Ordinal)
-    {
-        "abstract","as","base","bool","break","byte","case","catch","char","checked","class",
-        "const","continue","decimal","default","delegate","do","double","else","enum","event",
-        "explicit","extern","false","finally","fixed","float","for","foreach","goto","if",
-        "implicit","in","int","interface","internal","is","lock","long","namespace","new",
-        "null","object","operator","out","override","params","private","protected","public",
-        "readonly","ref","return","sbyte","sealed","short","sizeof","stackalloc","static",
-        "string","struct","switch","this","throw","true","try","typeof","uint","ulong",
-        "unchecked","unsafe","ushort","using","virtual","void","volatile","while"
-    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -299,7 +284,7 @@ public partial class Applications : IDisposable
         {
             _validationErrors.Add("App name is required.");
         }
-        else if (!AppNameRegex.IsMatch(_newAppName.Trim()))
+        else if (!NamingConventionValidator.IsValidAppName(_newAppName))
         {
             _validationErrors.Add("App name may only contain letters (incl. German characters ä ö ü ß), digits and spaces.");
         }
@@ -321,7 +306,7 @@ public partial class Applications : IDisposable
         }
         else if (_newAppWsdlPath.Contains("http", StringComparison.OrdinalIgnoreCase)
              || _newAppWsdlPath.Contains("://")
-             || !WsdlPathRegex.IsMatch(_newAppWsdlPath.Trim()))
+             || !NamingConventionValidator.IsValidWsdlPath(_newAppWsdlPath))
         {
             _validationErrors.Add("WSDL path must be a partial path (e.g. '?wsdl', '/service?wsdl') and must not contain a URL.");
         }
@@ -335,9 +320,7 @@ public partial class Applications : IDisposable
             foreach (var api in _newApis)
             {
                 var name = api.Name.Trim();
-                if (string.IsNullOrWhiteSpace(name)
-                    || !CSharpIdentifierRegex.IsMatch(name)
-                    || CSharpKeywords.Contains(name))
+                if (!NamingConventionValidator.IsValidCSharpIdentifier(name))
                 {
                     _validationErrors.Add($"API name '{api.Name}' is not a valid C# method name.");
                 }
@@ -626,7 +609,7 @@ public partial class Applications : IDisposable
         return string.Join(",", fields);
     }
 
-    private static string CsvField(string value) => $"\"{(value ?? "").Replace("\"", "\"\"")}\"";
+    private static string CsvField(string value) => CsvTextHelper.EncodeField(value);
 
     private static string? Redact(string? value) => string.IsNullOrEmpty(value) ? value : "***";
 

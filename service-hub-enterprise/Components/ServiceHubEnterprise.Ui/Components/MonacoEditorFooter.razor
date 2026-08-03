@@ -70,13 +70,13 @@
             }
             @if (ShowWordWrapToggle)
             {
-                <button type="button" class="footer-stat footer-btn" @onclick="() => OnWordWrapToggled.InvokeAsync(!WordWrapEnabled)" title="Toggle word wrap">
+                <button type="button" class="footer-stat footer-btn" @onclick="() => OnWordWrapToggled.InvokeAsync(!WordWrapEnabled)" title="@(WordWrapEnabled ? "Disable word wrap" : "Enable word wrap")" aria-label="@(WordWrapEnabled ? "Disable word wrap" : "Enable word wrap")">
                     <i class="bi @(WordWrapEnabled ? "bi-text-wrap" : "bi-text-paragraph")"></i>
                 </button>
             }
             @if (ShowMinimapToggle)
             {
-                <button type="button" class="footer-stat footer-btn" @onclick="() => OnMinimapToggled.InvokeAsync(!MinimapEnabled)" title="Toggle minimap">
+                <button type="button" class="footer-stat footer-btn" @onclick="() => OnMinimapToggled.InvokeAsync(!MinimapEnabled)" title="@(MinimapEnabled ? "Hide minimap" : "Show minimap")" aria-label="@(MinimapEnabled ? "Hide minimap" : "Show minimap")">
                     <i class="bi bi-map"></i>
                 </button>
             }

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Common\ServiceHubEnterprise.Common.csproj" />
     <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
     <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Ui\ServiceHubEnterprise.Ui.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.ADViewer\ServiceHubEnterprise.ADViewer.csproj" />

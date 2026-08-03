@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
+using ServiceHubEnterprise.Common;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
@@ -837,7 +838,7 @@ public partial class RequestFiles : IDisposable
         return string.Join(",", fields);
     }
 
-    private static string CsvField(string value) => $"\"{(value ?? "").Replace("\"", "\"\"")}\"";
+    private static string CsvField(string value) => CsvTextHelper.EncodeField(value);
 
     private async Task DeleteSelectedAsync()
     {

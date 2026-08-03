@@ -63,22 +63,22 @@ else
                                      ShowCompareButton="@ShowCompareButton"
                                      ShowUndoRedo="@ShowUndoRedo"
                                      ShowActionMenu="@ShowActionMenu"
-                                     OnBackClick="@OnBackClick"
-                                     OnSaveClick="@OnSaveClick"
-                                     OnFormatClick="@OnFormatClick"
-                                     OnValidateClick="@OnValidateClick"
-                                     OnDownloadClick="@OnDownloadClick"
-                                     OnCompareClick="@OnCompareClick"
-                                     OnUndo="@OnUndo"
-                                     OnRedo="@OnRedo"
-                                     OnFontFamilyChanged="@OnFontFamilyChanged"
-                                     OnFontSizeChanged="@OnFontSizeChanged"
-                                     OnThemeChanged="@OnThemeChanged"
-                                     OnWordWrapToggled="@OnWordWrapToggled"
-                                     OnLineNumbersToggled="@OnLineNumbersToggled"
-                                     OnSearch="@OnSearch"
-                                     OnGoToLine="@OnGoToLine"
-                                     OnActionMenuItem="@OnActionMenuItem" />
+                                     OnBackClick="@HandleBackClickAsync"
+                                     OnSaveClick="@HandleSaveClickAsync"
+                                     OnFormatClick="@HandleFormatClickAsync"
+                                     OnValidateClick="@HandleValidateClickAsync"
+                                     OnDownloadClick="@HandleDownloadClickAsync"
+                                     OnCompareClick="@HandleCompareClickAsync"
+                                     OnUndo="@HandleUndoAsync"
+                                     OnRedo="@HandleRedoAsync"
+                                     OnFontFamilyChanged="@HandleFontFamilyChangedAsync"
+                                     OnFontSizeChanged="@HandleFontSizeChangedAsync"
+                                     OnThemeChanged="@HandleThemeChangedAsync"
+                                     OnWordWrapToggled="@HandleWordWrapToggledAsync"
+                                     OnLineNumbersToggled="@HandleLineNumbersToggledAsync"
+                                     OnSearch="@HandleSearchAsync"
+                                     OnGoToLine="@HandleGoToLineAsync"
+                                     OnActionMenuItem="@HandleActionMenuItemAsync" />
             }
         }
 
@@ -119,8 +119,8 @@ else
                                     ShowRightStats="@ShowFooterRightStats"
                                     ShowWordWrapToggle="@ShowFooterWordWrapToggle"
                                     ShowMinimapToggle="@ShowFooterMinimapToggle"
-                                    OnWordWrapToggled="@OnWordWrapToggled"
-                                    OnMinimapToggled="@OnMinimapToggled" />
+                                    OnWordWrapToggled="@HandleWordWrapToggledAsync"
+                                    OnMinimapToggled="@HandleMinimapToggledAsync" />
             }
         }
     </div>

@@ -41,6 +41,25 @@
         document.head.appendChild(loader);
     }
 
+    function normalizeFontFamily(fontFamily) {
+        var raw = (fontFamily || '').toString().trim();
+        if (!raw) {
+            return "'JetBrains Mono', 'Menlo', 'Consolas', monospace";
+        }
+
+        var known = {
+            'jetbrains mono': "'JetBrains Mono', 'Menlo', 'Consolas', monospace",
+            'fira code': "'Fira Code', 'JetBrains Mono', 'Menlo', monospace",
+            'cascadia code': "'Cascadia Code', 'Consolas', 'Menlo', monospace",
+            'menlo': "'Menlo', 'Monaco', 'Consolas', monospace",
+            'consolas': "'Consolas', 'Menlo', 'Monaco', monospace",
+            'monaco': "'Monaco', 'Menlo', 'Consolas', monospace"
+        };
+
+        var mapped = known[raw.toLowerCase()];
+        return mapped || raw;
+    }
+
     function buildEditorOpts(content, opts) {
         opts = opts || {};
         return {
@@ -52,7 +71,7 @@
             lineNumbers: opts.lineNumbers !== false ? 'on' : 'off',
             renderLineHighlight: opts.renderLineHighlight || 'line',
             fontSize: opts.fontSize || 11,
-            fontFamily: opts.fontFamily || "'JetBrains Mono', 'Menlo', 'Consolas', monospace",
+            fontFamily: normalizeFontFamily(opts.fontFamily),
             wordWrap: opts.wordWrap !== false ? 'on' : 'off',
             automaticLayout: true,
             theme: opts.theme || 'vs-dark',
@@ -109,6 +128,7 @@
 
     window.monacoEditor = {
         _editors: {},
+        _searchState: {},
 
         /// Creates an editable/code Monaco editor with configurable options.
         /// containerId: DOM element id
@@ -128,14 +148,35 @@
                     var editor = monaco.editor.create(container, buildEditorOpts(content, opts));
 
                     // Listen for content changes - call back to .NET if reference provided
+                    function publishState() {
+                        if (dotNetRef && typeof dotNetRef.invokeMethodAsync === 'function') {
+                            var stats = window.monacoEditor.getEditorStats(containerId);
+                            dotNetRef.invokeMethodAsync('OnMonacoEditorStateChanged', stats);
+                        }
+                    }
+
                     if (dotNetRef && typeof dotNetRef.invokeMethodAsync === 'function') {
                         editor.getModel().onDidChangeContent(function () {
                             var value = editor.getValue();
                             dotNetRef.invokeMethodAsync('OnMonacoContentChanged', value);
+                            publishState();
+                        });
+
+                        editor.onDidChangeCursorPosition(function () {
+                            publishState();
+                        });
+
+                        editor.onDidChangeCursorSelection(function () {
+                            publishState();
+                        });
+
+                        editor.onMouseMove(function () {
+                            publishState();
                         });
                     }
 
                     window.monacoEditor._editors[containerId] = editor;
+                    publishState();
                     resolve(editor);
                 });
             });
@@ -220,6 +261,8 @@
                 }
                 delete window.monacoEditor._editors[containerId];
             }
+
+            delete window.monacoEditor._searchState[containerId];
         },
 
         /// Gets the current content from a regular editor (not diff).
@@ -262,8 +305,25 @@
             var ed = window.monacoEditor._editors[containerId];
             if (ed && ed.updateOptions) {
                 var opt = {};
-                opt[key] = value;
+                if (key === 'wordWrap') {
+                    opt.wordWrap = value ? 'on' : 'off';
+                } else if (key === 'lineNumbers') {
+                    opt.lineNumbers = value ? 'on' : 'off';
+                } else if (key === 'minimap') {
+                    opt.minimap = { enabled: value === true };
+                } else if (key === 'fontFamily') {
+                    opt.fontFamily = normalizeFontFamily(value);
+                } else {
+                    opt[key] = value;
+                }
                 ed.updateOptions(opt);
+
+                if (key === 'fontFamily' && monaco.editor && monaco.editor.remeasureFonts) {
+                    monaco.editor.remeasureFonts();
+                    if (ed.layout) {
+                        ed.layout();
+                    }
+                }
             }
         },
 
@@ -282,8 +342,7 @@
             if (selectedRanges) {
                 for (var i = 0; i < selectedRanges.length; i++) {
                     var r = selectedRanges[i];
-                    selectedChars += Math.abs(r.endColumn - r.startColumn) +
-                        (r.endLineNumber - r.startLineNumber) * 10000; // approximate
+                    selectedChars += model.getValueInRange(r).length;
                 }
             }
             return {
@@ -329,12 +388,71 @@
         /// Executes a Monaco command by ID (e.g. 'editor.action.formatDocument').
         executeCommand: function (containerId, commandId) {
             var ed = window.monacoEditor._editors[containerId];
-            if (ed && ed.getAction) {
+            if (!ed) return;
+
+            if (commandId === 'undo' || commandId === 'redo') {
+                ed.trigger('toolbar', commandId, null);
+                return;
+            }
+
+            if (ed.getAction) {
                 var action = ed.getAction(commandId);
                 if (action && action.run) {
                     action.run();
+                    return;
                 }
             }
+
+            if (ed.trigger) {
+                ed.trigger('toolbar', commandId, null);
+            }
+        },
+
+        /// Searches for query in the current editor and jumps to the next match.
+        searchInEditor: function (containerId, query) {
+            var ed = window.monacoEditor._editors[containerId];
+            if (!ed || !query) return false;
+
+            var model = ed.getModel ? ed.getModel() : null;
+            if (!model || !model.findMatches) return false;
+
+            var state = window.monacoEditor._searchState[containerId] || { query: '', index: -1, matches: [] };
+            if (state.query !== query) {
+                state.query = query;
+                state.matches = model.findMatches(query, true, false, false, null, true);
+                state.index = -1;
+            }
+
+            if (!state.matches || state.matches.length === 0) {
+                window.monacoEditor._searchState[containerId] = state;
+                return false;
+            }
+
+            state.index = (state.index + 1) % state.matches.length;
+            var range = state.matches[state.index].range;
+            ed.setSelection(range);
+            ed.revealRangeInCenter(range);
+            ed.focus();
+
+            window.monacoEditor._searchState[containerId] = state;
+            return true;
+        },
+
+        /// Moves cursor to the given line number and reveals it.
+        goToLine: function (containerId, lineNumber) {
+            var ed = window.monacoEditor._editors[containerId];
+            if (!ed || !lineNumber || lineNumber < 1) return;
+
+            var model = ed.getModel ? ed.getModel() : null;
+            if (!model || !model.getLineCount) return;
+
+            var maxLine = model.getLineCount();
+            var targetLine = Math.min(Math.max(1, lineNumber), maxLine);
+            var pos = { lineNumber: targetLine, column: 1 };
+
+            ed.setPosition(pos);
+            ed.revealPositionInCenter(pos);
+            ed.focus();
         },
 
         /// Focuses the editor.

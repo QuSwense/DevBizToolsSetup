@@ -106,21 +106,32 @@ else
                             }
 
                             <div class="form-group audit-section">
-                                <div class="properties-section-title">Audit Trail</div>
+                                <div class="audit-header">
+                                    <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                    <div class="properties-section-title">Audit Trail</div>
+                                </div>
                                 <div class="audit-grid">
-                                    <div class="audit-item">
+                                    <div class="audit-item audit-item-created">
                                         <span class="audit-label">Created</span>
-                                        <span class="audit-value">@_createdBy on @_createdAt</span>
+                                        <span class="audit-user">@(string.IsNullOrWhiteSpace(_createdBy) ? "Unknown user" : _createdBy)</span>
+                                        <span class="audit-time">
+                                            <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                            @(string.IsNullOrWhiteSpace(_createdAt) ? "Date unavailable" : _createdAt)
+                                        </span>
                                     </div>
-                                    <div class="audit-item">
+                                    <div class="audit-item audit-item-updated">
                                         <span class="audit-label">Last Updated</span>
-                                        <span class="audit-value">@_lastUpdatedBy @_lastUpdatedAt</span>
+                                        <span class="audit-user">@(string.IsNullOrWhiteSpace(_lastUpdatedBy) ? "Not updated yet" : _lastUpdatedBy)</span>
+                                        <span class="audit-time">
+                                            <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                            @(string.IsNullOrWhiteSpace(_lastUpdatedAt) ? "Date unavailable" : _lastUpdatedAt)
+                                        </span>
                                     </div>
                                     @if (_versionNumber > 0)
                                     {
-                                        <div class="audit-item">
+                                        <div class="audit-item audit-item-version">
                                             <span class="audit-label">Version</span>
-                                            <span class="audit-value mono-text">v@(_versionNumber)</span>
+                                            <span class="audit-version-pill mono-text">v@(_versionNumber)</span>
                                         </div>
                                     }
                                 </div>
@@ -167,7 +178,18 @@ else
                                       OnFormatClick="@FormatDocumentAsync"
                                       OnValidateClick="@ValidateDocumentAsync"
                                       OnDownloadClick="@DownloadFileAsync"
-                                      OnCompareClick="@OpenComparer" />
+                                      OnCompareClick="@OpenComparer"
+                                      OnUndo="@HandleUndoAsync"
+                                      OnRedo="@HandleRedoAsync"
+                                      OnFontFamilyChanged="@HandleFontFamilyChangedAsync"
+                                      OnFontSizeChanged="@HandleFontSizeChangedAsync"
+                                      OnThemeChanged="@HandleThemeChangedAsync"
+                                      OnWordWrapToggled="@HandleWordWrapToggledAsync"
+                                      OnLineNumbersToggled="@HandleLineNumbersToggledAsync"
+                                      OnMinimapToggled="@HandleMinimapToggledAsync"
+                                      OnSearch="@HandleSearchAsync"
+                                      OnGoToLine="@HandleGoToLineAsync"
+                                      OnActionMenuItem="@HandleActionMenuItemAsync" />
                     </div>
                 </div>
             }

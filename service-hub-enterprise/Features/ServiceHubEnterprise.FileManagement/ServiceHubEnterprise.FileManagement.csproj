@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\ServiceHubEnterprise.Data\ServiceHubEnterprise.Data.csproj" />
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Common\ServiceHubEnterprise.Common.csproj" />
     <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
     <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Ui\ServiceHubEnterprise.Ui.csproj" />
     <ProjectReference Include="..\..\Features\ServiceHubEnterprise.SoapApplications\ServiceHubEnterprise.SoapApplications.csproj" />

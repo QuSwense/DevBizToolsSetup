@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
+using ServiceHubEnterprise.Common;
 using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.FileManagement.Models;
 
@@ -220,26 +221,8 @@ public partial class FileViewer
     }
 
     private static string GetLanguageFromExtension(string fileName)
-    {
-        var ext = Path.GetExtension(fileName)?.TrimStart('.').ToLowerInvariant();
-        return ext switch
-        {
-            "json" => "json",
-            "xml" => "xml",
-            "wsdl" => "xml",
-            "txt" => "plaintext",
-            "csv" => "plaintext",
-            _ => "plaintext"
-        };
-    }
+        => FileFormatHelper.GetLanguageFromExtension(fileName, "plaintext");
 
     private static string FormatSize(int byteCount)
-    {
-        return byteCount switch
-        {
-            < 1024 => $"{byteCount} B",
-            < 1024 * 1024 => $"{byteCount / 1024.0:F1} KB",
-            _ => $"{byteCount / (1024.0 * 1024.0):F1} MB"
-        };
-    }
+        => FileFormatHelper.FormatSize(byteCount);
 }

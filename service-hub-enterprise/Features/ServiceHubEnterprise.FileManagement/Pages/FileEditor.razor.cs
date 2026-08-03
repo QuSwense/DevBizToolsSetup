@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using ServiceHubEnterprise.Common;
 using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.Data.Entities;
 using ServiceHubEnterprise.Ui.Components;
@@ -64,6 +65,7 @@ public partial class FileEditor : IDisposable
     private bool _isRestFile;
     private int _versionNumber;
     private bool _hasPreviousVersion;
+    private bool _minimapEnabled;
 
     // ── Validation ──
     private string? _validationMessage;
@@ -198,9 +200,215 @@ public partial class FileEditor : IDisposable
 
     private async Task FormatDocumentAsync()
     {
-        if (_monacoEditorRef is not null)
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleUndoAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleRedoAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleFontFamilyChangedAsync(string fontFamily)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleFontSizeChangedAsync(int fontSize)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleThemeChangedAsync(string theme)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleWordWrapToggledAsync(bool enabled)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleLineNumbersToggledAsync(bool enabled)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleMinimapToggledAsync(bool enabled)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleSearchAsync(string query)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleGoToLineAsync(int lineNumber)
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleActionMenuItemAsync(string itemId)
+    {
+        switch (itemId)
         {
-            await _monacoEditorRef.ExecuteCommandAsync("editor.action.formatDocument");
+            case "new":
+                _fileContent = string.Empty;
+                _hasUnsavedChanges = true;
+                await _monacoEditorRef!.SetContentAsync(_fileContent);
+                ShowValidation("New document started", false);
+                break;
+            case "open":
+            case "recent":
+                Nav.NavigateTo("/file/library");
+                break;
+            case "save":
+                await SaveAsync();
+                break;
+            case "save-as":
+                ShowValidation("Use File Name and Save to persist as a new name", false);
+                break;
+            case "export":
+                await DownloadFileAsync();
+                break;
+            case "print":
+                ShowValidation("Use browser print from the comparer page", false);
+                break;
+            case "close":
+                GoBack();
+                break;
+            case "undo":
+                await _monacoEditorRef!.ExecuteCommandAsync("undo");
+                break;
+            case "redo":
+                await _monacoEditorRef!.ExecuteCommandAsync("redo");
+                break;
+            case "cut":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.clipboardCutAction");
+                break;
+            case "copy":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.clipboardCopyAction");
+                break;
+            case "paste":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.clipboardPasteAction");
+                break;
+            case "select-all":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.selectAll");
+                break;
+            case "duplicate":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.copyLinesDownAction");
+                break;
+            case "delete-line":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.deleteLines");
+                break;
+            case "move-line-up":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.moveLinesUpAction");
+                break;
+            case "move-line-down":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.moveLinesDownAction");
+                break;
+            case "find":
+                await _monacoEditorRef!.OpenFindAsync();
+                break;
+            case "find-next":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.nextMatchFindAction");
+                break;
+            case "find-prev":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.previousMatchFindAction");
+                break;
+            case "replace":
+            case "replace-all":
+                await _monacoEditorRef!.OpenReplaceAsync();
+                break;
+            case "go-to-line":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.gotoLine");
+                break;
+            case "go-to-symbol":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.quickOutline");
+                break;
+            case "toggle-minimap":
+                _minimapEnabled = !_minimapEnabled;
+                await _monacoEditorRef!.SetEditorOptionAsync("minimap", _minimapEnabled);
+                break;
+            case "toggle-breadcrumbs":
+                ShowValidation("Breadcrumbs toggle is not available in embedded editor", false);
+                break;
+            case "toggle-word-wrap":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.toggleWordWrap");
+                break;
+            case "theme-dark":
+                await _monacoEditorRef!.SetThemeAsync("vs-dark");
+                break;
+            case "theme-light":
+                await _monacoEditorRef!.SetThemeAsync("vs-light");
+                break;
+            case "theme-high-contrast":
+                await _monacoEditorRef!.SetThemeAsync("hc-black");
+                break;
+            case "xml-validate":
+            case "validate":
+                await ValidateDocumentAsync();
+                break;
+            case "xml-format":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.action.formatDocument");
+                break;
+            case "xml-minify":
+                await MinifyCurrentDocumentAsync();
+                break;
+            case "xml-collapse":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.foldAll");
+                break;
+            case "xml-expand":
+                await _monacoEditorRef!.ExecuteCommandAsync("editor.unfoldAll");
+                break;
+            case "xml-to-json":
+                ShowValidation("XML to JSON conversion is not available in this page", false);
+                break;
+            case "json-to-xml":
+                ShowValidation("JSON to XML conversion is not available in this page", false);
+                break;
+            case "xml-generate-xsd":
+                ShowValidation("XSD generation is not available in this page", false);
+                break;
+            case "encoding-utf8":
+            case "encoding-utf8-bom":
+            case "encoding-utf16":
+            case "encoding-ascii":
+                ShowValidation($"{itemId.Replace("encoding-", string.Empty).ToUpperInvariant()} selected", false);
+                break;
+            case "line-lf":
+            case "line-crlf":
+            case "line-cr":
+                ShowValidation($"{itemId.Replace("line-", string.Empty).ToUpperInvariant()} selected", false);
+                break;
+            case "compare":
+                OpenComparer();
+                break;
+            case "statistics":
+                ShowValidation($"Length: {_fileContent.Length} characters", false);
+                break;
+            case "shortcuts":
+                ShowValidation("Use Monaco shortcuts: Ctrl/Cmd+S, Ctrl/Cmd+F, Ctrl/Cmd+H", false);
+                break;
+            case "settings":
+                ShowValidation("Use toolbar selectors for font, size, theme and wrapping", false);
+                break;
+            case "reset":
+                _fileContent = _originalContent;
+                _hasUnsavedChanges = false;
+                await _monacoEditorRef!.SetContentAsync(_fileContent);
+                ShowValidation("Editor reset to last saved content", false);
+                break;
+            case "about":
+                ShowValidation("Monaco editor embedded in Service Hub Enterprise", false);
+                break;
+            default:
+                break;
         }
     }
 
@@ -406,15 +614,41 @@ public partial class FileEditor : IDisposable
     }
 
     private static string GetLanguageFromExtension(string fileName)
+        => FileFormatHelper.GetLanguageFromExtension(fileName);
+
+    private async Task MinifyCurrentDocumentAsync()
     {
-        var ext = Path.GetExtension(fileName)?.TrimStart('.').ToLowerInvariant();
-        return ext switch
+        if (string.IsNullOrWhiteSpace(_fileContent))
         {
-            "json" => "json",
-            "xml" or "wsdl" or "soap" => "xml",
-            "txt" or "csv" => "plaintext",
-            _ => "xml"
-        };
+            ShowValidation("Content is empty", true);
+            return;
+        }
+
+        try
+        {
+            if (_language == "json")
+            {
+                using var jsonDoc = JsonDocument.Parse(_fileContent);
+                _fileContent = JsonSerializer.Serialize(jsonDoc.RootElement);
+            }
+            else
+            {
+                var xmlDoc = XDocument.Parse(_fileContent);
+                _fileContent = xmlDoc.ToString(SaveOptions.DisableFormatting);
+            }
+
+            _hasUnsavedChanges = _fileContent != _originalContent;
+            if (_monacoEditorRef is not null)
+            {
+                await _monacoEditorRef.SetContentAsync(_fileContent);
+            }
+
+            ShowValidation("Document minified", false);
+        }
+        catch (Exception ex)
+        {
+            ShowValidation($"Minify failed: {ex.Message}", true);
+        }
     }
 
     private void ShowValidation(string message, bool isError)
