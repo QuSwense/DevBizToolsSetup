@@ -1,0 +1,94 @@
+@namespace ServiceHubEnterprise.Ui.Components
+
+<div class="monaco-editor-footer">
+    <div class="footer-left">
+        @if (ShowLeftStats)
+        {
+            <span class="footer-stat" title="Total characters">@TotalCharacters chars</span>
+            <span class="footer-stat" title="Lines of code">@LinesOfCode LOC</span>
+            <span class="footer-stat-sep"></span>
+            <span class="footer-stat" title="File encoding">@FileEncoding</span>
+            <span class="footer-stat" title="Line ending format">@LineEndingFormat</span>
+            @if (FileSizeBytes > 0)
+            {
+                <span class="footer-stat" title="File size">@FormatFileSize(FileSizeBytes)</span>
+            }
+        }
+    </div>
+    <div class="footer-center">
+        @if (ShowCenterStats)
+        {
+            <span class="footer-stat" title="Line number">Ln @LineNumber</span>
+            <span class="footer-stat" title="Column number">Col @ColumnNumber</span>
+            @if (SelectedCharacters > 0)
+            {
+                <span class="footer-stat" title="Selected characters">Sel @SelectedCharacters</span>
+            }
+            @if (IsOverwriteMode)
+            {
+                <span class="footer-stat footer-stat-highlight" title="Insert/Overwrite mode">OVR</span>
+            }
+            @if (IsReadOnly)
+            {
+                <span class="footer-stat footer-stat-highlight" title="Read-only">RO</span>
+            }
+            <span class="footer-stat footer-stat-faint">@LanguageMode</span>
+        }
+    </div>
+    <div class="footer-right">
+        @if (ShowRightStats)
+        {
+            @if (IsLoading)
+            {
+                <span class="footer-stat">
+                    <span class="spinner-border spinner-border-sm" role="status" style="width:10px;height:10px"></span>
+                </span>
+            }
+            @if (HasValidationErrors)
+            {
+                <span class="footer-stat footer-stat-error" title="Validation errors found">
+                    <i class="bi bi-exclamation-circle"></i>
+                </span>
+            }
+            else
+            {
+                <span class="footer-stat footer-stat-success" title="No validation errors">
+                    <i class="bi bi-check-circle"></i>
+                </span>
+            }
+            @if (IsAutoSaveEnabled)
+            {
+                <span class="footer-stat" title="Auto-save enabled">
+                    <i class="bi bi-clock-history"></i>
+                </span>
+            }
+            @if (!IsConnected)
+            {
+                <span class="footer-stat footer-stat-error" title="Disconnected">
+                    <i class="bi bi-wifi-off"></i>
+                </span>
+            }
+            @if (ShowWordWrapToggle)
+            {
+                <button type="button" class="footer-stat footer-btn" @onclick="() => OnWordWrapToggled.InvokeAsync(!WordWrapEnabled)" title="Toggle word wrap">
+                    <i class="bi @(WordWrapEnabled ? "bi-text-wrap" : "bi-text-paragraph")"></i>
+                </button>
+            }
+            @if (ShowMinimapToggle)
+            {
+                <button type="button" class="footer-stat footer-btn" @onclick="() => OnMinimapToggled.InvokeAsync(!MinimapEnabled)" title="Toggle minimap">
+                    <i class="bi bi-map"></i>
+                </button>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes / (1024.0 * 1024.0):F1} MB";
+    }
+}

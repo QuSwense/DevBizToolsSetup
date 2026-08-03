@@ -257,7 +257,7 @@ public partial class RequestFiles : IDisposable
     private int GetRequestFilesDelayMs()
     {
         var raw = Config["MockDb:RequestFilesDelayMs"];
-        return int.TryParse(raw, out var ms) ? ms : 1500;
+        return int.TryParse(raw, out var ms) ? ms : 0;
     }
 
     private async Task LoadFilesAsync()

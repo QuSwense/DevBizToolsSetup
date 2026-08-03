@@ -10,14 +10,16 @@
     let pendingQueue = [];
 
     function onMonacoReady(callback) {
-        if (monacoReady) { callback(); return; }
-        pendingQueue.push(callback);
+        // Use shared global queue so both scripts get notified
+        if (window.__monacoReady) { callback(); return; }
+        if (!window.__monacoReadyCallbacks) window.__monacoReadyCallbacks = [];
+        window.__monacoReadyCallbacks.push(callback);
     }
 
     function firePending() {
-        monacoReady = true;
-        var q = pendingQueue;
-        pendingQueue = [];
+        window.__monacoReady = true;
+        var q = window.__monacoReadyCallbacks || [];
+        window.__monacoReadyCallbacks = [];
         for (var i = 0; i < q.length; i++) q[i]();
     }
 

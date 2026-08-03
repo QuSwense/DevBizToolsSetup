@@ -1,0 +1,93 @@
+@page "/file/browser"
+
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="min-height:300px">
+        <div class="spinner-border text-sh-accent" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadBrowserAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else
+{
+    <div class="editor-page">
+        @* ── Toolbar ── *@
+        <div class="editor-toolbar">
+            <div class="d-flex align-items-center gap-8px">
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="GoBack" type="button" aria-label="Back" title="Go back">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <h5 class="m-0">File Browser</h5>
+                <span class="file-type-badge">WebDAV</span>
+            </div>
+            <div class="d-flex align-items-center gap-8px">
+                <button class="btn btn-outline-secondary btn-dg" type="button" title="Upload file" disabled>
+                    <i class="bi bi-upload"></i>
+                    Upload
+                </button>
+                <button class="btn btn-outline-secondary btn-dg" type="button" title="Refresh" disabled>
+                    <i class="bi bi-arrow-repeat"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="datagrid-card empty-state-card" style="margin-top:14px">
+            <i class="bi bi-folder2-open empty-state-icon"></i>
+            <h3 class="empty-state-title">WebDAV File Browser</h3>
+            <p class="empty-state-desc">
+                Browse and manage files on remote WebDAV servers. Configure a WebDAV connection to get started.
+            </p>
+            <div class="empty-state-actions">
+                <button class="btn btn-dark btn-sh-primary" type="button" disabled>
+                    <i class="bi bi-plus-lg"></i>
+                    Configure Connection
+                </button>
+                <a href="/file/library" class="btn btn-outline-secondary btn-dg text-decoration-none">
+                    <i class="bi bi-file-earmark"></i>
+                    Browse File Library
+                </a>
+            </div>
+        </div>
+
+        @* ── Connection Info Card ── *@
+        <div class="dash-card mt-3">
+            <div class="card-header">
+                <span class="card-title">Connection Details</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Server URL</label>
+                        <input type="text" class="form-control-dg" placeholder="https://webdav.example.com" disabled readonly />
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control-dg" placeholder="username" disabled readonly />
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <input type="text" class="form-control-dg" value="Not connected" disabled readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

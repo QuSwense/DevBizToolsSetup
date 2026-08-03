@@ -1,90 +1,89 @@
 @page "/file/library"
 
-@{
-    var files = new[]
-    {
-        new { FileName = "payment_create_001.json", AppName = "PaymentService", Type = "json", Size = "2.4 KB", LinkedTo =
-"PaymentService /payments POST", Actions = "" },
-        new { FileName = "user_list_filter.xml", AppName = "UserManagement", Type = "xml", Size = "1.8 KB", LinkedTo =
-"UserManagement /users GET", Actions = "" },
-        new { FileName = "invoice_create.xml", AppName = "LegacyBilling", Type = "xml", Size = "3.1 KB", LinkedTo =
-"LegacyBilling CreateInvoice POST", Actions = "" },
-        new { FileName = "stock_update_003.json", AppName = "InventoryAPI", Type = "json", Size = "1.2 KB", LinkedTo =
-"InventoryAPI /stock PUT", Actions = "" }
-    };
-}
-
-<div class="datagrid-card">
-    <div class="grid-toolbar">
-        <div class="toolbar-left">
-            <div class="search-box">
-                <span class="search-icon">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input type="text" placeholder="Search files..." aria-label="Search files" />
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="datagrid-card" style="padding:0">
+        <div class="skeleton-table">
+            <div class="skeleton-header">
+                <div class="skeleton-cell skeleton-check"></div>
+                <div class="skeleton-cell skeleton-name"></div>
+                <div class="skeleton-cell skeleton-app"></div>
+                <div class="skeleton-cell skeleton-type"></div>
+                <div class="skeleton-cell skeleton-size"></div>
+                <div class="skeleton-cell skeleton-linked"></div>
+                <div class="skeleton-cell skeleton-actions"></div>
             </div>
-            <div class="meta-group">
-                <span class="meta-pill">4 files</span>
-            </div>
+            @RenderSkeletonRows
         </div>
-        <div class="toolbar-right">
-            <button class="btn btn-dark btn-sh-primary">
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadFilesAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else if (_allFiles.Length == 0)
+{
+    <div class="datagrid-card empty-state-card">
+        <i class="bi bi-folder-open" style="font-size:36px;color:var(--sh-text-faint)"></i>
+        <h4 class="empty-state-title">No files yet</h4>
+        <p class="empty-state-desc">Upload your first file to get started with the file library.</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark mt-2" type="button" aria-label="Upload File">
+            <i class="bi bi-plus-lg"></i>
+            Upload File
+        </button>
+    </div>
+}
+else
+{
+    <ServiceHubGrid TItem="FileItem"
+                    @ref="_grid"
+                    Id="fileLibraryGrid"
+                    Items="FilteredFiles"
+                    PageSize="10"
+                    EnableSelection="true"
+                    EnablePagination="true"
+                    EnableSearch="true"
+                    SearchPlaceholder="Search files..."
+                    EmptyText="No files found matching the current filters."
+                    @bind-SortColumn="_sortColumn"
+                    @bind-SortAscending="_sortAscending"
+                    @bind-CurrentPage="_currentPage"
+                    @bind-SearchText="_searchText"
+                    @bind-SelectedIds="_selectedIds"
+                    Columns="@_columns">
+
+        <ToolbarRight>
+            <button class="btn btn-sh-primary btn-dg btn-dark" type="button" aria-label="Upload File">
                 <i class="bi bi-plus-lg"></i>
                 Upload
             </button>
-            <button class="btn btn-outline-secondary btn-dg">
+            <button class="btn btn-outline-secondary btn-dg" type="button" aria-label="Export">
                 <i class="bi bi-download"></i>
                 Export
             </button>
-        </div>
-    </div>
-    <div class="table-wrap">
-        <table class="datagrid">
-            <thead>
-                <tr>
-                    <th class="check-cell"><input type="checkbox" class="form-check-input" aria-label="Select all" />
-                    </th>
-                    <th class="sortable">
-                        <span class="th-inner">File Name<span class="sort-indicator">
-                            <i class="bi bi-chevron-expand"></i>
-                        </span></span>
-                    </th>
-                    <th>Application</th>
-                    <th>Type</th>
-                    <th>Size</th>
-                    <th>Linked To</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var file in files)
-                {
-                    var typeColor = file.Type == "json" ? "var(--sh-success)" : "var(--sh-warning)";
-                    <tr>
-                        <td class="check-cell"><input type="checkbox" class="form-check-input"
-                                                          aria-label="Select @file.FileName" /></td>
-                            <td>
-                                <div class="name-stack">
-                                    <i class="bi bi-file-earmark-code file-icon" style="color:@typeColor"></i>
-                                    <span class="file-name">@file.FileName</span>
-                                </div>
-                            </td>
-                            <td class="text-sh-soft">@file.AppName</td>
-                            <td>
-                                <span class="type-badge text-uppercase">@file.Type</span>
-                            </td>
-                            <td class="text-sh-soft">@file.Size</td>
-                            <td class="cell-truncated">
-                                @file.LinkedTo</td>
-                                <td>
-                                    <div class="action-icons">
-                                        <button class="action-icon-btn">View</button>
-                                        <button class="action-icon-btn">Download</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        </ToolbarRight>
+
+        <RowActions Context="file">
+            <div class="action-icons">
+                <button class="action-icon-btn" @onclick="() => HandleViewFile(file)" type="button" aria-label="View" title="View">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button class="action-icon-btn" @onclick="() => HandleDownloadFile(file)" type="button" aria-label="Download" title="Download">
+                    <i class="bi bi-download"></i>
+                </button>
+                <button class="action-icon-btn text-danger" @onclick="() => HandleDeleteFile(file)" type="button" aria-label="Delete" title="Delete">
+                    <i class="bi bi-trash"></i>
+                </button>
             </div>
-        </div>
+        </RowActions>
+    </ServiceHubGrid>
+}

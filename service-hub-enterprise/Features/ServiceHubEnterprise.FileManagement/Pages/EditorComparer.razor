@@ -1,16 +1,93 @@
 @page "/file/comparer"
+@inject NavigationManager _nav
+@inject SoapDbContext _soapDb
+@inject RestDbContext _restDb
+@inject FileManagementDbContext _fmDb
 
-<div class="datagrid-card empty-state-card">
-    <i class="bi bi-file-diff empty-state-icon"></i>
-    <h3 class="empty-state-title">Editor Comparer</h3>
-    <p class="empty-state-desc">
-        Compare two files side by side. Upload or select files from the library to see differences highlighted with a
-        diff view.
-    </p>
-    <div class="empty-state-actions">
-        <button class="btn btn-dark btn-sh-primary">
-            <i class="bi bi-plus-lg"></i>
-            Select Files to Compare
-        </button>
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="min-height:300px">
+        <div class="spinner-border text-sh-accent" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
-</div>
+}
+else if (_isEmpty)
+{
+    <div class="datagrid-card empty-state-card">
+        <i class="bi bi-file-diff empty-state-icon"></i>
+        <h3 class="empty-state-title">Editor Comparer</h3>
+        <p class="empty-state-desc">
+            Compare two files side by side. Select files from the library or use the editor's Diff button
+            to see differences highlighted with a diff view.
+        </p>
+        <div class="empty-state-actions">
+            <a href="/file/library" class="btn btn-outline-secondary btn-dg text-decoration-none">
+                <i class="bi bi-file-earmark"></i>
+                Browse File Library
+            </a>
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadComparerAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else
+{
+    <div class="editor-page">
+        @* ── Toolbar ── *@
+        <div class="editor-toolbar">
+            <div class="d-flex align-items-center gap-8px">
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="GoBack" type="button" aria-label="Back" title="Go back">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <h5 class="m-0">Diff: @_leftFileName</h5>
+                <span class="text-sh-faint fs-11">vs @_rightFileName</span>
+            </div>
+        </div>
+
+        @* ── Diff Editor ── *@
+        <div class="diff-editor-container" style="height: calc(100vh - 120px);">
+            <MonacoDiffEditor @ref="_diffEditorRef"
+                              OriginalContent="@_leftContent"
+                              ModifiedContent="@_rightContent"
+                              OriginalLabel="@_leftFileName"
+                              ModifiedLabel="@_rightFileName"
+                              OriginalAuthor="@_leftAuthor"
+                              ModifiedAuthor="@_rightAuthor"
+                              OriginalTimestamp="@_leftTimestamp"
+                              ModifiedTimestamp="@_rightTimestamp"
+                              Language="@_leftLanguage"
+                              ShowHeader="true"
+                              ShowControls="true"
+                              ShowFooter="true"
+                              ShowUnchangedLines="true"
+                              ShowUnchangedLinesToggle="true"
+                              ShowWhitespaceToggles="true"
+                              ShowCaseToggle="true"
+                              ShowNavigation="true"
+                              ShowDiffCounter="true"
+                              ShowScrollSync="true"
+                              ShowViewModeToggle="true"
+                              ShowSwapButton="true"
+                              ShowRefreshButton="true"
+                              ShowExportButton="true"
+                              OnViewModeChanged="@OnViewModeChanged"
+                              OnPreviousDiff="@OnPreviousDiff"
+                              OnNextDiff="@OnNextDiff"
+                              OnSwap="@OnSwap"
+                              OnRefresh="@OnRefresh"
+                              OnExportReport="@OnExportReport" />
+        </div>
+    </div>
+}

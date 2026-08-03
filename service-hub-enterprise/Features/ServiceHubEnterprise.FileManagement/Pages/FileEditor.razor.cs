@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.Data.Entities;
+using ServiceHubEnterprise.Ui.Components;
 
 namespace ServiceHubEnterprise.FileManagement.Pages;
 
@@ -32,16 +33,16 @@ public partial class FileEditor : IDisposable
     [Inject]
     private FileManagementDbContext FmDb { get; set; } = default!;
 
-    private const string MonacoContainerId = "file-editor-monaco";
-    private DotNetObjectReference<FileEditor>? _dotNetRef;
+    private MonacoEditor? _monacoEditorRef;
 
     // ── State ──
     private bool _isLoading = true;
+    private bool _isEmpty;
     private bool _hasError;
     private string? _errorMessage;
-    private bool _monacoReady;
     private bool _isSaving;
     private bool _hasUnsavedChanges;
+    private int _activeTab;
 
     // ── File identity ──
     private string _fileId = "";
@@ -64,10 +65,6 @@ public partial class FileEditor : IDisposable
     private int _versionNumber;
     private bool _hasPreviousVersion;
 
-    private string _lastSavedLabel => !string.IsNullOrEmpty(_lastUpdatedAt)
-        ? $"Last saved: {_lastUpdatedAt}"
-        : "Not yet saved";
-
     // ── Validation ──
     private string? _validationMessage;
     private bool _validationIsError;
@@ -82,6 +79,7 @@ public partial class FileEditor : IDisposable
     private async Task InitializeAsync()
     {
         _isLoading = true;
+        _isEmpty = false;
         _hasError = false;
         _errorMessage = null;
 
@@ -96,8 +94,7 @@ public partial class FileEditor : IDisposable
 
             if (string.IsNullOrWhiteSpace(fileParam))
             {
-                _hasError = true;
-                _errorMessage = "No file specified. Use ?app=&file= or ?path= query parameters.";
+                _isEmpty = true;
                 _isLoading = false;
                 return;
             }
@@ -189,77 +186,27 @@ public partial class FileEditor : IDisposable
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !_hasError && !_isLoading)
-        {
-            await InitializeMonacoAsync();
-        }
-    }
-
-    private async Task InitializeMonacoAsync()
-    {
-        try
-        {
-            _dotNetRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("wsdlMonaco.createCodeEditor",
-                MonacoContainerId,
-                _fileContent,
-                _language,
-                _dotNetRef);
-            _monacoReady = true;
-        }
-        catch (Exception ex)
-        {
-            _hasError = true;
-            _errorMessage = $"Failed to initialize editor: {ex.Message}";
-        }
-    }
-
     /// <summary>
-    /// JS-invokable callback for Monaco content changes.
+    /// Called when the MonacoEditor component content changes.
     /// </summary>
-    [JSInvokable]
-    public void OnMonacoContentChanged(string content)
+    private async Task OnEditorContentChanged(string content)
     {
         _fileContent = content;
         _hasUnsavedChanges = content != _originalContent;
         StateHasChanged();
     }
 
-    private async Task SyncMonacoContentAsync()
-    {
-        if (!_monacoReady) return;
-        try
-        {
-            _fileContent = await JS.InvokeAsync<string>("wsdlMonaco.getEditorContent", MonacoContainerId);
-        }
-        catch
-        {
-            // Monaco may not be initialized yet
-        }
-    }
-
     private async Task FormatDocumentAsync()
     {
-        if (!_monacoReady) return;
-        try
+        if (_monacoEditorRef is not null)
         {
-            var editor = await JS.InvokeAsync<object>("wsdlMonaco.getEditorContent", MonacoContainerId);
-            // Monaco's format action via Ctrl+Shift+I or programmatic call
-            await JS.InvokeVoidAsync("eval",
-                $"document.querySelector('#{MonacoContainerId}').__editor?.getAction('editor.action.formatDocument')?.run()");
-        }
-        catch
-        {
-            // Format action may not be available
+            await _monacoEditorRef.ExecuteCommandAsync("editor.action.formatDocument");
         }
     }
 
     private async Task ValidateDocumentAsync()
     {
-        await SyncMonacoContentAsync();
-
+        // Content is already bound via two-way binding
         if (string.IsNullOrWhiteSpace(_fileContent))
         {
             ShowValidation("Content is empty", true);
@@ -291,7 +238,6 @@ public partial class FileEditor : IDisposable
 
     private async Task DownloadFileAsync()
     {
-        await SyncMonacoContentAsync();
         try
         {
             var module = await JS.InvokeAsync<IJSObjectReference>("import",
@@ -331,7 +277,15 @@ public partial class FileEditor : IDisposable
 
         try
         {
-            await SyncMonacoContentAsync();
+            // Sync content from editor if available
+            if (_monacoEditorRef is not null)
+            {
+                var editorContent = await _monacoEditorRef.GetContentAsync();
+                if (editorContent is not null)
+                {
+                    _fileContent = editorContent;
+                }
+            }
 
             var currentUser = Config["Users:CurrentUser"] ?? "Current User";
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -413,9 +367,28 @@ public partial class FileEditor : IDisposable
         }
     }
 
+    private async Task SetActiveTab(int tab)
+    {
+        _activeTab = tab;
+        StateHasChanged();
+
+        // When switching to Content tab, resize the Monaco editor
+        if (tab == 1 && _monacoEditorRef is not null)
+        {
+            await Task.Delay(50);
+            await _monacoEditorRef.ResizeAsync();
+        }
+    }
+
     private void GoBack()
     {
-        Nav.NavigateTo("/soap/request-files");
+        Nav.NavigateTo("/file/library");
+    }
+
+    private void DismissError()
+    {
+        _hasError = false;
+        _errorMessage = null;
     }
 
     private string GetFileExtension()
@@ -429,17 +402,6 @@ public partial class FileEditor : IDisposable
             "wsdl" => "wsdl",
             "txt" => "txt",
             _ => ext ?? "xml"
-        };
-    }
-
-    private string GetTypeBadgeClass()
-    {
-        return GetFileExtension() switch
-        {
-            "json" => "file-type-json",
-            "xml" => "file-type-xml",
-            "wsdl" => "file-type-wsdl",
-            _ => "file-type-generic"
         };
     }
 
@@ -472,13 +434,15 @@ public partial class FileEditor : IDisposable
             }
         });
         StateHasChanged();
+
+        // Also show in the MonacoEditor component
+        _monacoEditorRef?.ShowValidation(message, isError);
     }
 
     private void DismissValidation() => _validationMessage = null;
 
     public void Dispose()
     {
-        _dotNetRef?.Dispose();
         _validationCts?.Cancel();
         _validationCts?.Dispose();
     }

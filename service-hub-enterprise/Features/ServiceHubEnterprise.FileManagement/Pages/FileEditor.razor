@@ -1,6 +1,5 @@
 @page "/file/editor"
 @inject NavigationManager _nav
-@inject IJSRuntime _js
 @inject IConfiguration _config
 @inject SoapAppStore _appStore
 @inject SoapDbContext _soapDb
@@ -16,6 +15,23 @@
         </div>
     </div>
 }
+else if (_isEmpty)
+{
+    <div class="datagrid-card empty-state-card">
+        <i class="bi bi-file-earmark-text" style="font-size:36px;color:var(--sh-text-faint)"></i>
+        <h4 class="empty-state-title">No file selected</h4>
+        <p class="empty-state-desc">
+            Specify a file to edit using the <code>?app=</code> and <code>?file=</code> query parameters.
+            Browse the File Library to find and open a file.
+        </p>
+        <div class="empty-state-actions">
+            <a href="/file/library" class="btn btn-outline-secondary btn-dg text-decoration-none">
+                <i class="bi bi-file-earmark"></i>
+                Browse File Library
+            </a>
+        </div>
+    </div>
+}
 else if (_hasError)
 {
     <div class="datagrid-card error-state-card">
@@ -25,135 +41,136 @@ else if (_hasError)
             <i class="bi bi-arrow-repeat"></i>
             Retry
         </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
     </div>
 }
 else
 {
     <div class="editor-page">
-        @* ── Toolbar ── *@
-        <div class="editor-toolbar">
-            <div class="d-flex align-items-center gap-8px">
-                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="GoBack" type="button" aria-label="Back" title="Go back">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-                <h5 class="m-0 mono-text">@_fileName</h5>
-                <span class="file-type-badge @GetTypeBadgeClass()">@GetFileExtension()</span>
-                @if (_isSoapFile)
-                {
-                    <span class="text-sh-faint fs-11">— @_appName / @_operation</span>
-                }
-            </div>
-            <div class="d-flex align-items-center gap-8px">
-                <span class="fs-12 text-sh-faint" title="Last saved">@_lastSavedLabel</span>
-                @if (_hasUnsavedChanges)
-                {
-                    <span class="unsaved-badge">Unsaved</span>
-                }
-                <button class="btn btn-outline-secondary btn-dg" @onclick="FormatDocumentAsync" type="button" title="Format document" disabled="@(!_monacoReady)">
-                    <i class="bi bi-file-indent"></i>
-                    Format
-                </button>
-                <button class="btn btn-outline-secondary btn-dg" @onclick="ValidateDocumentAsync" type="button" title="Validate XML/JSON" disabled="@(!_monacoReady)">
-                    <i class="bi bi-check-circle"></i>
-                    Validate
-                </button>
-                <button class="btn btn-outline-secondary btn-dg" @onclick="DownloadFileAsync" type="button" title="Download file">
-                    <i class="bi bi-download"></i>
-                </button>
-                <button class="btn btn-outline-secondary btn-dg" @onclick="OpenComparer" type="button" title="Compare with saved version" disabled="@(!_hasPreviousVersion)">
-                    <i class="bi bi-file-diff"></i>
-                    Diff
-                </button>
-                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="SaveAsync" type="button" disabled="@_isSaving">
-                    @if (_isSaving)
-                    {
-                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                    }
-                    <i class="bi bi-check-lg"></i>
-                    Save
-                </button>
-            </div>
+        @* ── Tabs ── *@
+        <div class="tabs-header">
+            <button class="tab-btn@(_activeTab == 0 ? " is-active" : "")"
+                    @onclick="() => SetActiveTab(0)" type="button" role="tab" aria-selected="@(_activeTab == 0)">
+                <i class="bi bi-info-circle"></i>
+                Properties
+            </button>
+            <button class="tab-btn@(_activeTab == 1 ? " is-active" : "")"
+                    @onclick="() => SetActiveTab(1)" type="button" role="tab" aria-selected="@(_activeTab == 1)">
+                <i class="bi bi-code-slash"></i>
+                Content
+            </button>
         </div>
 
-        <div class="editor-layout">
-            @* ── Properties Panel (left) ── *@
-            <div class="editor-properties">
-                <div class="properties-section">
-                    <div class="properties-section-title">File Properties</div>
-
-                    <div class="form-group">
-                        <label class="form-label">File Name</label>
-                        <input type="text" class="form-control-dg" @bind="_editFileName" @bind:event="oninput" />
-                    </div>
-
-                    @if (_isSoapFile || _isRestFile)
-                    {
-                        <div class="form-group">
-                            <label class="form-label">Application</label>
-                            <input type="text" class="form-control-dg" value="@_appName" disabled readonly />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Operation</label>
-                            <input type="text" class="form-control-dg" value="@_operation" disabled readonly />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Verb</label>
-                            <input type="text" class="form-control-dg" value="@_verb" disabled readonly />
-                        </div>
-                    }
-
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control-dg textarea" rows="3" @bind="_editDescription" @bind:event="oninput"></textarea>
-                    </div>
-
-                    @if (_isSoapFile || _isRestFile)
-                    {
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select class="form-control-dg" @bind="_editStatus">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    }
-
-                    <div class="border-sh-top my-2"></div>
-
-                    <div class="properties-meta">
-                        <div class="meta-row">
-                            <span class="meta-label">Created</span>
-                            <span class="meta-value">@_createdBy on @_createdAt</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-label">Updated</span>
-                            <span class="meta-value">@_lastUpdatedBy @_lastUpdatedAt</span>
-                        </div>
-                        @if (_versionNumber > 0)
-                        {
-                            <div class="meta-row">
-                                <span class="meta-label">Version</span>
-                                <span class="meta-value mono-text">v@(_versionNumber)</span>
+        <div class="tab-content">
+            @* ── TAB 0: Properties (editable) ── *@
+            @if (_activeTab == 0)
+            {
+                <div class="tab-panel properties-tab" role="tabpanel">
+                    <div class="editor-properties-panel">
+                        <div class="properties-grid">
+                            <div class="form-group">
+                                <label>File Name</label>
+                                <input type="text" class="form-control-dg" @bind="_editFileName" @bind:event="oninput" />
                             </div>
-                        }
+
+                            @if (_isSoapFile || _isRestFile)
+                            {
+                                <div class="form-group">
+                                    <label>Application</label>
+                                    <input type="text" class="form-control-dg" value="@_appName" disabled readonly />
+                                </div>
+                                <div class="form-group">
+                                    <label>Operation</label>
+                                    <input type="text" class="form-control-dg" value="@_operation" disabled readonly />
+                                </div>
+                                <div class="form-group">
+                                    <label>Verb</label>
+                                    <input type="text" class="form-control-dg" value="@_verb" disabled readonly />
+                                </div>
+                            }
+
+                            <div class="form-group full-width">
+                                <label>Description</label>
+                                <textarea class="form-control-dg textarea" rows="3" @bind="_editDescription" @bind:event="oninput"></textarea>
+                            </div>
+
+                            @if (_isSoapFile || _isRestFile)
+                            {
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select class="form-control-dg" @bind="_editStatus">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            }
+
+                            <div class="form-group audit-section">
+                                <div class="properties-section-title">Audit Trail</div>
+                                <div class="audit-grid">
+                                    <div class="audit-item">
+                                        <span class="audit-label">Created</span>
+                                        <span class="audit-value">@_createdBy on @_createdAt</span>
+                                    </div>
+                                    <div class="audit-item">
+                                        <span class="audit-label">Last Updated</span>
+                                        <span class="audit-value">@_lastUpdatedBy @_lastUpdatedAt</span>
+                                    </div>
+                                    @if (_versionNumber > 0)
+                                    {
+                                        <div class="audit-item">
+                                            <span class="audit-label">Version</span>
+                                            <span class="audit-value mono-text">v@(_versionNumber)</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
 
-            @* ── Monaco Editor (right) ── *@
-            <div class="editor-main">
-                <div id="file-editor-monaco" class="monaco-editor-host"></div>
-            </div>
+            @* ── TAB 1: Content (Monaco editor) ── *@
+            @if (_activeTab == 1)
+            {
+                <div class="tab-panel content-tab" role="tabpanel">
+                    <div class="editor-main" style="height: calc(100vh - 220px);">
+                        <MonacoEditor @ref="_monacoEditorRef"
+                                      FileName="@_fileName"
+                                      Content="@_fileContent"
+                                      ContentChanged="@OnEditorContentChanged"
+                                      Language="@_language"
+                                      HasUnsavedChanges="@_hasUnsavedChanges"
+                                      IsSaving="@_isSaving"
+                                      ShowBackButton="false"
+                                      ShowFileName="true"
+                                      ShowFontSelector="true"
+                                      ShowWordWrapToggle="true"
+                                      ShowLineNumbersToggle="true"
+                                      ShowThemeSelector="true"
+                                      ShowSearchBox="true"
+                                      ShowCursorPosition="true"
+                                      ShowGoToLine="true"
+                                      ShowSaveButton="true"
+                                      ShowFormatButton="true"
+                                      ShowValidateButton="true"
+                                      ShowDownloadButton="true"
+                                      ShowCompareButton="@_hasPreviousVersion"
+                                      ShowUndoRedo="true"
+                                      ShowActionMenu="true"
+                                      ShowFooter="true"
+                                      ShowFooterLeftStats="true"
+                                      ShowFooterCenterStats="true"
+                                      ShowFooterRightStats="true"
+                                      OnBackClick="@GoBack"
+                                      OnSaveClick="@SaveAsync"
+                                      OnFormatClick="@FormatDocumentAsync"
+                                      OnValidateClick="@ValidateDocumentAsync"
+                                      OnDownloadClick="@DownloadFileAsync"
+                                      OnCompareClick="@OpenComparer" />
+                    </div>
+                </div>
+            }
         </div>
     </div>
-
-    @* ── Validation toast ── *@
-    @if (_validationMessage is not null)
-    {
-        <div class="sh-toast @(_validationIsError ? "sh-toast-danger" : "sh-toast-success")"
-             @onclick="DismissValidation" role="status" aria-live="polite">
-            <i class="bi @(_validationIsError ? "bi-exclamation-circle" : "bi-check-circle")"></i>
-            <span>@_validationMessage</span>
-        </div>
-    }
 }
