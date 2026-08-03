@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\ServiceHubEnterprise.Data\ServiceHubEnterprise.Data.csproj" />
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Common\ServiceHubEnterprise.Common.csproj" />
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Grid\ServiceHubEnterprise.Grid.csproj" />
+    <ProjectReference Include="..\..\Components\ServiceHubEnterprise.Ui\ServiceHubEnterprise.Ui.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.SoapApplications\ServiceHubEnterprise.SoapApplications.csproj" />
+    <ProjectReference Include="..\..\Features\ServiceHubEnterprise.RestApplications\ServiceHubEnterprise.RestApplications.csproj" />
+  </ItemGroup>
+
+</Project>
