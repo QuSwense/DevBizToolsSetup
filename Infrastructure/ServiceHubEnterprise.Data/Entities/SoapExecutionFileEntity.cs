@@ -18,6 +18,9 @@ public class SoapExecutionFileEntity
     [Column("AppName"), Required]
     public string AppName { get; set; } = "";
 
+    [Column("AppId")]
+    public string? AppId { get; set; }
+
     [Column("Operation"), Required]
     public string Operation { get; set; } = "";
 

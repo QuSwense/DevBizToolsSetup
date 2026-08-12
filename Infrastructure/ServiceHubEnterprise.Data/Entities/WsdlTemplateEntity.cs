@@ -32,7 +32,4 @@ public class WsdlTemplateEntity
 
     [Column("UpdatedAt")]
     public string? UpdatedAt { get; set; }
-
-    [Column("UsageCount")]
-    public int UsageCount { get; set; }
 }

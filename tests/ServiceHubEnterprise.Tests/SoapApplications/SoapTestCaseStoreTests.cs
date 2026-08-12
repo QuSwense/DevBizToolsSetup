@@ -1,6 +1,10 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -26,14 +30,17 @@ public class SoapTestCaseStoreTests
     public async Task Add_GetForFile_Update_Delete_RoundTrip()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-test-cases.json", "[]"));
-        var loader = new MockDbLoader(db.BuildConfiguration());
-        var store = new SoapTestCaseStore(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapTestCaseStore(sp);
 
         await store.AddTestCaseAsync(TestCase("tc-1", "Validate status"));
         store.GetEnabledForFile("BillingService", "GetInvoice.xml").Should().ContainSingle();
 
         // Persisted to JSON → a fresh store sees it.
-        var reloaded = new SoapTestCaseStore(loader);
+        var reloaded = new SoapTestCaseStore(sp);
         reloaded.GetForFile("BillingService", "GetInvoice.xml").Should().ContainSingle(t => t.Id == "tc-1");
 
         // Update
@@ -51,8 +58,11 @@ public class SoapTestCaseStoreTests
     public async Task GetEnabledForFile_ExcludesDisabledAndOtherFiles()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-test-cases.json", "[]"));
-        var loader = new MockDbLoader(db.BuildConfiguration());
-        var store = new SoapTestCaseStore(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapTestCaseStore(sp);
 
         await store.AddTestCaseAsync(TestCase("tc-1", "Enabled", enabled: true));
         await store.AddTestCaseAsync(TestCase("tc-2", "Disabled", enabled: false));

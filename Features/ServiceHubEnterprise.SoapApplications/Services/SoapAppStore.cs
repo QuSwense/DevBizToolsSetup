@@ -67,7 +67,6 @@ public class SoapAppStore
             DateTime.TryParse(entity.CreatedAt, out var ca) ? ca : DateTime.MinValue,
             entity.UpdatedBy,
             entity.UpdatedAt is not null && DateTime.TryParse(entity.UpdatedAt, out var ua) ? ua : null,
-            entity.ApisCount,
             MapAuthConfig(entity),
             entity.Apis.Select(a => new SoapApiEntry { Name = a.Name, Description = a.Description }).ToArray()
         );
@@ -172,7 +171,6 @@ public class WsdlSyncStore
             UploadedAt = r.UploadedAt,
             Status = r.Status,
             WsdlContentKey = r.WsdlContentKey ?? "",
-            VersionCount = r.VersionCount
         }).ToList();
 
         _versions = db.WsdlVersions.AsNoTracking().Select(v => new WsdlVersionEntry
@@ -200,8 +198,7 @@ public class WsdlSyncStore
                     : [],
                 CreatedBy = t.CreatedBy,
                 CreatedAt = t.CreatedAt,
-                UpdatedAt = t.UpdatedAt,
-                UsageCount = t.UsageCount
+                UpdatedAt = t.UpdatedAt
             }).ToList();
 
         _syncHistory = db.WsdlSyncHistory.AsNoTracking().ToList()
@@ -243,7 +240,6 @@ public class WsdlSyncStore
                     UploadedAt = r.UploadedAt,
                     Status = r.Status,
                     WsdlContentKey = string.IsNullOrEmpty(r.WsdlContentKey) ? null : r.WsdlContentKey,
-                    VersionCount = r.VersionCount
                 });
             }
         }
@@ -283,8 +279,7 @@ public class WsdlSyncStore
                         : null,
                     CreatedBy = t.CreatedBy,
                     CreatedAt = t.CreatedAt,
-                    UpdatedAt = t.UpdatedAt,
-                    UsageCount = t.UsageCount
+                    UpdatedAt = t.UpdatedAt
                 });
             }
         }
@@ -484,8 +479,6 @@ public class WsdlSyncStore
             Content = content
         };
         db.WsdlVersions.Add(newVersion);
-        record.VersionCount = maxVersion + 1;
-        await db.SaveChangesAsync();
 
         // Reload in-memory cache
         _versions = null;

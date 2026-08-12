@@ -103,6 +103,22 @@
 			"type": "shell",
 			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
 			"group": "build"
+		},
+		{
+			"label": "sqlproj: Build servicehubdb",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/Users/sndjones/Documents/SUBHADEEP/PROJECTS/GitHub/DevBizToolsSetup/servicehubdb/servicehubdb.sqlproj"
+			],
+			"problemMatcher": "$sqlproj-problem-matcher",
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"detail": "Builds the servicehubdb SQL project"
 		}
 	]
 }

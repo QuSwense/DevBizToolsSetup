@@ -1,11 +1,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Pages;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.SoapApplications.Services.Execution;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -91,11 +93,13 @@ public class RequestFilesPageTests : BunitTestBase
                 ["MockDb:ExecutionStageDelayMs"] = "0"
             })
             .Build();
-        var loader = new MockDbLoader(config);
-        var appStore = new SoapAppStore(loader);
-        var testCaseStore = new SoapTestCaseStore(loader);
-        var executionStore = new SoapExecutionStore(loader);
-        Services.AddSingleton(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(config)
+            .BuildServiceProvider();
+        var appStore = new SoapAppStore(sp);
+        var testCaseStore = new SoapTestCaseStore(sp);
+        var executionStore = new SoapExecutionStore(sp);
         Services.AddSingleton(appStore);
         Services.AddSingleton(testCaseStore);
         Services.AddSingleton(executionStore);

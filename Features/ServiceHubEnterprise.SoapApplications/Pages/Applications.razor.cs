@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using ServiceHubEnterprise.Common;
+using ServiceHubEnterprise.Common.Helpers;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
@@ -150,7 +151,7 @@ public partial class Applications : IDisposable
             },
             new() { Title = "Last Updated", Sortable = true, Field = a => $"{a.UpdatedBy} ({(a.UpdatedAt.HasValue ? a.UpdatedAt.Value.ToString("yyyy-MM-dd") : "—")})" },
             new() { Title = "Created", Sortable = true, Field = a => $"{a.CreatedBy} ({a.CreatedAt:yyyy-MM-dd})" },
-            new() { Title = "Operations", Sortable = true, Field = a => a.ApisCount }
+            new() { Title = "Operations", Sortable = true, Field = a => a.Apis.Length }
         ];
 
         await LoadAppsAsync();
@@ -221,7 +222,7 @@ public partial class Applications : IDisposable
             if (_filterCreatedDateTo.HasValue)
                 query = query.Where(a => a.CreatedAt <= _filterCreatedDateTo.Value);
             if (!string.IsNullOrWhiteSpace(_filterOperations) && int.TryParse(_filterOperations, out var ops))
-                query = query.Where(a => a.ApisCount == ops);
+                query = query.Where(a => a.Apis.Length == ops);
 
             if (!string.IsNullOrWhiteSpace(_sortColumn))
             {
@@ -232,7 +233,7 @@ public partial class Applications : IDisposable
                     "Status" => _sortAscending ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
                     "UpdatedBy" => _sortAscending ? query.OrderBy(a => a.UpdatedBy) : query.OrderByDescending(a => a.UpdatedBy),
                     "CreatedDate" => _sortAscending ? query.OrderBy(a => a.CreatedAt) : query.OrderByDescending(a => a.CreatedAt),
-                    "ApisCount" => _sortAscending ? query.OrderBy(a => a.ApisCount) : query.OrderByDescending(a => a.ApisCount),
+                    "ApisCount" => _sortAscending ? query.OrderBy(a => a.Apis.Length) : query.OrderByDescending(a => a.Apis.Length),
                     _ => query
                 };
             }
@@ -343,7 +344,6 @@ public partial class Applications : IDisposable
                 _editingApp.CreatedAt,
                 _editingApp.UpdatedBy,
                 _editingApp.UpdatedAt,
-                _newApis.Count,
                 BuildAuthConfig(),
                 [.._newApis]
             );
@@ -363,7 +363,6 @@ public partial class Applications : IDisposable
                 DateTime.Now,
                 null,
                 null,
-                _newApis.Count,
                 BuildAuthConfig(),
                 [.._newApis]
             );
@@ -604,7 +603,7 @@ public partial class Applications : IDisposable
             CsvField(app.Description), CsvField(app.Status.ToString()),
             CsvField(app.CreatedBy), CsvField(app.CreatedAt.ToString("yyyy-MM-dd HH:mm")),
             CsvField(app.UpdatedBy ?? ""), CsvField(app.UpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? ""),
-            CsvField(app.ApisCount.ToString()), CsvField(app.Auth.Type.ToString())
+            CsvField(app.Apis.Length.ToString()), CsvField(app.Auth.Type.ToString())
         };
         return string.Join(",", fields);
     }

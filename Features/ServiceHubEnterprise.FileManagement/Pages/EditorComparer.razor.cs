@@ -205,7 +205,7 @@ public partial class EditorComparer
         }
     }
 
-    private async Task OnViewModeChanged(DiffViewMode mode)
+    private async Task OnViewModeChanged(EDiffViewMode mode)
     {
         if (_diffEditorRef is not null)
         {

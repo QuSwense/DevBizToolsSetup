@@ -32,7 +32,4 @@ public class WsdlRecordEntity
 
     [Column("WsdlContentKey")]
     public string? WsdlContentKey { get; set; }
-
-    [Column("VersionCount")]
-    public int VersionCount { get; set; } = 1;
 }

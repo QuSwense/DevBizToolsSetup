@@ -41,4 +41,7 @@ public class RestRequestFileEntity
 
     [Column("Content")]
     public string? Content { get; set; }
+
+    [Column("AppId")]
+    public string? AppId { get; set; }
 }

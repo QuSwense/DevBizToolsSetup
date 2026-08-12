@@ -405,8 +405,7 @@ public partial class WsdlSync
                 Variables = vars,
                 CreatedBy = "Current User",
                 CreatedAt = now,
-                UpdatedAt = now,
-                UsageCount = 0
+                UpdatedAt = now
             });
         }
 

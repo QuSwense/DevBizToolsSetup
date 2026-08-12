@@ -21,5 +21,4 @@ public class WsdlTemplate
     public string CreatedAt { get; set; } = "";
     public string? UpdatedBy { get; set; }
     public string? UpdatedAt { get; set; }
-    public int UsageCount { get; set; } = 0;
 }

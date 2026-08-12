@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Pages;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -92,11 +94,13 @@ public class ExecuteHistoryPageTests : BunitTestBase
     private void Setup(TempMockDb db)
     {
         var config = db.BuildConfiguration();
-        var loader = new MockDbLoader(config);
-        Services.AddSingleton(loader);
-        Services.AddSingleton(new SoapAppStore(loader));
-        Services.AddSingleton(new SoapTestCaseStore(loader));
-        Services.AddSingleton(new SoapExecutionStore(loader));
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(config)
+            .BuildServiceProvider();
+        Services.AddSingleton(new SoapAppStore(sp));
+        Services.AddSingleton(new SoapTestCaseStore(sp));
+        Services.AddSingleton(new SoapExecutionStore(sp));
         Services.AddSingleton<IConfiguration>(config);
     }
 

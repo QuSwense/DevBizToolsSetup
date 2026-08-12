@@ -72,14 +72,14 @@ public class OverviewCardsTests : BunitTestBase
     {
         var cut = Render<TemplatesOverview>(p => p.Add(x => x.Templates, new[]
         {
-            TestData.Template(id: "t1", name: "Base", variables: ["a"], usageCount: 2),
-            TestData.Template(id: "t2", name: "Child", extendsTemplateId: "t1", variables: ["a", "b"], usageCount: 5)
+            TestData.Template(id: "t1", name: "Base", variables: ["a"]),
+            TestData.Template(id: "t2", name: "Child", extendsTemplateId: "t1", variables: ["a", "b"])
         }));
 
         TileValue(cut, "Templates").Should().Be("2");
         TileValue(cut, "Extending").Should().Be("1");
         TileValue(cut, "Variables").Should().Be("3");
-        TileValue(cut, "Usage").Should().Be("7");
+        TileValue(cut, "Usage").Should().Be("3");
     }
 
     [Fact]

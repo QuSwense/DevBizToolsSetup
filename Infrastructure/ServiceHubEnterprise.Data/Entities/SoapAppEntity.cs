@@ -36,9 +36,6 @@ public class SoapAppEntity
     [Column("UpdatedAt")]
     public string? UpdatedAt { get; set; }
 
-    [Column("ApisCount")]
-    public int ApisCount { get; set; }
-
     [Column("AuthType")]
     public string AuthType { get; set; } = "None";
 

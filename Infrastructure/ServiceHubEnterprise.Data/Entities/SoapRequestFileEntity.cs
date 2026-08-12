@@ -42,6 +42,6 @@ public class SoapRequestFileEntity
     [Column("Content")]
     public string? Content { get; set; }
 
-    [Column("TestCaseIds")]
-    public string? TestCaseIds { get; set; }
+    [Column("AppId")]
+    public string? AppId { get; set; }
 }

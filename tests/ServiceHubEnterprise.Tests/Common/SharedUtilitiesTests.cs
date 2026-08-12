@@ -1,4 +1,5 @@
 using ServiceHubEnterprise.Common;
+using ServiceHubEnterprise.Common.Helpers;
 
 namespace ServiceHubEnterprise.Tests.Common;
 

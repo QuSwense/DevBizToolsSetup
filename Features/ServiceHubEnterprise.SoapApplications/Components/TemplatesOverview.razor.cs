@@ -30,7 +30,7 @@ public partial class TemplatesOverview
 
     private int ExtendingCount => Templates.Count(t => !string.IsNullOrEmpty(t.ExtendsTemplateId));
     private int TotalVariables => Templates.Sum(t => t.Variables.Length);
-    private int TotalUsage => Templates.Sum(t => t.UsageCount);
+    private int TotalUsage => Templates.Sum(t => t.Variables.Length);
 
     /// <inheritdoc />
     protected override void OnInitialized()
@@ -60,7 +60,7 @@ public partial class TemplatesOverview
                 }
             },
             new() { Title = "Variables", Sortable = true, Field = t => t.Variables.Length, Width = "100px" },
-            new() { Title = "Usage", Sortable = true, Field = t => t.UsageCount, Width = "90px" },
+            new() { Title = "Usage", Sortable = true, Field = t => t.Variables.Length, Width = "90px" },
             new() { Title = "Updated", Sortable = true, Field = t => t.UpdatedAt ?? "—", Width = "120px" }
         ];
     }

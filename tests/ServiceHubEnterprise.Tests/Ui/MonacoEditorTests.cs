@@ -404,7 +404,7 @@ public class DiffViewModeTests
     [Fact]
     public void EnumValuesAreCorrect()
     {
-        ((int)DiffViewMode.SideBySide).Should().Be(0);
-        ((int)DiffViewMode.Inline).Should().Be(1);
+        ((int)EDiffViewMode.SideBySide).Should().Be(0);
+        ((int)EDiffViewMode.Inline).Should().Be(1);
     }
 }

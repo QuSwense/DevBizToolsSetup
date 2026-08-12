@@ -1,4 +1,4 @@
-namespace ServiceHubEnterprise.Common;
+namespace ServiceHubEnterprise.Common.Helpers;
 
 public static class CsvTextHelper
 {

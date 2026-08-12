@@ -49,7 +49,7 @@ public partial class MonacoDiffEditor : IAsyncDisposable
     [Parameter] public bool IgnoreCase { get; set; }
 
     // ── View mode ──
-    [Parameter] public DiffViewMode ViewMode { get; set; } = DiffViewMode.SideBySide;
+    [Parameter] public EDiffViewMode ViewMode { get; set; } = EDiffViewMode.SideBySide;
 
     // ── Section visibility ──
     [Parameter] public bool ShowHeader { get; set; } = true;
@@ -91,7 +91,7 @@ public partial class MonacoDiffEditor : IAsyncDisposable
 
     // ── Callbacks ──
     [Parameter] public EventCallback OnRetry { get; set; }
-    [Parameter] public EventCallback<DiffViewMode> OnViewModeChanged { get; set; }
+    [Parameter] public EventCallback<EDiffViewMode> OnViewModeChanged { get; set; }
     [Parameter] public EventCallback OnPreviousDiff { get; set; }
     [Parameter] public EventCallback OnNextDiff { get; set; }
     [Parameter] public EventCallback OnSwap { get; set; }
@@ -130,7 +130,7 @@ public partial class MonacoDiffEditor : IAsyncDisposable
                 wordWrap = WordWrap,
                 lineNumbers = ShowLineNumbers,
                 minimap = ShowMinimap,
-                renderSideBySide = ViewMode == DiffViewMode.SideBySide,
+                renderSideBySide = ViewMode == EDiffViewMode.SideBySide,
                 ignoreTrimWhitespace = IgnoreTrimWhitespace,
                 hideUnchangedRegions = !ShowUnchangedLines,
                 revealLineCount = 20,
@@ -257,14 +257,14 @@ public partial class MonacoDiffEditor : IAsyncDisposable
     /// <summary>
     /// Toggles between side-by-side and inline view.
     /// </summary>
-    public async Task ToggleViewModeAsync(DiffViewMode mode)
+    public async Task ToggleViewModeAsync(EDiffViewMode mode)
     {
         if (_editorCreated)
         {
             try
             {
                 ViewMode = mode;
-                await JS.InvokeVoidAsync($"{MonacoModule}.toggleDiffViewMode", _containerId, mode == DiffViewMode.SideBySide);
+                await JS.InvokeVoidAsync($"{MonacoModule}.toggleDiffViewMode", _containerId, mode == EDiffViewMode.SideBySide);
                 StateHasChanged();
             }
             catch { /* ignore */ }

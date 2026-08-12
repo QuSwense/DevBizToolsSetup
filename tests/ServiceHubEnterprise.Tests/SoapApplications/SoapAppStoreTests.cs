@@ -1,7 +1,11 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.Tests.Builders;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -46,7 +50,11 @@ public class SoapAppStoreTests : BunitTestBase
     public void LoadsAppsAndDeserializesStatusAndAuth()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", SoapAppsJson));
-        var store = new SoapAppStore(new MockDbLoader(db.BuildConfiguration()));
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapAppStore(sp);
 
         store.Apps.Should().HaveCount(2);
 
@@ -69,7 +77,11 @@ public class SoapAppStoreTests : BunitTestBase
     public void UpdateAppsReplacesApps()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-apps.json", "[]"));
-        var store = new SoapAppStore(new MockDbLoader(db.BuildConfiguration()));
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapAppStore(sp);
 
         store.UpdateApps(new[] { TestData.SoapApp(id: "x", name: "NewApp") });
 

@@ -18,6 +18,9 @@ public class SoapTestCaseEntity
     [Column("AppName"), Required]
     public string AppName { get; set; } = "";
 
+    [Column("AppId")]
+    public string? AppId { get; set; }
+
     [Column("FileName"), Required]
     public string FileName { get; set; } = "";
 

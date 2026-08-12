@@ -1,13 +1,23 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.Tests.Builders;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
 public class WsdlSyncStoreTests : BunitTestBase
 {
     private static WsdlSyncStore CreateStore(TempMockDb db)
-        => new(new MockDbLoader(db.BuildConfiguration()));
+    {
+        var sp = new ServiceCollection()
+            .AddDbContext<WsdlDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        return new WsdlSyncStore(sp);
+    }
 
     [Fact]
     public void GetRecordsForAppFiltersAndOrdersNewestFirst()

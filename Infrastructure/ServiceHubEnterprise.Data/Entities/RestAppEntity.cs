@@ -33,6 +33,5 @@ public class RestAppEntity
     [Column("UpdatedAt")]
     public string? UpdatedAt { get; set; }
 
-    [Column("ApisCount")]
-    public int ApisCount { get; set; }
+    public List<RestApiEntity> Apis { get; set; } = new();
 }

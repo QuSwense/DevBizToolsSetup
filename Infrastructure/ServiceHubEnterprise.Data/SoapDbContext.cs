@@ -16,7 +16,7 @@ public class SoapDbContext : DbContext
     public DbSet<SoapAppEntity> SoapApps => Set<SoapAppEntity>();
     public DbSet<SoapApiEntity> SoapApis => Set<SoapApiEntity>();
     public DbSet<SoapRequestFileEntity> SoapRequestFiles => Set<SoapRequestFileEntity>();
-    public DbSet<SoapFileVersionEntity> SoapFileVersions => Set<SoapFileVersionEntity>();
+    public DbSet<SoapRequestFileTestCaseEntity> SoapRequestFileTestCases => Set<SoapRequestFileTestCaseEntity>();
     public DbSet<SoapExecutionGroupEntity> SoapExecutionGroups => Set<SoapExecutionGroupEntity>();
     public DbSet<SoapExecutionFileEntity> SoapExecutionFiles => Set<SoapExecutionFileEntity>();
     public DbSet<SoapExecutionLogEntity> SoapExecutionLogs => Set<SoapExecutionLogEntity>();
@@ -54,11 +54,12 @@ public class SoapDbContext : DbContext
             entity.HasIndex(e => e.FileName);
         });
 
-        modelBuilder.Entity<SoapFileVersionEntity>(entity =>
+        modelBuilder.Entity<SoapRequestFileTestCaseEntity>(entity =>
         {
-            entity.ToTable("SoapFileVersions");
-            entity.HasKey(e => e.Id);
+            entity.ToTable("SoapRequestFileTestCases");
+            entity.HasKey(e => new { e.FileId, e.TestCaseId });
             entity.HasIndex(e => e.FileId);
+            entity.HasIndex(e => e.TestCaseId);
         });
 
         modelBuilder.Entity<SoapExecutionGroupEntity>(entity =>

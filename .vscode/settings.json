@@ -52,5 +52,8 @@
     "github.copilot.chat.experimental.tokenOptimization": true,
     
     // Max tokens for code completion (reduces overhead)
-    "github.copilot.chat.maxCompletionTokens": 2048
+    "github.copilot.chat.maxCompletionTokens": 2048,
+    "dataworkspace.excludedProjects": [
+        "servicehubdb/servicehubdb.sqlproj"
+    ]
 }

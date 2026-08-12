@@ -34,7 +34,6 @@ public static class TestData
             createdAt ?? new DateTime(2024, 1, 15),
             updatedBy,
             updatedAt ?? new DateTime(2024, 6, 1),
-            apis?.Length ?? 0,
             auth ?? Auth(),
             apis ?? [Api("GetInvoice")]);
 
@@ -121,8 +120,7 @@ public static class TestData
         string createdBy = "Priya Sharma",
         string createdAt = "2024-06-01",
         string? updatedBy = null,
-        string? updatedAt = null,
-        int usageCount = 0)
+        string? updatedAt = null)
         => new()
         {
             Id = id,
@@ -135,8 +133,7 @@ public static class TestData
             CreatedBy = createdBy,
             CreatedAt = createdAt,
             UpdatedBy = updatedBy,
-            UpdatedAt = updatedAt,
-            UsageCount = usageCount
+            UpdatedAt = updatedAt
         };
 
     // ── Executions ──

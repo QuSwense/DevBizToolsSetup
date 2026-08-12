@@ -30,5 +30,5 @@ public partial class ApplicationsOverview
     private int TotalApps => Apps.Count;
     private int EnabledApps => Apps.Count(a => a.Status == AppStatus.Enabled);
     private int DisabledApps => TotalApps - EnabledApps;
-    private int TotalOperations => Apps.Sum(a => a.ApisCount);
+    private int TotalOperations => Apps.Sum(a => a.Apis.Length);
 }

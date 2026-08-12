@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-using ServiceHubEnterprise.Common;
+using ServiceHubEnterprise.Common.Helpers;
 using ServiceHubEnterprise.Grid.Components;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;

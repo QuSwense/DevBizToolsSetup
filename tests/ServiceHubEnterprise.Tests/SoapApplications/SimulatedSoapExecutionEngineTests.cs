@@ -1,9 +1,12 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.SoapApplications.Services.Execution;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -57,9 +60,12 @@ public class SimulatedSoapExecutionEngineTests
             })
             .Build();
 
-        var loader = new MockDbLoader(config);
-        var appStore = new SoapAppStore(loader);
-        var tcStore = new SoapTestCaseStore(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(config)
+            .BuildServiceProvider();
+        var appStore = new SoapAppStore(sp);
+        var tcStore = new SoapTestCaseStore(sp);
         var engine = new SimulatedSoapExecutionEngine(config, appStore, tcStore);
         return (engine, tcStore);
     }

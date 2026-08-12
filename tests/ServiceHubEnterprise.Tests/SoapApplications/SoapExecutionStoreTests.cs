@@ -1,7 +1,11 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Core.Enums;
 using ServiceHubEnterprise.SoapApplications.Models;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -34,15 +38,18 @@ public class SoapExecutionStoreTests
     public async Task AddGroupAsync_PersistsToJson_AndReloads()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-executions.json", "[]"));
-        var loader = new MockDbLoader(db.BuildConfiguration());
-        var store = new SoapExecutionStore(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapExecutionStore(sp);
 
         await store.AddGroupAsync(Group("exg-1"));
 
         store.Groups.Should().ContainSingle();
 
         // A fresh store re-reads the persisted JSON.
-        var reloaded = new SoapExecutionStore(loader);
+        var reloaded = new SoapExecutionStore(sp);
         reloaded.Groups.Should().ContainSingle();
         reloaded.Groups[0].Id.Should().Be("exg-1");
         reloaded.Groups[0].Files[0].FileName.Should().Be("GetInvoice.xml");
@@ -54,8 +61,11 @@ public class SoapExecutionStoreTests
     public async Task GetGroupsForFile_FiltersAcrossGroups()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-executions.json", "[]"));
-        var loader = new MockDbLoader(db.BuildConfiguration());
-        var store = new SoapExecutionStore(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapExecutionStore(sp);
 
         await store.AddGroupAsync(Group("exg-1"));
         var other = Group("exg-2");
@@ -69,8 +79,11 @@ public class SoapExecutionStoreTests
     public async Task GetGroup_ReturnsGroupById()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/soap-executions.json", "[]"));
-        var loader = new MockDbLoader(db.BuildConfiguration());
-        var store = new SoapExecutionStore(loader);
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new SoapExecutionStore(sp);
 
         await store.AddGroupAsync(Group("exg-1"));
 

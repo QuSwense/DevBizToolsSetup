@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS SoapApps (
     UpdatedBy       TEXT,
     CreatedAt       TEXT NOT NULL,
     UpdatedAt       TEXT,
-    ApisCount       INTEGER NOT NULL DEFAULT 0,
     AuthType        TEXT NOT NULL DEFAULT 'None' CHECK(AuthType IN ('None','Basic','ApiKey','Bearer','Ntlm')),
     AuthUsername    TEXT,
     AuthPassword    TEXT,
@@ -50,25 +49,20 @@ CREATE TABLE IF NOT EXISTS SoapRequestFiles (
     UpdatedBy   TEXT,
     UpdatedAt   TEXT,
     Content     TEXT,
-    TestCaseIds TEXT   -- JSON array of test case IDs
+    AppId       TEXT
 );
 
 CREATE INDEX IF NOT EXISTS IX_SoapRequestFiles_AppName ON SoapRequestFiles(AppName);
 CREATE INDEX IF NOT EXISTS IX_SoapRequestFiles_FileName ON SoapRequestFiles(FileName);
 
-CREATE TABLE IF NOT EXISTS SoapFileVersions (
-    Id            TEXT PRIMARY KEY,
-    FileId        TEXT NOT NULL REFERENCES SoapRequestFiles(Id) ON DELETE CASCADE,
-    FileName      TEXT NOT NULL,
-    AppName       TEXT NOT NULL,
-    Content       TEXT NOT NULL,
-    SavedBy       TEXT NOT NULL,
-    SavedAt       TEXT NOT NULL,
-    VersionNumber INTEGER NOT NULL,
-    Notes         TEXT
+CREATE TABLE IF NOT EXISTS SoapRequestFileTestCases (
+    FileId      TEXT NOT NULL REFERENCES SoapRequestFiles(Id) ON DELETE CASCADE,
+    TestCaseId  TEXT NOT NULL REFERENCES SoapTestCases(Id) ON DELETE CASCADE,
+    PRIMARY KEY (FileId, TestCaseId)
 );
 
-CREATE INDEX IF NOT EXISTS IX_SoapFileVersions_FileId ON SoapFileVersions(FileId);
+CREATE INDEX IF NOT EXISTS IX_SoapRequestFileTestCases_FileId ON SoapRequestFileTestCases(FileId);
+CREATE INDEX IF NOT EXISTS IX_SoapRequestFileTestCases_TestCaseId ON SoapRequestFileTestCases(TestCaseId);
 
 CREATE TABLE IF NOT EXISTS SoapExecutionGroups (
     Id          TEXT PRIMARY KEY,
@@ -85,6 +79,7 @@ CREATE TABLE IF NOT EXISTS SoapExecutionFiles (
     FileName         TEXT NOT NULL,
     AppName          TEXT NOT NULL,
     Operation        TEXT NOT NULL,
+    AppId            TEXT,
     Status           TEXT NOT NULL DEFAULT 'queued' CHECK(Status IN ('queued','running','success','failed')),
     Stage            INTEGER NOT NULL DEFAULT 0,
     StagesCompleted  INTEGER NOT NULL DEFAULT 0,
@@ -140,6 +135,7 @@ CREATE TABLE IF NOT EXISTS SoapTestCases (
     Description TEXT NOT NULL DEFAULT '',
     AppName     TEXT NOT NULL,
     FileName    TEXT NOT NULL,
+    AppId       TEXT,
     Enabled     INTEGER NOT NULL DEFAULT 1,
     CreatedBy   TEXT NOT NULL,
     CreatedAt   TEXT NOT NULL,
@@ -174,9 +170,17 @@ CREATE TABLE IF NOT EXISTS RestApps (
     CreatedBy   TEXT NOT NULL,
     CreatedAt   TEXT NOT NULL,
     UpdatedBy   TEXT,
-    UpdatedAt   TEXT,
-    ApisCount   INTEGER NOT NULL DEFAULT 0
+    UpdatedAt   TEXT
 );
+
+CREATE TABLE IF NOT EXISTS RestApis (
+    Id          TEXT PRIMARY KEY,
+    AppId       TEXT NOT NULL REFERENCES RestApps(Id) ON DELETE CASCADE,
+    Name        TEXT NOT NULL,
+    Description TEXT NOT NULL DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS IX_RestApis_AppId ON RestApis(AppId);
 
 CREATE TABLE IF NOT EXISTS RestRequestFiles (
     Id          TEXT PRIMARY KEY,
@@ -190,7 +194,8 @@ CREATE TABLE IF NOT EXISTS RestRequestFiles (
     CreatedAt   TEXT NOT NULL,
     UpdatedBy   TEXT,
     UpdatedAt   TEXT,
-    Content     TEXT
+    Content     TEXT,
+    AppId       TEXT
 );
 
 CREATE INDEX IF NOT EXISTS IX_RestRequestFiles_AppName ON RestRequestFiles(AppName);
@@ -222,8 +227,7 @@ CREATE TABLE IF NOT EXISTS WsdlRecords (
     UploadedBy      TEXT NOT NULL,
     UploadedAt      TEXT NOT NULL,
     Status          TEXT NOT NULL DEFAULT 'synced' CHECK(Status IN ('synced','parsing','error')),
-    WsdlContentKey  TEXT,
-    VersionCount    INTEGER NOT NULL DEFAULT 1
+    WsdlContentKey  TEXT
 );
 
 CREATE TABLE IF NOT EXISTS WsdlVersions (
@@ -260,7 +264,7 @@ CREATE TABLE IF NOT EXISTS WsdlTemplates (
     CreatedBy          TEXT NOT NULL,
     CreatedAt          TEXT NOT NULL,
     UpdatedAt          TEXT,
-    UsageCount         INTEGER NOT NULL DEFAULT 0
+    UpdatedAt        TEXT
 );
 
 -- ============================================================================

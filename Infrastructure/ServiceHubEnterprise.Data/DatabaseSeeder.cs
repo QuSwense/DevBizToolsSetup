@@ -1,5 +1,6 @@
+using System.Data;
+using System.Data.Common;
 using System.Text.Json;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ServiceHubEnterprise.Data.Entities;
@@ -82,7 +83,8 @@ public class DatabaseSeeder
 
         var sql = await File.ReadAllTextAsync(schemaPath);
 
-        await using var connection = new SqliteConnection(_connectionString);
+        // TODO: Replace with actual database connection implementation
+        DbConnection connection = null!;
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
         command.CommandText = sql;
@@ -116,7 +118,6 @@ public class DatabaseSeeder
                 UpdatedBy = GetNullableString(el, "updatedBy"),
                 CreatedAt = el.GetProperty("createdAt").GetString() ?? "",
                 UpdatedAt = GetNullableString(el, "updatedAt"),
-                ApisCount = el.GetProperty("apisCount").GetInt32(),
                 AuthType = authType,
                 AuthUsername = GetNullableString(auth, "username"),
                 AuthPassword = GetNullableString(auth, "password"),
@@ -213,8 +214,7 @@ public class DatabaseSeeder
                 CreatedBy = el.GetProperty("createdBy").GetString() ?? "",
                 CreatedAt = el.GetProperty("createdAt").GetString() ?? "",
                 UpdatedBy = GetNullableString(el, "updatedBy"),
-                UpdatedAt = GetNullableString(el, "updatedAt"),
-                ApisCount = el.GetProperty("apisCount").GetInt32()
+                UpdatedAt = GetNullableString(el, "updatedAt")
             });
         }
 
@@ -271,8 +271,7 @@ public class DatabaseSeeder
                     UploadedBy = el.GetProperty("uploadedBy").GetString() ?? "",
                     UploadedAt = el.GetProperty("uploadedAt").GetString() ?? "",
                     Status = el.GetProperty("status").GetString() ?? "synced",
-                    WsdlContentKey = GetNullableString(el, "wsdlContentKey"),
-                    VersionCount = el.GetProperty("versionCount").GetInt32()
+                    WsdlContentKey = GetNullableString(el, "wsdlContentKey")
                 });
             }
         }
@@ -362,8 +361,7 @@ public class DatabaseSeeder
                     Variables = el.TryGetProperty("variables", out var v) ? v.ToString() : null,
                     CreatedBy = el.GetProperty("createdBy").GetString() ?? "",
                     CreatedAt = el.GetProperty("createdAt").GetString() ?? "",
-                    UpdatedAt = GetNullableString(el, "updatedAt"),
-                    UsageCount = el.GetProperty("usageCount").GetInt32()
+                    UpdatedAt = GetNullableString(el, "updatedAt")
                 });
             }
         }
@@ -478,10 +476,7 @@ public class DatabaseSeeder
             {
                 _dashboard.TestSuites.Add(new TestSuiteEntity
                 {
-                    Name = el.GetProperty("name").GetString() ?? "",
-                    TotalCases = el.GetProperty("totalCases").GetInt32(),
-                    PassingCases = el.GetProperty("passingCases").GetInt32(),
-                    TotalFiles = el.GetProperty("totalFiles").GetInt32()
+                    Name = el.GetProperty("name").GetString() ?? ""
                 });
             }
         }

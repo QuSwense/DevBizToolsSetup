@@ -25,13 +25,13 @@ public partial class MonacoComparerToolbar
     [Parameter] public bool IgnoreWhitespace { get; set; }
     [Parameter] public bool IgnoreCase { get; set; }
     [Parameter] public bool ScrollSync { get; set; } = true;
-    [Parameter] public DiffViewMode ViewMode { get; set; } = DiffViewMode.SideBySide;
+    [Parameter] public EDiffViewMode ViewMode { get; set; } = EDiffViewMode.SideBySide;
 
     [Parameter] public int TotalDifferences { get; set; }
     [Parameter] public int CurrentDifference { get; set; }
     [Parameter] public EventCallback<int> CurrentDifferenceChanged { get; set; }
 
-    [Parameter] public EventCallback<DiffViewMode> OnViewModeChanged { get; set; }
+    [Parameter] public EventCallback<EDiffViewMode> OnViewModeChanged { get; set; }
     [Parameter] public EventCallback OnPreviousDiff { get; set; }
     [Parameter] public EventCallback OnNextDiff { get; set; }
     [Parameter] public EventCallback OnSwap { get; set; }

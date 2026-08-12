@@ -27,15 +27,15 @@ builder.Services.AddRazorPages(options =>
 var connectionString = ServiceHubDataConfig.GetConnectionString(builder.Configuration);
 
 builder.Services.AddDbContext<SoapDbContext>(opts =>
-    opts.UseSqlite(connectionString));
+    opts.UseSqlServer(connectionString));
 builder.Services.AddDbContext<RestDbContext>(opts =>
-    opts.UseSqlite(connectionString));
+    opts.UseSqlServer(connectionString));
 builder.Services.AddDbContext<DashboardDbContext>(opts =>
-    opts.UseSqlite(connectionString));
+    opts.UseSqlServer(connectionString));
 builder.Services.AddDbContext<WsdlDbContext>(opts =>
-    opts.UseSqlite(connectionString));
+    opts.UseSqlServer(connectionString));
 builder.Services.AddDbContext<FileManagementDbContext>(opts =>
-    opts.UseSqlite(connectionString));
+    opts.UseSqlServer(connectionString));
 
 // Register the DatabaseSeeder (transient — invoked once at startup)
 builder.Services.AddTransient<DatabaseSeeder>();

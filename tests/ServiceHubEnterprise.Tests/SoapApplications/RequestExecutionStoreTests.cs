@@ -1,5 +1,9 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data;
 using ServiceHubEnterprise.SoapApplications.Services;
 using ServiceHubEnterprise.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServiceHubEnterprise.Tests.SoapApplications;
 
@@ -17,7 +21,11 @@ public class RequestExecutionStoreTests : BunitTestBase
     public void FiltersToSoapAppTypeCaseInsensitiveAndOrdersNewestFirst()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/Request/request-executions.json", ExecutionsJson));
-        var store = new RequestExecutionStore(new MockDbLoader(db.BuildConfiguration()));
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new RequestExecutionStore(sp);
 
         store.SoapExecutions.Should().HaveCount(2);
         store.SoapExecutions.Select(e => e.Id)
@@ -28,7 +36,11 @@ public class RequestExecutionStoreTests : BunitTestBase
     public void HandlesEmptySource()
     {
         using var db = MockDbFixture.CreateTempMockDb(("Soap/Request/request-executions.json", "[]"));
-        var store = new RequestExecutionStore(new MockDbLoader(db.BuildConfiguration()));
+        var sp = new ServiceCollection()
+            .AddDbContext<SoapDbContext>(opts => opts.UseSqlServer("Data Source=:memory:"))
+            .AddSingleton<IConfiguration>(db.BuildConfiguration())
+            .BuildServiceProvider();
+        var store = new RequestExecutionStore(sp);
 
         store.SoapExecutions.Should().BeEmpty();
     }
