@@ -20,9 +20,9 @@ public partial class SectionCard
     [Parameter] public string? Icon { get; set; }
 
     /// <summary>
-    /// Gets or sets an optional subtitle shown under the title.
+    /// Gets or sets optional information shown on a separate line under the header row.
     /// </summary>
-    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string? Information { get; set; }
 
     /// <summary>
     /// Gets or sets the active date-range filter; null hides the filter dialog.

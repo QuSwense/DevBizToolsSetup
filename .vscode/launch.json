@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-webapp",
-      "program": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/bin/Debug/net8.0/ServiceHubEnterprise.Web.dll",
+      "program": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/bin/Debug/net10.0/ServiceHubEnterprise.Web.dll",
       "args": [],
       "cwd": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web",
       "stopAtEntry": false,

@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using ServiceHubEnterprise.Web.Components;
 using ServiceHubEnterprise.Dashboard;
 using ServiceHubEnterprise.RestApplications;
@@ -23,22 +22,9 @@ builder.Services.AddRazorPages(options =>
     options.RootDirectory = "/Components";
 });
 
-// ── Database (single SQLite, per-feature DbContexts) ──
+// ── Database (MSSQL, per-feature linq2db DbContexts) ──
 var connectionString = ServiceHubDataConfig.GetConnectionString(builder.Configuration);
-
-builder.Services.AddDbContext<SoapDbContext>(opts =>
-    opts.UseSqlServer(connectionString));
-builder.Services.AddDbContext<RestDbContext>(opts =>
-    opts.UseSqlServer(connectionString));
-builder.Services.AddDbContext<DashboardDbContext>(opts =>
-    opts.UseSqlServer(connectionString));
-builder.Services.AddDbContext<WsdlDbContext>(opts =>
-    opts.UseSqlServer(connectionString));
-builder.Services.AddDbContext<FileManagementDbContext>(opts =>
-    opts.UseSqlServer(connectionString));
-
-// Register the DatabaseSeeder (transient — invoked once at startup)
-builder.Services.AddTransient<DatabaseSeeder>();
+builder.Services.AddServiceHubData(connectionString);
 
 // Register Feature services
 builder.Services
@@ -52,13 +38,6 @@ builder.Services
     .AddSettingsFeature();
 
 var app = builder.Build();
-
-// ── Seed the database on first run ──
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedIfEmptyAsync();
-}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

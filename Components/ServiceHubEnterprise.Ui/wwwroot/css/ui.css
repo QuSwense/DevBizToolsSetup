@@ -17,6 +17,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 0;
+}
+
+.section-header {
     margin-bottom: 12px;
 }
 
@@ -53,13 +57,22 @@
     line-height: 1;
 }
 
-.section-subtitle {
+.section-information {
     font-size: 11px;
     font-weight: 400;
     color: var(--sh-text-faint);
     text-transform: none;
     letter-spacing: 0;
-    margin-top: 1px;
+    margin-top: 2px;
+}
+
+.section-divider {
+    border-top: 1px solid var(--sh-border);
+    margin: 8px 0;
+}
+
+.section-divider-light {
+    border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 /* ── Filter pill (SectionCard) ────────────── */
@@ -81,6 +94,7 @@
 
 .filter-pill-label {
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .filter-pill-icon {

@@ -22,6 +22,69 @@ public partial class Dashboard
     private bool _isLoading = true;
     private string? _errorMessage;
 
+    private readonly IReadOnlyList<KpiMetric> _kpiMetrics =
+    [
+        new("Total Registered Applications", "36", "+4 this month"),
+        new("Total Active Users Today / Week / Month", "1,284 / 2,340 / 8,191", "+15% vs last month"),
+        new("Total Departments Using the Tool", "18", "+5 new departments"),
+        new("Requests Processed Today / Week / Month", "1,240 / 2,500 / 13,200", "95% success rate"),
+        new("Success Rate", "95.8%", "Stable execution quality"),
+        new("Number of Test Assets Managed", "1,284", "Across SOAP and REST"),
+        new("XML Files", "342", "Updated this month"),
+        new("Templates", "88", "21 ready for deployment"),
+        new("WSDL Versions", "27", "3 new this month")
+    ];
+
+    private readonly IReadOnlyList<ApplicationUsage> _topApplications =
+    [
+        new("Application A", 240, 42),
+        new("Application B", 185, 32),
+        new("Application C", 115, 19),
+        new("Application D", 55, 7)
+    ];
+
+    private readonly IReadOnlyList<GrowthMetric> _growthMetrics =
+    [
+        new("New Users Added", "146"),
+        new("New Applications Registered", "12"),
+        new("New XML Templates Created", "28"),
+        new("New WSDL Versions Published", "4")
+    ];
+
+    private readonly IReadOnlyList<ServiceHealthMetric> _serviceHealth =
+    [
+        new("Platform Availability", "Healthy", "healthy"),
+        new("Database Connectivity", "Healthy", "healthy"),
+        new("Authentication Service", "Healthy", "healthy"),
+        new("SOAP Execution Engine", "Healthy", "healthy")
+    ];
+
+    private readonly IReadOnlyList<string> _insights =
+    [
+        "15% growth in active users this month.",
+        "5 new departments onboarded.",
+        "2,500 requests processed this week.",
+        "95% of executions completed successfully.",
+        "Top consuming application: Claims Service."
+    ];
+
+    private readonly IReadOnlyList<ActivityItem> _recentActivities =
+    [
+        new("08:42 AM", "Claims Service processed 220 requests successfully."),
+        new("08:10 AM", "New XML template published for Billing API."),
+        new("Yesterday", "3 departments were onboarded to the platform."),
+        new("2 days ago", "WSDL version 4.8 was approved for release.")
+    ];
+
+    private readonly IReadOnlyList<string> _recentAccessLinks =
+    [
+        "Claims Service",
+        "Billing Gateway",
+        "Customer Compliance",
+        "REST Templates",
+        "SOAP Execution History"
+    ];
+
     // Per-card expand/collapse state, persisted to localStorage via JS interop.
     private readonly Dictionary<string, bool> _cardCollapsed = new();
     private IJSObjectReference? _collapseModule;
@@ -170,4 +233,14 @@ public partial class Dashboard
         new QuickActions.QuickActionItem("File Library", "/File/Library", "bi bi-file-earmark"),
         new QuickActions.QuickActionItem("Execute History", "/Rest/ExecuteHistory", "bi bi-clock-history")
     };
+
+    private sealed record KpiMetric(string Label, string Value, string Detail);
+
+    private sealed record ApplicationUsage(string Name, int Executions, int Contribution);
+
+    private sealed record GrowthMetric(string Label, string Value);
+
+    private sealed record ServiceHealthMetric(string Name, string Status, string StatusClass);
+
+    private sealed record ActivityItem(string Time, string Message);
 }

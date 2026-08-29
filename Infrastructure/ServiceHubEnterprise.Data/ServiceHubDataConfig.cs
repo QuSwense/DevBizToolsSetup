@@ -1,24 +1,43 @@
+using LinqToDB;
+using LinqToDB.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceHubEnterprise.Data.CoreManagement;
+using ServiceHubEnterprise.Data.RuleManagement;
+using ServiceHubEnterprise.Data.TestManagement;
+using ServiceHubEnterprise.Data.UserManagement;
 
 namespace ServiceHubEnterprise.Data;
 
 /// <summary>
-/// Helper for resolving the ServiceHub SQLite database connection string.
-/// Reads from <c>ConnectionStrings:ServiceHub</c> configuration key.
-/// Default: <c>Data Source=servicehub.db</c> in the current working directory.
+/// Dependency injection helpers for registering the linq2db (MSSQL) data contexts.
 /// </summary>
 public static class ServiceHubDataConfig
 {
-    public const string ConnectionStringName = "ServiceHub";
+    private const string ConnectionStringName = "DefaultConnection";
 
-    /// <summary>
-    /// Gets the SQLite connection string from configuration, or the default.
-    /// </summary>
     public static string GetConnectionString(IConfiguration configuration)
     {
-        var cs = configuration.GetConnectionString(ConnectionStringName);
-        return !string.IsNullOrWhiteSpace(cs)
-            ? cs
-            : "Data Source=servicehub.db";
+        return configuration.GetConnectionString(ConnectionStringName)
+            ?? throw new InvalidOperationException($"Connection string '{ConnectionStringName}' was not configured.");
+    }
+
+    /// <summary>
+    /// Registers all ServiceHub linq2db data contexts against the SQL Server connection string.
+    /// </summary>
+    public static IServiceCollection AddServiceHubData(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = GetConnectionString(configuration);
+        return services.AddServiceHubData(connectionString);
+    }
+
+    public static IServiceCollection AddServiceHubData(this IServiceCollection services, string connectionString)
+    {
+        services.AddLinqToDBContext<CoreDbContext>((_, options) => options.UseSqlServer(connectionString));
+        services.AddLinqToDBContext<RuleDbContext>((_, options) => options.UseSqlServer(connectionString));
+        services.AddLinqToDBContext<TestDbContext>((_, options) => options.UseSqlServer(connectionString));
+        services.AddLinqToDBContext<UserDbContext>((_, options) => options.UseSqlServer(connectionString));
+
+        return services;
     }
 }

@@ -1,18 +1,23 @@
 # AGENTS.md
 
-This file gives AI coding agents the project-level context they need when working in this repository.
+This repository keeps agent guidance intentionally lightweight. The detailed business and technical specifications live in the `specs/` folder and should be treated as the source of truth.
 
-## Where the authoritative project knowledge lives
+## Authoritative specs
 
-- **`.github/copilot-instructions.md`** — the canonical, git-checked-in project memory: architecture & structure, Blazor/CSS/C# standards, the critical solution map, execution & scope rules, the `mock_db` business spec, the SOAP Execute & Test-Cases feature map, and implementation gotchas. Copilot Chat auto-loads this file whenever this workspace is opened.
-- **`Features/ServiceHubEnterprise.SoapApplications/docs/redesign-plan.md`** — versioned design/implementation plan for the SOAP UI journey + execute engine + test cases.
-- **`Features/ServiceHubEnterprise.SoapApplications/docs/feature-redesign-template.md`** — reusable checklist template for redesigning any feature using the shared UI kit + `ServiceHubGrid<TItem>`.
+- `specs/README.md` — full index for the numbered feature and technical docs
+- `specs/technical/` — generic technical and architecture guidance
+- `specs/01-home-dashboard/` — Home Dashboard feature spec and subtopics
+- `specs/02-soap-api-test/` — SOAP API Test feature spec and subtopics
+- `specs/03-rest-api-test/` — REST API Test feature spec and subtopics
+- `specs/04-file-management/` — File Management feature spec and subtopics
+- `specs/05-test-suite/` — Test Suite feature spec and subtopics
+- `specs/06-monitoring-health/` — Monitoring & Health feature spec and subtopics
+- `specs/07-ad-viewer/` — AD Viewer feature spec
+- `specs/08-settings/` — Settings feature spec
 
-## Working agreements
+## Operating rules
 
-1. **Read `.github/copilot-instructions.md` first** before making changes — it defines the coding standards (code-behind `.razor.cs`, CSS variables, naming, DI, `mock_db` rules) and the **Zero Unrequested Edits** scope rule.
-2. **Solution map**: solution `ServiceHubEnterprise.slnx`; host `WebApp/ServiceHubEnterprise.Web`; feature projects under `Features/`; shared components under `Components/` (`ServiceHubEnterprise.Grid`, `ServiceHubEnterprise.Ui`).
-3. **Mock data** lives in `mock_db/` and is accessed via `MockDbLoader` (`MockDb:Path` config). Persist mutations with `MockDbLoader.SaveJsonAsync`.
-4. **Do not alter** `ServiceHubEnterprise.slnx` project references unless explicitly asked.
-5. **Before adding NuGet packages**, check the relevant `.csproj` first; ask before introducing new dependencies.
-6. **If a task needs changes outside the requested context, stop and ask.**
+- Read the relevant numbered spec before updating a feature.
+- Keep changes narrow and aligned to the active feature being requested.
+- Respect the current solution structure in `Features/`, `Components/`, and `WebApp/ServiceHubEnterprise.Web/`.
+- Avoid out-of-scope refactors or broad edits unless the user explicitly asks for them.

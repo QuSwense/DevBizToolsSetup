@@ -15,7 +15,7 @@ public class SectionCardTests : BunitTestBase
     {
         var cut = Render<SectionCard>(p => p
             .Add(x => x.Title, "SOAP Applications")
-            .Add(x => x.Subtitle, "6 configured")
+            .Add(x => x.Information, "6 configured")
             .Add(x => x.Icon, "📡"));
 
         cut.Find(".card-title").TextContent.Should().Be("SOAP Applications");

@@ -14,68 +14,167 @@ else if (!string.IsNullOrEmpty(_errorMessage))
         <strong>Failed to load dashboard:</strong> @_errorMessage
     </div>
 }
-else if (_viewModel.IsLoaded)
+else
 {
-    <div class="dashboard-stack">
-        <div class="row g-3">
-            <!-- Row 1: two quarters + a half -->
-            <div class="col-12 col-lg-3">
-                <UsersOverview Users="@_viewModel.Users"
-                               Activities="@_viewModel.UserActivities"
-                               Collapsed="@IsCollapsed(CardKey.Users)"
-                               OnToggle="OnUsersToggle" />
+    <div class="home-dashboard">
+        <header class="home-dashboard-header">
+            <div>
+                <p class="eyebrow">Operations</p>
+                <h1>Home Dashboard</h1>
+            </div>
+            <div class="header-date">Tuesday, August 11, 2026 1:57 PM</div>
+        </header>
+
+        <section class="home-panel">
+            <div class="panel-header">
+                <h2>Executive Summary Cards</h2>
             </div>
 
-            <div class="col-12 col-lg-3">
-                <TestSuitesOverview Suites="@_viewModel.TestSuites"
-                                    History="@_viewModel.TestSuiteHistory"
-                                    Collapsed="@IsCollapsed(CardKey.TestSuites)"
-                                    OnToggle="OnTestSuitesToggle" />
+            <div class="home-kpi-grid">
+                @foreach (var metric in _kpiMetrics)
+                {
+                    <div class="kpi-card">
+                        <div class="kpi-label">@metric.Label</div>
+                        <div class="kpi-value">@metric.Value</div>
+                        <div class="kpi-detail">@metric.Detail</div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="home-panel">
+            <div class="panel-header">
+                <h2>Usage Trend Graph</h2>
+                <span>Weekly / Monthly / Quarterly Platform Usage Trend</span>
             </div>
 
-            <div class="col-12 col-lg-6">
-                <ServiceHealthOverview Services="@_viewModel.HealthServices"
-                                            Uptime="@_viewModel.ServiceUptime"
-                                            Collapsed="@IsCollapsed(CardKey.ServiceHealth)"
-                                            OnToggle="OnServiceHealthToggle" />
+            <div class="chart-panel">
+                <div class="trend-legend">
+                    <span><i class="dot requests"></i> Requests Executed per Day</span>
+                    <span><i class="dot users"></i> Active Users per Day</span>
+                </div>
+                <svg class="trend-svg" viewBox="0 0 520 220" role="img" aria-label="Usage trend chart">
+                    <g class="chart-grid">
+                        <line x1="50" y1="30" x2="470" y2="30" />
+                        <line x1="50" y1="80" x2="470" y2="80" />
+                        <line x1="50" y1="130" x2="470" y2="130" />
+                        <line x1="50" y1="180" x2="470" y2="180" />
+                    </g>
+                    <polyline class="trend requests-line" points="50,150 100,145 150,130 200,118 250,105 300,92 350,82 400,70 470,60" />
+                    <polyline class="trend users-line" points="50,170 100,165 150,155 200,149 250,136 300,120 350,103 400,88 470,75" />
+                    <g class="chart-labels">
+                        <text x="50" y="210">Jan</text>
+                        <text x="120" y="210">Feb</text>
+                        <text x="190" y="210">Mar</text>
+                        <text x="260" y="210">Apr</text>
+                        <text x="330" y="210">May</text>
+                        <text x="400" y="210">Jun</text>
+                    </g>
+                </svg>
             </div>
+        </section>
 
-            <!-- Row 2: two halves -->
-            <div class="col-12 col-lg-6">
-                <RestAppsOverview Apps="@_viewModel.RestApps"
-                                    RequestFiles="@_viewModel.RestRequestFiles"
-                                    Executions="@_viewModel.RequestExecutions"
-                                    Collapsed="@IsCollapsed(CardKey.Rest)"
-                                    OnToggle="OnRestToggle" />
-            </div>
+        <section class="home-panel two-column-panel">
+            <div class="panel-column">
+                <div class="panel-header">
+                    <h2>Top Applications Being Tested</h2>
+                </div>
 
-            <div class="col-12 col-lg-6">
-                <SoapAppsOverview Apps="@_viewModel.SoapApps"
-                                    RequestFiles="@_viewModel.RequestFiles"
-                                    WsdlRecords="@_viewModel.WsdlRecords"
-                                    Executions="@_viewModel.RequestExecutions"
-                                    Collapsed="@IsCollapsed(CardKey.Soap)"
-                                    OnToggle="OnSoapToggle" />
-            </div>
-
-            <!-- Row 3: full width -->
-            <div class="col-12">
-                <RecentActivity Title="Recent Activity"
-                                    ShowViewAll="true"
-                                    ViewAllHref="#"
-                                    Activities="@BuildActivityLog()"
-                                    Users="@BuildUserNames()"
-                                    Collapsed="@IsCollapsed(CardKey.RecentActivity)"
-                                    OnToggle="OnRecentActivityToggle" />
-            </div>
-
-            <!-- Row 4: full width -->
-            <div class="col-12">
-                <div class="dashboard-grid">
-                    <QuickActions Actions="@QuickActionItems" />
+                <div class="bar-chart">
+                    @foreach (var app in _topApplications)
+                    {
+                        <div class="bar-row">
+                            <div class="bar-label-row">
+                                <span>@app.Name</span>
+                                <span>@app.Contribution%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width:@app.Contribution%;"></div>
+                            </div>
+                            <div class="bar-meta">@app.Executions executions</div>
+                        </div>
+                    }
                 </div>
             </div>
-        </div>
+
+            <div class="panel-column">
+                <div class="panel-header">
+                    <h2>Recent Platform Growth</h2>
+                    <span>Last 30 Days</span>
+                </div>
+
+                <div class="growth-grid">
+                    @foreach (var growth in _growthMetrics)
+                    {
+                        <div class="mini-metric">
+                            <div class="mini-label">@growth.Label</div>
+                            <div class="mini-value">@growth.Value</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="home-panel">
+            <div class="panel-header">
+                <h2>Service Health Snapshot</h2>
+            </div>
+
+            <div class="health-table">
+                @foreach (var health in _serviceHealth)
+                {
+                    <div class="health-row">
+                        <span class="health-name">@health.Name</span>
+                        <span class="health-status">
+                            <i class="status-indicator @health.StatusClass"></i>
+                            @health.Status
+                        </span>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="home-panel">
+            <div class="panel-header">
+                <h2>Adoption &amp; Efficiency Insights</h2>
+            </div>
+
+            <ul class="insight-list">
+                @foreach (var insight in _insights)
+                {
+                    <li>@insight</li>
+                }
+            </ul>
+        </section>
+
+        <section class="home-panel two-column-panel">
+            <div class="panel-column">
+                <div class="panel-header">
+                    <h2>Recent Activities</h2>
+                </div>
+                <ul class="activity-list">
+                    @foreach (var activity in _recentActivities)
+                    {
+                        <li>
+                            <span class="activity-time">@activity.Time</span>
+                            <span>@activity.Message</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="panel-column">
+                <div class="panel-header">
+                    <h2>Recent Access</h2>
+                </div>
+                <div class="access-list">
+                    @foreach (var link in _recentAccessLinks)
+                    {
+                        <a href="#">@link</a>
+                    }
+                </div>
+            </div>
+        </section>
     </div>
 }
 

@@ -1,38 +1,41 @@
 @namespace ServiceHubEnterprise.Ui.Components
 
 <div class="dash-card dashboard-row section-card">
-    <div class="card-header">
-        <div class="section-title">
-            @if (!string.IsNullOrEmpty(Icon))
-            {
-                <span class="section-icon">@Icon</span>
-            }
-            <div>
-                <span class="card-title">@Title</span>
-                @if (!string.IsNullOrEmpty(Subtitle))
+    <div class="section-header">
+        <div class="card-header">
+            <div class="section-title">
+                @if (!string.IsNullOrEmpty(Icon))
                 {
-                    <div class="section-subtitle">@Subtitle</div>
+                    <span class="section-icon">@Icon</span>
                 }
+                <span class="card-title">@Title</span>
+            </div>
+            <div class="position-relative d-flex align-items-center gap-2">
+                @if (Filter is not null)
+                {
+                    <button type="button"
+                            class="meta-pill cursor-pointer border-0 bg-transparent d-flex align-items-center gap-1 filter-pill"
+                            @onclick="ToggleFilter">
+                        <span class="filter-pill-label">@Filter.Label</span>
+                        <span class="filter-pill-icon">📅</span>
+                    </button>
+                    @if (_showFilter)
+                    {
+                        <div class="datepicker-overlay" @onclick="CloseFilter"></div>
+                        <DateRangeFilter Value="@Filter" ValueChanged="@HandleFilterChanged" />
+                    }
+                }
+                @HeaderActions
             </div>
         </div>
-        <div class="position-relative d-flex align-items-center gap-2">
-            @if (Filter is not null)
-            {
-                <button type="button"
-                        class="meta-pill cursor-pointer border-0 bg-transparent d-flex align-items-center gap-1 filter-pill"
-                        @onclick="ToggleFilter">
-                    <span class="filter-pill-label">@Filter.Label</span>
-                    <span class="filter-pill-icon">📅</span>
-                </button>
-                @if (_showFilter)
-                {
-                    <div class="datepicker-overlay" @onclick="CloseFilter"></div>
-                    <DateRangeFilter Value="@Filter" ValueChanged="@HandleFilterChanged" />
-                }
-            }
-            @HeaderActions
-        </div>
     </div>
+
+    @if (!string.IsNullOrEmpty(Information))
+    {
+        <div class="section-divider"></div>
+        <div class="section-information">@Information</div>
+        <div class="section-divider section-divider-light"></div>
+    }
 
     @if (Collapsible && Collapsed)
     {

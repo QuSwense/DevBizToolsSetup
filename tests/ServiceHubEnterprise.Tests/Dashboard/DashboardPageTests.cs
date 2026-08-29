@@ -8,18 +8,18 @@ namespace ServiceHubEnterprise.Tests.Dashboard;
 public class DashboardPageTests : BunitTestBase
 {
     [Fact]
-    public void RendersAllSixSectionCardsWhenLoaded()
+    public void RendersExecutiveHomeDashboardOverview()
     {
         Services.AddSingleton<IDashboardService>(new FakeDashboardService());
 
         var cut = Render<DashboardPage>();
-        cut.WaitForState(() => cut.FindAll(".section-card").Count == 6, TimeSpan.FromSeconds(5));
+        cut.WaitForState(() => cut.Markup.Contains("Home Dashboard"), TimeSpan.FromSeconds(5));
 
-        var titles = cut.FindAll(".card-title").Select(t => t.TextContent.Trim());
-        titles.Should().Contain("Users");
-        titles.Should().Contain("Test Suites");
-        titles.Should().Contain("Service Health");
-        titles.Should().Contain("Recent Activity");
+        cut.Markup.Should().Contain("Home Dashboard");
+        cut.Markup.Should().Contain("Total Registered Applications");
+        cut.Markup.Should().Contain("Usage Trend Graph");
+        cut.Markup.Should().Contain("Service Health Snapshot");
+        cut.Markup.Should().Contain("Recent Activities");
     }
 
     [Fact]
