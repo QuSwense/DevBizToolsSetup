@@ -1,9 +1,0 @@
-{
-  "restAppCount": 4,
-  "restAppsEnabled": 3,
-  "soapAppCount": 2,
-  "soapAppsEnabled": 1,
-  "testSuiteCount": 4,
-  "passingCases": 25,
-  "totalCases": 84
-}

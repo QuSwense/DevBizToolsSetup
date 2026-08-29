@@ -1,7 +1,0 @@
-[
-  { "name": "Payment Gateway", "status": "Ok" },
-  { "name": "User API", "status": "Ok" },
-  { "name": "Billing SOAP", "status": "Down" },
-  { "name": "Inventory", "status": "Ok" },
-  { "name": "Shipping SOAP", "status": "Down" }
-]
