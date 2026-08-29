@@ -50,9 +50,9 @@ Displays high-level KPI tiles in a responsive grid layout. Tiles marked with **[
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.Dashboard/UI/Pages/Dashboard.razor`
-- `Features/ServiceHubEnterprise.Dashboard/DependencyInjection/ServiceCollectionExtensions.cs`
-- `Features/ServiceHubEnterprise.Dashboard/README.md`
+- `Features/OrbitHub.Dashboard/UI/Pages/Dashboard.razor`
+- `Features/OrbitHub.Dashboard/DependencyInjection/ServiceCollectionExtensions.cs`
+- `Features/OrbitHub.Dashboard/README.md`
 
 ## Expected feature behavior
 

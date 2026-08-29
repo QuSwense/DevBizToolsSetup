@@ -1,0 +1,95 @@
+@namespace OrbitHub.Dashboard.UI.Components
+
+<div class="dash-card position-relative">
+    <div class="card-header">
+        <span class="card-title">@Title</span>
+        <div class="position-relative d-flex align-items-center gap-2">
+            <button class="meta-pill cursor-pointer border-0 bg-transparent"
+                    style="font-size:16px;padding:2px 6px;line-height:1"
+                    title="@SuiteBreakdownTitle"
+                    @onclick="ToggleSuiteBreakdown">
+                📊
+            </button>
+            <button class="meta-pill cursor-pointer border-0 bg-transparent"
+                    style="font-size:16px;padding:2px 6px;line-height:1"
+                    @onclick="ToggleDatePicker">
+                📅
+            </button>
+            @if (_showDatePicker)
+            {
+                <div class="datepicker-overlay" @onclick="CloseDatePicker"></div>
+                <div class="datepicker-popup" @onclick:stopPropagation="true">
+                    <label>Show stats until</label>
+                    <input type="date"
+                           class="datepicker-input"
+                           @bind="_selectedDate" />
+                    <div class="datepicker-info">
+                        @if (_selectedDate.HasValue)
+                        {
+                            <span>Showing data until @_selectedDate.Value.ToString("MMM dd, yyyy")</span>
+                        }
+                        else
+                        {
+                            <span>Showing all data</span>
+                        }
+                    </div>
+                    @if (_selectedDate.HasValue)
+                    {
+                        <button class="quick-action-link datepicker-clear"
+                                @onclick="ClearDateFilter">
+                            Clear filter
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="d-flex flex-column mt-2 gap-10px">
+        <div class="d-flex align-items-center justify-content-between gap-12px flex-wrap">
+            <div class="d-flex align-items-baseline gap-6px">
+                <span class="fs-28 fw-bold text-sh-accent lh-1">@TotalExecutions</span>
+                <span class="fs-12 text-sh-soft">total</span>
+            </div>
+            <div class="d-flex align-items-center exec-metrics">
+                <div class="d-flex align-items-center gap-6px">
+                    <div class="suite-bar exec-pass-bar">
+                        <div style="width:@(PassRate)%;height:100%;background:var(--sh-success);border-radius:4px"></div>
+                    </div>
+                    <span class="fs-15 fw-bold text-sh-success">@(PassRate)%</span>
+                    <span class="fs-11 text-sh-soft">pass</span>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <span class="fs-14 fw-semibold text-sh-warning">@FailCount</span>
+                    <span class="fs-11 text-sh-soft">fail</span>
+                </div>
+                <span class="exec-trend">↑</span>
+            </div>
+        </div>
+        @if (_selectedDate.HasValue)
+        {
+            <div class="fs-11 text-sh-faint border-sh-top pt-2">
+                Data from @_selectedDate.Value.ToString("MMM dd, yyyy") to present
+            </div>
+        }
+    </div>
+    @if (ShowSuiteBreakdown && SuiteStats.Count > 0)
+    {
+        <div class="suite-progress mt-3 border-sh-top pt-3">
+            @foreach (var suite in SuiteStats)
+            {
+                var pct = suite.Total > 0 ? suite.Passing * 100 / suite.Total : 0;
+                var barColor = pct >= 50 ? "var(--sh-success)" : "var(--sh-warning)";
+                <div class="d-flex align-items-center gap-2">
+                    <span class="suite-name">@suite.Name</span>
+                    <div class="suite-bar">
+                        <div style="width:@(pct)%;height:100%;background:@barColor;transition:width .3s">
+                        </div>
+                    </div>
+                    <span class="suite-stats">@suite.Passing / @suite.Total</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+

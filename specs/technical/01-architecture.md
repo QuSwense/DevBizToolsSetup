@@ -4,8 +4,8 @@
 
 The application is organized around a central web host and feature-specific projects. The current workspace shows the following primary groupings:
 
-- `WebApp/ServiceHubEnterprise.Web` — host application and startup configuration
-- `Features/ServiceHubEnterprise.*` — feature modules for dashboard, SOAP, REST, file management, monitoring, AD viewer, settings, and tests
+- `WebApp/OrbitHub.Web` — host application and startup configuration
+- `Features/OrbitHub.*` — feature modules for dashboard, SOAP, REST, file management, monitoring, AD viewer, settings, and tests
 - `Components/` — reusable UI and grid components
 - `mock_db/` — mock seed and runtime data content for feature modules
 - `tests/` — automated validation for the application

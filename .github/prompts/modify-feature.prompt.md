@@ -9,9 +9,9 @@ ${input}
 
 # REPOSITORY CONTEXT
 This is a **Service Hub Enterprise** Blazor app.
-- **Solution:** `ServiceHubEnterprise.slnx`
-- **Web Host:** `WebApp/ServiceHubEnterprise.Web/`
-- **Feature Projects:** Located under `Features/` (e.g., `Features/ServiceHubEnterprise.Dashboard/`, `Features/ServiceHubEnterprise.Settings/`, etc.)
+- **Solution:** `OrbitHub.slnx`
+- **Web Host:** `WebApp/OrbitHub.Web/`
+- **Feature Projects:** Located under `Features/` (e.g., `Features/OrbitHub.Dashboard/`, `Features/OrbitHub.Settings/`, etc.)
 - Each feature project contains `Components/`, `Pages/`, `DependencyInjection.cs`, and `_Imports.razor`.
 
 # STRICT EXECUTION SCOPE

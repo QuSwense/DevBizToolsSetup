@@ -25,8 +25,8 @@ The SOAP API Test feature provides enterprise operational management and visual 
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.SoapApplications/Pages/`
-- `Features/ServiceHubEnterprise.SoapApplications/Services/`
+- `Features/OrbitHub.SoapApplications/Pages/`
+- `Features/OrbitHub.SoapApplications/Services/`
 - `mock_db/Soap/`
 - `mock_db/Wsdl/`
 

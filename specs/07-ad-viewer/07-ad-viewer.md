@@ -16,5 +16,5 @@ The AD Viewer feature provides directory and identity visibility for the enterpr
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.ADViewer/Pages/ADViewer.razor`
-- `Features/ServiceHubEnterprise.ADViewer/DependencyInjection.cs`
+- `Features/OrbitHub.ADViewer/Pages/ADViewer.razor`
+- `Features/OrbitHub.ADViewer/DependencyInjection.cs`

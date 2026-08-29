@@ -21,6 +21,6 @@ The REST API Test feature manages the REST API application catalog, request file
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.RestApplications/Pages/`
-- `Features/ServiceHubEnterprise.RestApplications/DependencyInjection.cs`
+- `Features/OrbitHub.RestApplications/Pages/`
+- `Features/OrbitHub.RestApplications/DependencyInjection.cs`
 - `mock_db/Rest/`

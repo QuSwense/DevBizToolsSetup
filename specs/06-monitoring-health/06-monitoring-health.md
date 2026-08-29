@@ -16,5 +16,5 @@ The Monitoring & Health feature provides the operational visibility layer for th
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.MonitoringHealth/Pages/HealthDashboard.razor`
-- `Features/ServiceHubEnterprise.MonitoringHealth/DependencyInjection.cs`
+- `Features/OrbitHub.MonitoringHealth/Pages/HealthDashboard.razor`
+- `Features/OrbitHub.MonitoringHealth/DependencyInjection.cs`

@@ -1,0 +1,9 @@
+@namespace OrbitHub.Ui.Components
+
+<div class="timeline-strip">
+    @foreach (var seg in Segments)
+    {
+        <div class="timeline-seg" style="flex-basis:@(seg.Width)%;background:@seg.Color"
+             title="@seg.Tooltip"></div>
+    }
+</div>

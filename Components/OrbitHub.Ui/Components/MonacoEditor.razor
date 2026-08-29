@@ -1,0 +1,137 @@
+@namespace OrbitHub.Ui.Components
+
+@* ── Loading Skeleton ── *@
+@if (IsLoading)
+{
+    <div class="monaco-editor-wrapper" style="height:@Height">
+        <div class="monaco-editor-loading">
+            <div class="spinner-border text-sh-accent" role="status">
+                <span class="visually-hidden">Loading editor...</span>
+            </div>
+        </div>
+    </div>
+}
+else if (HasError)
+{
+    <div class="monaco-editor-wrapper" style="height:@Height">
+        <div class="monaco-editor-error">
+            <i class="bi bi-exclamation-triangle fs-4 text-danger"></i>
+            <p>@ErrorMessage</p>
+            <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="OnRetry" type="button">
+                <i class="bi bi-arrow-repeat"></i> Retry
+            </button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="monaco-editor-wrapper" style="height:@Height">
+        @* ── Toolbar ── *@
+        @if (ShowToolbar)
+        {
+            @if (ToolbarContent is not null)
+            {
+                @ToolbarContent
+            }
+            else
+            {
+                <MonacoEditorToolbar FileName="@FileName"
+                                     FilePath="@FilePath"
+                                     LanguageBadgeText="@GetLanguageBadge()"
+                                     HasUnsavedChanges="@HasUnsavedChanges"
+                                     FontFamily="@FontFamily"
+                                     FontSize="@FontSize"
+                                     Theme="@Theme"
+                                     WordWrapEnabled="@WordWrapEnabled"
+                                     LineNumbersEnabled="@ShowLineNumbers"
+                                     CursorLine="@CursorLine"
+                                     CursorColumn="@CursorColumn"
+                                     IsSaving="@IsSaving"
+                                     ShowBackButton="@ShowBackButton"
+                                     ShowFileName="@ShowFileName"
+                                     ShowFontSelector="@ShowFontSelector"
+                                     ShowWordWrapToggle="@ShowWordWrapToggle"
+                                     ShowLineNumbersToggle="@ShowLineNumbersToggle"
+                                     ShowThemeSelector="@ShowThemeSelector"
+                                     ShowSearchBox="@ShowSearchBox"
+                                     ShowCursorPosition="@ShowCursorPosition"
+                                     ShowGoToLine="@ShowGoToLine"
+                                     ShowSaveButton="@ShowSaveButton"
+                                     ShowFormatButton="@ShowFormatButton"
+                                     ShowValidateButton="@ShowValidateButton"
+                                     ShowDownloadButton="@ShowDownloadButton"
+                                     ShowCompareButton="@ShowCompareButton"
+                                     ShowUndoRedo="@ShowUndoRedo"
+                                     ShowActionMenu="@ShowActionMenu"
+                                     OnBackClick="@HandleBackClickAsync"
+                                     OnSaveClick="@HandleSaveClickAsync"
+                                     OnFormatClick="@HandleFormatClickAsync"
+                                     OnValidateClick="@HandleValidateClickAsync"
+                                     OnDownloadClick="@HandleDownloadClickAsync"
+                                     OnCompareClick="@HandleCompareClickAsync"
+                                     OnUndo="@HandleUndoAsync"
+                                     OnRedo="@HandleRedoAsync"
+                                     OnFontFamilyChanged="@HandleFontFamilyChangedAsync"
+                                     OnFontSizeChanged="@HandleFontSizeChangedAsync"
+                                     OnThemeChanged="@HandleThemeChangedAsync"
+                                     OnWordWrapToggled="@HandleWordWrapToggledAsync"
+                                     OnLineNumbersToggled="@HandleLineNumbersToggledAsync"
+                                     OnSearch="@HandleSearchAsync"
+                                     OnGoToLine="@HandleGoToLineAsync"
+                                     OnActionMenuItem="@HandleActionMenuItemAsync" />
+            }
+        }
+
+        @* ── Content Area (Monaco) ── *@
+        <div class="monaco-editor-content">
+            <div id="@_containerId" class="monaco-editor-host"></div>
+        </div>
+
+        @* ── Footer ── *@
+        @if (ShowFooter)
+        {
+            @if (FooterContent is not null)
+            {
+                @FooterContent
+            }
+            else
+            {
+                <MonacoEditorFooter TotalCharacters="@_totalChars"
+                                    LinesOfCode="@_nonEmptyLines"
+                                    BlankLines="@_blankLines"
+                                    FileSizeBytes="@_fileSizeBytes"
+                                    FileEncoding="@FileEncoding"
+                                    LineEndingFormat="@LineEndingFormat"
+                                    LineNumber="@CursorLine"
+                                    ColumnNumber="@CursorColumn"
+                                    SelectedCharacters="@_selectedChars"
+                                    IsOverwriteMode="@IsOverwriteMode"
+                                    IsReadOnly="@ReadOnly"
+                                    LanguageMode="@GetLanguageBadge()"
+                                    HasValidationErrors="@HasValidationErrors"
+                                    IsAutoSaveEnabled="@IsAutoSaveEnabled"
+                                    IsSaving="@IsSaving"
+                                    IsConnected="@IsConnected"
+                                    WordWrapEnabled="@WordWrapEnabled"
+                                    MinimapEnabled="@ShowMinimap"
+                                    ShowLeftStats="@ShowFooterLeftStats"
+                                    ShowCenterStats="@ShowFooterCenterStats"
+                                    ShowRightStats="@ShowFooterRightStats"
+                                    ShowWordWrapToggle="@ShowFooterWordWrapToggle"
+                                    ShowMinimapToggle="@ShowFooterMinimapToggle"
+                                    OnWordWrapToggled="@HandleWordWrapToggledAsync"
+                                    OnMinimapToggled="@HandleMinimapToggledAsync" />
+            }
+        }
+    </div>
+}
+
+@* ── Validation toast ── *@
+@if (_validationMessage is not null)
+{
+    <div class="sh-toast @(_validationIsError ? "sh-toast-danger" : "sh-toast-success")"
+         @onclick="DismissValidation" role="status" aria-live="polite">
+        <i class="bi @(_validationIsError ? "bi-exclamation-circle" : "bi-check-circle")"></i>
+        <span>@_validationMessage</span>
+    </div>
+}

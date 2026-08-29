@@ -16,5 +16,5 @@ The Settings feature provides configuration and preference controls for the appl
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.Settings/Pages/Settings.razor`
-- `Features/ServiceHubEnterprise.Settings/DependencyInjection.cs`
+- `Features/OrbitHub.Settings/Pages/Settings.razor`
+- `Features/OrbitHub.Settings/DependencyInjection.cs`

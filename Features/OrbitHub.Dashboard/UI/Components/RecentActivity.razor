@@ -1,0 +1,68 @@
+@namespace OrbitHub.Dashboard.UI.Components
+
+<SectionCard Title="@Title" Icon="🕘" Filter="@_range" OnFilterChanged="ApplyRange"
+             Collapsible="true" Collapsed="@Collapsed" OnToggle="OnToggle">
+    <Summary>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🕘</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Activities</span>
+                <span class="summary-chip-value">@RangeActivityCount</span>
+                <span class="summary-chip-sub">in range</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">👥</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Active users</span>
+                <span class="summary-chip-value">@RangeActiveUsers</span>
+                <span class="summary-chip-sub">in range</span>
+            </div>
+        </div>
+        <div class="summary-chip">
+            <span class="summary-chip-icon">🕛</span>
+            <div class="summary-chip-main">
+                <span class="summary-chip-label">Latest</span>
+                <span class="summary-chip-value">@LatestActivityTime</span>
+                <span class="summary-chip-sub">last activity</span>
+            </div>
+        </div>
+    </Summary>
+    <HeaderActions>
+        @if (Users.Count > 0)
+        {
+            <select class="datepicker-input user-select" @bind="_userFilter">
+                <option value="">All users</option>
+                @foreach (var user in Users)
+                {
+                    <option value="@user">@user</option>
+                }
+            </select>
+        }
+        @if (ShowViewAll)
+        {
+            <a href="@ViewAllHref" class="quick-action-link fs-11">View All</a>
+        }
+    </HeaderActions>
+    <ChildContent>
+    <div class="activity-body">
+        @foreach (var entry in Filtered)
+        {
+            <div class="activity-item">
+                <div class="activity-avatar">@entry.User.Substring(0, Math.Min(2, entry.User.Length)).ToUpper()</div>
+                <div class="flex-fill" style="min-width:0">
+                    <span class="activity-user">@entry.User</span>
+                    <span class="activity-action">@entry.Action</span>
+                </div>
+                <span class="activity-time">@entry.Time</span>
+            </div>
+        }
+        @if (!Filtered.Any())
+        {
+            <div class="activity-empty">No recent activity.</div>
+        }
+    </div>
+    </ChildContent>
+</SectionCard>
+
+

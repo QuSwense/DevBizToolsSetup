@@ -1,0 +1,1414 @@
+/* ═══════════════════════════════════════════
+   OrbitHub — Dashboard Styles
+   Feature: OrbitHub.Dashboard
+   ═══════════════════════════════════════════ */
+
+/* ── Dashboard Layout ─────────────────────── */
+
+.home-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 8px 0 24px;
+    color: var(--sh-text);
+}
+
+.home-dashboard-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 4px;
+}
+
+.eyebrow {
+    margin: 0 0 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sh-text-faint);
+}
+
+.home-dashboard-header h1 {
+    margin: 0;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.1;
+    font-weight: 700;
+}
+
+.header-date {
+    font-size: 14px;
+    color: var(--sh-text-soft);
+    white-space: nowrap;
+}
+
+.home-panel {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: var(--sh-shadow-sm);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.panel-header span {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+}
+
+.home-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.kpi-card {
+    background: linear-gradient(180deg, var(--sh-surface-2), var(--sh-surface));
+    border: 1px solid var(--sh-border);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 120px;
+}
+
+.kpi-label {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--sh-text-soft);
+    min-height: 36px;
+}
+
+.kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-top: 10px;
+    margin-bottom: 6px;
+}
+
+.kpi-detail {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+}
+
+.chart-panel {
+    background: linear-gradient(180deg, rgba(77, 128, 255, 0.03), rgba(77, 128, 255, 0.01));
+    border: 1px solid var(--sh-border);
+    border-radius: 12px;
+    padding: 12px 12px 4px;
+}
+
+.trend-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--sh-text-soft);
+    margin-bottom: 8px;
+}
+
+.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.dot.requests {
+    background: #3b82f6;
+}
+
+.dot.users {
+    background: #22c55e;
+}
+
+.trend-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.chart-grid line {
+    stroke: var(--sh-border);
+    stroke-width: 1;
+}
+
+.trend {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.requests-line {
+    stroke: #3b82f6;
+}
+
+.users-line {
+    stroke: #22c55e;
+}
+
+.chart-labels text {
+    font-size: 11px;
+    fill: var(--sh-text-faint);
+}
+
+.two-column-panel {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+}
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bar-label-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bar-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--sh-border);
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0f766e, #22c55e);
+}
+
+.bar-meta {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+}
+
+.growth-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.mini-metric {
+    background: var(--sh-surface-2);
+    border: 1px solid var(--sh-border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+}
+
+.mini-label {
+    font-size: 11px;
+    color: var(--sh-text-soft);
+    margin-bottom: 8px;
+    min-height: 28px;
+}
+
+.mini-value {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.health-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.health-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--sh-border);
+    border-radius: 10px;
+    background: var(--sh-surface-2);
+}
+
+.health-name {
+    font-weight: 600;
+}
+
+.health-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--sh-text-soft);
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.insight-list {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--sh-text-soft);
+}
+
+.activity-list,
+.access-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.activity-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--sh-border);
+    color: var(--sh-text-soft);
+}
+
+.activity-list li:last-child {
+    border-bottom: none;
+}
+
+.activity-time {
+    min-width: 68px;
+    color: var(--sh-text-faint);
+    font-size: 12px;
+}
+
+.access-list a {
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid var(--sh-border);
+    border-radius: 10px;
+    background: var(--sh-surface-2);
+    color: var(--sh-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.dash-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+.section-header {
+    margin-bottom: 12px;
+}
+
+.card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sh-text);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.card-value {
+    font-weight: 700;
+    line-height: 1;
+}
+
+.card-sub {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+}
+
+/* ── Metric Cards ─────────────────────────── */
+
+.dashboard-metrics {
+    display: contents;
+}
+
+.metric-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.metric-card:hover {
+    box-shadow: var(--sh-shadow-sm);
+    transform: translateY(-1px);
+}
+
+.metric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.metric-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sh-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.metric-icon {
+    font-size: 16px;
+    color: var(--sh-text-faint);
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.metric-sub {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+}
+
+/* ── Recent Activity ──────────────────────── */
+
+.activity-row {
+    margin-bottom: 12px;
+}
+
+.activity-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--sh-border);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--sh-accent);
+    color: var(--sh-on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.activity-user {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sh-text);
+    display: block;
+}
+
+.activity-action {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+    flex-shrink: 0;
+}
+
+.activity-empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--sh-text-faint);
+    font-size: 13px;
+}
+
+/* ── Quick Actions ────────────────────────── */
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quick-action-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sh-accent);
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.quick-action-link:hover {
+    background: var(--sh-hover);
+    color: var(--sh-accent-hover);
+}
+
+/* ── Bar Chart / File Breakdown ───────────── */
+
+.files-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.files-breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.files-breakdown-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--sh-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.files-breakdown-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+/* ── Suite Progress ───────────────────────── */
+
+.suite-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.suite-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sh-text);
+    min-width: 110px;
+}
+
+.suite-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--sh-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.suite-stats {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+    min-width: 60px;
+    text-align: right;
+}
+
+/* ── Execution Metrics ────────────────────── */
+
+.exec-metrics {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.exec-pass-bar {
+    width: 48px;
+}
+
+.exec-trend {
+    font-size: 14px;
+    color: var(--sh-success);
+}
+
+/* ── Donut Chart (Service Health) ─────────── */
+
+.donut-body {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.donut-chart-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.donut-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.donut-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sh-text);
+    line-height: 1.1;
+}
+
+.donut-sub {
+    font-size: 10px;
+    color: var(--sh-text-faint);
+    text-transform: uppercase;
+}
+
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.legend-label {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+}
+
+.legend-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sh-text);
+    margin-left: auto;
+}
+
+/* ── Date Picker ──────────────────────────── */
+
+.datepicker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+.datepicker-popup {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 220px;
+    box-shadow: var(--sh-shadow-md);
+}
+
+.datepicker-popup label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sh-text-soft);
+    margin-bottom: 6px;
+}
+
+.datepicker-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--sh-border);
+    border-radius: 4px;
+    font-size: 13px;
+    background: var(--sh-input-bg);
+    color: var(--sh-text);
+}
+
+.datepicker-info {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--sh-text-faint);
+}
+
+.datepicker-clear {
+    margin-top: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* ── Chart Widgets ────────────────────────── */
+
+.chart-widgets {
+    display: contents;
+}
+
+.chart-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.chart-header {
+    margin-bottom: 12px;
+}
+
+.chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sh-text);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.chart-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bar-label {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+    min-width: 80px;
+}
+
+.bar-track {
+    flex: 1;
+    height: 10px;
+    background: var(--sh-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+.bar-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sh-text);
+    min-width: 30px;
+    text-align: right;
+}
+
+.status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-label {
+    font-size: 12px;
+    color: var(--sh-text-soft);
+    flex: 1;
+}
+
+.status-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sh-text);
+}
+
+/* ── Utility Classes ──────────────────────── */
+
+.flex-fill {
+    flex: 1;
+    min-width: 0;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.border-0 {
+    border: none;
+}
+
+.bg-transparent {
+    background: transparent;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* ── Card Filters (Segmented Control / Pills) ── */
+
+.card-filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.segmented-control {
+    display: inline-flex;
+    border: 1px solid var(--sh-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.seg-btn {
+    border: none;
+    background: transparent;
+    color: var(--sh-text-soft);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.seg-btn:hover {
+    background: var(--sh-hover);
+}
+
+.seg-btn.active {
+    background: var(--sh-accent);
+    color: var(--sh-on-accent);
+}
+
+.pill-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--sh-text-soft);
+    cursor: pointer;
+    user-select: none;
+}
+
+.pill-check input {
+    accent-color: var(--sh-accent);
+    cursor: pointer;
+}
+
+/* ── WSDL Sync Status ─────────────────────── */
+
+.wsdl-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wsdl-status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wsdl-app {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sh-text);
+    display: block;
+}
+
+.wsdl-meta {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+    display: block;
+}
+
+/* ── Activity by User ─────────────────────── */
+
+.activity-you {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--sh-accent);
+    background: var(--sh-hover);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.activity-row-current {
+    background: var(--sh-hover);
+    border-radius: 6px;
+    padding: 4px 6px;
+}
+
+/* ═══════════════════════════════════════════
+   Redesigned Dashboard — Full-Row Section Cards
+   ═══════════════════════════════════════════ */
+
+:root {
+    --sh-danger: #ef4444;
+}
+
+/* ── Stack Layout ─────────────────────────── */
+
+.dashboard-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.dashboard-row {
+    width: 100%;
+}
+
+/* ── Equal-height section cards ───────────── */
+
+/* Bootstrap already stretches each row's columns to equal height; make the
+   .section-card fill its column so all cards in a row match height. */
+
+.dashboard-stack .row > [class*="col-"] {
+    display: flex;
+}
+
+.dashboard-stack .section-card {
+    flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-stack .section-card > .section-body,
+.dashboard-stack .section-card > .section-summary {
+    flex: 1 1 auto;
+}
+
+/* ── Section Card Header ──────────────────── */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.section-information {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--sh-text-faint);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 2px;
+}
+
+.filter-pill {
+    padding: 3px 8px;
+    border: 1px solid var(--sh-border);
+    border-radius: 999px;
+    background: var(--sh-input-bg);
+    font-size: 11px;
+    color: var(--sh-text-soft);
+    transition: background 0.15s, color 0.15s;
+}
+
+.filter-pill:hover {
+    background: var(--sh-hover);
+    color: var(--sh-accent);
+}
+
+.filter-pill-label {
+    font-weight: 500;
+}
+
+.filter-pill-icon {
+    font-size: 12px;
+}
+
+/* ── Section Body / Footers ───────────────── */
+
+.section-body {
+    margin-top: 4px;
+}
+
+.section-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sh-border);
+}
+
+.section-divider {
+    height: 1px;
+    background: var(--sh-border);
+    margin: 14px 0;
+}
+
+.sub-heading {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--sh-text-soft);
+    margin-bottom: 10px;
+}
+
+/* ── KPI Grid / Tiles ─────────────────────── */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+}
+
+.kpi-tile {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: box-shadow 0.2s;
+}
+
+.kpi-tile:hover {
+    box-shadow: var(--sh-shadow-sm);
+}
+
+.kpi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.kpi-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sh-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.kpi-icon {
+    font-size: 14px;
+    color: var(--sh-text-faint);
+}
+
+.kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--sh-text);
+}
+    margin-top: 2px;
+.kpi-sub {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kpi-donut-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-donut {
+    margin-top: 4px;
+}
+
+/* ── Status Badges ────────────────────────── */
+
+.sb-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.sb-enabled,
+.sb-ok,
+.sb-passed,
+.sb-synced {
+    background: rgba(16, 185, 129, 0.14);
+    color: #10b981;
+}
+
+.sb-disabled,
+.sb-failed,
+.sb-down {
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+}
+
+.sb-parsing,
+.sb-running,
+.sb-degraded {
+    background: rgba(245, 158, 11, 0.14);
+    color: #f59e0b;
+}
+
+.sb-none {
+    background: var(--sh-border);
+    color: var(--sh-text-soft);
+}
+
+/* ── App Tables (REST / SOAP / Suite runs) ── */
+
+.app-table {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.app-table-head,
+.app-table-row {
+    display: grid;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    font-size: 12px;
+}
+
+.app-table-head {
+    color: var(--sh-text-faint);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid var(--sh-border);
+}
+
+.app-table-row {
+    border-radius: 6px;
+}
+
+.app-table-row:hover {
+    background: var(--sh-hover);
+}
+
+.app-table-name {
+    font-weight: 600;
+    color: var(--sh-text);
+}
+
+.app-table-muted {
+    color: var(--sh-text-soft);
+}
+
+.app-table-success {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.app-table-head > span:nth-child(1),
+.app-table-row > span:nth-child(1) {
+    grid-column: span 1;
+    min-width: 0;
+}
+
+/* REST table: 5 columns */
+.app-table-head:has(> span:nth-child(5)):not(:has(> span:nth-child(6))),
+.app-table-row:has(> :nth-child(5)):not(:has(> :nth-child(6))) {
+    grid-template-columns: 2fr 1fr 1.2fr 1fr 1.4fr;
+}
+
+/* SOAP table: 6 columns */
+.app-table-head:has(> span:nth-child(6)),
+.app-table-row:has(> :nth-child(6)) {
+    grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr 1.4fr;
+}
+
+/* Suite runs table: 5 columns */
+.app-table.suite-runs .app-table-head,
+.app-table.suite-runs .app-table-row {
+    grid-template-columns: 1fr 1.4fr 1fr 1.2fr 1fr;
+}
+
+/* ── Date Range Filter Dialog ─────────────── */
+
+.daterange-popup {
+    min-width: 260px;
+}
+
+.daterange-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.daterange-fields {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.daterange-fields > div {
+    flex: 1;
+}
+
+.daterange-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-date-apply {
+    flex: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--sh-accent);
+    color: var(--sh-on-accent);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-date-clear {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--sh-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--sh-text-soft);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-date-clear:hover {
+    background: var(--sh-hover);
+}
+
+/* ── Timeline Strip (uptime) ──────────────── */
+
+.timeline-strip {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--sh-border);
+}
+
+.timeline-seg {
+    height: 100%;
+    transition: flex-basis 0.3s;
+}
+
+/* ── Top Active Users ─────────────────────── */
+
+.top-users {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.top-user-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sh-text);
+    min-width: 110px;
+}
+
+/* ── Service Health ───────────────────────── */
+
+.health-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.health-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.2fr) auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 10px;
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    background: var(--sh-surface);
+}
+
+.health-row-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.health-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sh-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.health-row-stats {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.health-up {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sh-text);
+}
+
+.health-up-text {
+    font-size: 11px;
+    color: var(--sh-text-faint);
+}
+
+.health-row-timeline {
+    min-width: 120px;
+}
+
+/* ── Selects (suite / user filters) ───────── */
+
+.suite-select,
+.user-select {
+    width: auto;
+    min-width: 100px;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* ── Suite History Meta ───────────────────── */
+
+.suite-history-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.suite-history-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 12px;
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    background: var(--sh-surface);
+    min-width: 90px;
+}
+
+.shc-label {
+    font-size: 10px;
+    color: var(--sh-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.shc-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sh-text);
+}

@@ -1,0 +1,23 @@
+@namespace OrbitHub.Dashboard.UI.Components
+
+<div class="dashboard-metrics">
+    @foreach (var metric in Metrics)
+    {
+        <div class="metric-card">
+            <div class="metric-header">
+                <span class="metric-title">@metric.Label</span>
+                @if (!string.IsNullOrEmpty(metric.Icon))
+                {
+                    <span class="metric-icon">@metric.Icon</span>
+                }
+            </div>
+            <div class="metric-value" style="color:@metric.Color">@metric.Value</div>
+            @if (!string.IsNullOrEmpty(metric.Sub))
+            {
+                <div class="metric-sub">@metric.Sub</div>
+            }
+        </div>
+    }
+</div>
+
+

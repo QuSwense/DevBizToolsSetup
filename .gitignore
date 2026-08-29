@@ -63,8 +63,8 @@ appsettings.*.local.json
 # Local application data, SQLite files, and generated test fixtures.
 Library/
 mock_db/
-WebApp/ServiceHubEnterprise.Web/servicehub.db
-WebApp/ServiceHubEnterprise.Web/servicehub.db-*
+WebApp/OrbitHub.Web/servicehub.db
+WebApp/OrbitHub.Web/servicehub.db-*
 
 # Local SQL Server container/database runtime files, not schema source.
 /servicehubdb/

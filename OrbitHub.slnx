@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/Features/">
+    <Project Path="Features/OrbitHub.ADViewer/OrbitHub.ADViewer.csproj" />
+    <Project Path="Features/OrbitHub.Dashboard/OrbitHub.Dashboard.csproj" />
+    <Project Path="Features/OrbitHub.FileManagement/OrbitHub.FileManagement.csproj" />
+    <Project Path="Features/OrbitHub.MonitoringHealth/OrbitHub.MonitoringHealth.csproj" />
+    <Project Path="Features/OrbitHub.RestApplications/OrbitHub.RestApplications.csproj" />
+    <Project Path="Features/OrbitHub.Settings/OrbitHub.Settings.csproj" />
+    <Project Path="Features/OrbitHub.SoapApplications/OrbitHub.SoapApplications.csproj" />
+    <Project Path="Features/OrbitHub.TestSuite/OrbitHub.TestSuite.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/OrbitHub.Data/OrbitHub.Data.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/OrbitHub.Data/" />
+  <Folder Name="/Infrastructure/OrbitHub.Data/scripts/" />
+  <Folder Name="/Infrastructure/OrbitHub.Data/scripts/linq2db-doccomments/">
+    <Project Path="Infrastructure/linq2db-doccomments/DocIntercept.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/WebApp/">
+    <Project Path="WebApp/OrbitHub.Web/OrbitHub.Web.csproj" />
+  </Folder>
+  <Folder Name="/Components/">
+    <Project Path="Components/OrbitHub.Common/OrbitHub.Common.csproj" />
+    <Project Path="Components/OrbitHub.Grid/OrbitHub.Grid.csproj" />
+    <Project Path="Components/OrbitHub.Ui/OrbitHub.Ui.csproj" />
+  </Folder>
+</Solution>

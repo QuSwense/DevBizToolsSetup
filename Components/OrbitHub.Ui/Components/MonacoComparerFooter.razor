@@ -1,0 +1,61 @@
+@namespace OrbitHub.Ui.Components
+
+<div class="monaco-diff-footer">
+    <div class="footer-left">
+        @if (ShowDiffStats)
+        {
+            <span class="footer-stat" title="Total differences">@TotalDifferences diff</span>
+            <span class="footer-stat footer-stat-success" title="Additions">+@Additions</span>
+            <span class="footer-stat footer-stat-error" title="Deletions">-@Deletions</span>
+            @if (Modifications > 0)
+            {
+                <span class="footer-stat footer-stat-warning" title="Modifications">~@Modifications</span>
+            }
+            <span class="footer-stat-sep"></span>
+            <span class="footer-stat" title="Percentage changed">@PercentageChanged.ToString("F1")% changed</span>
+            @if (SimilarityPercentage > 0)
+            {
+                <span class="footer-stat" title="Similarity">@SimilarityPercentage.ToString("F0")% similar</span>
+            }
+        }
+    </div>
+    <div class="footer-center">
+        @if (ShowNavigation)
+        {
+            if (TotalDifferencesForNav > 0)
+            {
+                <span class="footer-stat">Diff @CurrentDifference of @TotalDifferencesForNav</span>
+            }
+        }
+    </div>
+    <div class="footer-right">
+        @if (ShowStatus)
+        {
+            @if (IsProcessing)
+            {
+                <span class="footer-stat">
+                    <span class="spinner-border spinner-border-sm" role="status" style="width:10px;height:10px"></span>
+                    Processing...
+                </span>
+            }
+            else if (HasError)
+            {
+                <span class="footer-stat footer-stat-error" title="@ErrorMessage">
+                    <i class="bi bi-exclamation-circle"></i> Error
+                </span>
+            }
+            else if (TotalDifferences == 0)
+            {
+                <span class="footer-stat footer-stat-success">
+                    <i class="bi bi-check-circle"></i> No differences found
+                </span>
+            }
+            else
+            {
+                <span class="footer-stat footer-stat-success">
+                    <i class="bi bi-check-circle"></i> Comparison ready
+                </span>
+            }
+        }
+    </div>
+</div>

@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This application is structured as a multi-feature Blazor web application with a shared host and independently scoped feature modules. The host project at `WebApp/ServiceHubEnterprise.Web` wires the feature registrations and provides the application shell, while each feature project under `Features/` exposes pages, components, services, and domain models for a specific operational domain.
+This application is structured as a multi-feature Blazor web application with a shared host and independently scoped feature modules. The host project at `WebApp/OrbitHub.Web` wires the feature registrations and provides the application shell, while each feature project under `Features/` exposes pages, components, services, and domain models for a specific operational domain.
 
 ## Current implementation structure
 
-- `WebApp/ServiceHubEnterprise.Web/Program.cs` registers the core application services and feature extension methods.
+- `WebApp/OrbitHub.Web/Program.cs` registers the core application services and feature extension methods.
 - Each feature project contains a dependency registration extension method, such as `AddDashboardFeature()` or `AddSoapApplicationsFeature()`.
 - Most feature modules follow a similar boundary: pages, components, service/store classes, models, and dependency-injection registration.
 

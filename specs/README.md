@@ -1,6 +1,6 @@
 # Service Hub Enterprise Specification Index
 
-This folder holds the current project specification set, organized by feature area and technical concern. The documents are aligned to the active codebase structure in the workspace, including the major feature projects under `Features/` and the web host in `WebApp/ServiceHubEnterprise.Web`.
+This folder holds the current project specification set, organized by feature area and technical concern. The documents are aligned to the active codebase structure in the workspace, including the major feature projects under `Features/` and the web host in `WebApp/OrbitHub.Web`.
 
 ## 00. Technical specs
 

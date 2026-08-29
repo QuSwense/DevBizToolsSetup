@@ -21,5 +21,5 @@ The File Management feature provides the document and file operations layer for 
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.FileManagement/Pages/`
-- `Features/ServiceHubEnterprise.FileManagement/DependencyInjection/ServiceCollectionExtensions.cs`
+- `Features/OrbitHub.FileManagement/Pages/`
+- `Features/OrbitHub.FileManagement/DependencyInjection/ServiceCollectionExtensions.cs`

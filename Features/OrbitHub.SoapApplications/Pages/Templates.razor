@@ -1,0 +1,750 @@
+@page "/soap/templates"
+
+@* ── Toast / Success Banner ── *@
+@if (!string.IsNullOrEmpty(_successMessage))
+{
+    <div class="toast-notification toast-success" role="alert">
+        <i class="bi bi-check-circle-fill me-1"></i>
+        @_successMessage
+        <button class="toast-close" @onclick="DismissSuccess" type="button" aria-label="Dismiss">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+}
+
+@* ── Page Header ── *@
+<div class="templates-page-header">
+    <div class="header-left">
+        <h1 class="page-title">Templates</h1>
+        <button class="help-icon-btn" type="button" aria-label="Help" data-tooltip="Manage SOAP request templates">
+            <i class="bi bi-question-circle"></i>
+        </button>
+        <span class="meta-pill">@_allTemplates.Length total</span>
+    </div>
+</div>
+
+@* ── Templates Grid ── *@
+@if (_isLoading)
+{
+    <div class="datagrid-card" style="padding:0">
+        <div class="skeleton-table">
+            <div class="skeleton-header">
+                <div class="skeleton-cell skeleton-check"></div>
+                <div class="skeleton-cell skeleton-name"></div>
+                <div class="skeleton-cell skeleton-wsdl"></div>
+                <div class="skeleton-cell skeleton-vars"></div>
+                <div class="skeleton-cell skeleton-status"></div>
+                <div class="skeleton-cell skeleton-date"></div>
+                <div class="skeleton-cell skeleton-actions"></div>
+            </div>
+            @RenderSkeletonRows
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadTemplatesAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else
+{
+    @* Templates grid *@
+    <ServiceHubGrid TItem="Template"
+                    Id="templatesGrid"
+                    Items="_filteredTemplates"
+                    PageSize="10"
+                    EnableSelection="true"
+                    EnablePagination="true"
+                    EnableSearch="true"
+                    EnableExpand="true"
+                    SearchPlaceholder="Search templates..."
+                    EmptyText="No templates found."
+                    RowIdSelector="@(t => t.Name)"
+                    @bind-SearchText="_searchText"
+                    @bind-SortColumn="_sortColumn"
+                    @bind-SortAscending="_sortAscending"
+                    @bind-CurrentPage="_currentPage"
+                    SearchChanged="OnGridSearchChanged"
+                    ActionRowClosed="OnActionRowClosed"
+                    Columns="@_columns">
+
+        <ToolbarCenter>
+            <div class="control-select-wrap">
+                <i class="bi bi-funnel control-select-icon"></i>
+                <select class="form-control-dg control-select" aria-label="Filter by status" value="@_filterStatus" @onchange="OnFilterStatusChanged">
+                    <option value="All">All Status</option>
+                    <option value="Published">Published</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Archived">Archived</option>
+                    <option value="Invalid">Invalid</option>
+                </select>
+            </div>
+        </ToolbarCenter>
+
+        <ToolbarRight>
+            <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="OpenCreateTemplate" type="button" aria-label="Create Template">
+                <i class="bi bi-plus-lg"></i>
+                Create
+            </button>
+            <button class="btn btn-outline-secondary btn-dg" type="button" aria-label="Upload" data-tooltip="Upload template file"
+                    disabled="@(!string.IsNullOrEmpty(_searchText))">
+                <i class="bi bi-upload"></i>
+                Upload
+            </button>
+            <div class="position-relative">
+                <button class="btn btn-outline-secondary btn-dg" @onclick="ToggleSourceDropdown" type="button" aria-label="Export" aria-expanded="@_showSourceDropdown">
+                    <i class="bi bi-download"></i>
+                    Export
+                    <i class="bi bi-chevron-down fs-10"></i>
+                </button>
+                @if (_showSourceDropdown)
+                {
+                    <div class="position-fixed" style="inset:0;z-index:50" @onclick="CloseSourceDropdown"></div>
+                    <div class="dropdown-menu-dg">
+                        <div class="py-1">
+                            <button class="btn dropdown-item-dg" @onclick="ExportAsJson" type="button">
+                                <i class="bi bi-filetype-json"></i>
+                                Export as JSON
+                            </button>
+                            <button class="btn dropdown-item-dg" @onclick="ExportAsCsv" type="button">
+                                <i class="bi bi-filetype-csv"></i>
+                                Export as CSV
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+            <button class="btn btn-outline-danger btn-dg" @onclick="OpenBulkDelete" type="button"
+                    aria-label="Delete selected" disabled="@(!_hasSelection)">
+                <i class="bi bi-trash3"></i>
+                Delete
+            </button>
+        </ToolbarRight>
+
+        <RowActions Context="tpl">
+            <div class="row-actions-wrap blazor-managed@(_expandedActionRows.Contains(tpl.Name) ? " is-open" : "")">
+                <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions"
+                        @onclick="() => _expandedActionRows.Add(tpl.Name)">
+                    <i class="bi bi-three-dots" aria-hidden="true"></i>
+                </button>
+                <div class="inline-actions">
+                    <button class="ia-btn ia-normal" type="button" aria-label="Edit" data-tooltip="Edit"
+                            @onclick="() => OpenEditTemplate(tpl)">
+                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                    </button>
+                    <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete"
+                            @onclick="() => ConfirmDeleteTemplate(tpl.Name)">
+                        <i class="bi bi-trash" aria-hidden="true"></i>
+                    </button>
+                    <button class="ia-btn ia-normal" type="button" aria-label="Duplicate" data-tooltip="Duplicate">
+                        <i class="bi bi-copy" aria-hidden="true"></i>
+                    </button>
+                    <button class="ia-btn ia-normal" type="button" aria-label="Export" data-tooltip="Export">
+                        <i class="bi bi-download" aria-hidden="true"></i>
+                    </button>
+                    <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close"
+                            @onclick="() => _expandedActionRows.Remove(tpl.Name)">
+                        <i class="bi bi-x-lg fs-11" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </RowActions>
+
+        <DetailRow Context="tpl">
+            <div class="detail-grid">
+                <div>
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value mono-text">@tpl.Name</div>
+                </div>
+                <div>
+                    <div class="detail-label">Application</div>
+                    <div class="detail-value">@tpl.Category</div>
+                </div>
+                <div class="grid-col-full">
+                    <div class="detail-label">Operation</div>
+                    <div class="detail-value">@tpl.Operation</div>
+                </div>
+                <div class="grid-col-full">
+                    <div class="detail-label">Description</div>
+                    <div class="detail-value">@(string.IsNullOrEmpty(tpl.Description) ? "—" : tpl.Description)</div>
+                </div>
+                <div>
+                    <div class="detail-label">SOAP Action</div>
+                    <div class="detail-value mono-text">@tpl.SoapAction</div>
+                </div>
+                <div>
+                    <div class="detail-label">Endpoint URL</div>
+                    <div class="detail-value mono-text">@tpl.EndpointUrl</div>
+                </div>
+                <div>
+                    <div class="detail-label">Variables</div>
+                    <div class="detail-value">@tpl.Variables</div>
+                </div>
+                <div>
+                    <div class="detail-label">Usage</div>
+                    <div class="detail-value">@tpl.Usage</div>
+                </div>
+                <div>
+                    <div class="detail-label">Created</div>
+                    <div class="detail-value">@tpl.Created</div>
+                </div>
+                <div>
+                    <div class="detail-label">Last Updated</div>
+                    <div class="detail-value">@tpl.Updated</div>
+                </div>
+            </div>
+        </DetailRow>
+    </ServiceHubGrid>
+}
+
+@* ── Delete Confirmation Dialog ── *@
+@if (_showDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="modal-content-dg modal-w-440" @onclick:stopPropagation="true" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+            <div class="modal-header-dg">
+                <h3 id="delete-dialog-title">
+                    <i class="bi bi-exclamation-triangle text-danger me-1"></i>
+                    Confirm Delete
+                </h3>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="CancelDelete" type="button" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                @if (_deleteTargetName is not null)
+                {
+                    <p>Are you sure you want to delete <strong>"@_deleteTargetName"</strong>? This action cannot be undone.</p>
+                }
+                else
+                {
+                    <p>Are you sure you want to delete <strong>@_selectedIds.Count selected template(s)</strong>? This action cannot be undone.</p>
+                    <div class="delete-items-list">
+                        @foreach (var name in _allTemplates.Where(t => _selectedIds.Contains(t.Name)).Select(t => t.Name))
+                        {
+                            <div class="delete-item">
+                                <i class="bi bi-file-earmark-text me-1 text-sh-soft"></i>
+                                @name
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-dg" @onclick="CancelDelete" type="button">Cancel</button>
+                <button class="btn btn-sh-danger btn-dg" @onclick="ExecuteDeleteTemplate" type="button"
+                        disabled="@(_isBulkDeleting)">
+                    @if (_isBulkDeleting)
+                    {
+                        <span class="spinner-sm me-1"></span>
+                    }
+                    <i class="bi bi-trash3 me-1"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@* ── Create / Edit Modal ── *@
+@if (_showModal)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-content-dg modal-w-800" @onclick:stopPropagation="true" role="dialog" aria-modal="true" aria-labelledby="template-modal-title">
+            @* ── Modal Header ── *@
+            <div class="modal-header-dg">
+                <div class="modal-header-left">
+                    <h3 id="template-modal-title">@GetModalTitle()</h3>
+                    @if (_isEditMode)
+                    {
+                        <span class="version-info">v1.0</span>
+                    }
+                </div>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" @onclick="CloseModal" type="button" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-dg">
+                @* Validation errors banner *@
+                @if (_validationErrors.Count > 0)
+                {
+                    <div class="alert-validation mb-2" role="alert">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Please fix the following:
+                        <ul class="mt-1 mb-0 ps-20">
+                            @foreach (var err in _validationErrors)
+                            {
+                                <li>@err</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                @* ── Source Selection ── *@
+                <div class="source-selection-section">
+                    <span class="section-label">Source</span>
+                    <div class="source-options">
+                        <label class="source-radio@(GetSourceActiveClass("blank"))">
+                            <input type="radio" name="sourceType" value="blank" checked="@IsSourceBlank()"
+                                   @onchange="SelectSourceBlank" />
+                            <i class="bi bi-file-earmark-plus"></i>
+                            <span>Blank Template</span>
+                        </label>
+                        <label class="source-radio@(GetSourceActiveClass("upload"))">
+                            <input type="radio" name="sourceType" value="upload" checked="@IsSourceUpload()"
+                                   @onchange="SelectSourceUpload" />
+                            <i class="bi bi-upload"></i>
+                            <span>Upload XML</span>
+                        </label>
+                        <label class="source-radio@(GetSourceActiveClass("saved"))">
+                            <input type="radio" name="sourceType" value="saved" checked="@IsSourceSaved()"
+                                   @onchange="SelectSourceSaved" />
+                            <i class="bi bi-folder"></i>
+                            <span>From Saved Request</span>
+                        </label>
+                    </div>
+
+                    @if (_formModel.SourceType == "upload")
+                    {
+                        <div class="upload-zone @GetDragOverClass()"
+                             @ondragover="HandleDragOver" @ondragleave="HandleDragLeave">
+                            <i class="bi bi-cloud-upload fs-24"></i>
+                            <p class="upload-zone-text">Drag & drop XML file here, or</p>
+                            <label class="btn btn-outline-secondary btn-dg cursor-pointer">
+                                Browse Files
+                                <InputFile OnChange="HandleFileUpload" accept=".xml,.wsdl" hidden />
+                            </label>
+                            @if (!string.IsNullOrEmpty(_uploadFileName))
+                            {
+                                <div class="uploaded-file-info">
+                                    <i class="bi bi-file-check text-sh-success"></i>
+                                    @_uploadFileName
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (_formModel.SourceType == "saved")
+                    {
+                        <div class="saved-request-picker">
+                            <select class="form-control-dg" aria-label="Select a saved request">
+                                <option value="">Select a saved request...</option>
+                                @foreach (var tpl in _allTemplates)
+                                {
+                                    <option value="@tpl.Name">@tpl.Name (@tpl.Wsdl)</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                </div>
+
+                @* ── Tabs ── *@
+                <div class="templates-tabs">
+                    <div class="tabs-header">
+                        <button class="tab-btn@(GetTabActiveClass(0))"
+                                @onclick="() => SetActiveTab(0)" type="button" role="tab" aria-selected="@(_activeTabIndex == 0)">
+                            <i class="bi bi-info-circle"></i>
+                            Details
+                        </button>
+                        <button class="tab-btn@(GetTabActiveClass(1))"
+                                @onclick="() => SetActiveTab(1)" type="button" role="tab" aria-selected="@(_activeTabIndex == 1)">
+                            <i class="bi bi-code-slash"></i>
+                            XML
+                        </button>
+                        <button class="tab-btn@(GetTabActiveClass(2))"
+                                @onclick="() => SetActiveTab(2)" type="button" role="tab" aria-selected="@(_activeTabIndex == 2)">
+                            <i class="bi bi-list-ul"></i>
+                            Variables
+                            @if (_formModel.VariableList.Count > 0)
+                            {
+                                <span class="tab-badge">@_formModel.VariableList.Count</span>
+                            }
+                        </button>
+                    </div>
+
+                    <div class="tab-content">
+                        @* ── TAB 1: Details ── *@
+                        @if (_activeTabIndex == 0)
+                        {
+                            <div class="tab-panel details-tab" role="tabpanel">
+                                <div class="form-row">
+                                    <div class="form-group flex-grow-1">
+                                        <label>Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control-dg" placeholder="e.g. CreateUserRequest"
+                                               value="@_formModel.Name" @oninput="HandleNameChange" />
+                                    </div>
+                                    <div class="form-group flex-grow-1">
+                                        <label>Application <span class="text-danger">*</span></label>
+                                        <select class="form-control-dg" value="@_formModel.Category" @onchange="HandleApplicationChange">
+                                            <option value="">Select application...</option>
+                                            @foreach (var app in _availableApps)
+                                            {
+                                                <option value="@app.Name">@app.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea class="form-control-dg textarea" rows="2" placeholder="Describe the purpose of this template..."
+                                              value="@_formModel.Description" @oninput="HandleDescriptionChange"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tags</label>
+                                    <input type="text" class="form-control-dg" placeholder="e.g. billing, customer (comma-separated)"
+                                           value="@_formModel.Tags" @oninput="HandleTagsChange" />
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group flex-grow-1">
+                                        <label>Operation <span class="text-danger">*</span></label>
+                                        <select class="form-control-dg" value="@_formModel.Operation" @onchange="HandleOperationChange">
+                                            <option value="">@GetOperationPlaceholder()</option>
+                                            @foreach (var op in _formAvailableOperations)
+                                            {
+                                                <option value="@op">@op</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group flex-grow-1">
+                                        <label>SOAP Action</label>
+                                        <input type="text" class="form-control-dg" placeholder="http://tempuri.org/Action"
+                                               value="@_formModel.SoapAction" @oninput="HandleSoapActionChange" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="d-block mb-1">Status</label>
+                                    <div class="status-radio-group">
+                                        @foreach (var st in new[] { "Draft", "Published", "Archived" })
+                                        {
+                                            var statusValue = st;
+                                            <label class="status-radio@(GetStatusActiveClass(statusValue))">
+                                                <input type="radio" name="templateStatus" value="@statusValue"
+                                                       checked="@IsStatusSelected(statusValue)"
+                                                       @onchange="() => SelectStatus(statusValue)" />
+                                                <span class="status-badge @GetStatusClass(statusValue)">@statusValue</span>
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @* ── TAB 2: XML Editor ── *@
+                        @if (_activeTabIndex == 1)
+                        {
+                            <div class="tab-panel xml-tab" role="tabpanel">
+                                <div class="xml-editor-toolbar">
+                                    <button class="btn btn-dg fs-11 h-30" @onclick="AutoDetectVariables" type="button" data-tooltip="Scan XML for {{variables}}">
+                                        <i class="bi bi-magic"></i>
+                                        Auto-detect
+                                    </button>
+                                    <button class="btn btn-dg fs-11 h-30" @onclick="ValidateXml" type="button" data-tooltip="Validate XML structure">
+                                        <i class="bi bi-check-circle"></i>
+                                        Validate
+                                    </button>
+                                    <span class="flex-grow-1"></span>
+                                    <span class="xml-status-badge @GetXmlStatusClass()">
+                                        @if (string.IsNullOrEmpty(_formModel.XmlContent))
+                                        {
+                                            <i class="bi bi-dash-circle"></i>
+                                            <span>No XML</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-check-circle-fill text-sh-success"></i>
+                                            <span>XML loaded</span>
+                                        }
+                                    </span>
+                                </div>
+
+                                <div class="xml-editor-wrap">
+                                    <div id="@MonacoEditorId" class="monaco-editor-host" style="width:100%;height:400px;"></div>
+                                </div>
+
+                                @if (_showValidationPanel && _validationChecks.Count > 0)
+                                {
+                                    <div class="validation-panel">
+                                        <div class="validation-panel-header">
+                                            <span class="fw-semibold fs-11 text-uppercase ls-05">
+                                                <i class="bi bi-shield-check me-1"></i>
+                                                Validation Report
+                                            </span>
+                                            <button class="btn btn-link-dg fs-10" @onclick="CloseValidationPanel" type="button">Close</button>
+                                        </div>
+                                        <div class="validation-checks">
+                                            @foreach (var (check, passed) in _validationChecks)
+                                            {
+                                                <div class="validation-check @GetValidationCheckClass(passed)">
+                                                    <i class="bi @GetValidationCheckIcon(passed)"></i>
+                                                    <span>@check</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @* ── TAB 3: Variables ── *@
+                        @if (_activeTabIndex == 2)
+                        {
+                            <div class="tab-panel variables-tab" role="tabpanel">
+                                <div class="variables-toolbar">
+                                    <span class="fs-11 text-sh-soft">
+                                        @_formModel.VariableList.Count variable(s) defined
+                                    </span>
+                                    <span class="flex-grow-1"></span>
+                                    <button class="btn btn-dg fs-11 h-30" @onclick="AddVariable" type="button">
+                                        <i class="bi bi-plus-lg"></i>
+                                        Add Variable
+                                    </button>
+                                </div>
+
+                                @if (_formModel.VariableList.Count == 0)
+                                {
+                                    <div class="variables-empty">
+                                        <i class="bi bi-diagram-3 fs-20 text-sh-faint d-block mb-1"></i>
+                                        <p class="text-sh-soft fs-12">No variables defined yet. Add variables or auto-detect from XML.</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="variables-table-wrap">
+                                        <table class="variables-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="var-name-col">Name</th>
+                                                    <th class="var-type-col">Type</th>
+                                                    <th class="var-sample-col">Sample Value</th>
+                                                    <th class="var-req-col">Required</th>
+                                                    <th class="var-actions-col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                        <tbody>
+                                                @for (var vi = 0; vi < _formModel.VariableList.Count; vi++)
+                                            {
+                                                var idx = vi;
+                                                    var v = _formModel.VariableList[idx];
+                                                    var varName = v.Name;
+                                                    <tr class="variable-row">
+                                                        <td>
+                                                            <input type="text" class="form-control-dg variable-input"
+                                                                   placeholder="Variable name"
+                                                                   value="@v.Name"
+                                                                   @oninput="(e) => UpdateVariableNameFromEvent(idx, e)" />
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control-dg variable-input"
+                                                                    value="@v.Type"
+                                                                    @onchange="(e) => UpdateVariableTypeFromEvent(idx, e)">
+                                                                <option value="string">string</option>
+                                                                <option value="integer">integer</option>
+                                                                <option value="decimal">decimal</option>
+                                                                <option value="boolean">boolean</option>
+                                                                <option value="date">date</option>
+                                                                <option value="array">array</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control-dg variable-input"
+                                                                   placeholder="Sample value"
+                                                                   value="@v.Sample"
+                                                                   @oninput="(e) => UpdateVariableSampleFromEvent(idx, e)" />
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <input type="checkbox" class="form-check-input"
+                                                                   aria-label="@($"Required: {varName}")"
+                                                                   checked="@v.Required"
+                                                                   @onchange="() => ToggleVariableRequired(idx)" />
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex gap-4px justify-content-center">
+                                                                <button class="ia-btn ia-danger ia-btn-xs"
+                                                                        @onclick="() => RemoveVariable(idx)"
+                                                                        type="button" aria-label="Delete variable" data-tooltip="Delete">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* ── Preview & Test Section (collapsible) ── *@
+                <div class="preview-section">
+                    <button class="preview-toggle" @onclick="TogglePreviewSection" type="button"
+                            aria-expanded="@_showPreviewSection">
+                        <i class="bi @GetPreviewChevronIcon()"></i>
+                        <i class="bi bi-eye"></i>
+                        Preview & Test
+                    </button>
+
+                    @if (_showPreviewSection)
+                    {
+                        <div class="preview-content">
+                            @* Test values *@
+                            @if (_formModel.VariableList.Count > 0)
+                            {
+                                <div class="test-values-section">
+                                    <span class="fs-11 fw-semibold text-sh-soft mb-1 d-block">Test Values</span>
+                                    <div class="test-values-grid">
+                                        @foreach (var v in _formModel.VariableList)
+                                        {
+                                            var testVar = v;
+                                            var val = _testValues.TryGetValue(v.Name, out var existing) ? existing : v.Sample;
+                                            <div class="test-value-item">
+                                                <label class="test-value-label">@v.Name</label>
+                                                <input type="text" class="form-control-dg test-value-input"
+                                                       placeholder="@v.Sample"
+                                                       value="@val"
+                                                       @oninput="(e) => HandleTestValueChange(testVar.Name, e)" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="preview-actions">
+                                <button class="btn btn-dg fs-11 h-30" @onclick="GeneratePreview" type="button">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Generate Sample
+                                </button>
+                                <button class="btn btn-sh-primary btn-dg btn-dark fs-11 h-30" @onclick="SendTestRequest" type="button"
+                                        disabled="@(_isTestLoading || string.IsNullOrEmpty(_formModel.XmlContent))">
+                                    @if (_isTestLoading)
+                                    {
+                                        <span class="spinner-sm me-1"></span>
+                                    }
+                                    <i class="bi bi-send"></i>
+                                    Send Test Request
+                                </button>
+                            </div>
+
+                            @* Rendered XML preview *@
+                            @if (!string.IsNullOrEmpty(_renderedXmlPreview))
+                            {
+                                <div class="preview-xml-box">
+                                    <div class="preview-xml-header">
+                                        <span class="fs-10 fw-semibold text-uppercase ls-05 text-sh-soft">Rendered XML</span>
+                                        <button class="btn btn-link-dg fs-10" @onclick="CopyPreviewToClipboard" type="button">
+                                            <i class="bi bi-clipboard"></i>
+                                            Copy
+                                        </button>
+                                    </div>
+                                    <pre class="preview-xml-content"><code>@_renderedXmlPreview</code></pre>
+                                </div>
+                            }
+
+                            @* Test response *@
+                            @if (!string.IsNullOrEmpty(_testResponse))
+                            {
+                                <div class="response-box">
+                                    <div class="response-box-header">
+                                        <span class="fs-10 fw-semibold text-uppercase ls-05">
+                                            <i class="bi bi-arrow-return-right text-sh-success"></i>
+                                            Response
+                                        </span>
+                                        <span class="response-status-badge">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            200 OK
+                                        </span>
+                                    </div>
+                                    <pre class="response-content"><code>@_testResponse</code></pre>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @* ── Validation Panel (sidebar style) ── *@
+                @if (_showValidationPanel && _validationChecks.Count > 0 && _activeTabIndex != 1)
+                {
+                    <div class="validation-panel-bottom">
+                        <div class="validation-panel-header">
+                            <span class="fw-semibold fs-11 text-uppercase ls-05">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Validation Checks
+                            </span>
+                            <button class="btn btn-link-dg fs-10" @onclick="CloseValidationPanel" type="button">Close</button>
+                        </div>
+                        <div class="validation-checks">
+                            @foreach (var (check, passed) in _validationChecks)
+                            {
+                                <div class="validation-check @GetValidationCheckClass(passed)">
+                                    <i class="bi @GetValidationCheckIcon(passed)"></i>
+                                    <span>@check</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* ── Modal Footer ── *@
+            <div class="modal-footer-dg">
+                <div class="footer-left">
+                    @if (_isEditMode)
+                    {
+                        <span class="last-saved-info">
+                            <i class="bi bi-clock-history me-1"></i>
+                            Last saved: @_allTemplates.FirstOrDefault(t => t.Name == _editOriginalName)?.Updated ?? "—"
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(_savingIndicator))
+                    {
+                        <span class="saving-indicator">
+                            <span class="spinner-sm me-1"></span>
+                            @_savingIndicator
+                        </span>
+                    }
+                </div>
+                <div class="footer-right">
+                    <button class="btn btn-dg" @onclick="CloseModal" type="button">Cancel</button>
+                    @if (_formModel.Status != "Published")
+                    {
+                        <button class="btn btn-outline-secondary btn-dg" @onclick="SaveAsDraft" type="button"
+                                disabled="@(_isSaving)">
+                            <i class="bi bi-cloud-download"></i>
+                            Save Draft
+                        </button>
+                    }
+                    <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="SaveTemplate" type="button"
+                            disabled="@(_isSaving)">
+                        @if (_isSaving)
+                        {
+                            <span class="spinner-sm me-1"></span>
+                        }
+                        <i class="bi bi-check-lg"></i>
+                        @(_formModel.Status == "Published" ? "Publish" : "Save & Publish")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* ── Upload Progress (hidden by default) ── *@
+<div class="upload-progress-bar" style="display:none">
+    <div class="upload-progress-fill" style="width:0%"></div>
+</div>
+
+

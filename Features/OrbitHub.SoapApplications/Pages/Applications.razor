@@ -1,0 +1,504 @@
+@page "/soap/applications"
+@inject SoapAppStore _appStore
+@inject SoapTestCaseStore _testCaseStore
+@inject WsdlSyncStore _wsdlStore
+@inject SoapExecutionStore _executionStore
+
+@* ── Loading Skeleton ── *@
+@if (_isLoading)
+{
+    <div class="datagrid-card" style="padding:0">
+        <div class="skeleton-table">
+            <div class="skeleton-header">
+                <div class="skeleton-cell skeleton-check"></div>
+                <div class="skeleton-cell skeleton-name"></div>
+                <div class="skeleton-cell skeleton-url"></div>
+                <div class="skeleton-cell skeleton-status"></div>
+                <div class="skeleton-cell skeleton-updatedby"></div>
+                <div class="skeleton-cell skeleton-date"></div>
+                <div class="skeleton-cell skeleton-actions"></div>
+            </div>
+            @RenderSkeletonRows
+        </div>
+    </div>
+}
+else if (_hasError)
+{
+    <div class="datagrid-card error-state-card">
+        <i class="bi bi-exclamation-triangle fs-28 text-danger"></i>
+        <p class="error-state-text">@_errorMessage</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="LoadAppsAsync" type="button">
+            <i class="bi bi-arrow-repeat"></i>
+            Retry
+        </button>
+        <button class="btn btn-outline-secondary btn-dg ms-2" @onclick="DismissError" type="button">Dismiss</button>
+    </div>
+}
+else if (_allApps.Length == 0)
+{
+    <div class="datagrid-card empty-state-card">
+        <i class="bi bi-database-empty" style="font-size:36px;color:var(--sh-text-faint)"></i>
+        <h4 class="empty-state-title">No SOAP applications yet</h4>
+        <p class="empty-state-desc">Create your first SOAP application to get started with request files, WSDL sync and executions.</p>
+        <button class="btn btn-sh-primary btn-dg btn-dark mt-2" @onclick="() => { _validationErrors = []; _showAddModal = true; }" type="button" aria-label="Add Application">
+            <i class="bi bi-plus-lg"></i>
+            Add Application
+        </button>
+    </div>
+}
+else
+{
+    @* ── Loading Grid ── *@
+    <ServiceHubGrid TItem="SoapApp"
+                    @ref="_grid"
+                    Id="soapAppsGrid"
+                    Items="FilteredApps"
+                PageSize="5"
+                EnableSelection="true"
+                EnablePagination="true"
+                EnableSearch="true"
+                EnableExpand="true"
+                EnableContextMenu="true"
+                SearchPlaceholder="Search applications..."
+                EmptyText="No applications found matching the current filters."
+                FilterModalTitle="Filter Applications"
+                @bind-SortColumn="_sortColumn"
+                @bind-SortAscending="_sortAscending"
+                @bind-CurrentPage="_currentPage"
+                @bind-SearchText="_searchText"
+                @bind-ShowFilterModal="_showFilterModal"
+                @bind-SelectedIds="_selectedIds"
+                FilterApplied="OnFilterApplied"
+                RowIdSelector="@(app => app.Id)"
+                ContextMenuItemsProvider="@GetAppContextMenuItems"
+                ContextMenuItemClicked="@HandleContextMenuAction"
+                ActionRowClosed="OnActionRowClosed"
+                Columns="@_columns">
+
+    <ToolbarCenter>
+        <button class="filter-btn" @onclick="() => _showFilterModal = true" type="button" aria-label="Filter applications">
+            <i class="bi bi-funnel"></i>
+            Filter
+        </button>
+    </ToolbarCenter>
+
+    <ToolbarRight>
+        <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="() => { _validationErrors = []; _showAddModal = true; }" type="button" aria-label="Add Application">
+            <i class="bi bi-plus-lg"></i>
+            Add Application
+        </button>
+        <div class="position-relative">
+            <button class="btn btn-outline-secondary btn-dg" @onclick="() => _showDropdown = !_showDropdown" type="button">
+                <i class="bi bi-three-dots-vertical"></i>
+                Actions
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            @if (_showDropdown)
+            {
+                <div class="position-fixed" style="inset:0;z-index:50" @onclick="() => _showDropdown = false"></div>
+                <div class="dropdown-menu-dg">
+                    <div class="py-1">
+                        <div class="dropdown-header-dg">Export</div>
+                        <button class="btn dropdown-item-dg" @onclick="ExportToCsvAsync" type="button">
+                            <i class="bi bi-download"></i>
+                            Export to CSV
+                        </button>
+                        <button class="btn dropdown-item-dg" @onclick="ExportToJsonAsync" type="button">
+                            <i class="bi bi-download"></i>
+                            Export to JSON
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <button class="btn dropdown-item-dg dropdown-item-sh-danger" @onclick="DeleteSelectedAsync" type="button">
+                            <i class="bi bi-trash3"></i>
+                            Delete Selected
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <div class="dropdown-header-dg">View</div>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="() => { _showDropdown = false; ResetAdvancedFilters(); }"
+                                type="button">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Reset Filter
+                        </button>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="HandleResetSort"
+                                type="button">
+                            <i class="bi bi-arrow-up-short"></i>
+                            Reset Sort
+                        </button>
+                        <div class="dropdown-divider-dg"></div>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="ExpandSelected"
+                                type="button">
+                            <i class="bi bi-arrows-expand"></i>
+                            Expand Selected
+                        </button>
+                        <button class="btn dropdown-item-dg"
+                                @onclick="CollapseSelected"
+                                type="button">
+                            <i class="bi bi-arrows-collapse"></i>
+                            Collapse Selected
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </ToolbarRight>
+
+    <RowActions Context="app">
+        @{
+            var isEnabled = app.Status == AppStatus.Enabled;
+        }
+        <div class="row-actions-wrap blazor-managed@(_expandedActionRows.Contains(app.Id) ? " is-open" : "")">
+            <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions"
+                    @onclick="() => _expandedActionRows.Add(app.Id)">
+                <i class="bi bi-three-dots" aria-hidden="true"></i>
+            </button>
+            <div class="inline-actions">
+                <button class="ia-btn ia-normal" type="button" aria-label="Edit" data-tooltip="Edit"
+                        @onclick="() => OpenEditDialog(app)">
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                </button>
+                <button class="ia-btn ia-danger" type="button" aria-label="Delete" data-tooltip="Delete">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+                <button class="ia-btn @(isEnabled ? "ia-enable" : "ia-normal")" type="button" aria-label="Toggle" data-tooltip="@(isEnabled ? "Disable" : "Enable")">
+                    @if(isEnabled)
+                    {
+                        <i class="bi bi-toggle-off" aria-hidden="true"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-toggle-on" aria-hidden="true"></i>
+                    }
+                </button>
+                <button class="ia-btn ia-close" type="button" aria-label="Close" data-tooltip="Close" @onclick="() => _expandedActionRows.Remove(app.Id)" >
+                    <i class="bi bi-x-lg fs-11" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </RowActions>
+
+    <DetailRow Context="app">
+        @{
+            var isEnabled = app.Status == AppStatus.Enabled;
+        }
+        <div class="detail-grid">
+            <div>
+                <div class="detail-label">Application ID</div>
+                <div class="detail-value">@app.Id</div>
+            </div>
+            <div>
+                <div class="detail-label">Full URL</div>
+                <div class="detail-value text-break">@app.BaseUrl</div>
+            </div>
+            <div class="grid-col-full">
+                <div class="detail-label">Description</div>
+                <div class="detail-value">@(string.IsNullOrEmpty(app.Description) ? "—" : app.Description)</div>
+            </div>
+            <div>
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                    <span class="status-badge @(isEnabled ? "status-enabled" : "status-disabled")">
+                        @(isEnabled ? "Enabled" : "Disabled")
+                    </span>
+                </div>
+            </div>
+            <div>
+                <div class="detail-label">Last Modified</div>
+                <div class="detail-value">@(app.UpdatedAt?.ToString("yyyy-MM-dd") ?? "—") by @(app.UpdatedBy ?? "—")</div>
+            </div>
+
+            <div class="grid-col-full border-sh-top pt-2 mt-1">
+                <div class="fs-10 fw-semibold text-uppercase ls-06 text-sh-faint mb-2">
+                    <i class="bi bi-shield-lock me-1"></i>Authentication
+                </div>
+            </div>
+            <div>
+                <div class="detail-label">Auth Type</div>
+                <div class="detail-value">
+                    <span class="d-inline-flex align-items-center fs-10 fw-semibold text-sh-accent" style="height:20px;padding:0 7px;background:var(--sh-accent-soft);border:1px solid var(--sh-border)">
+                        @(app.Auth.Type switch
+                        {
+                            AuthType.None => "None",
+                            AuthType.Basic => "Basic",
+                            AuthType.ApiKey => "API Key",
+                            AuthType.Bearer => "Bearer",
+                            AuthType.Ntlm => "NTLM",
+                            _ => app.Auth.Type.ToString()
+                        })
+                    </span>
+                </div>
+            </div>
+            <div>
+                <div class="detail-label">Credentials</div>
+                <div class="detail-value">
+                    @(app.Auth.Type switch
+                    {
+                        AuthType.None => "—",
+                        AuthType.ApiKey => app.Auth.KeyName,
+                        AuthType.Bearer => "Token configured",
+                        _ => string.IsNullOrEmpty(app.Auth.Username) ? "—" : app.Auth.Username
+                    })
+                    @if (app.Auth.Type == AuthType.Ntlm && !string.IsNullOrEmpty(app.Auth.Domain))
+                    {
+                        <span class="text-sh-faint">(@app.Auth.Domain)</span>
+                    }
+                </div>
+            </div>
+
+            <div class="grid-col-full border-sh-top pt-2 mt-1">
+                <div class="fs-10 fw-semibold text-uppercase ls-06 text-sh-faint mb-2">
+                    <i class="bi bi-diagram-3 me-1"></i>SOAP APIs (@app.Apis.Length)
+                </div>
+            </div>
+            @if (app.Apis.Length > 0)
+            {
+                <div style="grid-column:1/-1">
+                    <div class="d-flex flex-column gap-1">
+                        @foreach (var api in app.Apis)
+                        {
+                            <div class="d-flex align-items-center gap-8px bg-sh-surface-2 border-sh" style="padding:5px 10px">
+                                <span class="fw-medium fs-12 text-nowrap" style="color:var(--sh-text)">@api.Name</span>
+                                @if (!string.IsNullOrEmpty(api.Description))
+                                {
+                                    <span class="text-sh-soft fs-11">— @api.Description</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="grid-col-full">
+                    <div class="detail-value text-sh-faint fst-italic">No APIs configured</div>
+                </div>
+            }
+        </div>
+    </DetailRow>
+
+    <FilterModalBody>
+        <div class="form-group">
+            <label class="form-label">App Name</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by name..."
+                   @bind="_filterName" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Base URL</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by URL..."
+                   @bind="_filterUrl" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select class="form-control-dg" @bind="_filterStatus">
+                <option value="">All</option>
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Last Updated By</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by user..."
+                   @bind="_filterUpdatedBy" @bind:event="oninput" />
+        </div>
+        <div class="form-group">
+            <label>Last Updated Date</label>
+            <div class="d-flex gap-8px align-items-center">
+                <input type="date" class="form-control-dg" @bind="_filterUpdatedDateFrom" />
+                <span class="text-sh-faint">to</span>
+                <input type="date" class="form-control-dg" @bind="_filterUpdatedDateTo" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Created Date</label>
+            <div class="d-flex gap-8px align-items-center">
+                <input type="date" class="form-control-dg" @bind="_filterCreatedDateFrom" />
+                <span class="text-sh-faint">to</span>
+                <input type="date" class="form-control-dg" @bind="_filterCreatedDateTo" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Operations</label>
+            <input type="text" class="form-control-dg" placeholder="Filter by operations..."
+                   @bind="_filterOperations" @bind:event="oninput" />
+        </div>
+    </FilterModalBody>
+</ServiceHubGrid>
+}
+
+@if (_showAddModal)
+{
+    <div class="modal-overlay" @onclick="() => { _validationErrors = []; _showAddModal = false; }">
+        <div class="modal-content-dg" @onclick:stopPropagation="true">
+            <div class="modal-header-dg">
+                <h3>@(_editingApp is null ? "Add" : "Edit") SOAP Application</h3>
+                <button class="btn btn-sh-ghost btn-dg btn-icon-sm" type="button" aria-label="Close" @onclick="() => { _validationErrors = []; _showAddModal = false; }">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body-dg">
+                @if (_validationErrors.Count > 0)
+                {
+                    <div class="alert-validation">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Please fix the following:
+                        <ul class="mt-1 mb-0 ps-20">
+                            @foreach (var err in _validationErrors)
+                            {
+                                <li>@err</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="form-group">
+                    <label class="form-label">App Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control-dg" placeholder="Enter application name..."
+                           @bind="_newAppName" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Base URL <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control-dg" placeholder="https://soap.example.com/Service"
+                           @bind="_newAppUrl" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WSDL Path <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control-dg" placeholder="?wsdl"
+                           @bind="_newAppWsdlPath" @bind:event="oninput" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control-dg textarea" placeholder="Describe the SOAP application..."
+                              @bind="_newAppDescription" @bind:event="oninput"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control-dg" @bind="_newAppStatus">
+                        <option value="@AppStatus.Enabled">Enabled</option>
+                        <option value="@AppStatus.Disabled">Disabled</option>
+                    </select>
+                </div>
+
+                <div class="border-sh-top my-1 mb-2"></div>
+                <div class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft mb-2">
+                    Authentication Details <span class="text-danger">*</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Auth Type</label>
+                    <select class="form-control-dg" @bind="_newAuth.Type">
+                        <option value="@AuthType.None">No Authentication</option>
+                        <option value="@AuthType.Basic">Basic Auth</option>
+                        <option value="@AuthType.ApiKey">API Key</option>
+                        <option value="@AuthType.Bearer">Bearer Token</option>
+                        <option value="@AuthType.Ntlm">NTLM</option>
+                    </select>
+                </div>
+
+                @if (_newAuth.Type == AuthType.Basic)
+                {
+                    <div class="form-group">
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control-dg" placeholder="Authentication username..."
+                               @bind="_newAuth.Username" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control-dg" placeholder="Authentication password..."
+                               @bind="_newAuth.Password" @bind:event="oninput" />
+                    </div>
+                }
+                else if (_newAuth.Type == AuthType.ApiKey)
+                {
+                    <div class="form-group">
+                        <label class="form-label">Key Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control-dg" placeholder="e.g. X-API-Key"
+                               @bind="_newAuth.KeyName" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Key Value <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control-dg" placeholder="API key value..."
+                               @bind="_newAuth.KeyValue" @bind:event="oninput" />
+                    </div>
+                }
+                else if (_newAuth.Type == AuthType.Bearer)
+                {
+                    <div class="form-group">
+                        <label class="form-label">Token <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control-dg" placeholder="Bearer token..."
+                               @bind="_newAuth.Token" @bind:event="oninput" />
+                    </div>
+                }
+                else if (_newAuth.Type == AuthType.Ntlm)
+                {
+                    <div class="form-group">
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control-dg" placeholder="DOMAIN\\Username"
+                               @bind="_newAuth.Username" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control-dg" placeholder="NTLM password..."
+                               @bind="_newAuth.Password" @bind:event="oninput" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Domain <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control-dg" placeholder="NTLM domain..."
+                               @bind="_newAuth.Domain" @bind:event="oninput" />
+                    </div>
+                }
+
+                <div class="border-sh-top my-1 mb-2"></div>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="fs-11 fw-semibold text-uppercase ls-05 text-sh-soft">
+                        SOAP APIs <span class="text-danger">*</span>
+                    </span>
+                    <button class="btn btn-dg fs-11 h-30" @onclick="AddApiEntry" type="button">
+                        <i class="bi bi-plus-lg"></i>
+                        Add API
+                    </button>
+                </div>
+                @for (var i = 0; i < _newApis.Count; i++)
+                {
+                    var idx = i;
+                    <div class="d-flex gap-8px align-items-start mb-2">
+                        <div class="d-flex flex-column flex-fill" style="gap:6px">
+                            <input type="text" class="form-control-dg" placeholder="API name..."
+                                   @bind="_newApis[idx].Name" @bind:event="oninput" />
+                            <input type="text" class="form-control-dg" placeholder="API description..."
+                                   @bind="_newApis[idx].Description" @bind:event="oninput" />
+                        </div>
+                        <button class="btn btn-dg btn-sh-ghost btn-remove-file"
+                                @onclick="() => RemoveApiEntry(idx)" type="button" aria-label="Remove API">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                }
+                @if (_newApis.Count == 0)
+                {
+                    <div class="fs-12 text-sh-faint py-1">
+                        No APIs added yet. Click "Add API" to define SOAP endpoints.
+                    </div>
+                }
+            </div>
+            <div class="modal-footer-dg">
+                <button class="btn btn-dg" @onclick="() => { _validationErrors = []; _showAddModal = false; }" type="button">Cancel</button>
+                <button class="btn btn-sh-primary btn-dg btn-dark" @onclick="HandleAddApplication" type="button">
+                    <i class="bi @(_editingApp is null ? "bi-plus-lg" : "bi-check-lg")"></i>
+                    @(_editingApp is null ? "Add" : "Save Changes") Application
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@* ── Transient feedback toast ── *@
+@if (_toastMessage is not null)
+{
+    <div class="sh-toast @(_toastType == "danger" ? "sh-toast-danger" : "sh-toast-success")"
+         @onclick="DismissToast"
+         role="status"
+         aria-live="polite">
+        <i class="bi @(_toastType == "danger" ? "bi-exclamation-circle" : "bi-check-circle")"></i>
+        <span>@_toastMessage</span>
+    </div>
+}

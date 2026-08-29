@@ -1,0 +1,28 @@
+@namespace OrbitHub.Ui.Components
+
+<div class="datepicker-popup daterange-popup" @onclick:stopPropagation="true">
+    <div class="daterange-presets">
+        @foreach (var preset in Presets)
+        {
+            <button type="button"
+                    class="seg-btn @(IsPresetActive(preset) ? "active" : "")"
+                    @onclick="() => ApplyPreset(preset)">
+                @preset.Label
+            </button>
+        }
+    </div>
+    <div class="daterange-fields">
+        <div>
+            <label>Start</label>
+            <input type="date" class="datepicker-input" @bind="_startValue" />
+        </div>
+        <div>
+            <label>End</label>
+            <input type="date" class="datepicker-input" @bind="_endValue" />
+        </div>
+    </div>
+    <div class="daterange-actions">
+        <button type="button" class="btn-date-apply" @onclick="Apply">Apply</button>
+        <button type="button" class="btn-date-clear" @onclick="Clear">Clear</button>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+{
+  "scaffoldFormat": {
+    "splitColumnAttributes": true,
+    "fileScopedNamespaces": true,
+    "squeezeAlignmentPadding": true,
+    "blankLineBetweenMembers": true,
+    "searchPattern": "*.cs",
+    "recurseSubdirectories": true
+  },
+  "descriptionInterceptors": {
+    "enabled": true,
+    "connectionString": ""
+  }
+}

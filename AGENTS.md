@@ -19,5 +19,5 @@ This repository keeps agent guidance intentionally lightweight. The detailed bus
 
 - Read the relevant numbered spec before updating a feature.
 - Keep changes narrow and aligned to the active feature being requested.
-- Respect the current solution structure in `Features/`, `Components/`, and `WebApp/ServiceHubEnterprise.Web/`.
+- Respect the current solution structure in `Features/`, `Components/`, and `WebApp/OrbitHub.Web/`.
 - Avoid out-of-scope refactors or broad edits unless the user explicitly asks for them.

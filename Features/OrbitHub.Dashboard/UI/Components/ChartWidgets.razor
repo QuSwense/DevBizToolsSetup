@@ -1,0 +1,46 @@
+@namespace OrbitHub.Dashboard.UI.Components
+
+<div class="chart-widgets">
+    @foreach (var widget in Widgets)
+    {
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="chart-title">@widget.Title</span>
+            </div>
+            <div class="chart-body">
+                @if (widget.Type == "bar")
+                {
+                    <div class="bar-chart">
+                        @foreach (var (label, value, color) in widget.DataPoints)
+                        {
+                            <div class="bar-item">
+                                <span class="bar-label">@label</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill"
+                                         style="width: @(NormalizeValue(value, widget.DataPoints))%; background: @color">
+                                    </div>
+                                </div>
+                                <span class="bar-value">@value</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (widget.Type == "status")
+                {
+                    <div class="status-list">
+                        @foreach (var (label, value, color) in widget.DataPoints)
+                        {
+                            <div class="status-item">
+                                <span class="status-dot" style="background:@color"></span>
+                                <span class="status-label">@label</span>
+                                <span class="status-count">@value</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+

@@ -2,13 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch ServiceHubEnterprise.Web",
+      "name": "Launch OrbitHub.Web",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-webapp",
-      "program": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/bin/Debug/net10.0/ServiceHubEnterprise.Web.dll",
+      "program": "${workspaceFolder}/WebApp/OrbitHub.Web/bin/Debug/net10.0/OrbitHub.Web.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/WebApp/ServiceHubEnterprise.Web",
+      "cwd": "${workspaceFolder}/WebApp/OrbitHub.Web",
       "stopAtEntry": false,
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"

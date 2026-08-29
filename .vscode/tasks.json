@@ -7,7 +7,7 @@
 			"command": "dotnet",
 			"args": [
 				"build",
-				"${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
+				"${workspaceFolder}/WebApp/OrbitHub.Web/OrbitHub.Web.csproj"
 			],
 			"group": "build",
 			"problemMatcher": "$msCompile"
@@ -19,7 +19,7 @@
 			"args": [
 				"run",
 				"--project",
-				"${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
+				"${workspaceFolder}/WebApp/OrbitHub.Web/OrbitHub.Web.csproj"
 			],
 			"group": {
 				"kind": "build",
@@ -36,7 +36,7 @@
 				"watch",
 				"run",
 				"--project",
-				"${workspaceFolder}/WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj"
+				"${workspaceFolder}/WebApp/OrbitHub.Web/OrbitHub.Web.csproj"
 			],
 			"group": {
 				"kind": "build",
@@ -55,7 +55,7 @@
 			"command": "dotnet",
 			"args": [
 				"test",
-				"${workspaceFolder}/tests/ServiceHubEnterprise.Tests/ServiceHubEnterprise.Tests.csproj"
+				"${workspaceFolder}/tests/OrbitHub.Tests/OrbitHub.Tests.csproj"
 			],
 			"group": "test",
 			"problemMatcher": []
@@ -66,7 +66,7 @@
 			"command": "dotnet",
 			"args": [
 				"test",
-				"${workspaceFolder}/tests/ServiceHubEnterprise.Tests/ServiceHubEnterprise.Tests.csproj",
+				"${workspaceFolder}/tests/OrbitHub.Tests/OrbitHub.Tests.csproj",
 				"--collect:XPlat Code Coverage",
 				"--results-directory",
 				"${workspaceFolder}/coverage"
@@ -77,31 +77,31 @@
 		{
 			"label": "build-dashboard",
 			"type": "shell",
-			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
+			"command": "dotnet build Features/OrbitHub.Dashboard/OrbitHub.Dashboard.csproj",
 			"group": "build"
 		},
 		{
 			"label": "build-webapp-full",
 			"type": "shell",
-			"command": "dotnet build WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj",
+			"command": "dotnet build WebApp/OrbitHub.Web/OrbitHub.Web.csproj",
 			"group": "build"
 		},
 		{
 			"label": "build-dashboard-final",
 			"type": "shell",
-			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
+			"command": "dotnet build Features/OrbitHub.Dashboard/OrbitHub.Dashboard.csproj",
 			"group": "build"
 		},
 		{
 			"label": "build-solution-final",
 			"type": "shell",
-			"command": "dotnet build WebApp/ServiceHubEnterprise.Web/ServiceHubEnterprise.Web.csproj",
+			"command": "dotnet build WebApp/OrbitHub.Web/OrbitHub.Web.csproj",
 			"group": "build"
 		},
 		{
 			"label": "build-dashboard",
 			"type": "shell",
-			"command": "dotnet build Features/ServiceHubEnterprise.Dashboard/ServiceHubEnterprise.Dashboard.csproj",
+			"command": "dotnet build Features/OrbitHub.Dashboard/OrbitHub.Dashboard.csproj",
 			"group": "build"
 		},
 		{

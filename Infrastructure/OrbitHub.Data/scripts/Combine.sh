@@ -1,0 +1,1 @@
+./Rule.sh && ./Test.sh && ./User.sh && ./Core.sh

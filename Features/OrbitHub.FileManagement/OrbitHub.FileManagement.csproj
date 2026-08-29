@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\OrbitHub.Data\OrbitHub.Data.csproj" />
+    <ProjectReference Include="..\..\Components\OrbitHub.Common\OrbitHub.Common.csproj" />
+    <ProjectReference Include="..\..\Components\OrbitHub.Grid\OrbitHub.Grid.csproj" />
+    <ProjectReference Include="..\..\Components\OrbitHub.Ui\OrbitHub.Ui.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.SoapApplications\OrbitHub.SoapApplications.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.RestApplications\OrbitHub.RestApplications.csproj" />
+  </ItemGroup>
+
+</Project>

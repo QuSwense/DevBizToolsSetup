@@ -20,5 +20,5 @@ The Test Suite feature provides the execution and validation model for API testi
 
 ## Current implementation anchors
 
-- `Features/ServiceHubEnterprise.TestSuite/Pages/`
-- `Features/ServiceHubEnterprise.TestSuite/DependencyInjection.cs`
+- `Features/OrbitHub.TestSuite/Pages/`
+- `Features/OrbitHub.TestSuite/DependencyInjection.cs`

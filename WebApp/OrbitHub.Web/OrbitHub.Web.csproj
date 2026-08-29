@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\OrbitHub.Data\OrbitHub.Data.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.Dashboard\OrbitHub.Dashboard.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.RestApplications\OrbitHub.RestApplications.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.SoapApplications\OrbitHub.SoapApplications.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.FileManagement\OrbitHub.FileManagement.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.TestSuite\OrbitHub.TestSuite.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.MonitoringHealth\OrbitHub.MonitoringHealth.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.ADViewer\OrbitHub.ADViewer.csproj" />
+    <ProjectReference Include="..\..\Features\OrbitHub.Settings\OrbitHub.Settings.csproj" />
+    <ProjectReference Include="..\..\Components\OrbitHub.Grid\OrbitHub.Grid.csproj" />
+    <ProjectReference Include="..\..\Components\OrbitHub.Ui\OrbitHub.Ui.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

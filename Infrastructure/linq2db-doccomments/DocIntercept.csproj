@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    DocIntercept = linq2db.cli scaffold customizer + post-scaffold formatter.
+
+    1. Interceptor (passed via the scaffold "customize" flag pointing at
+       "<path>/DocIntercept.dll"):
+       Injects MS_Description extended properties as <summary> doc comments into
+       generated entities. linq2db.Scaffold version MUST match the installed
+       linq2db.cli tool version: the customize loader requires an interceptor
+       built against the same Scaffold version (currently 6.4.0).
+
+    2. Formatter CLI (run via  dotnet "<path>/DocIntercept.dll" format <dir>):
+       Post-processes scaffold output - the role format-entities.py used to
+       fill: splits "[Column(...)] public ..." one-liners, squeezes alignment
+       padding, converts to file-scoped namespaces and adds blank lines between
+       class members. Each rule is a toggle in ScaffoldFormatOptions and is
+       configured from DocIntercept.settings.json (copied next to the DLL) with
+       per-invocation CLI overrides.
+
+    Microsoft.Data.SqlClient reads sys.extended_properties; its dependencies
+    (incl. System.Configuration.ConfigurationManager) come transitively.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>DocIntercept</AssemblyName>
+    <RootNamespace>DocIntercept</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="linq2db" Version="6.4.0" />
+    <PackageReference Include="linq2db.Scaffold" Version="6.4.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DocIntercept.settings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
