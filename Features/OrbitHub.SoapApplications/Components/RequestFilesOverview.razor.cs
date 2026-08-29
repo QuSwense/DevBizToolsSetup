@@ -37,11 +37,10 @@ public partial class RequestFilesOverview
     /// </summary>
     public record PerAppRow(string AppName, int Active, int Total, int ActivePct);
 
-    private IReadOnlyList<string> AppNames => Files
+    private IReadOnlyList<string> AppNames => [.. Files
         .Select(f => f.AppName)
         .Distinct(StringComparer.OrdinalIgnoreCase)
-        .OrderBy(n => n)
-        .ToList();
+        .OrderBy(n => n)];
 
     private int ActiveCount => Files.Count(f => f.Status.Equals("active", StringComparison.OrdinalIgnoreCase));
     private int InactiveCount => Files.Count - ActiveCount;
@@ -51,15 +50,14 @@ public partial class RequestFilesOverview
         get
         {
             var inRange = InRangeFiles(Files).ToList();
-            return AppNames
+            return [.. AppNames
                 .Select(app =>
                 {
                     var rows = inRange.Where(f => f.AppName.Equals(app, StringComparison.OrdinalIgnoreCase)).ToList();
                     var active = rows.Count(f => f.Status.Equals("active", StringComparison.OrdinalIgnoreCase));
                     return new PerAppRow(app, active, rows.Count, rows.Count > 0 ? active * 100 / rows.Count : 0);
                 })
-                .Where(r => r.Total > 0)
-                .ToList();
+                .Where(r => r.Total > 0)];
         }
     }
 

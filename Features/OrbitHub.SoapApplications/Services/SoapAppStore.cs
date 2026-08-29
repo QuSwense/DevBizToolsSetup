@@ -14,15 +14,10 @@ namespace OrbitHub.SoapApplications.Services;
 /// shared between Applications.razor and RequestFiles.razor.
 /// Loaded from the MSSQL database via SoapDbContext.
 /// </summary>
-public class SoapAppStore
+public class SoapAppStore(IServiceProvider serviceProvider)
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private SoapApp[]? _cached;
-
-    public SoapAppStore(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     /// <summary>Retrieves all SOAP applications, loading from DB on first access.</summary>
     public SoapApp[] Apps
@@ -36,7 +31,7 @@ public class SoapAppStore
             var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
             var apps = db.SoapApps.ToList();
             var apisByApp = db.SoapApis.ToList().ToLookup(a => a.AppId);
-            _cached = apps.Select(a => MapToModel(a, apisByApp[a.Id])).ToArray();
+            _cached = [.. apps.Select(a => MapToModel(a, apisByApp[a.Id]))];
             return _cached;
         }
     }
@@ -70,7 +65,7 @@ public class SoapAppStore
             entity.UpdatedBy,
             entity.UpdatedAt is not null && DateTime.TryParse(entity.UpdatedAt, out var ua) ? ua : null,
             MapAuthConfig(entity),
-            apis.Select(a => new SoapApiEntry { Name = a.Name, Description = a.Description ?? "" }).ToArray()
+            [.. apis.Select(a => new SoapApiEntry { Name = a.Name, Description = a.Description ?? "" })]
         );
     }
 
@@ -104,18 +99,13 @@ public class SoapAppStore
 /// Loaded from the MSSQL database via WsdlDbContext on first access.
 /// In-memory caching with database persistence.
 /// </summary>
-public class WsdlSyncStore
+public class WsdlSyncStore(IServiceProvider serviceProvider)
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private List<WsdlSyncRecord>? _records;
     private List<WsdlVersionEntry>? _versions;
     private List<WsdlTemplate>? _templates;
     private List<WsdlSyncHistoryPoint>? _syncHistory;
-
-    public WsdlSyncStore(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     /// <summary>All WSDL sync records, lazy-loaded from DB.</summary>
     public List<WsdlSyncRecord> Records
@@ -162,7 +152,7 @@ public class WsdlSyncStore
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<WsdlDbContext>();
 
-        _records = db.WsdlRecords.Select(r => new WsdlSyncRecord
+        _records = [.. db.WsdlRecords.Select(r => new WsdlSyncRecord
         {
             Id = r.Id,
             AppId = r.AppId,
@@ -173,9 +163,9 @@ public class WsdlSyncStore
             UploadedAt = r.UploadedAt,
             Status = r.Status,
             WsdlContentKey = r.WsdlContentKey ?? "",
-        }).ToList();
+        })];
 
-        _versions = db.WsdlVersions.Select(v => new WsdlVersionEntry
+        _versions = [.. db.WsdlVersions.Select(v => new WsdlVersionEntry
         {
             Id = v.Id,
             SyncRecordId = v.SyncRecordId,
@@ -185,9 +175,9 @@ public class WsdlSyncStore
             UploadedAt = v.UploadedAt,
             Status = v.Status,
             Notes = v.Notes ?? ""
-        }).ToList();
+        })];
 
-        _templates = db.WsdlTemplates.ToList()
+        _templates = [.. db.WsdlTemplates.ToList()
             .Select(t => new WsdlTemplate
             {
                 Id = t.Id,
@@ -201,19 +191,19 @@ public class WsdlSyncStore
                 CreatedBy = t.CreatedBy,
                 CreatedAt = t.CreatedAt,
                 UpdatedAt = t.UpdatedAt
-            }).ToList();
+            })];
 
-        _syncHistory = db.WsdlSyncHistory.ToList()
+        _syncHistory = [.. db.WsdlSyncHistory.ToList()
             .Select(h => new WsdlSyncHistoryPoint
-        {
-            Id = h.Id,
-            AppId = h.AppId,
-            AppName = h.AppName,
-            SyncRecordId = h.SyncRecordId,
-            Date = h.Date,
-            Status = h.Status,
-            Details = h.Details ?? ""
-        }).ToList();
+            {
+                Id = h.Id,
+                AppId = h.AppId,
+                AppName = h.AppName,
+                SyncRecordId = h.SyncRecordId,
+                Date = h.Date,
+                Status = h.Status,
+                Details = h.Details ?? ""
+            })];
     }
 
     /// <summary>Persists all in-memory changes back to the database.</summary>
@@ -307,12 +297,12 @@ public class WsdlSyncStore
     // ── Convenience methods for backward compatibility ──
 
     public WsdlSyncRecord[] GetRecordsForApp(string appId) =>
-        Records.Where(r => r.AppId == appId).OrderByDescending(r => r.UploadedAt).ToArray();
+        [.. Records.Where(r => r.AppId == appId).OrderByDescending(r => r.UploadedAt)];
 
     public WsdlVersionEntry[] GetVersionsForSync(string syncId) =>
-        Versions.Where(v => v.SyncRecordId == syncId).OrderByDescending(v => v.VersionNumber).ToArray();
+        [.. Versions.Where(v => v.SyncRecordId == syncId).OrderByDescending(v => v.VersionNumber)];
 
-    public WsdlTemplate[] GetTemplates() => Templates.OrderBy(t => t.Name).ToArray();
+    public WsdlTemplate[] GetTemplates() => [.. Templates.OrderBy(t => t.Name)];
 
     public WsdlTemplate? GetTemplate(string id) => Templates.FirstOrDefault(t => t.Id == id);
 
@@ -348,7 +338,7 @@ public class WsdlSyncStore
                 ? null
                 : GetTemplate(current.ExtendsTemplateId);
         }
-        return allVars.ToArray();
+        return [.. allVars];
     }
 
     public static string[] ParseWsdlVariables(string wsdlContent)
@@ -380,7 +370,7 @@ public class WsdlSyncStore
                 AddVariablesFromText(content, vars);
         }
 
-        return vars.OrderBy(v => v).ToArray();
+        return [.. vars.OrderBy(v => v)];
     }
 
     private static void AddVariablesFromText(string text, HashSet<string> vars)
@@ -428,7 +418,7 @@ public class WsdlSyncStore
     }
 
     public WsdlSyncHistoryPoint[] GetSyncHistoryForApp(string appId) =>
-        SyncHistory.Where(h => h.AppId == appId).OrderByDescending(h => h.Date).ToArray();
+        [.. SyncHistory.Where(h => h.AppId == appId).OrderByDescending(h => h.Date)];
 
     public async Task<string?> GetVersionContentAsync(string versionId)
     {

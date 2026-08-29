@@ -262,7 +262,7 @@ public partial class FileLibrary
                 };
             }
 
-            return query.ToArray();
+            return [.. query];
         }
     }
 

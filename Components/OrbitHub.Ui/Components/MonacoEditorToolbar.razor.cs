@@ -136,13 +136,13 @@ public partial class MonacoEditorToolbar
 
     private static List<MenuGroup> DefaultActionMenuGroups()
     {
-        return new List<MenuGroup>
-        {
+        return
+        [
             new()
             {
                 Title = "File Operations",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "new", Label = "New", Icon = "bi bi-file-earmark", Shortcut = "Ctrl+N" },
                     new() { Id = "open", Label = "Open", Icon = "bi bi-folder-open", Shortcut = "Ctrl+O" },
                     new() { Id = "recent", Label = "Recent Files", Icon = "bi bi-clock-history" },
@@ -153,13 +153,13 @@ public partial class MonacoEditorToolbar
                     new() { Id = "print", Label = "Print", Icon = "bi bi-printer", Shortcut = "Ctrl+P" },
                     new() { Id = "sep2", Label = "", IsSeparator = true },
                     new() { Id = "close", Label = "Close", Icon = "bi bi-x", Shortcut = "Ctrl+W" }
-                }
+                ]
             },
             new()
             {
                 Title = "Edit Operations",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "undo", Label = "Undo", Icon = "bi bi-arrow-counterclockwise", Shortcut = "Ctrl+Z" },
                     new() { Id = "redo", Label = "Redo", Icon = "bi bi-arrow-clockwise", Shortcut = "Ctrl+Y" },
                     new() { Id = "sep3", Label = "", IsSeparator = true },
@@ -172,13 +172,13 @@ public partial class MonacoEditorToolbar
                     new() { Id = "delete-line", Label = "Delete Line", Icon = "bi bi-trash", Shortcut = "Ctrl+Shift+K" },
                     new() { Id = "move-line-up", Label = "Move Line Up", Icon = "bi bi-arrow-up-short", Shortcut = "Alt+Up" },
                     new() { Id = "move-line-down", Label = "Move Line Down", Icon = "bi bi-arrow-down-short", Shortcut = "Alt+Down" }
-                }
+                ]
             },
             new()
             {
                 Title = "Find & Replace",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "find", Label = "Find", Icon = "bi bi-search", Shortcut = "Ctrl+F" },
                     new() { Id = "find-next", Label = "Find Next", Icon = "bi bi-arrow-down", Shortcut = "F3" },
                     new() { Id = "find-prev", Label = "Find Previous", Icon = "bi bi-arrow-up", Shortcut = "Shift+F3" },
@@ -187,13 +187,13 @@ public partial class MonacoEditorToolbar
                     new() { Id = "sep5", Label = "", IsSeparator = true },
                     new() { Id = "go-to-line", Label = "Go to Line", Icon = "bi bi-sign-turn-right", Shortcut = "Ctrl+G" },
                     new() { Id = "go-to-symbol", Label = "Go to Symbol", Icon = "bi bi-signpost-2", Shortcut = "Ctrl+Shift+O" }
-                }
+                ]
             },
             new()
             {
                 Title = "View & Appearance",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "toggle-minimap", Label = "Toggle Minimap", Icon = "bi bi-map" },
                     new() { Id = "toggle-breadcrumbs", Label = "Toggle Breadcrumbs", Icon = "bi bi-signpost" },
                     new() { Id = "toggle-word-wrap", Label = "Toggle Word Wrap", Icon = "bi bi-text-wrap", Shortcut = "Alt+Z" },
@@ -201,13 +201,13 @@ public partial class MonacoEditorToolbar
                     new() { Id = "theme-dark", Label = "Dark Theme", Icon = "bi bi-moon" },
                     new() { Id = "theme-light", Label = "Light Theme", Icon = "bi bi-sun" },
                     new() { Id = "theme-high-contrast", Label = "High Contrast", Icon = "bi bi-eye" }
-                }
+                ]
             },
             new()
             {
                 Title = "XML Tools",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "xml-validate", Label = "Validate XML", Icon = "bi bi-check-circle" },
                     new() { Id = "xml-format", Label = "Format XML", Icon = "bi bi-file-indent" },
                     new() { Id = "xml-minify", Label = "Minify XML", Icon = "bi bi-compress" },
@@ -217,13 +217,13 @@ public partial class MonacoEditorToolbar
                     new() { Id = "xml-to-json", Label = "Convert to JSON", Icon = "bi bi-arrow-left-right" },
                     new() { Id = "json-to-xml", Label = "Convert from JSON", Icon = "bi bi-arrow-left-right" },
                     new() { Id = "xml-generate-xsd", Label = "Generate XSD", Icon = "bi bi-file-earmark-code" }
-                }
+                ]
             },
             new()
             {
                 Title = "Encoding & Line Endings",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "encoding-utf8", Label = "UTF-8", Icon = "bi bi-check-lg" },
                     new() { Id = "encoding-utf8-bom", Label = "UTF-8 BOM" },
                     new() { Id = "encoding-utf16", Label = "UTF-16" },
@@ -232,30 +232,30 @@ public partial class MonacoEditorToolbar
                     new() { Id = "line-lf", Label = "Unix (LF)", Icon = "bi bi-check-lg" },
                     new() { Id = "line-crlf", Label = "Windows (CRLF)" },
                     new() { Id = "line-cr", Label = "Mac (CR)" }
-                }
+                ]
             },
             new()
             {
                 Title = "Tools & Utilities",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "compare", Label = "Compare File", Icon = "bi bi-file-diff" },
                     new() { Id = "statistics", Label = "File Statistics", Icon = "bi bi-bar-chart" },
                     new() { Id = "validate", Label = "Validation", Icon = "bi bi-shield-check" }
-                }
+                ]
             },
             new()
             {
                 Title = "Help & Settings",
-                Items = new List<MenuItem>
-                {
+                Items =
+                [
                     new() { Id = "shortcuts", Label = "Keyboard Shortcuts", Icon = "bi bi-keyboard", Shortcut = "Ctrl+K Ctrl+S" },
                     new() { Id = "settings", Label = "Settings", Icon = "bi bi-gear" },
                     new() { Id = "reset", Label = "Reset Editor", Icon = "bi bi-arrow-counterclockwise" },
                     new() { Id = "sep9", Label = "", IsSeparator = true },
                     new() { Id = "about", Label = "About", Icon = "bi bi-info-circle" }
-                }
+                ]
             }
-        };
+        ];
     }
 }

@@ -209,7 +209,7 @@ public partial class Applications : IDisposable
             if (!string.IsNullOrWhiteSpace(_filterStatus) && Enum.TryParse<AppStatus>(_filterStatus, true, out var statusFilter))
                 query = query.Where(a => a.Status == statusFilter);
             if (!string.IsNullOrWhiteSpace(_filterUpdatedBy))
-                query = query.Where(a => a.UpdatedBy != null && 
+                query = query.Where(a => a.UpdatedBy != null &&
                              a.UpdatedBy.Contains(_filterUpdatedBy, StringComparison.CurrentCultureIgnoreCase));
             if (_filterUpdatedDateFrom.HasValue)
                 query = query.Where(a => a.UpdatedAt.HasValue && a.UpdatedAt.Value >= _filterUpdatedDateFrom.Value);
@@ -236,7 +236,7 @@ public partial class Applications : IDisposable
                 };
             }
 
-            return query.ToArray();
+            return [.. query];
         }
     }
 
@@ -263,7 +263,7 @@ public partial class Applications : IDisposable
             Token = app.Auth.Token,
             Domain = app.Auth.Domain
         };
-        _newApis = [..app.Apis];
+        _newApis = [.. app.Apis];
         _expandedActionRows.Remove(app.Id);
         _validationErrors = [];
         _showAddModal = true;
@@ -343,9 +343,9 @@ public partial class Applications : IDisposable
                 _editingApp.UpdatedBy,
                 _editingApp.UpdatedAt,
                 BuildAuthConfig(),
-                [.._newApis]
+                [.. _newApis]
             );
-            _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != _editingApp.Id), updatedApp]);
+            _appStore.UpdateApps([.. _appStore.Apps.Where(a => a.Id != _editingApp.Id), updatedApp]);
         }
         else
         {
@@ -362,9 +362,9 @@ public partial class Applications : IDisposable
                 null,
                 null,
                 BuildAuthConfig(),
-                [.._newApis]
+                [.. _newApis]
             );
-            _appStore.UpdateApps([.._appStore.Apps, newApp]);
+            _appStore.UpdateApps([.. _appStore.Apps, newApp]);
         }
 
         _showAddModal = false;
@@ -501,7 +501,7 @@ public partial class Applications : IDisposable
             UpdatedBy = CurrentUser,
             UpdatedAt = DateTime.Now
         };
-        _appStore.UpdateApps([.._appStore.Apps.Select(a => a.Id == app.Id ? updated : a)]);
+        _appStore.UpdateApps([.. _appStore.Apps.Select(a => a.Id == app.Id ? updated : a)]);
         _allApps = _appStore.Apps;
         ShowToast(newStatus == AppStatus.Enabled ? "Application enabled" : "Application disabled");
     }
@@ -521,7 +521,7 @@ public partial class Applications : IDisposable
         if (!confirmed) return;
 
         await CascadeDeleteAppAsync(app);
-        _appStore.UpdateApps([.._appStore.Apps.Where(a => a.Id != app.Id)]);
+        _appStore.UpdateApps([.. _appStore.Apps.Where(a => a.Id != app.Id)]);
         _allApps = _appStore.Apps;
         _expandedActionRows.Remove(app.Id);
         if (_editingApp?.Id == app.Id)
@@ -681,7 +681,7 @@ public partial class Applications : IDisposable
             await CascadeDeleteAppAsync(app);
         }
 
-        _appStore.UpdateApps([.._appStore.Apps.Where(a => !_selectedIds.Contains(a.Id))]);
+        _appStore.UpdateApps([.. _appStore.Apps.Where(a => !_selectedIds.Contains(a.Id))]);
         _allApps = _appStore.Apps;
 
         _expandedActionRows.RemoveWhere(_selectedIds.Contains);
@@ -763,4 +763,5 @@ public partial class Applications : IDisposable
         _toastCts?.Cancel();
         _toastCts?.Dispose();
         GC.SuppressFinalize(this);
-    }}
+    }
+}

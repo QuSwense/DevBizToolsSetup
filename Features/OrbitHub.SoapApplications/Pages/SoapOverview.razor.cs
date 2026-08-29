@@ -28,7 +28,7 @@ public partial class SoapOverview
 
     // Per-card expand/collapse state, persisted to localStorage via JS interop.
     // Cards default to collapsed (compact summary) so the page stays short.
-    private readonly Dictionary<string, bool> _cardCollapsed = new();
+    private readonly Dictionary<string, bool> _cardCollapsed = [];
     private IJSObjectReference? _collapseModule;
 
     /// <inheritdoc />
@@ -39,10 +39,10 @@ public partial class SoapOverview
         {
             // Singleton stores are populated at construction; request files load async.
             Apps = AppStore.Apps;
-            Records = WsdlStore.Records.ToArray();
-            Versions = WsdlStore.Versions.ToArray();
-            SyncHistory = WsdlStore.SyncHistory.ToArray();
-            Templates = WsdlStore.Templates.ToArray();
+            Records = [.. WsdlStore.Records];
+            Versions = [.. WsdlStore.Versions];
+            SyncHistory = [.. WsdlStore.SyncHistory];
+            Templates = [.. WsdlStore.Templates];
             Executions = ExecutionStore.SoapExecutions;
 
             // Request files are not yet backed by a database table — previously loaded

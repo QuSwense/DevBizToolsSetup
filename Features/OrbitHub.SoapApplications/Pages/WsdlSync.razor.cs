@@ -457,7 +457,7 @@ public partial class WsdlSync
     {
         if (string.IsNullOrWhiteSpace(content)) return [];
         var matches = System.Text.RegularExpressions.Regex.Matches(content, @"\{\{(\w+)\}\}");
-        return matches.Select(m => m.Groups[1].Value).Distinct().OrderBy(v => v).ToArray();
+        return [.. matches.Select(m => m.Groups[1].Value).Distinct().OrderBy(v => v)];
     }
 
     /// <summary>

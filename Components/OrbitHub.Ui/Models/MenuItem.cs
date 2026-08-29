@@ -49,5 +49,5 @@ public class MenuGroup
     /// <summary>
     /// Items in this group.
     /// </summary>
-    public List<MenuItem> Items { get; set; } = new();
+    public List<MenuItem> Items { get; set; } = [];
 }

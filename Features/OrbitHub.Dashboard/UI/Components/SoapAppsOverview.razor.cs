@@ -68,7 +68,7 @@ public partial class SoapAppsOverview
     public record SoapAppRow(string Name, bool Enabled, string WsdlStatus, string LastSync, int FilesActive, int FilesTotal, int Executions, int Success, int SuccessPct);
 
     private IReadOnlyList<SoapAppRow> Rows =>
-        Apps.Select(a =>
+        [.. Apps.Select(a =>
         {
             var records = WsdlRecords.Where(w => w.AppName.Equals(a.Name, StringComparison.OrdinalIgnoreCase)).ToList();
             var files = RequestFiles.Where(f => f.AppName.Equals(a.Name, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -96,7 +96,7 @@ public partial class SoapAppsOverview
                 execs.Count,
                 success,
                 execs.Count > 0 ? success * 100 / execs.Count : 0);
-        }).ToList();
+        })];
 
     private string WsdlBadgeClass(string status) => status switch
     {

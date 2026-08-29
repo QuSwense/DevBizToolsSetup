@@ -42,11 +42,10 @@ public partial class RequestFilesByApp
         {
             var filtered = Files.Where(f => MatchesStatus(f) && MatchesUser(f)).ToList();
 
-            return filtered
+            return [.. filtered
                 .GroupBy(f => f.AppName)
                 .OrderByDescending(g => g.Count())
-                .Select((g, i) => new AppFileCount(g.Key, g.Count(), Palette[i % Palette.Length]))
-                .ToList();
+                .Select((g, i) => new AppFileCount(g.Key, g.Count(), Palette[i % Palette.Length]))];
         }
     }
 

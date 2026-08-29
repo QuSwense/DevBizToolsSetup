@@ -337,7 +337,7 @@ public partial class Templates : IAsyncDisposable
             _ => query.OrderBy(t => t.Name)
         };
 
-        _filteredTemplates = query.ToArray();
+        _filteredTemplates = [.. query];
         _currentPage = 1;
         UpdateActiveFilterPills();
     }
@@ -415,7 +415,7 @@ public partial class Templates : IAsyncDisposable
         _selectAll = (bool)(e.Value ?? false);
         if (_selectAll)
         {
-            _selectedIds = new HashSet<string>(_filteredTemplates.Select(t => t.Name));
+            _selectedIds = [.. _filteredTemplates.Select(t => t.Name)];
         }
         else
         {

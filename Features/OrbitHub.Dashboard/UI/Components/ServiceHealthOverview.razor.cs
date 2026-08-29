@@ -72,7 +72,7 @@ public partial class ServiceHealthOverview
     public record HealthRow(string Name, string CurrentStatus, int UpPct, string UptimeText, IReadOnlyList<TimelineStrip.Segment> Segments);
 
     private IReadOnlyList<HealthRow> Rows =>
-        Services.Select(s =>
+        [.. Services.Select(s =>
         {
             var samples = FilteredSamples.Where(u => u.ServiceName.Equals(s.Name, StringComparison.OrdinalIgnoreCase)).ToList();
             var ok = samples.Count(x => x.Status.Equals("ok", StringComparison.OrdinalIgnoreCase));
@@ -101,7 +101,7 @@ public partial class ServiceHealthOverview
             }
 
             return new HealthRow(s.Name, s.Status, upPct, BuildUptimeText(ok, total), segments);
-        }).ToList();
+        })];
 
     private string BuildUptimeText(int ok, int total)
     {

@@ -1,0 +1,6 @@
+[*.cs]
+dotnet_diagnostic.IDE0290.severity = warning
+csharp_style_prefer_primary_constructors = true:suggestion
+dotnet_diagnostic.IDE0028.severity = warning
+dotnet_diagnostic.IDE0305.severity = warning
+csharp_style_collection_initializer = true:suggestion

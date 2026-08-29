@@ -10,11 +10,9 @@ namespace DocIntercept.Formatting;
 /// newlines around them, and applies the result to a directory of generated
 /// files - the same job format-entities.py used to perform.
 /// </summary>
-public sealed class EntityFormatter
+public sealed class EntityFormatter(ScaffoldFormatOptions options)
 {
-    private readonly ScaffoldFormatOptions _options;
-
-    public EntityFormatter(ScaffoldFormatOptions options) => _options = options;
+    private readonly ScaffoldFormatOptions _options = options;
 
     /// <summary>Formats a single source string (line-ending and BOM neutral).</summary>
     public string Format(string content)
@@ -67,7 +65,7 @@ public sealed class EntityFormatter
             {
                 var preamble = hasBom ? Encoding.UTF8.GetPreamble() : Array.Empty<byte>();
                 var body = Encoding.UTF8.GetBytes(updated);
-                File.WriteAllBytes(file, preamble.Concat(body).ToArray());
+                File.WriteAllBytes(file, [.. preamble, .. body]);
             }
 
             changed++;

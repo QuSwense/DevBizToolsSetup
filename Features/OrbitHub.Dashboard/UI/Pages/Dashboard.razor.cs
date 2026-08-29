@@ -86,7 +86,7 @@ public partial class Dashboard
     ];
 
     // Per-card expand/collapse state, persisted to localStorage via JS interop.
-    private readonly Dictionary<string, bool> _cardCollapsed = new();
+    private readonly Dictionary<string, bool> _cardCollapsed = [];
     private IJSObjectReference? _collapseModule;
 
     /// <inheritdoc />
@@ -212,20 +212,18 @@ public partial class Dashboard
 
     private IReadOnlyList<RecentActivity.ActivityEntry> BuildActivityLog()
     {
-        return _viewModel.UserActivities
+        return [.. _viewModel.UserActivities
             .Select(a => new RecentActivity.ActivityEntry(
                 a.UserName,
                 a.Action,
-                DateTime.TryParse(a.Timestamp, out var dt) ? dt : DateTime.MinValue))
-            .ToList();
+                DateTime.TryParse(a.Timestamp, out var dt) ? dt : DateTime.MinValue))];
     }
 
     private IReadOnlyList<string> BuildUserNames()
     {
-        return _viewModel.Users
+        return [.. _viewModel.Users
             .Select(u => u.Name)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+            .Distinct(StringComparer.OrdinalIgnoreCase)];
     }
 
     private static readonly IReadOnlyList<QuickActions.QuickActionItem> QuickActionItems = new[]

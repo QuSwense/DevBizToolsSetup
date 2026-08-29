@@ -57,14 +57,13 @@ public partial class ActivityByUser
             var max = grouped.Count > 0 ? grouped.Max(g => g.Count()) : 1;
             var paletteIndex = 0;
 
-            return grouped
+            return [.. grouped
                 .Select(g =>
                 {
                     var isCurrent = g.Key.Equals(CurrentUser, StringComparison.OrdinalIgnoreCase);
                     var color = isCurrent ? "var(--sh-accent)" : Palette[paletteIndex++ % Palette.Length];
                     return new ActivityItem(g.Key, g.Count(), isCurrent, color, max > 0 ? g.Count() * 100 / max : 0);
-                })
-                .ToList();
+                })];
         }
     }
 

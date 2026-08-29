@@ -18,16 +18,10 @@ namespace OrbitHub.Dashboard.Infrastructure.Repositories;
 /// Reads dashboard data from the MSSQL database through the linq2db data connections.
 /// Replaces the previous mock JSON loader; sections without a backing table return empty.
 /// </summary>
-internal sealed class DashboardRepository : IDashboardRepository
+internal sealed class DashboardRepository(IServiceProvider serviceProvider, IConfiguration configuration) : IDashboardRepository
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IConfiguration _configuration;
-
-    public DashboardRepository(IServiceProvider serviceProvider, IConfiguration configuration)
-    {
-        _serviceProvider = serviceProvider;
-        _configuration = configuration;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly IConfiguration _configuration = configuration;
 
     /// <inheritdoc />
     public Task<IReadOnlyList<ServiceHealthEntity>> GetServiceHealthAsync()
@@ -45,15 +39,14 @@ internal sealed class DashboardRepository : IDashboardRepository
         var caseCountBySuite = (await db.ServiceTestSuitTestCaseLinks.ToListAsync())
             .ToLookup(l => l.ServiceTestSuiteId);
 
-        return (await db.ServiceTestSuites.ToListAsync())
+        return [.. (await db.ServiceTestSuites.ToListAsync())
             .Select(s => new TestSuiteEntity
             {
                 Name = s.Name,
                 TotalCases = caseCountBySuite[s.Id].Count(),
                 PassingCases = 0, // no pass/fail tracking in the schema yet
                 TotalFiles = 0
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -85,14 +78,13 @@ internal sealed class DashboardRepository : IDashboardRepository
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
 
-        return (await db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
+        return [.. (await db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
             .Select(a => new RecentActivityEntity
             {
                 User = a.UserId,
                 Action = a.FeatureActivitiesJson ?? "",
                 TimeAgo = a.Timestamp.ToString("yyyy-MM-dd HH:mm")
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -101,7 +93,7 @@ internal sealed class DashboardRepository : IDashboardRepository
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
 
-        return (await db.SoapRequestFiles.ToListAsync())
+        return [.. (await db.SoapRequestFiles.ToListAsync())
             .Select(f => new RequestFileEntity
             {
                 FileName = f.FileName,
@@ -109,8 +101,7 @@ internal sealed class DashboardRepository : IDashboardRepository
                 Verb = f.Verb,
                 Status = f.Status,
                 CreatedBy = f.CreatedBy
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -122,7 +113,7 @@ internal sealed class DashboardRepository : IDashboardRepository
         var versionCountByRecord = (await db.WsdlVersions.ToListAsync())
             .ToLookup(v => v.SyncRecordId);
 
-        return (await db.WsdlRecords.ToListAsync())
+        return [.. (await db.WsdlRecords.ToListAsync())
             .Select(r => new WsdlRecordEntity
             {
                 Id = r.Id,
@@ -133,8 +124,7 @@ internal sealed class DashboardRepository : IDashboardRepository
                 UploadedAt = r.UploadedAt,
                 Status = r.Status,
                 VersionCount = versionCountByRecord[r.Id].Count()
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -143,13 +133,12 @@ internal sealed class DashboardRepository : IDashboardRepository
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
 
-        return (await db.Users.ToListAsync())
+        return [.. (await db.Users.ToListAsync())
             .Select(u => new UserEntity
             {
                 Name = FormatUserName(u),
                 Role = u.Role ?? ""
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -182,7 +171,7 @@ internal sealed class DashboardRepository : IDashboardRepository
         var apiCountByApp = (await db.SoapApis.ToListAsync())
             .ToLookup(a => a.AppId);
 
-        return (await db.SoapApps.ToListAsync())
+        return [.. (await db.SoapApps.ToListAsync())
             .Select(a => new SoapAppEntity
             {
                 Id = a.Id,
@@ -194,8 +183,7 @@ internal sealed class DashboardRepository : IDashboardRepository
                 CreatedAt = a.CreatedAt,
                 UpdatedAt = a.UpdatedAt ?? "",
                 ApisCount = apiCountByApp[a.Id].Count()
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -204,7 +192,7 @@ internal sealed class DashboardRepository : IDashboardRepository
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<RestDbContext>();
 
-        return (await db.RestRequestFiles.ToListAsync())
+        return [.. (await db.RestRequestFiles.ToListAsync())
             .Select(f => new RequestFileEntity
             {
                 FileName = f.FileName,
@@ -212,8 +200,7 @@ internal sealed class DashboardRepository : IDashboardRepository
                 Verb = f.Verb,
                 Status = f.Status,
                 CreatedBy = f.CreatedBy
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -222,15 +209,14 @@ internal sealed class DashboardRepository : IDashboardRepository
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
 
-        return (await db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
+        return [.. (await db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
             .Select(a => new UserActivityEntity
             {
                 Id = a.Id.ToString(),
                 UserName = a.UserId,
                 Action = a.FeatureActivitiesJson ?? "",
                 Timestamp = a.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -242,7 +228,7 @@ internal sealed class DashboardRepository : IDashboardRepository
         var groups = await db.SoapExecutionGroups.ToListAsync();
         var files = await db.SoapExecutionFiles.ToListAsync();
 
-        return files
+        return [.. files
             .Select(f =>
             {
                 var group = groups.FirstOrDefault(g => g.Id == f.GroupId);
@@ -258,8 +244,7 @@ internal sealed class DashboardRepository : IDashboardRepository
                     TriggeredBy = group?.TriggeredBy ?? ""
                 };
             })
-            .OrderByDescending(e => e.ExecutedAt)
-            .ToList();
+            .OrderByDescending(e => e.ExecutedAt)];
     }
 
     /// <inheritdoc />
@@ -271,7 +256,7 @@ internal sealed class DashboardRepository : IDashboardRepository
         var suites = await db.ServiceTestSuites.ToListAsync();
         var suiteById = suites.ToDictionary(s => s.Id);
 
-        return (await db.ServiceTestExecutionAudits.OrderByDescending(a => a.ExecutedAt).ToListAsync())
+        return [.. (await db.ServiceTestExecutionAudits.OrderByDescending(a => a.ExecutedAt).ToListAsync())
             .Select(a =>
             {
                 suiteById.TryGetValue(a.ServiceTestSuiteId, out var suite);
@@ -288,8 +273,7 @@ internal sealed class DashboardRepository : IDashboardRepository
                     PassingCases = 0,  // no per-audit case counts in the schema yet
                     DurationMs = Math.Max(durationMs, 0)
                 };
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />

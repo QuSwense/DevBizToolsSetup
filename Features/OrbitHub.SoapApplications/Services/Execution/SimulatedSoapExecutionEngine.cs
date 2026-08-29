@@ -17,24 +17,18 @@ namespace OrbitHub.SoapApplications.Services.Execution;
 /// The execution is modeled as a server-side job: the caller waits through the
 /// cycle while progress is reported "as per server update".
 /// </summary>
-public class SimulatedSoapExecutionEngine : IExecutionEngine
+public class SimulatedSoapExecutionEngine(
+    SoapAppStore appStore,
+    SoapTestCaseStore testCaseStore) : IExecutionEngine
 {
-    private readonly SoapAppStore _appStore;
-    private readonly SoapTestCaseStore _testCaseStore;
+    private readonly SoapAppStore _appStore = appStore;
+    private readonly SoapTestCaseStore _testCaseStore = testCaseStore;
 
     /// <summary>
     /// Delay (ms) between stages. The old MockDb:ExecutionStageDelayMs config key was
     /// removed with the mock database; fixed at 500 ms.
     /// </summary>
     private int StageDelayMs => 500;
-
-    public SimulatedSoapExecutionEngine(
-        SoapAppStore appStore,
-        SoapTestCaseStore testCaseStore)
-    {
-        _appStore = appStore;
-        _testCaseStore = testCaseStore;
-    }
 
     /// <inheritdoc />
     public SoapExecutionGroup CreateGroup(IReadOnlyList<SoapRequestFile> files, string triggeredBy)
@@ -46,7 +40,7 @@ public class SimulatedSoapExecutionEngine : IExecutionEngine
             StartedAt = FormatTimestamp(now),
             TriggeredBy = triggeredBy,
             Status = "running",
-            Files = files.Select(f => new SoapExecutionFile
+            Files = [.. files.Select(f => new SoapExecutionFile
             {
                 FileName = f.FileName,
                 AppName = f.AppName,
@@ -61,7 +55,7 @@ public class SimulatedSoapExecutionEngine : IExecutionEngine
                 [
                     CreateLog("info", $"Execution queued for '{f.FileName}' (operation '{f.ApiPath}').")
                 ]
-            }).ToList()
+            })]
         };
         return group;
     }
@@ -147,10 +141,9 @@ public class SimulatedSoapExecutionEngine : IExecutionEngine
         await AdvanceAsync(file, ExecutionStage.RunningTestCases,
             "Running attached test cases...", cancellationToken, progress, group);
         var testCases = _testCaseStore.GetEnabledForFile(file.AppName, file.FileName);
-        file.Extractions = testCases
+        file.Extractions = [.. testCases
             .SelectMany(tc => tc.Extractors)
-            .Select(ex => EvaluateExtractor(ex, file))
-            .ToList();
+            .Select(ex => EvaluateExtractor(ex, file))];
         if (file.Extractions.Count == 0)
         {
             file.Logs.Add(CreateLog("info", "No test cases attached to this request file."));

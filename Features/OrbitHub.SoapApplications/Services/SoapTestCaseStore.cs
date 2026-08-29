@@ -11,14 +11,9 @@ namespace OrbitHub.SoapApplications.Services;
 /// via SoapDbContext. Test cases are attached to request files and define
 /// extraction/assertion rules (XPath / JSON path / PDF) evaluated at execution time.
 /// </summary>
-public class SoapTestCaseStore
+public class SoapTestCaseStore(IServiceProvider serviceProvider)
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public SoapTestCaseStore(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     /// <summary>All test cases, ordered by application then file name.</summary>
     public IReadOnlyList<SoapTestCase> TestCases
@@ -27,9 +22,8 @@ public class SoapTestCaseStore
         {
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
-            return LoadTestCases(db, db.SoapTestCases.ToList())
-                .OrderBy(t => t.AppName).ThenBy(t => t.FileName).ThenBy(t => t.Name)
-                .ToList();
+            return [.. LoadTestCases(db, [.. db.SoapTestCases])
+                .OrderBy(t => t.AppName).ThenBy(t => t.FileName).ThenBy(t => t.Name)];
         }
     }
 
@@ -39,7 +33,7 @@ public class SoapTestCaseStore
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
         var entities = db.SoapTestCases.Where(t => t.AppName == appName && t.FileName == fileName && t.Enabled).ToList();
-        return LoadTestCases(db, entities).ToList();
+        return [.. LoadTestCases(db, entities)];
     }
 
     /// <summary>Returns all test cases attached to a specific file (any enabled state).</summary>
@@ -48,7 +42,7 @@ public class SoapTestCaseStore
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
         var entities = db.SoapTestCases.Where(t => t.AppName == appName && t.FileName == fileName).ToList();
-        return LoadTestCases(db, entities).ToList();
+        return [.. LoadTestCases(db, entities)];
     }
 
     /// <summary>Returns a test case by id, or null.</summary>
@@ -129,7 +123,7 @@ public class SoapTestCaseStore
         var ids = entities.Select(t => t.Id).ToList();
         var extractorsByTestCase = db.SoapExtractors.Where(e => ids.Contains(e.TestCaseId)).ToList().ToLookup(e => e.TestCaseId);
 
-        return entities.Select(entity => new SoapTestCase
+        return [.. entities.Select(entity => new SoapTestCase
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -141,7 +135,7 @@ public class SoapTestCaseStore
             CreatedAt = entity.CreatedAt,
             UpdatedBy = entity.UpdatedBy,
             UpdatedAt = entity.UpdatedAt,
-            Extractors = extractorsByTestCase[entity.Id].Select(e => new SoapExtractor
+            Extractors = [.. extractorsByTestCase[entity.Id].Select(e => new SoapExtractor
             {
                 Id = e.Id,
                 Name = e.Name,
@@ -149,8 +143,8 @@ public class SoapTestCaseStore
                 Type = e.Type,
                 Path = e.Path,
                 ExpectedValue = e.ExpectedValue
-            }).ToList()
-        }).ToList();
+            })]
+        })];
     }
 
     private static async Task InsertTestCaseAsync(SoapDbContext db, SoapTestCase testCase)

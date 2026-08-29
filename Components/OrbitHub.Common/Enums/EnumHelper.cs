@@ -53,9 +53,9 @@ public static class EnumHelper<T> where T : struct, Enum
     /// Gets the string representation of an enum value (O(1) lookup)
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetName(T value) => 
-        _valueToNameMap.Value.TryGetValue(value, out var name) 
-            ? name 
+    public static string GetName(T value) =>
+        _valueToNameMap.Value.TryGetValue(value, out var name)
+            ? name
             : value.ToString();
 
     /// <summary>
@@ -63,8 +63,8 @@ public static class EnumHelper<T> where T : struct, Enum
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T GetValue(string name) =>
-        _nameToValueMap.Value.TryGetValue(name, out var value) 
-            ? value 
+        _nameToValueMap.Value.TryGetValue(name, out var value)
+            ? value
             : throw new ArgumentException($"Invalid enum name '{name}' for type {typeof(T).Name}", nameof(name));
 
     /// <summary>
@@ -79,8 +79,8 @@ public static class EnumHelper<T> where T : struct, Enum
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T GetValue(int value) =>
-        _intToValueMap.Value.TryGetValue(value, out var enumValue) 
-            ? enumValue 
+        _intToValueMap.Value.TryGetValue(value, out var enumValue)
+            ? enumValue
             : throw new ArgumentException($"Invalid enum value '{value}' for type {typeof(T).Name}", nameof(value));
 
     /// <summary>
@@ -129,14 +129,14 @@ public static class EnumHelper<T> where T : struct, Enum
     {
         var values = _enumValues.Value;
         var names = _enumNames.Value;
-        
+
         // Use dictionary builder for FrozenDictionary
         var builder = new Dictionary<T, string>(values.Length);
         for (int i = 0; i < values.Length; i++)
         {
             builder[values[i]] = names[i];
         }
-        
+
         return builder.ToFrozenDictionary();
     }
 
@@ -144,13 +144,13 @@ public static class EnumHelper<T> where T : struct, Enum
     {
         var values = _enumValues.Value;
         var names = _enumNames.Value;
-        
+
         var builder = new Dictionary<string, T>(values.Length, StringComparer.Ordinal);
         for (int i = 0; i < values.Length; i++)
         {
             builder[names[i]] = values[i];
         }
-        
+
         return builder.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
@@ -158,7 +158,7 @@ public static class EnumHelper<T> where T : struct, Enum
     {
         var values = _enumValues.Value;
         var underlyingType = Enum.GetUnderlyingType(typeof(T));
-        
+
         var builder = new Dictionary<int, T>(values.Length);
         foreach (var value in values)
         {
@@ -166,7 +166,7 @@ public static class EnumHelper<T> where T : struct, Enum
             var intValue = Convert.ToInt32(value);
             builder[intValue] = value;
         }
-        
+
         return builder.ToFrozenDictionary();
     }
 }

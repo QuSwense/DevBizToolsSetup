@@ -32,8 +32,8 @@ namespace DocIntercept;
 /// </summary>
 public sealed class DescriptionInterceptors : ScaffoldInterceptors
 {
-    private readonly Dictionary<string, string> _tableDescriptions = new();
-    private readonly Dictionary<string, string> _columnDescriptions = new();
+    private readonly Dictionary<string, string> _tableDescriptions = [];
+    private readonly Dictionary<string, string> _columnDescriptions = [];
     private readonly bool _enabled;
     private bool _loaded;
 

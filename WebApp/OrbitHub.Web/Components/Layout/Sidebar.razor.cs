@@ -6,7 +6,7 @@ public partial class Sidebar : IDisposable
 {
     private string currentPage = "/";
     private bool _collapsed;
-    private HashSet<string> _expandedSections = new();
+    private HashSet<string> _expandedSections = [];
 
     private const string SoapSection = "soap";
     private const string RestSection = "rest";

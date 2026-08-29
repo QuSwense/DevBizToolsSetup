@@ -61,7 +61,7 @@ public partial class RestAppsOverview
     public record RestAppRow(string Name, bool Enabled, int FilesActive, int FilesTotal, int Executions, int Success, int SuccessPct);
 
     private IReadOnlyList<RestAppRow> Rows =>
-        Apps.Select(a =>
+        [.. Apps.Select(a =>
         {
             var files = RequestFiles.Where(f => f.AppName.Equals(a.Name, StringComparison.OrdinalIgnoreCase)).ToList();
             var execs = FilteredExecutions.Where(e => e.AppName.Equals(a.Name, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -75,5 +75,5 @@ public partial class RestAppsOverview
                 execs.Count,
                 success,
                 execs.Count > 0 ? success * 100 / execs.Count : 0);
-        }).ToList();
+        })];
 }

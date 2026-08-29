@@ -26,7 +26,7 @@ public partial class WsdlStatus
     {
         get
         {
-            return Records
+            return [.. Records
                 .GroupBy(r => r.AppName)
                 .Select(g => g.OrderByDescending(r => r.UploadedAt).First())
                 .OrderBy(r => r.AppName, StringComparer.OrdinalIgnoreCase)
@@ -35,8 +35,7 @@ public partial class WsdlStatus
                     r.Status,
                     r.Status.Equals("synced", StringComparison.OrdinalIgnoreCase),
                     FormatDate(r.UploadedAt),
-                    r.VersionCount))
-                .ToList();
+                    r.VersionCount))];
         }
     }
 

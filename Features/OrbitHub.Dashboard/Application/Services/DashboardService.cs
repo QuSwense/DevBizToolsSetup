@@ -6,14 +6,9 @@ namespace OrbitHub.Dashboard.Application.Services;
 /// <summary>
 /// Provides dashboard data by aggregating from the underlying repository.
 /// </summary>
-internal sealed class DashboardService : IDashboardService
+internal sealed class DashboardService(IDashboardRepository repository) : IDashboardService
 {
-    private readonly IDashboardRepository _repository;
-
-    public DashboardService(IDashboardRepository repository)
-    {
-        _repository = repository;
-    }
+    private readonly IDashboardRepository _repository = repository;
 
     /// <inheritdoc />
     public async Task<DashboardMetricsDto> GetMetricsAsync()
@@ -37,13 +32,12 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetServiceHealthAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new ServiceHealthDto
             {
                 Name = e.Name,
                 Status = e.Status.ToString()
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -51,15 +45,14 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetTestSuitesAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new TestSuiteDto
             {
                 Name = e.Name,
                 TotalCases = e.TotalCases,
                 PassingCases = e.PassingCases,
                 TotalFiles = e.TotalFiles
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -67,15 +60,14 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetRecentActivityAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new RecentActivityDto
             {
                 User = e.User,
                 Action = e.Action,
                 TimeAgo = e.TimeAgo
             })
-            .Take(maxEntries)
-            .ToList();
+            .Take(maxEntries)];
     }
 
     /// <inheritdoc />
@@ -83,7 +75,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetRequestFilesAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new RequestFileDto
             {
                 FileName = e.FileName,
@@ -91,8 +83,7 @@ internal sealed class DashboardService : IDashboardService
                 Verb = e.Verb,
                 Status = e.Status,
                 CreatedBy = e.CreatedBy
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -100,7 +91,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetWsdlRecordsAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new WsdlRecordDto
             {
                 AppName = e.AppName,
@@ -108,8 +99,7 @@ internal sealed class DashboardService : IDashboardService
                 UploadedAt = e.UploadedAt,
                 Status = e.Status,
                 VersionCount = e.VersionCount
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -117,13 +107,12 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetUsersAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new UserDto
             {
                 Name = e.Name,
                 Role = e.Role
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -145,7 +134,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetRestAppsAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new RestAppDto
             {
                 Id = e.Id,
@@ -157,8 +146,7 @@ internal sealed class DashboardService : IDashboardService
                 CreatedAt = e.CreatedAt,
                 UpdatedAt = e.UpdatedAt,
                 ApisCount = e.ApisCount
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -166,7 +154,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetSoapAppsAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new SoapAppDto
             {
                 Id = e.Id,
@@ -178,8 +166,7 @@ internal sealed class DashboardService : IDashboardService
                 CreatedAt = e.CreatedAt,
                 UpdatedAt = e.UpdatedAt,
                 ApisCount = e.ApisCount
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -187,7 +174,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetRestRequestFilesAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new RequestFileDto
             {
                 FileName = e.FileName,
@@ -195,8 +182,7 @@ internal sealed class DashboardService : IDashboardService
                 Verb = e.Verb,
                 Status = e.Status,
                 CreatedBy = e.CreatedBy
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -204,15 +190,14 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetUserActivitiesAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new UserActivityDto
             {
                 Id = e.Id,
                 UserName = e.UserName,
                 Action = e.Action,
                 Timestamp = e.Timestamp
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -220,7 +205,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetRequestExecutionsAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new RequestExecutionDto
             {
                 Id = e.Id,
@@ -231,8 +216,7 @@ internal sealed class DashboardService : IDashboardService
                 ExecutedAt = e.ExecutedAt,
                 DurationMs = e.DurationMs,
                 TriggeredBy = e.TriggeredBy
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -240,7 +224,7 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetTestSuiteHistoryAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new TestSuiteHistoryDto
             {
                 Id = e.Id,
@@ -250,8 +234,7 @@ internal sealed class DashboardService : IDashboardService
                 TotalCases = e.TotalCases,
                 PassingCases = e.PassingCases,
                 DurationMs = e.DurationMs
-            })
-            .ToList();
+            })];
     }
 
     /// <inheritdoc />
@@ -259,14 +242,13 @@ internal sealed class DashboardService : IDashboardService
     {
         var entities = await _repository.GetServiceUptimeAsync();
 
-        return entities
+        return [.. entities
             .Select(e => new ServiceUptimeDto
             {
                 Id = e.Id,
                 ServiceName = e.ServiceName,
                 Timestamp = e.Timestamp,
                 Status = e.Status
-            })
-            .ToList();
+            })];
     }
 }

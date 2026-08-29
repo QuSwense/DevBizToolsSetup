@@ -12,11 +12,9 @@ namespace DocIntercept.Formatting.Transformations;
 /// and <c>[Table]</c> attributes on their own lines. Replicates
 /// <c>split_member_lines</c>/<c>squeeze</c> from the old format-entities.py.
 /// </summary>
-public sealed partial class ColumnAttributeSplitter : ITextTransformation
+public sealed partial class ColumnAttributeSplitter(bool squeeze = true) : ITextTransformation
 {
-    private readonly bool _squeeze;
-
-    public ColumnAttributeSplitter(bool squeeze = true) => _squeeze = squeeze;
+    private readonly bool _squeeze = squeeze;
 
     public string Apply(string content)
     {

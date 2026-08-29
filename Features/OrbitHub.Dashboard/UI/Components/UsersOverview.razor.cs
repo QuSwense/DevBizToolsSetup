@@ -46,15 +46,14 @@ public partial class UsersOverview
     private int ActiveSharePct => Users.Count > 0 ? ActiveCount * 100 / Users.Count : 0;
 
     private IReadOnlyList<string> UserTypes =>
-        Users.Select(u => u.Role).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(r => r).ToList();
+        [.. Users.Select(u => u.Role).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(r => r)];
 
     private IReadOnlyList<(string User, int Count)> TopActiveUsers =>
-        FilteredActivities
+        [.. FilteredActivities
             .GroupBy(a => a.UserName, StringComparer.OrdinalIgnoreCase)
             .Select(g => (User: g.Key, Count: g.Count()))
             .OrderByDescending(x => x.Count)
-            .Take(5)
-            .ToList();
+            .Take(5)];
 
     private int MaxActivityCount => TopActiveUsers.Count > 0 ? TopActiveUsers[0].Count : 0;
 }

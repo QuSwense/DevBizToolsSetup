@@ -44,7 +44,7 @@ public partial class ExecuteHistory
     {
         await base.OnInitializedAsync();
 
-        _groups = ExecutionStore.Groups.ToArray();
+        _groups = [.. ExecutionStore.Groups];
         // Request files are not yet backed by a database table — previously loaded from
         // mock JSON. TODO: load from MSSQL (SoapRequestFiles) once the schema exists.
         _files = [];
@@ -148,7 +148,7 @@ public partial class ExecuteHistory
                 _ => query.OrderByDescending(g => g.StartedAt)
             };
 
-            return query.ToArray();
+            return [.. query];
         }
     }
 
@@ -159,7 +159,7 @@ public partial class ExecuteHistory
         SelectedGroup?.Files.FirstOrDefault(f => f.FileName == _selectedFileId)
         ?? SelectedGroup?.Files.FirstOrDefault();
 
-    private string[] AvailableApps => AppStore.Apps.Select(a => a.Name).OrderBy(n => n).ToArray();
+    private string[] AvailableApps => [.. AppStore.Apps.Select(a => a.Name).OrderBy(n => n)];
 
     // ── Selection handlers ──
 

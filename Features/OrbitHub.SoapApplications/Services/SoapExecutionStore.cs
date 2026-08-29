@@ -11,14 +11,9 @@ namespace OrbitHub.SoapApplications.Services;
 /// Singleton store for SOAP execution groups, persisted to the database
 /// via SoapDbContext. Provides LINQ queries over execution groups and their files.
 /// </summary>
-public class SoapExecutionStore
+public class SoapExecutionStore(IServiceProvider serviceProvider)
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public SoapExecutionStore(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     /// <summary>All execution groups, newest first.</summary>
     public IReadOnlyList<SoapExecutionGroup> Groups
@@ -27,9 +22,7 @@ public class SoapExecutionStore
         {
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
-            return LoadGroups(db, db.SoapExecutionGroups.ToList())
-                .OrderByDescending(g => g.StartedAt)
-                .ToList();
+            return [.. LoadGroups(db, [.. db.SoapExecutionGroups]).OrderByDescending(g => g.StartedAt)];
         }
     }
 
@@ -52,9 +45,7 @@ public class SoapExecutionStore
         var db = scope.ServiceProvider.GetRequiredService<SoapDbContext>();
         var groupIds = db.SoapExecutionFiles.Where(f => f.FileName == fileName).Select(f => f.GroupId).Distinct().ToList();
         var groups = db.SoapExecutionGroups.Where(g => groupIds.Contains(g.Id)).ToList();
-        return LoadGroups(db, groups)
-            .OrderByDescending(g => g.StartedAt)
-            .ToList();
+        return [.. LoadGroups(db, groups).OrderByDescending(g => g.StartedAt)];
     }
 
     /// <summary>Returns the per-file record for a file within a group, or null.</summary>
@@ -104,7 +95,7 @@ public class SoapExecutionStore
         var parsedByFile = db.SoapParsedFields.Where(p => fileIds.Contains(p.ExecutionFileId)).ToList().ToLookup(p => p.ExecutionFileId);
         var extractionsByFile = db.SoapExtractionResults.Where(e => fileIds.Contains(e.ExecutionFileId)).ToList().ToLookup(e => e.ExecutionFileId);
 
-        return groups.Select(g => new SoapExecutionGroup
+        return [.. groups.Select(g => new SoapExecutionGroup
         {
             Id = g.Id,
             StartedAt = g.StartedAt,
@@ -112,8 +103,8 @@ public class SoapExecutionStore
             TriggeredBy = g.TriggeredBy,
             Status = g.Status,
             DurationMs = g.DurationMs ?? 0,
-            Files = filesByGroup[g.Id].Select(f => MapFile(f, logsByFile[f.Id], parsedByFile[f.Id], extractionsByFile[f.Id])).ToList()
-        }).ToList();
+            Files = [.. filesByGroup[g.Id].Select(f => MapFile(f, logsByFile[f.Id], parsedByFile[f.Id], extractionsByFile[f.Id]))]
+        })];
     }
 
     private static SoapExecutionFile MapFile(
@@ -134,14 +125,14 @@ public class SoapExecutionStore
             RequestContent = entity.RequestContent ?? "",
             ResponseContent = entity.ResponseContent ?? "",
             ResponseMimeType = entity.ResponseMimeType ?? "",
-            Logs = logs.Select(l => new SoapExecutionLog
+            Logs = [.. logs.Select(l => new SoapExecutionLog
             {
                 Id = l.Id,
                 Timestamp = l.Timestamp,
                 Type = l.Type,
                 Message = l.Message
-            }).ToList(),
-            ParsedFields = parsedFields.Select(p => new SoapParsedField
+            })],
+            ParsedFields = [.. parsedFields.Select(p => new SoapParsedField
             {
                 Name = p.Name,
                 Source = p.Source,
@@ -149,8 +140,8 @@ public class SoapExecutionStore
                 Value = p.Value ?? "",
                 IsEmbedded = p.IsEmbedded,
                 DecodedPreview = p.DecodedPreview ?? ""
-            }).ToList(),
-            Extractions = extractions.Select(e => new SoapExtractionResult
+            })],
+            Extractions = [.. extractions.Select(e => new SoapExtractionResult
             {
                 ExtractorId = e.ExtractorId,
                 Name = e.Name,
@@ -160,7 +151,7 @@ public class SoapExecutionStore
                 Value = e.Value ?? "",
                 Expected = e.Expected ?? "",
                 Passed = e.Passed ?? false
-            }).ToList()
+            })]
         };
     }
 

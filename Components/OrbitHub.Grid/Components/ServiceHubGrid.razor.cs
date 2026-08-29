@@ -227,7 +227,7 @@ public partial class ServiceHubGrid<TItem> : ComponentBase
         }
         else
         {
-            SelectedIds = new HashSet<string>(Items.Select(GetRowId));
+            SelectedIds = [.. Items.Select(GetRowId)];
         }
 
         SelectedIdsChanged.InvokeAsync(SelectedIds);

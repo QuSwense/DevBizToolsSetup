@@ -49,22 +49,22 @@ public partial class ExecutionsOverview
             if (!string.IsNullOrWhiteSpace(_searchText))
             {
                 var q = _searchText.Trim();
-                result = result.Where(e =>
+                result = [.. result.Where(e =>
                     e.AppName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
                     e.FileName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                    e.TriggeredBy.Contains(q, StringComparison.OrdinalIgnoreCase)).ToList();
+                    e.TriggeredBy.Contains(q, StringComparison.OrdinalIgnoreCase))];
             }
 
             return (_sortColumn, _sortAscending) switch
             {
-                ("Id", true) or (null, _) => result.OrderBy(e => e.Id).ToList(),
-                ("Id", false) => result.OrderByDescending(e => e.Id).ToList(),
-                ("AppName", true) => result.OrderBy(e => e.AppName).ToList(),
-                ("AppName", false) => result.OrderByDescending(e => e.AppName).ToList(),
-                ("Status", true) => result.OrderBy(e => e.Status).ToList(),
-                ("Status", false) => result.OrderByDescending(e => e.Status).ToList(),
-                ("ExecutedAt", true) => result.OrderBy(e => e.ExecutedAt).ToList(),
-                ("ExecutedAt", false) => result.OrderByDescending(e => e.ExecutedAt).ToList(),
+                ("Id", true) or (null, _) => [.. result.OrderBy(e => e.Id)],
+                ("Id", false) => [.. result.OrderByDescending(e => e.Id)],
+                ("AppName", true) => [.. result.OrderBy(e => e.AppName)],
+                ("AppName", false) => [.. result.OrderByDescending(e => e.AppName)],
+                ("Status", true) => [.. result.OrderBy(e => e.Status)],
+                ("Status", false) => [.. result.OrderByDescending(e => e.Status)],
+                ("ExecutedAt", true) => [.. result.OrderBy(e => e.ExecutedAt)],
+                ("ExecutedAt", false) => [.. result.OrderByDescending(e => e.ExecutedAt)],
                 _ => result
             };
         }

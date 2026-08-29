@@ -31,7 +31,7 @@ public partial class TestSuitesOverview
 
     private string? _selectedSuite;
 
-    private IReadOnlyList<string> SuiteNames => Suites.Select(s => s.Name).ToList();
+    private IReadOnlyList<string> SuiteNames => [.. Suites.Select(s => s.Name)];
 
     private string SelectedSuite => _selectedSuite ?? string.Empty;
 
@@ -66,10 +66,9 @@ public partial class TestSuitesOverview
         => DateTime.TryParse(value, out var dt) ? dt : null;
 
     private IReadOnlyList<TestSuiteHistoryDto> SelectedRuns =>
-        History
+        [.. History
             .Where(h => h.SuiteName.Equals(SelectedSuite, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(h => TryParseTimestamp(h.ExecutedAt))
-            .ToList();
+            .OrderByDescending(h => TryParseTimestamp(h.ExecutedAt))];
 
     private int RunsCount => SelectedRuns.Count;
     private string LastResult => SelectedRuns.FirstOrDefault()?.Status ?? "—";

@@ -88,7 +88,7 @@ public partial class RequestFiles : IDisposable
     private DateTime? _filterCreatedDateFrom;
     private DateTime? _filterCreatedDateTo;
 
-    private string[] _availableApps => _appStore.Apps.Select(a => a.Name).OrderBy(a => a).ToArray();
+    private string[] _availableApps => [.. _appStore.Apps.Select(a => a.Name).OrderBy(a => a)];
     private SoapApiEntry[] _availableOperations =>
         _appStore.Apps.FirstOrDefault(a => a.Name == _uploadAppName)?.Apis ?? [];
     private SoapApiEntry[] EditAvailableOperations =>
@@ -387,7 +387,7 @@ public partial class RequestFiles : IDisposable
     private void OpenTestCasesModal(SoapRequestFile file)
     {
         _tcFile = file;
-        _fileTestCases = _testCaseStore.GetForFile(file.AppName, file.FileName).ToArray();
+        _fileTestCases = [.. _testCaseStore.GetForFile(file.AppName, file.FileName)];
         _showTestCasesModal = true;
     }
 
@@ -414,7 +414,7 @@ public partial class RequestFiles : IDisposable
         _tcName = testCase.Name;
         _tcDescription = testCase.Description;
         _tcEnabled = testCase.Enabled;
-        _tcExtractors = testCase.Extractors.Select(e => new SoapExtractor
+        _tcExtractors = [.. testCase.Extractors.Select(e => new SoapExtractor
         {
             Id = e.Id,
             Name = e.Name,
@@ -422,7 +422,7 @@ public partial class RequestFiles : IDisposable
             Type = e.Type,
             Path = e.Path,
             ExpectedValue = e.ExpectedValue
-        }).ToList();
+        })];
         _tcValidationErrors = [];
         _showTestCaseModal = true;
     }
@@ -505,7 +505,7 @@ public partial class RequestFiles : IDisposable
             await _testCaseStore.AddTestCaseAsync(testCase);
         }
 
-        _fileTestCases = _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName).ToArray();
+        _fileTestCases = [.. _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName)];
         _showTestCaseModal = false;
         ShowToast(_editingTestCase is null ? "Test case created" : "Test case updated");
     }
@@ -518,7 +518,7 @@ public partial class RequestFiles : IDisposable
         await _testCaseStore.UpdateTestCaseAsync(testCase);
         if (_tcFile is not null)
         {
-            _fileTestCases = _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName).ToArray();
+            _fileTestCases = [.. _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName)];
         }
     }
 
@@ -530,7 +530,7 @@ public partial class RequestFiles : IDisposable
         await _testCaseStore.DeleteTestCaseAsync(testCase.Id);
         if (_tcFile is not null)
         {
-            _fileTestCases = _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName).ToArray();
+            _fileTestCases = [.. _testCaseStore.GetForFile(_tcFile.AppName, _tcFile.FileName)];
         }
         ShowToast("Test case deleted", "danger");
     }
@@ -561,12 +561,12 @@ public partial class RequestFiles : IDisposable
 
     private void AddUploadFileEntry()
     {
-        _uploadFiles = [.._uploadFiles, new UploadFileEntry()];
+        _uploadFiles = [.. _uploadFiles, new UploadFileEntry()];
     }
 
     private void RemoveUploadFileEntry(int index)
     {
-        _uploadFiles = [.._uploadFiles.Where((_, i) => i != index)];
+        _uploadFiles = [.. _uploadFiles.Where((_, i) => i != index)];
     }
 
     private async Task HandleLocalFileUpload(InputFileChangeEventArgs e)
@@ -579,7 +579,7 @@ public partial class RequestFiles : IDisposable
             using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
             using var reader = new StreamReader(stream);
             var content = await reader.ReadToEndAsync();
-            _uploadFiles = [.._uploadFiles, new UploadFileEntry { FileName = file.Name, Content = content }];
+            _uploadFiles = [.. _uploadFiles, new UploadFileEntry { FileName = file.Name, Content = content }];
         }
     }
 
@@ -645,7 +645,7 @@ public partial class RequestFiles : IDisposable
             f.Content
         )).ToArray();
 
-        _files = [.._files, ..newFiles];
+        _files = [.. _files, .. newFiles];
 
         // Reset form
         _uploadAppName = "";
@@ -757,7 +757,7 @@ public partial class RequestFiles : IDisposable
         var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete request file '{file.FileName}'? This cannot be undone.");
         if (!confirmed) return;
 
-        _files = [.._files.Where(f => f.FileName != file.FileName)];
+        _files = [.. _files.Where(f => f.FileName != file.FileName)];
         _expandedActionRows.Remove(file.FileName);
         _selectedIds.Remove(file.FileName);
 
@@ -845,7 +845,7 @@ public partial class RequestFiles : IDisposable
         var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete {_selectedIds.Count} selected request file(s)? This cannot be undone.");
         if (!confirmed) return;
 
-        _files = [.._files.Where(f => !_selectedIds.Contains(f.FileName))];
+        _files = [.. _files.Where(f => !_selectedIds.Contains(f.FileName))];
         _expandedActionRows.RemoveWhere(_selectedIds.Contains);
         _selectedIds.Clear();
 
@@ -976,7 +976,7 @@ public partial class RequestFiles : IDisposable
                 };
             }
 
-            return query.ToArray();
+            return [.. query];
         }
     }
 

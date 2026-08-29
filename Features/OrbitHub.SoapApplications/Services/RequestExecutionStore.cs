@@ -8,14 +8,9 @@ namespace OrbitHub.SoapApplications.Services;
 /// Singleton store for request-file execution history, filtered to SOAP applications.
 /// Reads from the database via SoapDbContext.
 /// </summary>
-public class RequestExecutionStore
+public class RequestExecutionStore(IServiceProvider serviceProvider)
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public RequestExecutionStore(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     /// <summary>
     /// All SOAP executions, ordered newest-first.
@@ -30,7 +25,7 @@ public class RequestExecutionStore
             var groups = db.SoapExecutionGroups.ToList();
             var filesByGroup = db.SoapExecutionFiles.ToList().ToLookup(f => f.GroupId);
 
-            return groups
+            return [.. groups
                 .SelectMany(g => filesByGroup[g.Id].Select(f => new SoapExecution(
                     Id: $"ex-{g.Id}-{f.FileName}",
                     AppName: f.AppName,
@@ -41,8 +36,7 @@ public class RequestExecutionStore
                     DurationMs: g.DurationMs ?? 0,
                     TriggeredBy: g.TriggeredBy
                 )))
-                .OrderByDescending(e => e.ExecutedAt)
-                .ToArray();
+                .OrderByDescending(e => e.ExecutedAt)];
         }
     }
 }
