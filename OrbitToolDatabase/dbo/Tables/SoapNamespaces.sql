@@ -1,10 +1,21 @@
+/*
+    Table: SoapNamespaces
+    Description: Stores SOAP namespace definitions associated with service operation schemas.
+*/
 CREATE TABLE [dbo].[SoapNamespaces] (
+    -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Foreign Key to ServiceOperationSchemas table
     [ServiceOperationSchemaId] INT NOT NULL,
+    -- Namespace prefix, e.g., 'ns1', 'soapenv', etc. extracted from the XSD extracted from SOAP WSDL
     [Prefix] NVARCHAR(50) NOT NULL,
+    -- Namespace URI, e.g., 'http://example.com/namespace' extracted from the XSD extracted from SOAP WSDL
     [NamespaceUri] NVARCHAR(500) NOT NULL,
-    [CreatedAt] DATETIME NOT NULL
-        CONSTRAINT [DF_SoapNamespaces_CreatedAt] DEFAULT GETDATE(),
+    -- Timestamps for auditing created and last updated
+    [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_SoapNamespaces_CreatedAt] DEFAULT GETDATE(),
+    [CreatedBy] NVARCHAR(20) NULL,
+    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     -- Primary Key
     CONSTRAINT [PK_SoapNamespaces] PRIMARY KEY CLUSTERED ([Id] ASC),

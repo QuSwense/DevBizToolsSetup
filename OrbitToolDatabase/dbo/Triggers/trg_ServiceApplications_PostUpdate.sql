@@ -19,3 +19,4 @@ BEGIN
     INNER JOIN [inserted] AS [i] ON [SA].[Id] = [i].[Id]
     INNER JOIN [deleted] AS [d] ON [SA].[Id] = [d].[Id];
 END
+GO

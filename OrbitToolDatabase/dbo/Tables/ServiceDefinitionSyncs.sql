@@ -1,15 +1,32 @@
+/* 
+    Table: ServiceDefinitionSyncs
+    Description: Stores the synchronization details of service definitions (WSDL, Swagger, OpenAPI) for service applications.
+    Logic:
+    - In the UI there will be a Sync button to fetch the latest definition file from the service application.
+*/
 CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
+    -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Foreign Key to ServiceApplications table
     [ServiceApplicationId] INT NOT NULL,
-    [DefinitionUrl] NVARCHAR(500) NULL, -- Built from BaseUrl + DefinitionRelativeUrl
-    [DefinitionContent] VARBINARY(MAX) NOT NULL, -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
+    -- Built from BaseUrl + DefinitionRelativeUrl
+    [DefinitionUrl] NVARCHAR(500) NULL,
+    -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
+    [CompressedContent] VARBINARY(MAX) NOT NULL,
+    -- uncompressed size of the definition file in bytes
     [UncompressedSizeBytes] INT NULL,
-    [CompressionAlgorithmType] VARCHAR(50) NULL, -- e.g., 'Zstandard', 'deflate', 'none'
+    -- compression algorithm used for the definition file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
+    [CompressionAlgorithmType] VARCHAR(50) NULL,
+    -- SHA256 hash of the definition file content for integrity verification
     [FileHash] VARCHAR(64) NULL,
+    -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceDefinitionSyncs_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
-    [SyncedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceDefinitionSync_SyncedAt DEFAULT GETDATE(),
-    [SyncedBy] NVARCHAR(20) NOT NULL,
+    -- Timestamps for auditing created and last updated
+    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceDefinitionSyncs_CreatedAt DEFAULT GETDATE(),
+    [CreatedBy] NVARCHAR(20) NOT NULL,
+    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT CK_ServiceDefinitionSyncs_DefinitionUrl
@@ -25,7 +42,9 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     CONSTRAINT FK_ServiceDefinitionSyncs_ServiceApplications_ServiceApplicationId
         FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_ServiceDefinitionSyncs_Users_SyncedBy
-        FOREIGN KEY ([SyncedBy]) REFERENCES [dbo].[Users]([UserId]),
+        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
+    CONSTRAINT FK_ServiceDefinitionSyncs_Users_LastUpdatedBy
+        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId]),
 
     -- Index constraint
     CONSTRAINT IX_ServiceDefinitionSyncs_ServiceApplicationId UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC)

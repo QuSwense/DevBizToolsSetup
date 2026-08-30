@@ -1,4 +1,4 @@
-CREATE TRIGGER [dbo].[trg_ServiceAppAuthentications_AutoUpdate]
+CREATE TRIGGER [dbo].[trg_ServiceAppAuthentications_PostUpdate]
 ON [dbo].[ServiceAppAuthentications]
 AFTER UPDATE
 AS
@@ -19,3 +19,4 @@ BEGIN
     INNER JOIN [inserted] AS [i] ON [SAA].[Id] = [i].[Id]
     INNER JOIN [deleted] AS [d] ON [SAA].[Id] = [d].[Id];
 END
+GO

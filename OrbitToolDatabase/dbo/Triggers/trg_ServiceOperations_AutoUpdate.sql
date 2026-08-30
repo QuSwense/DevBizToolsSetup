@@ -21,3 +21,4 @@ BEGIN
     INNER JOIN [inserted] AS [i] ON [SO].[Id] = [i].[Id]
     INNER JOIN [deleted] AS [d] ON [SO].[Id] = [d].[Id];
 END
+GO

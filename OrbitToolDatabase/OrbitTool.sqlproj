@@ -13,9 +13,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dbo" />
+    <Folder Include="dbo\StoredProcedures" />
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Functions" />
     <Folder Include="dbo\Triggers" />
+    <Folder Include="dbo\Views" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\OrbitTool_SQLCMD.sh" />

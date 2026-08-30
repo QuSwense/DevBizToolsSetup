@@ -49,3 +49,4 @@ BEGIN
     FROM [deleted] AS [d]
     INNER JOIN [inserted] AS [i] ON [d].[Id] = [i].[Id];
 END
+GO
