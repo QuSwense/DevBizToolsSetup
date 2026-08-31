@@ -10,17 +10,17 @@
   <ItemGroup>
     <Build Remove="dbDesign\**" />
     <Build Remove="scripts\**" />
+    <Build Remove="Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dbo" />
     <Folder Include="dbo\StoredProcedures" />
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Functions" />
-    <Folder Include="dbo\Triggers" />
     <Folder Include="dbo\Views" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="scripts\OrbitTool_SQLCMD.sh" />
   </ItemGroup>
   <Target Name="BeforeBuild">
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />

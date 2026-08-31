@@ -45,9 +45,10 @@ BEGIN
         WHERE [PublicId] = @PublicId
         ORDER BY [Id] DESC;
 
+        DECLARE @PublicIdText VARCHAR(36) = CONVERT(varchar(36), @PublicId);
         IF @TargetId IS NULL
         BEGIN
-            RAISERROR('Service application with PublicId %s not found.', 16, 1, @PublicId);
+            RAISERROR('Service application with PublicId %s not found.', 16, 1, @PublicIdText);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

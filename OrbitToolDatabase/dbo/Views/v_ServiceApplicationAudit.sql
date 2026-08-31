@@ -4,10 +4,10 @@
 */
 CREATE VIEW [dbo].[v_ServiceApplicationAudit]
 AS
-SELECT 
+SELECT TOP (100) PERCENT 
     ua.[Id] AS AuditId,
     ua.[UserId],
-    u.[FullName] AS UserFullName,
+    CONCAT(u.[FirstName], ' ', u.[LastName]) AS UserFullName,
     u.[Email] AS UserEmail,
     ua.[ActivityType],
     ua.[ActionType],

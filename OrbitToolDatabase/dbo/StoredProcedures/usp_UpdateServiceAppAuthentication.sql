@@ -73,9 +73,10 @@ BEGIN
         ORDER BY [Id] DESC;
 
         -- 4. Check if record exists
+        DECLARE @PublicIdText VARCHAR(36) = CONVERT(varchar(36), @PublicId);
         IF @InternalId IS NULL
         BEGIN
-            RAISERROR('ServiceAppAuthentication record with PublicId %s not found.', 16, 1, @PublicId);
+            RAISERROR('ServiceAppAuthentication record with PublicId %s not found.', 16, 1, @PublicIdText);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -103,7 +104,7 @@ BEGIN
                 @ExistingName AS Name,
                 @ExistingAuthenticationType AS AuthenticationType,
                 @ExistingEncryptionAlgorithmType AS EncryptionAlgorithmType,
-                @ExistingRecordVersion AS RecordVersion,
+                @CurrentRecordVersion AS RecordVersion,
                 @CurrentIsActive AS IsActive
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
@@ -207,7 +208,7 @@ BEGIN
                 'AuthConfigUpdate' AS ChangeType,
                 @PublicId AS AuthConfigId,
                 ISNULL(@Name, @ExistingName) AS AuthConfigName,
-                @ExistingRecordVersion AS OldVersion,
+                @CurrentRecordVersion AS OldVersion,
                 @NewRecordVersion AS NewVersion,
                 @LogMessage AS Message,
                 @OldValueJson AS OldValues,

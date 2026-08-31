@@ -31,6 +31,9 @@ CREATE TABLE [dbo].[ServiceOperations] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceOperations_ServiceApplicationId_OperationName_RecordVersion
+        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC),
+
     CONSTRAINT CK_ServiceOperations_HttpMethod
         CHECK ([HttpMethod] IS NULL OR [HttpMethod] IN ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')),
     CONSTRAINT CK_ServiceOperations_RecordVersionFormat

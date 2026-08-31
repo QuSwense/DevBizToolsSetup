@@ -1,8 +1,11 @@
+/*
+    Table: ServiceTestCases
+    Description: This table represents service test cases.
+*/
 CREATE TABLE [dbo].[ServiceTestCases] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Name] NVARCHAR(200) NOT NULL,
     [ServiceRequestFileId] INT NULL,
-    [ServiceRequestFileHistoryId] INT NULL,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestCases_IsActive DEFAULT 1,
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceTestCases_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -13,19 +16,12 @@ CREATE TABLE [dbo].[ServiceTestCases] (
 
     -- Primary Key
     CONSTRAINT PK_ServiceTestCases PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT CK_ServiceTestCases_OneParent
-        CHECK (
-            ([ServiceRequestFileId] IS NOT NULL AND [ServiceRequestFileHistoryId] IS NULL)
-            OR ([ServiceRequestFileId] IS NULL AND [ServiceRequestFileHistoryId] IS NOT NULL)
-        ),
     CONSTRAINT CK_ServiceTestCases_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
     -- Foreign Key
     CONSTRAINT FK_ServiceTestCases_ServiceRequestFiles_ServiceRequestFileId
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
-    CONSTRAINT FK_ServiceTestCases_ServiceRequestFileHistories_ServiceRequestFileHistoryId
-        FOREIGN KEY ([ServiceRequestFileHistoryId]) REFERENCES [dbo].[ServiceRequestFileHistories]([Id]),
     CONSTRAINT FK_ServiceTestCases_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceTestCases_Users_LastUpdatedBy

@@ -14,7 +14,7 @@ CREATE TABLE [dbo].[ServiceApplications] (
     -- Type of service application, e.g., 'SOAP', 'REST'
     [ServiceType] VARCHAR(10) NOT NULL,
     -- Foreign Key to ServiceAppAuthentications table
-    [ServiceAppAuthenticationId] INT NULL,
+    [ServiceAppAuthenticationId] BIGINT NULL,
     -- Name of the service application, e.g., 'My SOAP Service', 'My REST API'
     [Name] NVARCHAR(200) NOT NULL,
     -- Base URL of the service application, e.g., 'https://api.example.com', 'http://service.example.com'

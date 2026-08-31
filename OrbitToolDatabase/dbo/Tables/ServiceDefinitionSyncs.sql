@@ -18,7 +18,7 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     -- compression algorithm used for the definition file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the definition file content for integrity verification
-    [FileHash] VARCHAR(64) NULL,
+    [ContentHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceDefinitionSyncs_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -29,12 +29,15 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_RecordVersion
+        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [RecordVersion] ASC),
+
     CONSTRAINT CK_ServiceDefinitionSyncs_DefinitionUrl
         CHECK (LEFT([DefinitionUrl], 7) = 'http://' OR LEFT([DefinitionUrl], 8) = 'https://'),
     CONSTRAINT CK_ServiceDefinitionSyncs_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
-    CONSTRAINT CK_ServiceDefinitionSyncs_FileHash
-        CHECK ([FileHash] IS NULL OR LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
+    CONSTRAINT CK_ServiceDefinitionSyncs_ContentHash
+        CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceDefinitionSyncs_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 

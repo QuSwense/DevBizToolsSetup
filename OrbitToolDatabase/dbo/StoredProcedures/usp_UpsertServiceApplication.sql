@@ -1,6 +1,6 @@
 /*
-    Stored Procedure: usp_UpdateServiceApplication
-    Description: Updates a service application using PublicId and RecordVersion for concurrency.
+    Stored Procedure: usp_UpsertServiceApplication
+    Description: Inserts or updates a service application using PublicId and RecordVersion for concurrency.
     Includes comprehensive audit logging for all changes.
     
     Versioning Logic:
@@ -8,7 +8,7 @@
     - If BaseUrl, DefinitionType, DefinitionRelativeUrl, or HealthcheckRelativeUrl changes: New version created
     - If IsActive changes: In-place update
 */
-CREATE PROCEDURE [dbo].[usp_UpdateServiceApplication]
+CREATE PROCEDURE [dbo].[usp_UpsertServiceApplication]
     @PublicId UNIQUEIDENTIFIER,
     @RecordVersion VARCHAR(50),  -- For optimistic concurrency check
     @ServiceType VARCHAR(10) = NULL,
@@ -112,9 +112,10 @@ BEGIN
         ORDER BY [Id] DESC;
 
         -- 6. Validate record exists
+        DECLARE @PublicIdText VARCHAR(36) = CONVERT(varchar(36), @PublicId);
         IF @ExistingId IS NULL
         BEGIN
-            RAISERROR('Service application with PublicId %s not found.', 16, 1, @PublicId);
+            RAISERROR('Service application with PublicId %s not found.', 16, 1, @PublicIdText);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

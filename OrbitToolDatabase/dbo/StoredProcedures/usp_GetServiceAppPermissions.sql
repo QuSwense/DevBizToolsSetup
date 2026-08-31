@@ -27,7 +27,7 @@ BEGIN
         sap.[Id] AS PermissionId,
         sap.[PublicId] AS PermissionPublicId,
         sap.[UserId],
-        u.[FullName] AS UserFullName,
+        CONCAT(u.[FirstName], ' ', u.[LastName]) AS UserFullName,
         u.[Email] AS UserEmail,
         sap.[IsGranted],
         rp.[PermissionKey],

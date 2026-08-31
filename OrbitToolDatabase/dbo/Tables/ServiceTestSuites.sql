@@ -1,8 +1,11 @@
+/*
+    Table: ServiceTestSuites
+    Description: This table represents service test suites. A service test suite can contain multiple service test cases and is used to group related tests together for execution and management purposes.
+*/
 CREATE TABLE [dbo].[ServiceTestSuites] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Name] NVARCHAR(200) NOT NULL,
     [Description] NVARCHAR(MAX) NULL,
-    [ServiceApplicationId] INT NULL,  -- Optional: specific to a service
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestSuites_IsActive DEFAULT 1,
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceTestSuites_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -16,8 +19,6 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
     CONSTRAINT CK_ServiceTestSuites_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
-    CONSTRAINT FK_ServiceTestSuites_ServiceApplications_ServiceApplicationId
-        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]) ON DELETE SET NULL,
     CONSTRAINT FK_ServiceTestSuites_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceTestSuites_Users_LastUpdatedBy

@@ -43,5 +43,8 @@ GO
 
 CREATE UNIQUE NONCLUSTERED INDEX [IX_ServiceAppPermissions_ServiceApplicationId_UserId]
     ON [dbo].[ServiceAppPermissions]([ServiceApplicationId] ASC, [UserId] ASC);
+GO
+
 CREATE UNIQUE NONCLUSTERED INDEX [IX_ServiceAppPermissions_ServiceApplicationId_UserId_ResourcePermissionId]
     ON [dbo].[ServiceAppPermissions]([ServiceApplicationId] ASC, [UserId] ASC, [ResourcePermissionId] ASC);
+GO

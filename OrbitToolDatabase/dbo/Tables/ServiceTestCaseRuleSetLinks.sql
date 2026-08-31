@@ -1,3 +1,7 @@
+/*
+    Table: ServiceTestCaseRuleSetLinks
+    Description: This table represents the many-to-many relationship between ServiceTestCases and RuleSets.
+*/
 CREATE TABLE [dbo].[ServiceTestCaseRuleSetLinks] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [ServiceTestCaseId] INT NOT NULL,

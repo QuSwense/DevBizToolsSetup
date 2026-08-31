@@ -26,7 +26,7 @@ SELECT
         FOR XML PATH('')
     ), 1, 2, '') AS GrantedPermissions,
     STUFF((
-        SELECT DISTINCT ', ' + u.[FullName]
+        SELECT DISTINCT ', ' + CONCAT(u.[FirstName], ' ', u.[LastName])
         FROM [dbo].[ServiceAppPermissions] sap2
         INNER JOIN [dbo].[Users] u ON sap2.[UserId] = u.[UserId]
         WHERE sap2.[ServiceApplicationId] = sa.[Id]

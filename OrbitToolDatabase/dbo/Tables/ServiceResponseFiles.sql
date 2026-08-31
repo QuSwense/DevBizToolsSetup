@@ -7,16 +7,20 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     -- Foreign key to the ServiceRequestFiles table
     [ServiceRequestFileId] INT NOT NULL,
-    -- Foreign key to the ServiceRequestFileHistorys table, allowing for versioning of response files
-    [ServiceRequestFileHistoryId] INT NULL,
     -- File format, e.g., 'XML', 'JSON', 'PDF', 'BINARY'
     [FileFormat] VARCHAR(10) NULL,
     -- File name, e.g., 'request.xml', 'response.json'
     [Name] NVARCHAR(250) NOT NULL,
+    -- Flag: 1 = Complete full payload snapshot; 0 = Differential patch/delta.
+    [IsBaseSnapshot] BIT NOT NULL CONSTRAINT [DF_ServiceResponseFiles_IsBase] DEFAULT 1,
+    -- Foreign key pointing to the primary Base Snapshot when IsBaseSnapshot = 0.
+    [ParentBaseId] INT NULL,
+    -- Foreign key pointing to the immediate predecessor record in the delta chain.
+    [ParentDeltaId] INT NULL,
+    -- Depth count in the delta chain (0 for base snapshots, >0 for incremental deltas).
+    [DeltaDepth] INT NOT NULL CONSTRAINT [DF_ServiceResponseFiles_DeltaDepth] DEFAULT 0,
     -- Compressed file data
     [CompressedData] VARBINARY(MAX) NOT NULL,
-    -- Flattened minimized content of the file, e.g., for XML or JSON files, this could be a single-line representation of the content. Stripped of whitespace and line breaks for easier searching and indexing. Any sensitive information should be removed or masked in this field to ensure privacy and security. Any file data embedded is stripped out. use rules atatched to the application to determine what is sensitive and should be removed or masked.
-    [FlattenedContent] NVARCHAR(MAX) NOT NULL,
     -- Uncompressed size of the file in bytes
     [UncompressedSizeBytes] INT NULL,
     -- Compression algorithm used for the file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
@@ -25,17 +29,17 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     [FileHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
-        CONSTRAINT DF_ServiceRequestFiles_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
-    -- Indicates if the service request file record is currently active
-    [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceRequestFiles_IsActive DEFAULT 1,
+        CONSTRAINT DF_ServiceResponseFiles_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
+    -- Indicates if the service response file record is currently active
+    [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceResponseFiles_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceRequestFiles_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceResponseFiles_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
     [LastUpdatedAt] DATETIME NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceResponseFiles PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceResponseFiles_Name UNIQUE ([ServiceRequestFileId] ASC, [ServiceRequestFileHistoryId] ASC, [RecordVersion] ASC),
+    CONSTRAINT UQ_ServiceResponseFiles_Name UNIQUE ([Name] ASC, [RecordVersion] ASC),
     
     CONSTRAINT CK_ServiceResponseFiles_Format
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
@@ -49,8 +53,6 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Foreign Key Constraint
     CONSTRAINT FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
-    CONSTRAINT FK_ServiceResponseFiles_ServiceRequestFileHistorys_ServiceRequestFileHistoryId
-        FOREIGN KEY ([ServiceRequestFileHistoryId]) REFERENCES [dbo].[ServiceRequestFileHistorys]([Id]),
     CONSTRAINT FK_ServiceResponseFiles_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceResponseFiles_Users_LastUpdatedBy

@@ -24,7 +24,7 @@ SELECT
     
     -- User Details
     u.[UserId],
-    u.[FullName] AS UserFullName,
+    CONCAT(u.[FirstName], ' ', u.[LastName]) AS UserFullName,
     u.[Email] AS UserEmail,
     u.[Department] AS UserDepartment,
     
