@@ -19,7 +19,9 @@ public partial class MonacoEditor : IAsyncDisposable
     private string _containerId = DefaultContainerId;
     private DotNetObjectReference<MonacoEditor>? _dotNetRef;
     private bool _editorCreated;
+#pragma warning disable CS0414 // assigned and used in OnAfterRenderAsync/InitializeEditorAsync
     private bool _editorInitializing;
+#pragma warning restore CS0414
 
     // ── Content ──
     private string _previousContent = "";
@@ -129,7 +131,9 @@ public partial class MonacoEditor : IAsyncDisposable
 
     // ── Auto-save ──
     [Parameter] public int AutoSaveIntervalMs { get; set; }
+#pragma warning disable CS0649 // _autoSaveTimer is used in Dispose; assigned externally if AutoSaveIntervalMs > 0
     private Timer? _autoSaveTimer;
+#pragma warning restore CS0649
 
     // ── Callbacks ──
     [Parameter] public EventCallback OnBackClick { get; set; }

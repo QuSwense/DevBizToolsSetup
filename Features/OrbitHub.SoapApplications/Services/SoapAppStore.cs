@@ -4,6 +4,8 @@ using LinqToDB.Async;
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.SoapApplications.Core.Enums;
 using OrbitHub.SoapApplications.Models;
+using OrbitHub.Data.SoapManagement;
+using OrbitHub.Data.WsdlManagement;
 
 namespace OrbitHub.SoapApplications.Services;
 

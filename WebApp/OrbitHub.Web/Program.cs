@@ -7,6 +7,7 @@ using OrbitHub.MonitoringHealth;
 using OrbitHub.ADViewer;
 using OrbitHub.Settings;
 using OrbitHub.Data;
+using OrbitHub.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -21,7 +21,7 @@ public partial class MiniDonut
     /// <summary>
     /// Gets or sets the sub-label shown under the percentage.
     /// </summary>
-    [Parameter] public string Label { get; set; }
+    [Parameter] public string Label { get; set; } = "";
 
     /// <summary>
     /// Gets or sets the color of the value arc (CSS color).

@@ -2,6 +2,7 @@ using LinqToDB;
 using LinqToDB.Async;
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.SoapApplications.Models;
+using OrbitHub.Data.SoapManagement;
 
 namespace OrbitHub.SoapApplications.Services;
 

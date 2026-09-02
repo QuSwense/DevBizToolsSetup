@@ -4,13 +4,17 @@ using LinqToDB.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Data.CoreManagement;
+using OrbitHub.Data.FileVersionManagement;
 using OrbitHub.Data.IndexingManagement;
 using OrbitHub.Data.PermissionsManagement;
 using OrbitHub.Data.Repositories;
 using OrbitHub.Data.RuleManagement;
+using OrbitHub.Data.SoapManagement;
 using OrbitHub.Data.TestManagement;
 using OrbitHub.Data.UIManagement;
 using OrbitHub.Data.UserManagement;
+using OrbitHub.Data.WsdlManagement;
+using OrbitHub.Data.RestManagement;
 
 namespace OrbitHub.Data;
 
@@ -39,12 +43,16 @@ public static class ServiceHubDataConfig
     public static IServiceCollection AddServiceHubData(this IServiceCollection services, string connectionString)
     {
         services.AddLinqToDBContext<CoreDbContext>((_, options) => UseSqlServer(options, connectionString));
+        services.AddLinqToDBContext<FileManagementDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<IndexingDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<PermissionsDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<RuleDbContext>((_, options) => UseSqlServer(options, connectionString));
+        services.AddLinqToDBContext<SoapDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<TestDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<UiDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<UserDbContext>((_, options) => UseSqlServer(options, connectionString));
+        services.AddLinqToDBContext<WsdlDbContext>((_, options) => UseSqlServer(options, connectionString));
+        services.AddLinqToDBContext<RestDbContext>((_, options) => UseSqlServer(options, connectionString));
 
         services.AddRepositories();
 

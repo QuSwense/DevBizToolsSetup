@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Data.TestManagement;
 using OrbitHub.Data.UserManagement;
+using OrbitHub.Data.RestManagement;
 using OrbitHub.Dashboard.Core.Entities;
 using OrbitHub.Dashboard.Core.Interfaces;
 
@@ -136,7 +137,7 @@ internal sealed class DashboardRepository(IServiceProvider serviceProvider, ICon
             .Select(u => new UserEntity
             {
                 Name = FormatUserName(u),
-                Role = u.Role ?? ""
+                Role = u.RoleId?.ToString() ?? ""
             })];
     }
 
