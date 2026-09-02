@@ -22,7 +22,8 @@ BEGIN
         DECLARE @ResolvedUser NVARCHAR(20);
         DECLARE @ActivityId BIGINT;
         DECLARE @Notes NVARCHAR(MAX);
-        DECLARE @Role NVARCHAR(50);
+        DECLARE @RoleId INT;
+        DECLARE @RoleName NVARCHAR(50);
         DECLARE @PermissionKey NVARCHAR(MAX);
         DECLARE @ExistingIsGranted BIT;
         DECLARE @ExistingIsActive BIT;
@@ -36,11 +37,13 @@ BEGIN
 
         -- Get current details with lock
         SELECT TOP 1
-            @Role = rp.[Role],
+            @RoleId = rp.[RoleId],
+            @RoleName = ro.[Name],
             @ExistingIsGranted = rp.[IsGranted],
             @ExistingIsActive = rp.[IsActive],
             @PermissionKey = res.[PermissionKey]
         FROM [dbo].[RolePermissions] rp WITH (UPDLOCK, HOLDLOCK)
+        INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
         INNER JOIN [dbo].[ResourcePermissions] res ON rp.[ResourcePermissionId] = res.[Id]
         WHERE rp.[Id] = @RolePermissionId;
 
@@ -69,18 +72,20 @@ BEGIN
                 COMMIT TRANSACTION;
 
             SELECT 
-                [Id] AS RolePermissionId,
-                [Role],
-                [ResourcePermissionId],
-                [IsGranted],
-                [IsActive],
-                [CreatedAt],
-                [CreatedBy],
-                [LastUpdatedAt],
-                [LastUpdatedBy],
+                rp.[Id] AS RolePermissionId,
+                rp.[RoleId],
+                ro.[Name] AS Role,
+                rp.[ResourcePermissionId],
+                rp.[IsGranted],
+                rp.[IsActive],
+                rp.[CreatedAt],
+                rp.[CreatedBy],
+                rp.[LastUpdatedAt],
+                rp.[LastUpdatedBy],
                 @PermissionKey AS PermissionKey
-            FROM [dbo].[RolePermissions]
-            WHERE [Id] = @RolePermissionId;
+            FROM [dbo].[RolePermissions] rp
+            INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
+            WHERE rp.[Id] = @RolePermissionId;
             
             RETURN;
         END
@@ -95,7 +100,7 @@ BEGIN
         WHERE [Id] = @RolePermissionId;
 
         -- Build notes
-        SET @Notes = CONCAT('Role permission updated for role: ', @Role, 
+        SET @Notes = CONCAT('Role permission updated for role: ', @RoleName, 
                            ' with permission: ', @PermissionKey);
         IF @GrantedChanged = 1
             SET @Notes = CONCAT(@Notes, ' Granted: ', CASE WHEN @IsGranted = 1 THEN 'Yes' ELSE 'No' END);
@@ -107,7 +112,8 @@ BEGIN
             SELECT 
                 'Update' AS ChangeType,
                 @RolePermissionId AS RolePermissionId,
-                @Role AS Role,
+                @RoleId AS RoleId,
+                @RoleName AS Role,
                 @PermissionKey AS PermissionKey,
                 @IsGranted AS IsGranted,
                 @IsActive AS IsActive,
@@ -131,19 +137,21 @@ BEGIN
 
         -- Return the updated record
         SELECT 
-            [Id] AS RolePermissionId,
-            [Role],
-            [ResourcePermissionId],
-            [IsGranted],
-            [IsActive],
-            [CreatedAt],
-            [CreatedBy],
-            [LastUpdatedAt],
-            [LastUpdatedBy],
+            rp.[Id] AS RolePermissionId,
+            rp.[RoleId],
+            ro.[Name] AS Role,
+            rp.[ResourcePermissionId],
+            rp.[IsGranted],
+            rp.[IsActive],
+            rp.[CreatedAt],
+            rp.[CreatedBy],
+            rp.[LastUpdatedAt],
+            rp.[LastUpdatedBy],
             @PermissionKey AS PermissionKey,
             @ActivityId AS AuditActivityId
-        FROM [dbo].[RolePermissions]
-        WHERE [Id] = @RolePermissionId;
+        FROM [dbo].[RolePermissions] rp
+        INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
+        WHERE rp.[Id] = @RolePermissionId;
 
     END TRY
     BEGIN CATCH

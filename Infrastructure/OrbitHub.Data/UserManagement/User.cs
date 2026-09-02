@@ -48,10 +48,10 @@ public partial class User
 	public string? LastName { get; set; } // nvarchar(100)
 
 	/// <summary>
-	/// Application role assigned to the user.
+	/// Identifier of the related Roles record.
 	/// </summary>
-	[Column("Role")]
-	public string? Role { get; set; } // nvarchar(50)
+	[Column("RoleId")]
+	public int? RoleId { get; set; } // int
 
 	/// <summary>
 	/// Indicates whether this record is active and available for use.
@@ -60,16 +60,16 @@ public partial class User
 	public bool IsActive { get; set; } // bit
 
 	/// <summary>
+	/// Date and time at which this record was created.
+	/// </summary>
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
 	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("CreatedBy")]
 	public string? CreatedBy { get; set; } // nvarchar(20)
-
-	/// <summary>
-	/// Date and time at which this record was created.
-	/// </summary>
-	[Column("CreatedDate")]
-	public DateTime CreatedDate { get; set; } // datetime
 
 	/// <summary>
 	/// Date and time at which this record was last updated.

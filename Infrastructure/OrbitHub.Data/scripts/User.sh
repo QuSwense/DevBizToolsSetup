@@ -22,6 +22,7 @@ dotnet linq2db scaffold \
   --connection "$CONNECTION_STRING" \
   --output "$OUTPUT_DIR" \
   --overwrite \
+  --objects table,foreign-key \
   --include-tables Users,UserActivities \
   --namespace OrbitHub.Data.UserManagement \
   --context-name UserDbContext \

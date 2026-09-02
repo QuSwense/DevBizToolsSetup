@@ -3,7 +3,7 @@
     Description: Creates a new role permission with audit logging.
 */
 CREATE PROCEDURE [dbo].[usp_CreateRolePermission]
-    @Role NVARCHAR(50),
+    @RoleId INT,
     @ResourcePermissionId BIGINT,
     @IsGranted BIT = 1,
     @IsActive BIT = 1,
@@ -25,6 +25,7 @@ BEGIN
         DECLARE @ActivityId BIGINT;
         DECLARE @Notes NVARCHAR(MAX);
         DECLARE @PermissionKey NVARCHAR(MAX);
+        DECLARE @RoleName NVARCHAR(50);
 
         -- Resolve audit user
         SET @ResolvedUser = COALESCE(
@@ -46,16 +47,29 @@ BEGIN
             RETURN;
         END
 
+        -- Validate Role exists and resolve its name
+        SELECT @RoleName = [Name]
+        FROM [dbo].[Roles]
+        WHERE [Id] = @RoleId;
+
+        IF @RoleName IS NULL
+        BEGIN
+            RAISERROR('Role with Id %d not found.', 16, 1, @RoleId);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
         -- Check for duplicate role permission
         IF EXISTS (
             SELECT 1 
             FROM [dbo].[RolePermissions]
-            WHERE [Role] = @Role
+            WHERE [RoleId] = @RoleId
               AND [ResourcePermissionId] = @ResourcePermissionId
               AND [IsActive] = 1
         )
         BEGIN
-            RAISERROR('Permission "%s" already exists for role "%s".', 16, 1, @PermissionKey, @Role);
+            RAISERROR('Permission "%s" already exists for role "%s".', 16, 1, @PermissionKey, @RoleName);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -63,7 +77,7 @@ BEGIN
 
         -- Insert new record
         INSERT INTO [dbo].[RolePermissions] (
-            [Role],
+            [RoleId],
             [ResourcePermissionId],
             [IsGranted],
             [IsActive],
@@ -73,7 +87,7 @@ BEGIN
             [LastUpdatedBy]
         )
         VALUES (
-            @Role,
+            @RoleId,
             @ResourcePermissionId,
             @IsGranted,
             @IsActive,
@@ -86,7 +100,7 @@ BEGIN
         SET @NewId = SCOPE_IDENTITY();
 
         -- Build notes
-        SET @Notes = CONCAT('Role permission created for role: ', @Role, 
+        SET @Notes = CONCAT('Role permission created for role: ', @RoleName, 
                            ' with permission: ', @PermissionKey, 
                            ' (Granted: ', CASE WHEN @IsGranted = 1 THEN 'Yes' ELSE 'No' END, ')');
 
@@ -94,7 +108,8 @@ BEGIN
         DECLARE @FeatureJson NVARCHAR(MAX) = (
             SELECT 
                 'Create' AS ChangeType,
-                @Role AS Role,
+                @RoleId AS RoleId,
+                @RoleName AS Role,
                 @ResourcePermissionId AS ResourcePermissionId,
                 @PermissionKey AS PermissionKey,
                 @IsGranted AS IsGranted,
@@ -117,19 +132,21 @@ BEGIN
 
         -- Return the new record
         SELECT 
-            [Id] AS RolePermissionId,
-            [Role],
-            [ResourcePermissionId],
-            [IsGranted],
-            [IsActive],
-            [CreatedAt],
-            [CreatedBy],
-            [LastUpdatedAt],
-            [LastUpdatedBy],
+            rp.[Id] AS RolePermissionId,
+            rp.[RoleId],
+            ro.[Name] AS Role,
+            rp.[ResourcePermissionId],
+            rp.[IsGranted],
+            rp.[IsActive],
+            rp.[CreatedAt],
+            rp.[CreatedBy],
+            rp.[LastUpdatedAt],
+            rp.[LastUpdatedBy],
             @PermissionKey AS PermissionKey,
             @ActivityId AS AuditActivityId
-        FROM [dbo].[RolePermissions]
-        WHERE [Id] = @NewId;
+        FROM [dbo].[RolePermissions] rp
+        INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
+        WHERE rp.[Id] = @NewId;
 
     END TRY
     BEGIN CATCH

@@ -24,22 +24,52 @@ public partial class ServiceResponseFile
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Identifier of the related ServiceRequestFiles record.
+	/// </summary>
+	[Column("ServiceRequestFileId")]
+	public int ServiceRequestFileId { get; set; } // int
+
+	/// <summary>
 	/// Format of the stored file payload, such as XML, JSON, PDF, or BINARY.
 	/// </summary>
 	[Column("FileFormat")]
 	public string? FileFormat { get; set; } // varchar(10)
 
 	/// <summary>
-	/// Original name of the stored file.
+	/// Human-readable name of this record.
 	/// </summary>
-	[Column("FileName", CanBeNull = false)]
-	public string FileName { get; set; } = null!; // nvarchar(250)
+	[Column("Name", CanBeNull = false)]
+	public string Name { get; set; } = null!; // nvarchar(250)
 
 	/// <summary>
-	/// Binary content of the stored file.
+	/// Indicates whether this record is a complete base snapshot (1) or a differential delta (0).
 	/// </summary>
-	[Column("FileData", CanBeNull = false)]
-	public byte[] FileData { get; set; } = null!; // varbinary(max)
+	[Column("IsBaseSnapshot")]
+	public bool IsBaseSnapshot { get; set; } // bit
+
+	/// <summary>
+	/// Identifier of the base snapshot record in the delta chain.
+	/// </summary>
+	[Column("ParentBaseId")]
+	public int? ParentBaseId { get; set; } // int
+
+	/// <summary>
+	/// Identifier of the immediate predecessor record in the delta chain.
+	/// </summary>
+	[Column("ParentDeltaId")]
+	public int? ParentDeltaId { get; set; } // int
+
+	/// <summary>
+	/// Depth of this record in the delta chain (0 for base snapshots).
+	/// </summary>
+	[Column("DeltaDepth")]
+	public int DeltaDepth { get; set; } // int
+
+	/// <summary>
+	/// Compressed binary content stored for this record.
+	/// </summary>
+	[Column("CompressedData", CanBeNull = false)]
+	public byte[] CompressedData { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
 	/// Size of the file content before compression, in bytes.
@@ -60,6 +90,18 @@ public partial class ServiceResponseFile
 	public string? FileHash { get; set; } // varchar(64)
 
 	/// <summary>
+	/// Application-managed version value used for record change tracking.
+	/// </summary>
+	[Column("RecordVersion", CanBeNull = false)]
+	public string RecordVersion { get; set; } = null!; // varchar(50)
+
+	/// <summary>
+	/// Indicates whether this record is active and available for use.
+	/// </summary>
+	[Column("IsActive")]
+	public bool IsActive { get; set; } // bit
+
+	/// <summary>
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
@@ -70,6 +112,18 @@ public partial class ServiceResponseFile
 	/// </summary>
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>
@@ -85,9 +139,15 @@ public partial class ServiceResponseFile
 	public IEnumerable<ServiceResponseFileEmbedding> ServiceResponseFileEmbeddings { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceTestExecutionAuditTestSuitLinks_ServiceResponseFiles_ServiceResponseFileId backreference
+	/// FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestExecutionAuditTestSuitLink.ServiceResponseFileId))]
-	public IEnumerable<ServiceTestExecutionAuditTestSuitLink> ServiceTestExecutionAuditTestSuitLinks { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(ServiceRequestFileId), OtherKey = nameof(TestManagement.ServiceRequestFile.Id))]
+	public ServiceRequestFile ServiceRequestFile { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceResponseFiles_ServiceResponseFileId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteExecutionAuditTestCaseLink.ServiceResponseFileId))]
+	public IEnumerable<ServiceTestSuiteExecutionAuditTestCaseLink> ServiceTestSuiteExecutionAuditTestCaseLinks { get; set; } = null!;
 	#endregion
 }

@@ -1,7 +1,6 @@
 using LinqToDB;
 using LinqToDB.Async;
 using Microsoft.Extensions.DependencyInjection;
-using OrbitHub.Data.SoapManagement;
 using OrbitHub.SoapApplications.Core.Enums;
 using OrbitHub.SoapApplications.Models;
 

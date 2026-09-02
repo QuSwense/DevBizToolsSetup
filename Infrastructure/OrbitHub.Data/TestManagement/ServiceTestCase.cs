@@ -30,16 +30,22 @@ public partial class ServiceTestCase
 	public string Name { get; set; } = null!; // nvarchar(200)
 
 	/// <summary>
-	/// Value of the ServiceRequestFileId field for this ServiceTestCases record.
+	/// Identifier of the related ServiceRequestFiles record.
 	/// </summary>
 	[Column("ServiceRequestFileId")]
-	public int ServiceRequestFileId { get; set; } // int
+	public int? ServiceRequestFileId { get; set; } // int
 
 	/// <summary>
 	/// Indicates whether this record is active and available for use.
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
+
+	/// <summary>
+	/// Application-managed version value used for record change tracking.
+	/// </summary>
+	[Column("RecordVersion", CanBeNull = false)]
+	public string RecordVersion { get; set; } = null!; // varchar(50)
 
 	/// <summary>
 	/// Date and time at which this record was created.
@@ -73,15 +79,21 @@ public partial class ServiceTestCase
 	public IEnumerable<ServiceTestCaseRuleSetLink> ServiceTestCaseRuleSetLinks { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceTestExecutionAuditTestSuitLinks_ServiceTestCases_ServiceTestCaseId backreference
+	/// FK_ServiceTestCases_ServiceRequestFiles_ServiceRequestFileId
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestExecutionAuditTestSuitLink.ServiceTestCaseId))]
-	public IEnumerable<ServiceTestExecutionAuditTestSuitLink> ServiceTestExecutionAuditTestSuitLinks { get; set; } = null!;
+	[Association(ThisKey = nameof(ServiceRequestFileId), OtherKey = nameof(TestManagement.ServiceRequestFile.Id))]
+	public ServiceRequestFile? ServiceRequestFile { get; set; }
 
 	/// <summary>
-	/// FK_ServiceTestSuitTestCaseLinks_ServiceTestCases_ServiceTestCaseId backreference
+	/// FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestCases_ServiceTestCaseId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuitTestCaseLink.ServiceTestCaseId))]
-	public IEnumerable<ServiceTestSuitTestCaseLink> ServiceTestSuitTestCaseLinks { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteExecutionAuditTestCaseLink.ServiceTestCaseId))]
+	public IEnumerable<ServiceTestSuiteExecutionAuditTestCaseLink> ServiceTestSuiteExecutionAuditTestCaseLinks { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceTestSuiteTestCaseLinks_ServiceTestCases_ServiceTestCaseId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteTestCaseLink.ServiceTestCaseId))]
+	public IEnumerable<ServiceTestSuiteTestCaseLink> ServiceTestSuiteTestCaseLinks { get; set; } = null!;
 	#endregion
 }

@@ -5,7 +5,8 @@
 CREATE VIEW [dbo].[v_RolePermissionSummary]
 AS
 SELECT 
-    rp.[Role],
+    rp.[RoleId],
+    ro.[Name] AS Role,
     
     -- Permission counts
     COUNT(DISTINCT rp.[Id]) AS TotalPermissions,
@@ -24,7 +25,7 @@ SELECT
         SELECT DISTINCT ', ' + res2.[PermissionKey]
         FROM [dbo].[RolePermissions] rp2
         INNER JOIN [dbo].[ResourcePermissions] res2 ON rp2.[ResourcePermissionId] = res2.[Id]
-        WHERE rp2.[Role] = rp.[Role]
+        WHERE rp2.[RoleId] = rp.[RoleId]
           AND rp2.[IsGranted] = 1
           AND rp2.[IsActive] = 1
         FOR XML PATH('')
@@ -35,6 +36,7 @@ SELECT
     MAX(rp.[LastUpdatedAt]) AS LastPermissionUpdated
 
 FROM [dbo].[RolePermissions] rp
+INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
 INNER JOIN [dbo].[ResourcePermissions] res ON rp.[ResourcePermissionId] = res.[Id]
-GROUP BY rp.[Role];
+GROUP BY rp.[RoleId], ro.[Name];
 GO

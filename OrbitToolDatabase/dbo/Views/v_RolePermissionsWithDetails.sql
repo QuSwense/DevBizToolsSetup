@@ -6,7 +6,8 @@ CREATE VIEW [dbo].[v_RolePermissionsWithDetails]
 AS
 SELECT 
     rp.[Id] AS RolePermissionId,
-    rp.[Role],
+    rp.[RoleId],
+    ro.[Name] AS Role,
     rp.[ResourcePermissionId],
     rp.[IsGranted],
     rp.[IsActive],
@@ -38,5 +39,6 @@ SELECT
     DATEDIFF(DAY, rp.[CreatedAt], GETDATE()) AS AgeDays
 
 FROM [dbo].[RolePermissions] rp
+INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
 INNER JOIN [dbo].[ResourcePermissions] res ON rp.[ResourcePermissionId] = res.[Id];
 GO

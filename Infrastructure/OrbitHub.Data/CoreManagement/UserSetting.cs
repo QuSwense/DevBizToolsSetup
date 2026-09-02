@@ -23,6 +23,12 @@ public partial class UserSetting
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related GlobalSettings record.
 	/// </summary>
 	[Column("GlobalSettingId")]

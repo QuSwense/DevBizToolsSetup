@@ -2,7 +2,6 @@ using LinqToDB;
 using LinqToDB.Async;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OrbitHub.Data.RestManagement;
 using OrbitHub.Data.TestManagement;
 using OrbitHub.Data.UserManagement;
 using OrbitHub.Dashboard.Core.Entities;
@@ -36,7 +35,7 @@ internal sealed class DashboardRepository(IServiceProvider serviceProvider, ICon
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TestDbContext>();
 
-        var caseCountBySuite = (await db.ServiceTestSuitTestCaseLinks.ToListAsync())
+        var caseCountBySuite = (await db.ServiceTestSuiteTestCaseLinks.ToListAsync())
             .ToLookup(l => l.ServiceTestSuiteId);
 
         return [.. (await db.ServiceTestSuites.ToListAsync())
@@ -256,7 +255,7 @@ internal sealed class DashboardRepository(IServiceProvider serviceProvider, ICon
         var suites = await db.ServiceTestSuites.ToListAsync();
         var suiteById = suites.ToDictionary(s => s.Id);
 
-        return [.. (await db.ServiceTestExecutionAudits.OrderByDescending(a => a.ExecutedAt).ToListAsync())
+        return [.. (await db.ServiceTestSuiteExecutionAudits.OrderByDescending(a => a.ExecutedAt).ToListAsync())
             .Select(a =>
             {
                 suiteById.TryGetValue(a.ServiceTestSuiteId, out var suite);

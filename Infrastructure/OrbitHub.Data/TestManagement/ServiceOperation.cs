@@ -48,18 +48,6 @@ public partial class ServiceOperation
 	public string? HttpMethod { get; set; } // varchar(10)
 
 	/// <summary>
-	/// Root element name expected in the operation request payload.
-	/// </summary>
-	[Column("InputRootElementName")]
-	public string? InputRootElementName { get; set; } // nvarchar(200)
-
-	/// <summary>
-	/// Root element name expected in the operation response payload.
-	/// </summary>
-	[Column("OutputRootElementName")]
-	public string? OutputRootElementName { get; set; } // nvarchar(200)
-
-	/// <summary>
 	/// Optional human-readable description of this record.
 	/// </summary>
 	[Column("Description")]
@@ -103,9 +91,9 @@ public partial class ServiceOperation
 
 	#region Associations
 	/// <summary>
-	/// FK_ServiceOperationSchemas_ServiceOperations_OperationId backreference
+	/// FK_ServiceOperationSchemas_ServiceOperations_ServiceOperationId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceOperationSchema.OperationId))]
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceOperationSchema.ServiceOperationId))]
 	public IEnumerable<ServiceOperationSchema> ServiceOperationSchemas { get; set; } = null!;
 
 	/// <summary>
@@ -115,9 +103,9 @@ public partial class ServiceOperation
 	public ServiceApplication ServiceApplication { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceRequestFiles_ServiceOperations_OperationId backreference
+	/// FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceRequestFile.OperationId))]
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceRequestFile.ServiceOperationId))]
 	public IEnumerable<ServiceRequestFile> ServiceRequestFiles { get; set; } = null!;
 	#endregion
 }

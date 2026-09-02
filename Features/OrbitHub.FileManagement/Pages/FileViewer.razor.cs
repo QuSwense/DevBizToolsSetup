@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Components;
 using LinqToDB.Async;
 using Microsoft.JSInterop;
 using OrbitHub.Common;
-using OrbitHub.Data.SoapManagement;
-using OrbitHub.Data.RestManagement;
 
 namespace OrbitHub.FileManagement.Pages;
 

@@ -21,7 +21,19 @@ public partial class ServiceAppAuthentication
 	/// Unique identifier for this ServiceAppAuthentications record.
 	/// </summary>
 	[Column("Id", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
-	public int Id { get; set; } // int
+	public long Id { get; set; } // bigint
+
+	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
+	/// Human-readable name of this record.
+	/// </summary>
+	[Column("Name", CanBeNull = false)]
+	public string Name { get; set; } = null!; // nvarchar(200)
 
 	/// <summary>
 	/// Authentication mechanism used to access a service application.
@@ -38,8 +50,8 @@ public partial class ServiceAppAuthentication
 	/// <summary>
 	/// Encrypted JSON document containing authentication credentials.
 	/// </summary>
-	[Column("EncryptedCredentialsJson", CanBeNull = false)]
-	public string EncryptedCredentialsJson { get; set; } = null!; // nvarchar(max)
+	[Column("EncryptedJson", CanBeNull = false)]
+	public string EncryptedJson { get; set; } = null!; // nvarchar(max)
 
 	/// <summary>
 	/// Indicates whether this record is active and available for use.
@@ -79,7 +91,7 @@ public partial class ServiceAppAuthentication
 
 	#region Associations
 	/// <summary>
-	/// FK_ServiceApplications_ServiceAppAuthentications_AuthenticationId backreference
+	/// FK_ServiceApplications_ServiceAppAuthentications_ServiceAppAuthenticationId backreference
 	/// </summary>
 	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceApplication.ServiceAppAuthenticationId))]
 	public IEnumerable<ServiceApplication> ServiceApplications { get; set; } = null!;

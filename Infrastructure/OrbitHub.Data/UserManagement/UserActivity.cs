@@ -29,6 +29,18 @@ public partial class UserActivity
 	public string UserId { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
+	/// Type of activity performed by the user, such as Login or FeatureUsage.
+	/// </summary>
+	[Column("ActivityType", CanBeNull = false)]
+	public string ActivityType { get; set; } = null!; // nvarchar(100)
+
+	/// <summary>
+	/// Granular action type of the activity, such as Click, View, or Edit.
+	/// </summary>
+	[Column("ActionType")]
+	public string? ActionType { get; set; } // nvarchar(50)
+
+	/// <summary>
 	/// JSON document containing user feature activity details.
 	/// </summary>
 	[Column("FeatureActivitiesJson")]

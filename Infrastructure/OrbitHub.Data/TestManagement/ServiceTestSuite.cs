@@ -36,12 +36,6 @@ public partial class ServiceTestSuite
 	public string? Description { get; set; } // nvarchar(max)
 
 	/// <summary>
-	/// Identifier of the related ServiceApplications record.
-	/// </summary>
-	[Column("ServiceApplicationId")]
-	public int? ServiceApplicationId { get; set; } // int
-
-	/// <summary>
 	/// Indicates whether this record is active and available for use.
 	/// </summary>
 	[Column("IsActive")]
@@ -79,21 +73,15 @@ public partial class ServiceTestSuite
 
 	#region Associations
 	/// <summary>
-	/// FK_ServiceTestExecutionAudits_ServiceTestSuites_ServiceTestSuiteId backreference
+	/// FK_ServiceTestSuiteExecutionAudits_ServiceTestSuites_ServiceTestSuiteId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestExecutionAudit.ServiceTestSuiteId))]
-	public IEnumerable<ServiceTestExecutionAudit> ServiceTestExecutionAudits { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteExecutionAudit.ServiceTestSuiteId))]
+	public IEnumerable<ServiceTestSuiteExecutionAudit> ServiceTestSuiteExecutionAudits { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceTestSuitTestCaseLinks_ServiceTestSuites_ServiceTestSuiteId backreference
+	/// FK_ServiceTestSuiteTestCaseLinks_ServiceTestSuites_ServiceTestSuiteId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuitTestCaseLink.ServiceTestSuiteId))]
-	public IEnumerable<ServiceTestSuitTestCaseLink> ServiceTestSuitTestCaseLinks { get; set; } = null!;
-
-	/// <summary>
-	/// FK_ServiceTestSuites_ServiceApplications_ServiceApplicationId
-	/// </summary>
-	[Association(ThisKey = nameof(ServiceApplicationId), OtherKey = nameof(TestManagement.ServiceApplication.Id))]
-	public ServiceApplication? ServiceApplication { get; set; }
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteTestCaseLink.ServiceTestSuiteId))]
+	public IEnumerable<ServiceTestSuiteTestCaseLink> ServiceTestSuiteTestCaseLinks { get; set; } = null!;
 	#endregion
 }

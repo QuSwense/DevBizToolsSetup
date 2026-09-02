@@ -132,13 +132,16 @@ IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTes
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteExecutionAudits')) DROP TABLE [dbo].[ServiceTestSuiteExecutionAudits];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteTestCaseLinks')) DROP TABLE [dbo].[ServiceTestSuiteTestCaseLinks];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestCaseRuleSetLinks')) DROP TABLE [dbo].[ServiceTestCaseRuleSetLinks];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuitesPermissions')) DROP TABLE [dbo].[ServiceTestSuitesPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuites')) DROP TABLE [dbo].[ServiceTestSuites];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestCasesPermissions')) DROP TABLE [dbo].[ServiceTestCasesPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestCases')) DROP TABLE [dbo].[ServiceTestCases];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseIndexingStatus')) DROP TABLE [dbo].[ServiceResponseIndexingStatus];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFileEmbeddings')) DROP TABLE [dbo].[ServiceResponseFileEmbeddings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFiles')) DROP TABLE [dbo].[ServiceResponseFiles];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestIndexingStatus')) DROP TABLE [dbo].[ServiceRequestIndexingStatus];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFileEmbeddings')) DROP TABLE [dbo].[ServiceRequestFileEmbeddings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFilesPermissions')) DROP TABLE [dbo].[ServiceRequestFilesPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFiles')) DROP TABLE [dbo].[ServiceRequestFiles];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.BinaryEmbeddingsStore')) DROP TABLE [dbo].[BinaryEmbeddingsStore];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.SoapNamespaces')) DROP TABLE [dbo].[SoapNamespaces];
@@ -150,14 +153,19 @@ IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceApp
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceAppAuthentications')) DROP TABLE [dbo].[ServiceAppAuthentications];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleExecutionLogs')) DROP TABLE [dbo].[RuleExecutionLogs];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetContextObjectLinks')) DROP TABLE [dbo].[RuleSetContextObjectLinks];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetsPermissions')) DROP TABLE [dbo].[RuleSetsPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSets')) DROP TABLE [dbo].[RuleSets];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserSettings')) DROP TABLE [dbo].[UserSettings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserActivities')) DROP TABLE [dbo].[UserActivities];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserPermissions')) DROP TABLE [dbo].[UserPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RolePermissions')) DROP TABLE [dbo].[RolePermissions];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.PermissionToUIPageMapping')) DROP TABLE [dbo].[PermissionToUIPageMapping];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UIActions')) DROP TABLE [dbo].[UIActions];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UIPages')) DROP TABLE [dbo].[UIPages];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ResourcePermissions')) DROP TABLE [dbo].[ResourcePermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.GlobalSettings')) DROP TABLE [dbo].[GlobalSettings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleContextObjects')) DROP TABLE [dbo].[RuleContextObjects];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Roles')) DROP TABLE [dbo].[Roles];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Users')) DROP TABLE [dbo].[Users];
 GO
 
@@ -180,7 +188,59 @@ GO
 GO
 
 /* Recreate tables from project source, honoring foreign-key dependencies. */
-:r ../dbo/Tables/Users.sql
+/* Users and Roles have a circular foreign-key relationship:
+     Users.RoleId    -> Roles(Id)
+     Roles.CreatedBy -> Users(UserId)
+   SQL Server cannot create either table with both FKs before the other exists,
+   so Users is created below WITHOUT FK_Users_Roles_RoleId, then Roles is
+   created, then the FK is added via ALTER to complete the cycle.
+   The inline Users DDL mirrors ../dbo/Tables/Users.sql (minus FK_Users_Roles_RoleId). */
+CREATE TABLE [dbo].[Users] (
+    [UserId] NVARCHAR(20) NOT NULL,
+    [Email] NVARCHAR(250) NOT NULL,
+    [Department] NVARCHAR(100) NULL,
+    [FirstName] NVARCHAR(100) NULL,
+    [LastName] NVARCHAR(100) NULL,
+    [RoleId] INT NULL,
+    [IsActive] BIT NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT 1,
+    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT GETDATE(),
+    [CreatedBy] NVARCHAR(20) NULL,
+    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedBy] NVARCHAR(20) NULL,
+
+    CONSTRAINT PK_Users PRIMARY KEY CLUSTERED ([UserId] ASC),
+    CONSTRAINT UQ_Users_Email UNIQUE ([Email] ASC),
+
+    -- Foreign Keys
+    CONSTRAINT FK_Users_CreatedBy_Users FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
+    CONSTRAINT FK_Users_LastUpdatedBy_Users FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Users_RoleId ON [dbo].[Users]([RoleId] ASC)
+GO
+
+/* Seed the SYSTEM user so the Roles seed (and other seeds) that set
+   CreatedBy = N'SYSTEM' satisfy the FK_*_Users_CreatedBy constraints. */
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [UserId] = N'SYSTEM')
+    INSERT INTO [dbo].[Users] ([UserId], [Email], [FirstName], [LastName], [CreatedBy])
+    VALUES (N'SYSTEM', N'system@orbit.local', N'System', N'User', N'SYSTEM');
+GO
+
+:r ../dbo/Tables/Roles.sql
+GO
+
+/* Seed the system roles (same seed as Seeds/RolesSeed.sql for project deploys). */
+INSERT INTO [dbo].[Roles] ([Name], [Description], [IsSystemRole], [CreatedBy])
+VALUES 
+    (N'Developer', N'Developer role with full access to all resources including settings', 1, N'SYSTEM'),
+    (N'Admin', N'Administrator role with full access to main resource topics', 1, N'SYSTEM'),
+    (N'Viewer', N'Read-only access to all resources', 1, N'SYSTEM');
+GO
+
+/* Complete the Users <-> Roles foreign-key cycle. */
+ALTER TABLE [dbo].[Users] ADD CONSTRAINT FK_Users_Roles_RoleId
+    FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE SET NULL;
 GO
 :r ../dbo/Tables/RuleContextObjects.sql
 GO
@@ -190,6 +250,13 @@ GO
 GO
 :r ../dbo/Tables/RolePermissions.sql
 GO
+/* RBAC/UI tables (depend on Users, Roles, and ResourcePermissions created above). */
+:r ../dbo/Tables/UIPages.sql
+GO
+:r ../dbo/Tables/UIActions.sql
+GO
+:r ../dbo/Tables/PermissionToUIPageMapping.sql
+GO
 :r ../dbo/Tables/UserPermissions.sql
 GO
 :r ../dbo/Tables/UserActivities.sql
@@ -197,6 +264,8 @@ GO
 :r ../dbo/Tables/UserSettings.sql
 GO
 :r ../dbo/Tables/RuleSets.sql
+GO
+:r ../dbo/Tables/RuleSetsPermissions.sql
 GO
 :r ../dbo/Tables/RuleSetContextObjectLinks.sql
 GO
@@ -220,6 +289,8 @@ GO
 GO
 :r ../dbo/Tables/ServiceRequestFiles.sql
 GO
+:r ../dbo/Tables/ServiceRequestFilesPermissions.sql
+GO
 :r ../dbo/Tables/ServiceRequestFileEmbeddings.sql
 GO
 :r ../dbo/Tables/ServiceRequestIndexingStatus.sql
@@ -232,7 +303,11 @@ GO
 GO
 :r ../dbo/Tables/ServiceTestCases.sql
 GO
+:r ../dbo/Tables/ServiceTestCasesPermissions.sql
+GO
 :r ../dbo/Tables/ServiceTestSuites.sql
+GO
+:r ../dbo/Tables/ServiceTestSuitesPermissions.sql
 GO
 :r ../dbo/Tables/ServiceTestCaseRuleSetLinks.sql
 GO

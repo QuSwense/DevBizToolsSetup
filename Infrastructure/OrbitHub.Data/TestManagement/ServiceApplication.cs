@@ -24,6 +24,12 @@ public partial class ServiceApplication
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Service protocol category, such as SOAP or REST.
 	/// </summary>
 	[Column("ServiceType", CanBeNull = false)]
@@ -33,13 +39,13 @@ public partial class ServiceApplication
 	/// Identifier of the related ServiceAppAuthentications record.
 	/// </summary>
 	[Column("ServiceAppAuthenticationId")]
-	public int? ServiceAppAuthenticationId { get; set; } // int
+	public long? ServiceAppAuthenticationId { get; set; } // bigint
 
 	/// <summary>
-	/// Unique display name of the service application.
+	/// Human-readable name of this record.
 	/// </summary>
-	[Column("AppName", CanBeNull = false)]
-	public string AppName { get; set; } = null!; // nvarchar(200)
+	[Column("Name", CanBeNull = false)]
+	public string Name { get; set; } = null!; // nvarchar(200)
 
 	/// <summary>
 	/// Base HTTP or HTTPS URL for the service application.
@@ -109,22 +115,10 @@ public partial class ServiceApplication
 
 	#region Associations
 	/// <summary>
-	/// FK_ServiceAppPermissions_ServiceApplications_ServiceApplicationId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceAppPermission.ServiceApplicationId))]
-	public IEnumerable<ServiceAppPermission> ServiceAppPermissions { get; set; } = null!;
-
-	/// <summary>
-	/// FK_ServiceApplications_ServiceAppAuthentications_AuthenticationId
+	/// FK_ServiceApplications_ServiceAppAuthentications_ServiceAppAuthenticationId
 	/// </summary>
 	[Association(ThisKey = nameof(ServiceAppAuthenticationId), OtherKey = nameof(TestManagement.ServiceAppAuthentication.Id))]
 	public ServiceAppAuthentication? ServiceAppAuthentication { get; set; }
-
-	/// <summary>
-	/// FK_ServiceDefinitionSyncHistorys_ServiceApplications_ServiceApplicationId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceDefinitionSyncHistory.ServiceApplicationId))]
-	public IEnumerable<ServiceDefinitionSyncHistory> ServiceDefinitionSyncHistorys { get; set; } = null!;
 
 	/// <summary>
 	/// FK_ServiceDefinitionSyncs_ServiceApplications_ServiceApplicationId backreference
@@ -137,11 +131,5 @@ public partial class ServiceApplication
 	/// </summary>
 	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceOperation.ServiceApplicationId))]
 	public IEnumerable<ServiceOperation> ServiceOperations { get; set; } = null!;
-
-	/// <summary>
-	/// FK_ServiceTestSuites_ServiceApplications_ServiceApplicationId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuite.ServiceApplicationId))]
-	public IEnumerable<ServiceTestSuite> ServiceTestSuites { get; set; } = null!;
 	#endregion
 }

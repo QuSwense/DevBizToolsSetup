@@ -53,6 +53,24 @@ public partial class RuleContextObject
 	[Column("CreatedDate")]
 	public DateTime? CreatedDate { get; set; } // datetime
 
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("CreatedBy", CanBeNull = false)]
+	public string CreatedBy { get; set; } = null!; // nvarchar(20)
+
+	/// <summary>
+	/// Value of the LastUpdatedDate field for this RuleContextObjects record.
+	/// </summary>
+	[Column("LastUpdatedDate")]
+	public DateTime? LastUpdatedDate { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
+
 	#region Associations
 	/// <summary>
 	/// FK_RuleSetContextObjectLinks_RuleContextObjects backreference

@@ -6,9 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.Extensions.Configuration;
 using OrbitHub.Common;
-using OrbitHub.Data.SoapManagement;
-using OrbitHub.Data.RestManagement;
-using OrbitHub.Data.FileVersionManagement;
 using OrbitHub.Ui.Components;
 
 namespace OrbitHub.FileManagement.Pages;

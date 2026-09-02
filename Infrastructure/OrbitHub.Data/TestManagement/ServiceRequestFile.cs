@@ -26,8 +26,8 @@ public partial class ServiceRequestFile
 	/// <summary>
 	/// Identifier of the related ServiceOperations record.
 	/// </summary>
-	[Column("OperationId")]
-	public int OperationId { get; set; } // int
+	[Column("ServiceOperationId")]
+	public int ServiceOperationId { get; set; } // int
 
 	/// <summary>
 	/// Format of the stored file payload, such as XML, JSON, PDF, or BINARY.
@@ -36,16 +36,40 @@ public partial class ServiceRequestFile
 	public string? FileFormat { get; set; } // varchar(10)
 
 	/// <summary>
-	/// Original name of the stored file.
+	/// Human-readable name of this record.
 	/// </summary>
-	[Column("FileName", CanBeNull = false)]
-	public string FileName { get; set; } = null!; // nvarchar(250)
+	[Column("Name", CanBeNull = false)]
+	public string Name { get; set; } = null!; // nvarchar(250)
 
 	/// <summary>
-	/// Binary content of the stored file.
+	/// Indicates whether this record is a complete base snapshot (1) or a differential delta (0).
 	/// </summary>
-	[Column("FileData", CanBeNull = false)]
-	public byte[] FileData { get; set; } = null!; // varbinary(max)
+	[Column("IsBaseSnapshot")]
+	public bool IsBaseSnapshot { get; set; } // bit
+
+	/// <summary>
+	/// Identifier of the base snapshot record in the delta chain.
+	/// </summary>
+	[Column("ParentBaseId")]
+	public int? ParentBaseId { get; set; } // int
+
+	/// <summary>
+	/// Identifier of the immediate predecessor record in the delta chain.
+	/// </summary>
+	[Column("ParentDeltaId")]
+	public int? ParentDeltaId { get; set; } // int
+
+	/// <summary>
+	/// Depth of this record in the delta chain (0 for base snapshots).
+	/// </summary>
+	[Column("DeltaDepth")]
+	public int DeltaDepth { get; set; } // int
+
+	/// <summary>
+	/// Compressed binary content stored for this record.
+	/// </summary>
+	[Column("CompressedData", CanBeNull = false)]
+	public byte[] CompressedData { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
 	/// Size of the file content before compression, in bytes.
@@ -60,10 +84,10 @@ public partial class ServiceRequestFile
 	public string? CompressionAlgorithmType { get; set; } // varchar(50)
 
 	/// <summary>
-	/// SHA-256 hash of the stored file content.
+	/// SHA-256 hash of the stored content for integrity verification.
 	/// </summary>
-	[Column("FileHash")]
-	public string? FileHash { get; set; } // varchar(64)
+	[Column("ContentHash")]
+	public string? ContentHash { get; set; } // varchar(64)
 
 	/// <summary>
 	/// Application-managed version value used for record change tracking.
@@ -115,15 +139,21 @@ public partial class ServiceRequestFile
 	public IEnumerable<ServiceRequestFileEmbedding> ServiceRequestFileEmbeddings { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceRequestFileHistorys_ServiceRequestFiles_ServiceRequestFileId backreference
+	/// FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceRequestFileHistory.ServiceRequestFileId))]
-	public IEnumerable<ServiceRequestFileHistory> ServiceRequestFileHistorys { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(ServiceOperationId), OtherKey = nameof(TestManagement.ServiceOperation.Id))]
+	public ServiceOperation ServiceOperation { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceRequestFiles_ServiceOperations_OperationId
+	/// FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId backreference
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(OperationId), OtherKey = nameof(ServiceOperation.Id))]
-	public ServiceOperation Operation { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceResponseFile.ServiceRequestFileId))]
+	public IEnumerable<ServiceResponseFile> ServiceResponseFiles { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceTestCases_ServiceRequestFiles_ServiceRequestFileId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestCase.ServiceRequestFileId))]
+	public IEnumerable<ServiceTestCase> ServiceTestCases { get; set; } = null!;
 	#endregion
 }

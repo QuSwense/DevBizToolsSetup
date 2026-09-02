@@ -3,7 +3,7 @@
     Description: Gets all permissions for a specific role.
 */
 CREATE PROCEDURE [dbo].[usp_GetRolePermissions]
-    @Role NVARCHAR(50) = NULL,
+    @RoleId INT = NULL,
     @IncludeInactive BIT = 0
 AS
 BEGIN
@@ -11,7 +11,8 @@ BEGIN
 
     SELECT 
         rp.[Id] AS RolePermissionId,
-        rp.[Role],
+        rp.[RoleId],
+        ro.[Name] AS Role,
         rp.[ResourcePermissionId],
         rp.[IsGranted],
         rp.[IsActive],
@@ -29,9 +30,10 @@ BEGIN
             ELSE 'Inactive'
         END AS StatusDescription
     FROM [dbo].[RolePermissions] rp
+    INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
     INNER JOIN [dbo].[ResourcePermissions] res ON rp.[ResourcePermissionId] = res.[Id]
-    WHERE (@Role IS NULL OR rp.[Role] = @Role)
+    WHERE (@RoleId IS NULL OR rp.[RoleId] = @RoleId)
       AND (@IncludeInactive = 1 OR rp.[IsActive] = 1)
-    ORDER BY rp.[Role], res.[PermissionKey];
+    ORDER BY ro.[Name], res.[PermissionKey];
 END;
 GO

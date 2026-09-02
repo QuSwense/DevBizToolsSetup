@@ -11,9 +11,12 @@
     <Build Remove="dbDesign\**" />
     <Build Remove="scripts\**" />
     <Build Remove="Script.PostDeployment.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <PostDeploy Include="Script.PostDeployment.sql" />
+    <!-- The scripts/*.sql files are sqlcmd scripts (they use :r include directives,
+         cursors, and dynamic SQL) and cannot be modeled by Microsoft.Build.Sql.
+         They are kept in the project as None items for reference/deployment and
+         are executed via OrbitTool_SQLCMD.sh. -->
+    <None Include="scripts\ApplyColumnDescriptions.sql" />
+    <None Include="scripts\OrbitTool_ResetAndRecreate.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dbo" />
@@ -21,6 +24,15 @@
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Functions" />
     <Folder Include="dbo\Views" />
+    <Folder Include="Seeds" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Seeds\PermissionToUIPageMappingSeed.sql" />
+    <PostDeploy Include="Seeds\ResourcePermissionsSeed.sql" />
+    <None Include="Seeds\RolesSeed.sql" />
+    <None Include="Seeds\RolePermissionsSeed.sql" />
+    <None Include="Seeds\UIPagesSeed.sql" />
+    <None Include="Seeds\UIActionsSeed.sql" />
   </ItemGroup>
   <Target Name="BeforeBuild">
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />

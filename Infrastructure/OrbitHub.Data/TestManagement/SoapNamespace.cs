@@ -29,22 +29,58 @@ public partial class SoapNamespace
 	public int ServiceOperationSchemaId { get; set; } // int
 
 	/// <summary>
-	/// Namespace prefix used in SOAP XML documents.
+	/// Compressed binary content stored for this record.
 	/// </summary>
-	[Column("Prefix", CanBeNull = false)]
-	public string Prefix { get; set; } = null!; // nvarchar(50)
+	[Column("CompressedContent", CanBeNull = false)]
+	public byte[] CompressedContent { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
-	/// Namespace URI associated with the SOAP prefix.
+	/// Size of the file content before compression, in bytes.
 	/// </summary>
-	[Column("NamespaceUri", CanBeNull = false)]
-	public string NamespaceUri { get; set; } = null!; // nvarchar(500)
+	[Column("UncompressedSizeBytes")]
+	public int? UncompressedSizeBytes { get; set; } // int
+
+	/// <summary>
+	/// Algorithm used to compress the stored content.
+	/// </summary>
+	[Column("CompressionAlgorithmType")]
+	public string? CompressionAlgorithmType { get; set; } // varchar(50)
+
+	/// <summary>
+	/// SHA-256 hash of the stored content for integrity verification.
+	/// </summary>
+	[Column("ContentHash")]
+	public string? ContentHash { get; set; } // varchar(64)
+
+	/// <summary>
+	/// Application-managed version value used for record change tracking.
+	/// </summary>
+	[Column("RecordVersion", CanBeNull = false)]
+	public string RecordVersion { get; set; } = null!; // varchar(50)
 
 	/// <summary>
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
 	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the user who created this record.
+	/// </summary>
+	[Column("CreatedBy")]
+	public string? CreatedBy { get; set; } // nvarchar(20)
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the user who last updated this record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>

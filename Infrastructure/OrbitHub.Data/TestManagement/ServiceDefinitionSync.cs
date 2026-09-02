@@ -36,10 +36,10 @@ public partial class ServiceDefinitionSync
 	public string? DefinitionUrl { get; set; } // nvarchar(500)
 
 	/// <summary>
-	/// Compressed binary content of the synchronized WSDL, Swagger, or OpenAPI definition.
+	/// Compressed binary content stored for this record.
 	/// </summary>
-	[Column("DefinitionContent", CanBeNull = false)]
-	public byte[] DefinitionContent { get; set; } = null!; // varbinary(max)
+	[Column("CompressedContent", CanBeNull = false)]
+	public byte[] CompressedContent { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
 	/// Size of the file content before compression, in bytes.
@@ -54,10 +54,10 @@ public partial class ServiceDefinitionSync
 	public string? CompressionAlgorithmType { get; set; } // varchar(50)
 
 	/// <summary>
-	/// SHA-256 hash of the stored file content.
+	/// SHA-256 hash of the stored content for integrity verification.
 	/// </summary>
-	[Column("FileHash")]
-	public string? FileHash { get; set; } // varchar(64)
+	[Column("ContentHash")]
+	public string? ContentHash { get; set; } // varchar(64)
 
 	/// <summary>
 	/// Application-managed version value used for record change tracking.
@@ -66,24 +66,30 @@ public partial class ServiceDefinitionSync
 	public string RecordVersion { get; set; } = null!; // varchar(50)
 
 	/// <summary>
-	/// Date and time at which the service definition was synchronized.
+	/// Date and time at which this record was created.
 	/// </summary>
-	[Column("SyncedAt")]
-	public DateTime SyncedAt { get; set; } // datetime
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
 
 	/// <summary>
 	/// Identifier of the related Users record.
 	/// </summary>
-	[Column("SyncedBy", CanBeNull = false)]
-	public string SyncedBy { get; set; } = null!; // nvarchar(20)
+	[Column("CreatedBy", CanBeNull = false)]
+	public string CreatedBy { get; set; } = null!; // nvarchar(20)
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
-	/// <summary>
-	/// FK_ServiceDefinitionSyncHistorys_ServiceDefinitionSyncs_ServiceDefinitionSyncId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceDefinitionSyncHistory.ServiceDefinitionSyncId))]
-	public IEnumerable<ServiceDefinitionSyncHistory> ServiceDefinitionSyncHistorys { get; set; } = null!;
-
 	/// <summary>
 	/// FK_ServiceDefinitionSyncs_ServiceApplications_ServiceApplicationId
 	/// </summary>
@@ -91,9 +97,9 @@ public partial class ServiceDefinitionSync
 	public ServiceApplication ServiceApplication { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceOperationSchemas_ServiceDefinitionSync_DefinitionSyncId backreference
+	/// FK_ServiceOperationSchemas_ServiceDefinitionSyncs_ServiceDefinitionSyncId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceOperationSchema.DefinitionSyncId))]
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceOperationSchema.ServiceDefinitionSyncId))]
 	public IEnumerable<ServiceOperationSchema> ServiceOperationSchemas { get; set; } = null!;
 	#endregion
 }

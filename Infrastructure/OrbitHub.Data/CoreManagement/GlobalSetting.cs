@@ -24,6 +24,12 @@ public partial class GlobalSetting
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Category used to group the global setting.
 	/// </summary>
 	[Column("Category", CanBeNull = false)]
@@ -42,16 +48,16 @@ public partial class GlobalSetting
 	public string SettingValue { get; set; } = null!; // nvarchar(max)
 
 	/// <summary>
-	/// Optional human-readable description of this record.
-	/// </summary>
-	[Column("Description")]
-	public string? Description { get; set; } // nvarchar(500)
-
-	/// <summary>
 	/// Data type used to interpret the setting value.
 	/// </summary>
 	[Column("DataType", CanBeNull = false)]
 	public string DataType { get; set; } = null!; // varchar(20)
+
+	/// <summary>
+	/// Optional human-readable description of this record.
+	/// </summary>
+	[Column("Description")]
+	public string? Description { get; set; } // nvarchar(500)
 
 	/// <summary>
 	/// Indicates whether users may override this global setting.
@@ -64,6 +70,18 @@ public partial class GlobalSetting
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
+
+	/// <summary>
+	/// Date and time at which this record was created.
+	/// </summary>
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("CreatedBy", CanBeNull = false)]
+	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
 	/// Date and time at which this record was last updated.

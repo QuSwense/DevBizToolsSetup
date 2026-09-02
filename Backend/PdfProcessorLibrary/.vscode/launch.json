@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (TestRunner)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/PdfProcessor.TestRunner/bin/Debug/net10.0/PdfProcessor.TestRunner.dll",
+      "args": [
+        "PdfFormEditingTester"
+      ],
+      "cwd": "${workspaceFolder}/PdfProcessor.TestRunner",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

@@ -29,46 +29,46 @@ public partial class ServiceResponseFileEmbedding
 	public int ServiceResponseFileId { get; set; } // int
 
 	/// <summary>
-	/// Format of the stored file payload, such as XML, JSON, PDF, or BINARY.
+	/// Value of the BinaryEmbeddingsStoreId field for this ServiceResponseFileEmbeddings record.
 	/// </summary>
-	[Column("FileFormat")]
-	public string? FileFormat { get; set; } // varchar(10)
+	[Column("BinaryEmbeddingsStoreId")]
+	public int BinaryEmbeddingsStoreId { get; set; } // int
 
 	/// <summary>
-	/// Original name of the stored file.
+	/// Human-readable name of this record.
 	/// </summary>
-	[Column("FileName", CanBeNull = false)]
-	public string FileName { get; set; } = null!; // nvarchar(250)
-
-	/// <summary>
-	/// Binary content of the stored file.
-	/// </summary>
-	[Column("FileData", CanBeNull = false)]
-	public byte[] FileData { get; set; } = null!; // varbinary(max)
-
-	/// <summary>
-	/// Size of the file content before compression, in bytes.
-	/// </summary>
-	[Column("UncompressedSizeBytes")]
-	public int? UncompressedSizeBytes { get; set; } // int
-
-	/// <summary>
-	/// Algorithm used to compress the stored content.
-	/// </summary>
-	[Column("CompressionAlgorithmType")]
-	public string? CompressionAlgorithmType { get; set; } // varchar(50)
+	[Column("Name", CanBeNull = false)]
+	public string Name { get; set; } = null!; // nvarchar(250)
 
 	/// <summary>
 	/// SHA-256 hash of the stored file content.
 	/// </summary>
-	[Column("FileHash")]
-	public string? FileHash { get; set; } // varchar(64)
+	[Column("FileHash", CanBeNull = false)]
+	public string FileHash { get; set; } = null!; // varchar(64)
 
 	/// <summary>
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
 	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("CreatedBy", CanBeNull = false)]
+	public string CreatedBy { get; set; } = null!; // nvarchar(20)
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the related Users record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>

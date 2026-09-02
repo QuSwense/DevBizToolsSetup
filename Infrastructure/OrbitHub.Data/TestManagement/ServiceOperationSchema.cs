@@ -26,14 +26,26 @@ public partial class ServiceOperationSchema
 	/// <summary>
 	/// Identifier of the related ServiceDefinitionSyncs record.
 	/// </summary>
-	[Column("DefinitionSyncId")]
-	public int DefinitionSyncId { get; set; } // int
+	[Column("ServiceDefinitionSyncId")]
+	public int ServiceDefinitionSyncId { get; set; } // int
 
 	/// <summary>
 	/// Identifier of the related ServiceOperations record.
 	/// </summary>
-	[Column("OperationId")]
-	public int? OperationId { get; set; } // int
+	[Column("ServiceOperationId")]
+	public int ServiceOperationId { get; set; } // int
+
+	/// <summary>
+	/// Root element name expected in the operation request payload.
+	/// </summary>
+	[Column("InputRootElementName")]
+	public string? InputRootElementName { get; set; } // nvarchar(200)
+
+	/// <summary>
+	/// Root element name expected in the operation response payload.
+	/// </summary>
+	[Column("OutputRootElementName")]
+	public string? OutputRootElementName { get; set; } // nvarchar(200)
 
 	/// <summary>
 	/// Target namespace declared by the XML schema.
@@ -42,10 +54,34 @@ public partial class ServiceOperationSchema
 	public string? TargetNamespace { get; set; } // nvarchar(500)
 
 	/// <summary>
-	/// XML schema content associated with the service operation.
+	/// Compressed binary content stored for this record.
 	/// </summary>
-	[Column("SchemaContent", CanBeNull = false)]
-	public string SchemaContent { get; set; } = null!; // nvarchar(max)
+	[Column("CompressedContent", CanBeNull = false)]
+	public byte[] CompressedContent { get; set; } = null!; // varbinary(max)
+
+	/// <summary>
+	/// Size of the file content before compression, in bytes.
+	/// </summary>
+	[Column("UncompressedSizeBytes")]
+	public int? UncompressedSizeBytes { get; set; } // int
+
+	/// <summary>
+	/// Algorithm used to compress the stored content.
+	/// </summary>
+	[Column("CompressionAlgorithmType")]
+	public string? CompressionAlgorithmType { get; set; } // varchar(50)
+
+	/// <summary>
+	/// SHA-256 hash of the stored content for integrity verification.
+	/// </summary>
+	[Column("ContentHash")]
+	public string? ContentHash { get; set; } // varchar(64)
+
+	/// <summary>
+	/// Application-managed version value used for record change tracking.
+	/// </summary>
+	[Column("RecordVersion", CanBeNull = false)]
+	public string RecordVersion { get; set; } = null!; // varchar(50)
 
 	/// <summary>
 	/// Date and time at which this record was created.
@@ -53,18 +89,36 @@ public partial class ServiceOperationSchema
 	[Column("CreatedAt")]
 	public DateTime CreatedAt { get; set; } // datetime
 
-	#region Associations
 	/// <summary>
-	/// FK_ServiceOperationSchemas_ServiceDefinitionSync_DefinitionSyncId
+	/// Identifier of the user who created this record.
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(DefinitionSyncId), OtherKey = nameof(ServiceDefinitionSync.Id))]
-	public ServiceDefinitionSync DefinitionSync { get; set; } = null!;
+	[Column("CreatedBy", CanBeNull = false)]
+	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// FK_ServiceOperationSchemas_ServiceOperations_OperationId
+	/// Date and time at which this record was last updated.
 	/// </summary>
-	[Association(ThisKey = nameof(OperationId), OtherKey = nameof(ServiceOperation.Id))]
-	public ServiceOperation? Operation { get; set; }
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the user who last updated this record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
+
+	#region Associations
+	/// <summary>
+	/// FK_ServiceOperationSchemas_ServiceDefinitionSyncs_ServiceDefinitionSyncId
+	/// </summary>
+	[Association(CanBeNull = false, ThisKey = nameof(ServiceDefinitionSyncId), OtherKey = nameof(TestManagement.ServiceDefinitionSync.Id))]
+	public ServiceDefinitionSync ServiceDefinitionSync { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceOperationSchemas_ServiceOperations_ServiceOperationId
+	/// </summary>
+	[Association(CanBeNull = false, ThisKey = nameof(ServiceOperationId), OtherKey = nameof(TestManagement.ServiceOperation.Id))]
+	public ServiceOperation ServiceOperation { get; set; } = null!;
 
 	/// <summary>
 	/// FK_SoapNamespaces_ServiceOperationSchemas_ServiceOperationSchemaId backreference

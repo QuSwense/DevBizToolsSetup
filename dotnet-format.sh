@@ -1,0 +1,1 @@
+dotnet format --diagnostics IDE0305

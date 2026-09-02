@@ -1,4 +1,9 @@
 <Solution>
+  <Folder Name="/Backend/" >
+    <Project Path="Backend/PdfProcessorLibrary/PdfProcessor/PdfProcessor.csproj" />
+    <Project Path="Backend/RuleEngineProcessor/RuleEngineLibrary/RuleEngineLibrary.csproj" />
+    <Project Path="Backend/SoapApiProcessor/ServiceHub.SoapEngine.Core/ServiceHub.SoapEngine.Core.csproj" />
+  </Folder>
   <Folder Name="/Features/">
     <Project Path="Features/OrbitHub.ADViewer/OrbitHub.ADViewer.csproj" />
     <Project Path="Features/OrbitHub.Dashboard/OrbitHub.Dashboard.csproj" />
@@ -20,6 +25,24 @@
   <Folder Name="/tests/" />
   <Folder Name="/WebApp/">
     <Project Path="WebApp/OrbitHub.Web/OrbitHub.Web.csproj" />
+  </Folder>
+  <Folder Name="/Backend/" />
+  <Folder Name="/Backend/PdfProcessorLibrary/">
+    <Project Path="Backend/PdfProcessorLibrary/PdfProcessor.TestRunner/PdfProcessor.TestRunner.csproj" />
+    <Project Path="Backend/PdfProcessorLibrary/PdfProcessor/PdfProcessor.csproj" />
+  </Folder>
+  <Folder Name="/Backend/RuleEngineProcessor/">
+    <Project Path="Backend/RuleEngineProcessor/RuleEngineLibrary/RuleEngineLibrary.csproj" />
+  </Folder>
+  <Folder Name="/Backend/SoapApiProcessor/">
+    <Project Path="Backend/SoapApiProcessor/ServiceHub.SoapEngine.Core/ServiceHub.SoapEngine.Core.csproj" />
+  </Folder>
+  <Folder Name="/Backend/SoapApiProcessor/SoapServices/">
+    <Project Path="Backend/SoapApiProcessor/Tests/SoapServices/MockCustomerSoapService/MockCustomerSoapService.csproj" />
+    <Project Path="Backend/SoapApiProcessor/Tests/SoapServices/MockOAuthSoapService/MockOAuthSoapService.csproj" />
+  </Folder>
+  <Folder Name="/Backend/SoapApiProcessor/Tests/">
+    <Project Path="Backend/SoapApiProcessor/Tests/SoapApiProcessorTest/SoapApiProcessorTest.csproj" />
   </Folder>
   <Folder Name="/Components/">
     <Project Path="Components/OrbitHub.Common/OrbitHub.Common.csproj" />

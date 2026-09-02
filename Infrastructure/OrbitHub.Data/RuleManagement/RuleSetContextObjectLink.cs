@@ -41,7 +41,7 @@ public partial class RuleSetContextObjectLink
 	public DateTime CreatedAt { get; set; } // datetime
 
 	/// <summary>
-	/// Identifier of the user who created this record.
+	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
@@ -53,7 +53,7 @@ public partial class RuleSetContextObjectLink
 	public DateTime? LastUpdatedAt { get; set; } // datetime
 
 	/// <summary>
-	/// Identifier of the user who last updated this record.
+	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("LastUpdatedBy")]
 	public string? LastUpdatedBy { get; set; } // nvarchar(20)

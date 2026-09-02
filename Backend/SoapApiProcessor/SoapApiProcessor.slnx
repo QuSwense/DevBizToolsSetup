@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/SoapApiProcessorTest/SoapApiProcessorTest.csproj" />
+  </Folder>
+  <Project Path="ServiceHub.SoapEngine.Core/ServiceHub.SoapEngine.Core.csproj" />
+</Solution>

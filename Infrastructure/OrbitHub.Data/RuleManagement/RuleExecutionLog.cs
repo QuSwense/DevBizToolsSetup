@@ -29,25 +29,55 @@ public partial class RuleExecutionLog
 	public int RuleSetId { get; set; } // int
 
 	/// <summary>
-	/// JSON snapshot of the input context used for rule execution.
+	/// Compressed binary content of the rule input context.
 	/// </summary>
-	[Column("ContextSnapshot", CanBeNull = false)]
-	public string ContextSnapshot { get; set; } = null!; // nvarchar(max)
+	[Column("InputCompressedContent", CanBeNull = false)]
+	public byte[] InputCompressedContent { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
-	/// Indicates whether the rule execution completed successfully.
+	/// Compressed binary content of the rule output result.
+	/// </summary>
+	[Column("OutputCompressedContent")]
+	public byte[]? OutputCompressedContent { get; set; } // varbinary(max)
+
+	/// <summary>
+	/// Size of the rule input content before compression, in bytes.
+	/// </summary>
+	[Column("InputUncompressedSizeBytes")]
+	public int? InputUncompressedSizeBytes { get; set; } // int
+
+	/// <summary>
+	/// Size of the rule output content before compression, in bytes.
+	/// </summary>
+	[Column("OutputUncompressedSizeBytes")]
+	public int? OutputUncompressedSizeBytes { get; set; } // int
+
+	/// <summary>
+	/// Algorithm used to compress the stored content.
+	/// </summary>
+	[Column("CompressionAlgorithmType")]
+	public string? CompressionAlgorithmType { get; set; } // varchar(50)
+
+	/// <summary>
+	/// SHA-256 hash of the rule input content.
+	/// </summary>
+	[Column("InputContentHash")]
+	public string? InputContentHash { get; set; } // varchar(64)
+
+	/// <summary>
+	/// SHA-256 hash of the rule output content.
+	/// </summary>
+	[Column("OutputContentHash")]
+	public string? OutputContentHash { get; set; } // varchar(64)
+
+	/// <summary>
+	/// Indicates whether the execution completed successfully.
 	/// </summary>
 	[Column("IsSuccess")]
 	public bool IsSuccess { get; set; } // bit
 
 	/// <summary>
-	/// JSON serialized result produced by rule execution.
-	/// </summary>
-	[Column("Result")]
-	public string? Result { get; set; } // nvarchar(max)
-
-	/// <summary>
-	/// Error message captured when rule execution fails.
+	/// Error message captured when execution fails.
 	/// </summary>
 	[Column("ErrorMessage")]
 	public string? ErrorMessage { get; set; } // nvarchar(max)
