@@ -23,7 +23,7 @@ dotnet linq2db scaffold \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables BinaryEmbeddingsStore,IndexingFileElementSearch,IndexingFileElementType,IndexingJsonFileElementMappings,IndexingJsonFileElements,IndexingXmlFileElementMappings,IndexingXmlFileElements,ServiceRequestIndexingStatus,ServiceResponseIndexingStatus \
+  --include-tables IndexingJsonFileElementMappings,IndexingJsonFileElementSearch,IndexingJsonFileElements,IndexingPdfFileElementMappings,IndexingPdfFileElementSearch,IndexingPdfFileElements,IndexingXmlFileElementMappings,IndexingXmlFileElementSearch,IndexingXmlFileElements \
   --namespace OrbitHub.Data.IndexingManagement \
   --context-name IndexingDbContext \
   --add-typed-options-ctor \

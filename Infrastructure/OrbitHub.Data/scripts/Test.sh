@@ -23,7 +23,7 @@ dotnet linq2db scaffold \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables DirectExecutionAudit,DirectExecutionAuditResponseFileLinks,ServiceAppAuthentications,ServiceApplications,ServiceDefinitionSyncs,ServiceOperations,ServiceOperationSchemas,ServiceRequestFileEmbeddings,ServiceRequestFiles,ServiceResponseFileEmbeddings,ServiceResponseFiles,ServiceTestCaseRuleSetLinks,ServiceTestCases,ServiceTestSuites,ServiceTestSuiteTestCaseLinks,ServiceTestSuiteExecutionAudits,ServiceTestSuiteExecutionAuditTestCaseLinks,SoapNamespaces \
+  --include-tables ServiceTestCaseRuleSetLinks,ServiceTestCases,ServiceTestCasesPermissions,ServiceTestSuiteExecutionAuditTestCaseLinks,ServiceTestSuiteExecutionAudits,ServiceTestSuiteTestCaseLinks,ServiceTestSuites,ServiceTestSuitesPermissions \
   --namespace OrbitHub.Data.TestManagement \
   --context-name TestDbContext \
   --add-typed-options-ctor \
