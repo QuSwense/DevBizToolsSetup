@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="PdfProcessor/PdfProcessor.csproj" />
-  <Project Path="PdfProcessor.TestRunner/PdfProcessor.TestRunner.csproj" />
-</Solution>

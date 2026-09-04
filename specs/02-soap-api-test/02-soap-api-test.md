@@ -11,6 +11,8 @@ The SOAP API Test feature provides enterprise operational management and visual 
 - `/soap/wsdl-sync`
 - `/soap/templates`
 - `/soap/execute-history`
+- `/soap/test-cases` — dedicated per application and per request file
+- `/soap/rules` — execution rule management
 
 ## Core business outcomes
 
@@ -18,6 +20,9 @@ The SOAP API Test feature provides enterprise operational management and visual 
 - **Ad-Hoc Execution Group Testing:** Enables business analysts and testers to group and execute multiple SOAP request files simultaneously in a single execution package to validate multi-step SOAP operations.
 - **Visual Response Inspection & Manual Validation:** Delivers immediate, readable side-by-side displays of request payloads and raw/formatted responses for fast visual verification.
 - **Catalog & Artifact Management:** Maintains application definitions, links WSDL schemas, and manages reusable request file repositories across backend environments.
+- **Test Cases:** Dedicated test case definitions scoped per application and per request file, enabling structured validation of SOAP responses.
+- **Execution Rules:** Custom and global evaluation rules for automated pass/fail determination on SOAP responses.
+- **Rule Application:** Test cases support attaching new custom rules or linking common global rules for automated evaluation without manual inspection.
 
 > **Note on Feature Separation:**
 > - **Execution Groups (This Feature Area):** Used for manual/ad-hoc batch execution, direct response viewing, and quick visual verification of SOAP endpoints.
@@ -27,8 +32,8 @@ The SOAP API Test feature provides enterprise operational management and visual 
 
 - `Features/OrbitHub.SoapApplications/Pages/`
 - `Features/OrbitHub.SoapApplications/Services/`
-- `mock_db/Soap/`
-- `mock_db/Wsdl/`
+- `Infrastructure/OrbitHub.Data/SoapManagement/` (SoapDbContext, repositories)
+- `Infrastructure/OrbitHub.Data/WsdlManagement/` (WsdlDbContext, repositories)
 
 ## Workflow summary
 

@@ -6,7 +6,7 @@ This folder holds the current project specification set, organized by feature ar
 
 - [00-technical-overview.md](technical/00-technical-overview.md)
 - [01-architecture.md](technical/01-architecture.md)
-- [02-data-and-mockdb.md](technical/02-data-and-mockdb.md)
+- [02-data-architecture.md](technical/02-data-architecture.md)
 - [03-blazor-ui-patterns.md](technical/03-blazor-ui-patterns.md)
 
 ## 01. Home Dashboard
@@ -24,6 +24,8 @@ This folder holds the current project specification set, organized by feature ar
 - [02-03-wsdl-sync.md](02-soap-api-test/02-03-wsdl-sync.md)
 - [02-04-templates.md](02-soap-api-test/02-04-templates.md)
 - [02-05-execute-history.md](02-soap-api-test/02-05-execute-history.md)
+- [02-06-test-cases.md](02-soap-api-test/02-06-test-cases.md) — dedicated test cases per application and per request file
+- [02-07-rules.md](02-soap-api-test/02-07-rules.md) — execution rule management for SOAP
 
 ## 03. Rest API Test
 
@@ -33,6 +35,8 @@ This folder holds the current project specification set, organized by feature ar
 - [03-03-swagger-sync.md](03-rest-api-test/03-03-swagger-sync.md)
 - [03-04-templates.md](03-rest-api-test/03-04-templates.md)
 - [03-05-execute-history.md](03-rest-api-test/03-05-execute-history.md)
+- [03-06-test-cases.md](03-rest-api-test/03-06-test-cases.md) — dedicated test cases per application and per request file
+- [03-07-rules.md](03-rest-api-test/03-07-rules.md) — execution rule management for REST
 
 ## 04. File Management
 
@@ -50,6 +54,7 @@ This folder holds the current project specification set, organized by feature ar
 - [05-02-test-suites.md](05-test-suite/05-02-test-suites.md)
 - [05-03-executions-history.md](05-test-suite/05-03-executions-history.md)
 - [05-04-success-criteria.md](05-test-suite/05-04-success-criteria.md)
+- [05-05-rules.md](05-test-suite/05-05-rules.md) — shared global rule library for automated evaluation
 
 ## 06. Monitoring & Health
 

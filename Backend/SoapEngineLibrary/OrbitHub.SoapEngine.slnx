@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="OrbitHub.SoapEngine/OrbitHub.SoapEngine.Core.csproj" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/OrbitHub.SoapEngine.Tests/OrbitHub.SoapEngine.Tests.csproj" />
+    <Folder Name="SoapServices/" >
+      <Project Path="Tests/SoapServices/MockCustomerSoapService/MockCustomerSoapService.csproj" />
+      <Project Path="Tests/SoapServices/MockOAuthSoapService/MockOAuthSoapService.csproj" />
+    </Folder>
+  </Folder>
+</Solution>

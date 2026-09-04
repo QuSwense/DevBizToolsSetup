@@ -1,1 +1,1 @@
-dotnet format --diagnostics IDE0305
+dotnet format --diagnostics IDE0305 IDE0290

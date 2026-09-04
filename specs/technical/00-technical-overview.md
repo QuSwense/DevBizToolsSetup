@@ -13,13 +13,15 @@ This application is structured as a multi-feature Blazor web application with a 
 ## Key technology decisions
 
 - ASP.NET Core + Blazor server-side interactive components are used for the UI.
-- Feature data access is split across focused `DbContext` registrations for dashboard, SOAP, REST, file management, and WSDL content.
-- Mock data is centralized in the solution `mock_db/` folder and is loaded through the feature-specific singleton store services.
+- Data access uses **linq2db** v6.4.0 against a single **MS SQL Server** database (`OrbitTool`), with 11 focused `DataConnection` (linq2db DbContext) classes and a 112-class repository layer.
+- All persistence is centralized in `Infrastructure/OrbitHub.Data/`; the database schema is defined in the `OrbitToolDatabase/` SSDT project.
 - Shared UI conventions are provided by the component libraries under `Components/` and the feature-specific grid and UI helpers.
+- Backend services are present in the folder `Backend`. Eache services has inidividual Test projects to test itself.
 
 ## Integration model
 
 The system is designed around modular feature registration rather than a monolithic page model. Each feature owns its route namespace and persistence concerns, while the host remains responsible for app startup, routing, static files, and antiforgery setup.
+ALos, each feature has individual service libraries defined in the `Backend`
 
 ## Operational expectation
 

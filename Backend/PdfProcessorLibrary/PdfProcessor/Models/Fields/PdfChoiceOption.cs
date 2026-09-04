@@ -1,1 +1,0 @@
-public record PdfChoiceOption(string ExportValue, string DisplayValue);

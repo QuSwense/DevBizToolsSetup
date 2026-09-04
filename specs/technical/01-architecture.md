@@ -7,14 +7,15 @@ The application is organized around a central web host and feature-specific proj
 - `WebApp/OrbitHub.Web` — host application and startup configuration
 - `Features/OrbitHub.*` — feature modules for dashboard, SOAP, REST, file management, monitoring, AD viewer, settings, and tests
 - `Components/` — reusable UI and grid components
-- `mock_db/` — mock seed and runtime data content for feature modules
+- `Infrastructure/OrbitHub.Data/` — linq2db entity mappings, DbContexts, stored procedure repositories, and view repositories
+- `OrbitToolDatabase/` — SSDT project defining the database schema (55 tables, 40 views, 60+ stored procedures)
 - `tests/` — automated validation for the application
 
 ## Architectural principles
 
 1. Feature isolation: each feature owns its pages, components, and service/store logic.
 2. Shared runtime services: common infrastructure is registered centrally in the host `Program.cs`.
-3. Mock-driven behavior: business logic and UI flows rely on the mock data store in `mock_db/` rather than direct database initialization for all scenarios.
+3. **MS SQL Server persistence via linq2db:** All business logic and UI flows read from and write to the `OrbitTool` database through domain-specific `DataConnection` classes and stored procedure/view repositories. There is no mock data layer; the `Infrastructure/OrbitHub.Data/` project centralizes all data access.
 4. Route-based feature access: each feature is exposed through distinct route patterns such as `/soap/overview`, `/rest/applications`, `/health`, and `/settings`.
 
 ## Dependency wiring

@@ -4,6 +4,30 @@
 
 The app uses Razor component pages and code-behind patterns for feature logic. The repository guidance calls for page-level logic to remain in `.razor.cs` files rather than inline `@code` blocks.
 
+## Data-binding patterns
+
+Pages and components access data through the **repository layer** in `Infrastructure/OrbitHub.Data/Repositories/`. The common patterns are:
+
+- **View repositories** — injected via DI, called with `GetAllAsync()` to populate lists and grids. Returns `RepositoryResult<List<T>>`.
+- **Stored procedure repositories** — injected via DI, called with `ExecuteAsync(InputModel)` for mutations (create, update, delete). Returns `RepositoryResult<T>`.
+- **Direct linq2db queries** — for ad-hoc queries, the `DataConnection` subclass can be injected and queried with LINQ expressions against `ITable<T>` properties.
+
+Example pattern in a `.razor.cs` code-behind:
+
+```csharp
+[Inject]
+private ServiceApplicationAuditViewRepository AuditRepo { get; set; } = null!;
+
+private async Task LoadAuditData()
+{
+    var result = await AuditRepo.GetAllAsync();
+    if (result.IsSuccess)
+        auditItems = result.Value;
+}
+```
+
+Feature stores (e.g., `SoapAppStore`) wrap repository calls with in-memory caching for UI responsiveness, but the backing store is always the MS SQL database.
+
 ## Feature page structure
 
 Each major feature is exposed through one or more Razor pages, for example:

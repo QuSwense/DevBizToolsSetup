@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="OrbitHub.PdfProcessor/OrbitHub.PdfProcessor.Core.csproj" />
+  <Project Path="PdfProcessor.TestRunner/PdfProcessor.TestRunner.csproj" />
+</Solution>

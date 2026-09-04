@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The File Management feature provides the document and file operations layer for the application, including browsing, viewing, editing, comparison, and library-oriented workflows.
+The File Management feature provides the document and file operations layer for the application, including browsing, viewing, editing, comparison, and library-oriented workflows. It supports file types used across SOAP and REST testing (XML request files, JSON payloads, WSDL templates).
 
 ## Primary routes
 

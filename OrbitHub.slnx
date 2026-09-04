@@ -21,14 +21,14 @@
     <Project Path="WebApp/OrbitHub.Web/OrbitHub.Web.csproj" />
   </Folder>
   <Folder Name="/Backend/" />
+  <Folder Name="/Backend/OrbitHub.RuleEngine/">
+    <Project Path="Backend/RuleEngineLibrary/OrbitHub.RuleEngine/OrbitHub.RuleEngine.Core.csproj" />
+  </Folder>
   <Folder Name="/Backend/PdfProcessorLibrary/">
-    <Project Path="Backend/PdfProcessorLibrary/PdfProcessor/PdfProcessor.csproj" />
+    <Project Path="Backend/PdfProcessorLibrary/OrbitHub.PdfProcessor/OrbitHub.PdfProcessor.Core.csproj" />
   </Folder>
-  <Folder Name="/Backend/RuleEngineProcessor/">
-    <Project Path="Backend/RuleEngineProcessor/RuleEngineLibrary/RuleEngineLibrary.csproj" />
-  </Folder>
-  <Folder Name="/Backend/SoapApiProcessor/">
-    <Project Path="Backend/SoapApiProcessor/ServiceHub.SoapEngine.Core/ServiceHub.SoapEngine.Core.csproj" />
+  <Folder Name="/Backend/SoapEngineLibrary/">
+    <Project Path="Backend/SoapEngineLibrary/OrbitHub.SoapEngine/OrbitHub.SoapEngine.Core.csproj" />
   </Folder>
   <Folder Name="/Components/">
     <Project Path="Components/OrbitHub.Common/OrbitHub.Common.csproj" />

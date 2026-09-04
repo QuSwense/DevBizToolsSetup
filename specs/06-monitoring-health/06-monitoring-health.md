@@ -18,3 +18,7 @@ The Monitoring & Health feature provides the operational visibility layer for th
 
 - `Features/OrbitHub.MonitoringHealth/Pages/HealthDashboard.razor`
 - `Features/OrbitHub.MonitoringHealth/DependencyInjection.cs`
+
+## Integration
+
+Health monitoring is application-agnostic and provides status information for all platform components including SOAP execution engines, REST endpoints, database connectivity, and authentication services.

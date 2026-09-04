@@ -53,7 +53,7 @@ Expanded details include:
 ## Implementation Anchors  
 - UI: `Applications.razor`  
 - Service: `ISoapApplicationService.cs`  
-- Data: `mock_db/Soap/applications.json`
+- Data: `SoapDbContext` / `SoapApps` table (via `Infrastructure/OrbitHub.Data/SoapManagement/`)
 
 ## Expected Behavior  
 1. **Batch Trigger:** “New Execution Group” opens a modal to select request files and run them together.  
