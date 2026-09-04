@@ -13,6 +13,8 @@ CREATE TABLE [dbo].[ServiceResponseFileEmbeddings] (
     [Name] NVARCHAR(250) NOT NULL,
     -- Foreign Key referencing the deduplicated binary vault record in BinaryEmbeddingsStore.
     [FileHash] VARCHAR(64) NOT NULL,
+    -- Indicates if the service response file embedding record is currently active
+    [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceResponseFileEmbeddings_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceResponseFileEmbeddings_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
@@ -28,6 +30,8 @@ CREATE TABLE [dbo].[ServiceResponseFileEmbeddings] (
     -- Foreign Key
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_ServiceResponseFiles_ServiceResponseFileId]
         FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ServiceResponseFileEmbeddings_BinaryEmbeddingsStore]
+        FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id]),
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_Users_CreatedBy]
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_Users_LastUpdatedBy]

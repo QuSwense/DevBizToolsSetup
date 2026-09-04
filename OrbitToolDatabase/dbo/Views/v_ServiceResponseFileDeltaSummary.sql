@@ -25,7 +25,7 @@ SELECT
     b.[FileFormat],
     b.[UncompressedSizeBytes] AS BaseSize,
     b.[CreatedAt] AS BaseCreatedAt,
-    b.[FileHash] AS BaseHash,
+    b.[ContentHash] AS BaseHash,
     req.[Name] AS RequestFileName,
     
     -- Delta stats

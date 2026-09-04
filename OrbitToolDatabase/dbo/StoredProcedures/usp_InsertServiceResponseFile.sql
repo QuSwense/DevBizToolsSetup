@@ -13,7 +13,7 @@ CREATE PROCEDURE [dbo].[usp_InsertServiceResponseFile]
     @CompressedData VARBINARY(MAX),
     @UncompressedSizeBytes INT = NULL,
     @CompressionAlgorithmType VARCHAR(50) = NULL,
-    @FileHash VARCHAR(64) = NULL,
+    @ContentHash VARCHAR(64) = NULL,
     @UserId NVARCHAR(20) = NULL
 AS
 BEGIN
@@ -67,13 +67,13 @@ BEGIN
         END
 
         -- Calculate hash if not provided
-        IF @FileHash IS NULL AND @CompressedData IS NOT NULL
+        IF @ContentHash IS NULL AND @CompressedData IS NOT NULL
         BEGIN
             SET @CalculatedHash = CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', @CompressedData), 2);
         END
         ELSE
         BEGIN
-            SET @CalculatedHash = @FileHash;
+            SET @CalculatedHash = @ContentHash;
         END
 
         -- Calculate delta depth
@@ -153,7 +153,7 @@ BEGIN
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileHash],
+            [ContentHash],
             [RecordVersion],
             [IsActive],
             [CreatedAt],
@@ -204,7 +204,7 @@ BEGIN
                 @ParentDeltaId AS ParentDeltaId,
                 @UncompressedSizeBytes AS SizeBytes,
                 @CompressionAlgorithmType AS CompressionAlgorithm,
-                @CalculatedHash AS FileHash,
+                @CalculatedHash AS ContentHash,
                 @NewRecordVersion AS RecordVersion
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
@@ -235,7 +235,7 @@ BEGIN
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileHash],
+            [ContentHash],
             [RecordVersion],
             [IsActive],
             [CreatedAt],

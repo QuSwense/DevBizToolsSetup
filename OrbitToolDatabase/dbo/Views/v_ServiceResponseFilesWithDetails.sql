@@ -15,7 +15,7 @@ SELECT
     srf.[DeltaDepth],
     srf.[UncompressedSizeBytes] AS ResponseSize,
     srf.[CompressionAlgorithmType] AS ResponseCompression,
-    srf.[FileHash] AS ResponseFileHash,
+    srf.[ContentHash] AS ResponseFileHash,
     srf.[RecordVersion] AS ResponseRecordVersion,
     srf.[IsActive] AS ResponseIsActive,
     srf.[CreatedAt] AS ResponseCreatedAt,
@@ -65,7 +65,7 @@ SELECT
     pd.[Name] AS ParentDeltaName,
     
     -- Hash short
-    LEFT(srf.[FileHash], 16) + '...' AS HashShort,
+    LEFT(srf.[ContentHash], 16) + '...' AS HashShort,
     
     -- Status
     CASE 

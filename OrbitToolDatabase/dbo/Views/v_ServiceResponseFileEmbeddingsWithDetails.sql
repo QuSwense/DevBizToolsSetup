@@ -22,7 +22,7 @@ SELECT
     srf.[IsBaseSnapshot] AS ResponseIsBase,
     srf.[DeltaDepth] AS ResponseDeltaDepth,
     srf.[UncompressedSizeBytes] AS ResponseSize,
-    srf.[FileHash] AS ResponseFileHash,
+    srf.[ContentHash] AS ResponseFileHash,
     srf.[IsActive] AS ResponseIsActive,
     
     -- Request file details

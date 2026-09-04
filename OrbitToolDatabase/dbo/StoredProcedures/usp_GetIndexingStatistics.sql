@@ -39,11 +39,27 @@ BEGIN
 
     UNION ALL
 
+    -- PDF Statistics
+    SELECT 
+        'PDF' AS ElementType,
+        (SELECT COUNT(*) FROM [dbo].[IndexingPdfFileElements]) AS UniqueElements,
+        (SELECT COUNT(*) FROM [dbo].[IndexingPdfFileElementMappings]) AS TotalMappings,
+        0 AS RequestFiles,
+        0 AS ResponseFiles,
+        (SELECT COUNT(*) FROM [dbo].[ServiceRequestIndexingStatus] WHERE [IndexingStatus] = 'Completed') AS RequestCompleted,
+        (SELECT COUNT(*) FROM [dbo].[ServiceRequestIndexingStatus] WHERE [IndexingStatus] = 'Pending') AS RequestPending,
+        (SELECT COUNT(*) FROM [dbo].[ServiceRequestIndexingStatus] WHERE [IndexingStatus] = 'Failed') AS RequestFailed,
+        (SELECT COUNT(*) FROM [dbo].[ServiceResponseIndexingStatus] WHERE [IndexingStatus] = 'Completed') AS ResponseCompleted,
+        (SELECT COUNT(*) FROM [dbo].[ServiceResponseIndexingStatus] WHERE [IndexingStatus] = 'Pending') AS ResponsePending,
+        (SELECT COUNT(*) FROM [dbo].[ServiceResponseIndexingStatus] WHERE [IndexingStatus] = 'Failed') AS ResponseFailed
+
+    UNION ALL
+
     -- Combined Total
     SELECT 
         'TOTAL' AS ElementType,
-        (SELECT COUNT(*) FROM [dbo].[IndexingXmlFileElements]) + (SELECT COUNT(*) FROM [dbo].[IndexingJsonFileElements]) AS UniqueElements,
-        (SELECT COUNT(*) FROM [dbo].[IndexingXmlFileElementMappings]) + (SELECT COUNT(*) FROM [dbo].[IndexingJsonFileElementMappings]) AS TotalMappings,
+        (SELECT COUNT(*) FROM [dbo].[IndexingXmlFileElements]) + (SELECT COUNT(*) FROM [dbo].[IndexingJsonFileElements]) + (SELECT COUNT(*) FROM [dbo].[IndexingPdfFileElements]) AS UniqueElements,
+        (SELECT COUNT(*) FROM [dbo].[IndexingXmlFileElementMappings]) + (SELECT COUNT(*) FROM [dbo].[IndexingJsonFileElementMappings]) + (SELECT COUNT(*) FROM [dbo].[IndexingPdfFileElementMappings]) AS TotalMappings,
         (SELECT COUNT(DISTINCT [RequestFileId]) FROM [dbo].[IndexingXmlFileElementMappings] WHERE [RequestFileId] IS NOT NULL) 
             + (SELECT COUNT(DISTINCT [RequestFileId]) FROM [dbo].[IndexingJsonFileElementMappings] WHERE [RequestFileId] IS NOT NULL) AS RequestFiles,
         (SELECT COUNT(DISTINCT [ResponseFileId]) FROM [dbo].[IndexingXmlFileElementMappings] WHERE [ResponseFileId] IS NOT NULL) 

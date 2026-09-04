@@ -120,12 +120,15 @@ DEALLOCATE ProcCursor;
 GO
 
 /* Drop tables from most-dependent to least-dependent. */
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingFileElementSearch')) DROP TABLE [dbo].[IndexingFileElementSearch];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElementSearch')) DROP TABLE [dbo].[IndexingPdfFileElementSearch];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElementMappings')) DROP TABLE [dbo].[IndexingPdfFileElementMappings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElements')) DROP TABLE [dbo].[IndexingPdfFileElements];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElementSearch')) DROP TABLE [dbo].[IndexingJsonFileElementSearch];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElementMappings')) DROP TABLE [dbo].[IndexingJsonFileElementMappings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElements')) DROP TABLE [dbo].[IndexingJsonFileElements];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElementSearch')) DROP TABLE [dbo].[IndexingXmlFileElementSearch];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElementMappings')) DROP TABLE [dbo].[IndexingXmlFileElementMappings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElements')) DROP TABLE [dbo].[IndexingXmlFileElements];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingFileElementType')) DROP TABLE [dbo].[IndexingFileElementType];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionAuditResponseFileLinks')) DROP TABLE [dbo].[DirectExecutionAuditResponseFileLinks];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionAudit')) DROP TABLE [dbo].[DirectExecutionAudit];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteExecutionAuditTestCaseLinks')) DROP TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks];
@@ -169,7 +172,7 @@ IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Roles')) D
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Users')) DROP TABLE [dbo].[Users];
 GO
 
-/* Drop the full-text catalog created by the IndexingFileElementSearch table. */
+/* Drop the full-text catalog if it still exists (legacy cleanup). */
 IF EXISTS (SELECT 1 FROM sys.fulltext_catalogs WHERE name = N'IndexingCatalog')
     DROP FULLTEXT CATALOG [IndexingCatalog];
 GO
@@ -321,28 +324,31 @@ GO
 GO
 :r ../dbo/Tables/DirectExecutionAuditResponseFileLinks.sql
 GO
-:r ../dbo/Tables/IndexingFileElementType.sql
-GO
-
-/* Seed the element type lookup table (same seed as Script.PostDeployment.sql for project deploys). */
-INSERT INTO [dbo].[IndexingFileElementType] ([ElementType], [Description])
-VALUES (N'XML', N'XML File Elements'), (N'JSON', N'JSON File Elements');
-GO
-
 :r ../dbo/Tables/IndexingXmlFileElements.sql
+GO
+:r ../dbo/Tables/IndexingXmlFileElementSearch.sql
 GO
 :r ../dbo/Tables/IndexingXmlFileElementMappings.sql
 GO
 :r ../dbo/Tables/IndexingJsonFileElements.sql
 GO
+:r ../dbo/Tables/IndexingJsonFileElementSearch.sql
+GO
 :r ../dbo/Tables/IndexingJsonFileElementMappings.sql
 GO
-:r ../dbo/Tables/IndexingFileElementSearch.sql
+:r ../dbo/Tables/IndexingPdfFileElements.sql
+GO
+:r ../dbo/Tables/IndexingPdfFileElementSearch.sql
+GO
+:r ../dbo/Tables/IndexingPdfFileElementMappings.sql
 GO
 
-/* The full-text catalog and index for IndexingFileElementSearch are NOT created by this
-   script: they require the Full-Text Search component, which is not installed on every
-   instance. They are created by Script.PostDeployment.sql on instances that support them. */
+/* The full-text catalog and index are no longer created by this script.
+   The old IndexingFileElementSearch denormalized table has been replaced
+   by per-type element search tables (IndexingXmlFileElementSearch,
+   IndexingJsonFileElementSearch, IndexingPdfFileElementSearch).
+   The usp_SearchElements procedure now uses LIKE-based search via the
+   v_IndexingFileElementSearch view instead of FREETEXTTABLE. */
 GO
 
 /* =====================================================================
@@ -531,10 +537,9 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_RemoveServiceAppPermissions.sql
 GO
-/* usp_SearchElements is intentionally NOT recreated here: it uses FREETEXTTABLE and
-   therefore requires the Full-Text Search component, which is not installed on every
-   instance. It is created by the SQL project (OrbitTool.sqlproj) on FTS-capable
-   instances. */
+/* usp_SearchElements is recreated below using LIKE-based search via the
+   v_IndexingFileElementSearch view (no longer uses FREETEXTTABLE). */
+:r ../dbo/StoredProcedures/usp_SearchElements.sql
 GO
 :r ../dbo/StoredProcedures/usp_ToggleServiceApplicationActive.sql
 GO

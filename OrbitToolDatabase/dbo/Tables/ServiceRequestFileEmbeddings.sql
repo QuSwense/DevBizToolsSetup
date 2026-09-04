@@ -37,3 +37,11 @@ CREATE TABLE [dbo].[ServiceRequestFileEmbeddings] (
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO
+
+CREATE NONCLUSTERED INDEX [IX_ServiceRequestFileEmbeddings_ServiceRequestFileId]
+    ON [dbo].[ServiceRequestFileEmbeddings]([ServiceRequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_ServiceRequestFileEmbeddings_Name]
+    ON [dbo].[ServiceRequestFileEmbeddings]([Name] ASC)
+GO

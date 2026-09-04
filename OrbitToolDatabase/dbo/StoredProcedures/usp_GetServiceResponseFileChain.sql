@@ -41,7 +41,7 @@ BEGIN
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileHash],
+            [ContentHash],
             [CreatedAt],
             [CreatedBy],
             0 AS ChainPosition
@@ -63,7 +63,7 @@ BEGIN
             srf.[CompressedData],
             srf.[UncompressedSizeBytes],
             srf.[CompressionAlgorithmType],
-            srf.[FileHash],
+            srf.[ContentHash],
             srf.[CreatedAt],
             srf.[CreatedBy],
             dc.ChainPosition + 1
@@ -84,7 +84,7 @@ BEGIN
         CASE WHEN @IncludeData = 1 THEN [CompressedData] ELSE CAST(0x AS VARBINARY(1)) END AS CompressedData,
         [UncompressedSizeBytes],
         [CompressionAlgorithmType],
-        [FileHash],
+        [ContentHash],
         [CreatedAt],
         [CreatedBy],
         ChainPosition,

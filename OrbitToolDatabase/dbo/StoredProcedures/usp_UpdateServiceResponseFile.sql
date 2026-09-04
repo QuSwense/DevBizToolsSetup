@@ -9,7 +9,7 @@ CREATE PROCEDURE [dbo].[usp_UpdateServiceResponseFile]
     @CompressedData VARBINARY(MAX) = NULL,
     @UncompressedSizeBytes INT = NULL,
     @CompressionAlgorithmType VARCHAR(50) = NULL,
-    @FileHash VARCHAR(64) = NULL,
+    @ContentHash VARCHAR(64) = NULL,
     @IsActive BIT = NULL,
     @UserId NVARCHAR(20) = NULL,
     @RecordVersion VARCHAR(50)  -- For optimistic concurrency control
@@ -62,7 +62,7 @@ BEGIN
             @ExistingCompressedData = [CompressedData],
             @ExistingUncompressedSizeBytes = [UncompressedSizeBytes],
             @ExistingCompressionAlgorithmType = [CompressionAlgorithmType],
-            @ExistingFileHash = [FileHash],
+            @ExistingContentHash = [ContentHash],
             @ExistingIsActive = [IsActive],
             @ServiceRequestFileId = [ServiceRequestFileId]
         FROM [dbo].[ServiceResponseFiles] WITH (UPDLOCK, HOLDLOCK)
@@ -101,18 +101,18 @@ BEGIN
         BEGIN
             SET @ContentChanged = 1;
             
-            IF @FileHash IS NULL
+            IF @ContentHash IS NULL
             BEGIN
                 SET @CalculatedHash = CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', @CompressedData), 2);
             END
             ELSE
             BEGIN
-                SET @CalculatedHash = @FileHash;
+                SET @CalculatedHash = @ContentHash;
             END
         END
         ELSE
         BEGIN
-            SET @CalculatedHash = @ExistingFileHash;
+            SET @CalculatedHash = @ExistingContentHash;
         END
 
         IF @Name IS NOT NULL AND @Name <> @ExistingName
@@ -148,7 +148,7 @@ BEGIN
                 [CompressedData],
                 [UncompressedSizeBytes],
                 [CompressionAlgorithmType],
-                [FileHash],
+                [ContentHash],
                 [RecordVersion],
                 [IsActive],
                 [CreatedAt],
@@ -172,7 +172,7 @@ BEGIN
             [CompressedData] = ISNULL(@CompressedData, [CompressedData]),
             [UncompressedSizeBytes] = ISNULL(@UncompressedSizeBytes, [UncompressedSizeBytes]),
             [CompressionAlgorithmType] = ISNULL(@CompressionAlgorithmType, [CompressionAlgorithmType]),
-            [FileHash] = @CalculatedHash,
+            [ContentHash] = @CalculatedHash,
             [IsActive] = ISNULL(@IsActive, [IsActive]),
             [RecordVersion] = @NewRecordVersion,
             [LastUpdatedAt] = GETDATE(),
@@ -229,7 +229,7 @@ BEGIN
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileHash],
+            [ContentHash],
             [RecordVersion],
             [IsActive],
             [CreatedAt],

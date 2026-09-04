@@ -26,7 +26,7 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Compression algorithm used for the file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the file data for integrity verification
-    [FileHash] VARCHAR(64) NULL,
+    [ContentHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceResponseFiles_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -45,8 +45,8 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
     CONSTRAINT CK_ServiceResponseFiles_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
-    CONSTRAINT CK_ServiceResponseFiles_FileHash
-        CHECK ([FileHash] IS NULL OR LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
+    CONSTRAINT CK_ServiceResponseFiles_ContentHash
+        CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceResponseFiles_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 

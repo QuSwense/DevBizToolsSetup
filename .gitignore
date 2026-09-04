@@ -77,3 +77,7 @@ OrbitToolDatabase/*
 !OrbitToolDatabase/scripts/
 OrbitToolDatabase/scripts/*
 !OrbitToolDatabase/scripts/OrbitTool_ResetAndRecreate.sql
+
+# Ignore all other SQL scripts in the Setup directory.
+Setup/data/
+Setup/dbDesign/

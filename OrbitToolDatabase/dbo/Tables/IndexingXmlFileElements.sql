@@ -1,32 +1,27 @@
+/*
+    Table: IndexingXmlFileElements
+    Description: Stores unique XML element key-value combinations for indexing.
+    Similar to JSON elements but optimized for XML path structures.
+*/
 CREATE TABLE [dbo].[IndexingXmlFileElements]
 (
-  -- Primary Key, auto-incrementing identity integer.
-    [ElementId] BIGINT IDENTITY(1,1) NOT NULL,
-    -- XPath key path (e.g., '/Orders/Order/Address/City').
-    [XPathKeyPath] VARCHAR(400) NOT NULL,
-    -- String representation of the scalar value (e.g., 'Pune').
-    [ElementValue] NVARCHAR(450) NOT NULL,
-    -- Binary SHA-256 hash calculated over (NormalizedKeyPath + '|' + ElementValue) for fast uniqueness matching.
-    [ValueHash] BINARY(32) NOT NULL,
+    [Id] BIGINT IDENTITY(1,1) NOT NULL,
+    -- Primary Key, auto-incrementing identity integer.
+    [ElementName] NVARCHAR(400) NOT NULL,
+    -- XML Path key path, using XPath in C#
+    [XmlPath] NVARCHAR(400) NOT NULL,
+    -- XML value type: 'String', 'Number', 'Boolean', 'Array', 'Object'
+    [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
+    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [UpdatedAt] DATETIME NULL,
 
-    CONSTRAINT [PK_IndexingXmlFileElements] PRIMARY KEY CLUSTERED ([ElementId] ASC) WITH (DATA_COMPRESSION = PAGE)
+    CONSTRAINT [PK_IndexingXmlFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
+    CONSTRAINT [CK_IndexingXmlFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object'))
 );
 GO
 
--- Unique index enforcing global single-instance storage of element key-value combinations.
-CREATE UNIQUE NONCLUSTERED INDEX [UX_IndexingXmlFileElements_ValueHash] 
-ON [dbo].[IndexingXmlFileElements] ([ValueHash]) 
-INCLUDE ([ElementId]);
-GO
-
--- Index supporting wildcard and exact-value searches across element values.
+-- Index supporting wildcard and exact-value searches across XML values.
 CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElements_Value_KeyPath] 
-ON [dbo].[IndexingXmlFileElements] ([ElementValue] ASC, [XPathKeyPath] ASC) 
-INCLUDE ([ElementId]);
-GO
-
--- Index supporting exact key-path searches.
-CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElements_KeyPath_Value] 
-ON [dbo].[IndexingXmlFileElements] ([XPathKeyPath] ASC, [ElementValue] ASC) 
-INCLUDE ([ElementId]);
+ON [dbo].[IndexingXmlFileElements] ([ElementName] ASC, [XmlPath] ASC) 
+INCLUDE ([Id]);
 GO
