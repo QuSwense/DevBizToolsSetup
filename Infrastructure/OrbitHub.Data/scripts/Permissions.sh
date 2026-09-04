@@ -23,7 +23,7 @@ dotnet linq2db scaffold \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables ResourcePermissions,RolePermissions,RuleSetsPermissions,ServiceAppPermissions,ServiceRequestFilesPermissions,ServiceTestCasesPermissions,ServiceTestSuitesPermissions,UserPermissions \
+  --include-tables ResourcePermissions,RolePermissions,Roles,RuleSetsPermissions,ServiceAppPermissions,ServiceRequestFilesPermissions,ServiceTestCasesPermissions,ServiceTestSuitesPermissions,UserPermissions \
   --namespace OrbitHub.Data.PermissionsManagement \
   --context-name PermissionsDbContext \
   --add-typed-options-ctor \
