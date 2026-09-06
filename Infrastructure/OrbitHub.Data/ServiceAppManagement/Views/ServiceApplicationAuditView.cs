@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.CoreManagement.Views;
+namespace OrbitHub.Data.Repositories.ServiceAppManagement.Views;
 
 public class ServiceApplicationAuditView
 {

@@ -6,16 +6,16 @@
 using LinqToDB;
 using LinqToDB.Data;
 using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.CoreManagement.Views;
-using OrbitHub.Data.CoreManagement;
+using OrbitHub.Data.Repositories.ServiceAppManagement.Views;
+using OrbitHub.Data.ServiceAppManagement;
 
-namespace OrbitHub.Data.Repositories.CoreManagement.Views;
+namespace OrbitHub.Data.Repositories.ServiceAppManagement.Views;
 
 public class ServiceApplicationAuditViewRepository
 {
-    private readonly CoreDbContext _ctx;
+    private readonly ServiceAppDbContext _ctx;
 
-    public ServiceApplicationAuditViewRepository(CoreDbContext ctx) => _ctx = ctx;
+    public ServiceApplicationAuditViewRepository(ServiceAppDbContext ctx) => _ctx = ctx;
 
     public async Task<RepositoryResult<List<ServiceApplicationAuditView>>> GetAllAsync(CancellationToken ct = default)
     {

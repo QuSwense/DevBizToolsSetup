@@ -5,13 +5,13 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Data.Repositories.CoreManagement.Repositories;
-using OrbitHub.Data.Repositories.CoreManagement.Views;
 using OrbitHub.Data.Repositories.IndexingManagement.Repositories;
 using OrbitHub.Data.Repositories.IndexingManagement.Views;
 using OrbitHub.Data.Repositories.PermissionsManagement.Repositories;
 using OrbitHub.Data.Repositories.PermissionsManagement.Views;
 using OrbitHub.Data.Repositories.RuleManagement.Repositories;
 using OrbitHub.Data.Repositories.RuleManagement.Views;
+using OrbitHub.Data.Repositories.ServiceAppManagement.Views;
 using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.Repositories.TestManagement.Views;
 
@@ -118,7 +118,7 @@ public static class RepositoryRegistration
         services.AddScoped<UpdateTestCaseExecutionRepository>();
         services.AddScoped<UpsertServiceApplicationRepository>();
 
-        // Views - CoreManagement
+        // Views - ServiceAppManagement
         services.AddScoped<ServiceApplicationAuditViewRepository>();
 
         // Views - IndexingManagement
