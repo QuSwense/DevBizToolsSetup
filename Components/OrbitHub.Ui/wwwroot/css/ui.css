@@ -140,10 +140,11 @@
     color: var(--sh-text-soft);
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    padding-right: 5px;
 }
 
 .kpi-icon {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--sh-text-faint);
 }
 

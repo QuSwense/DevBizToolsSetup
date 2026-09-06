@@ -9,19 +9,20 @@ namespace OrbitHub.Dashboard.Infrastructure.Repositories.Users;
 
 /// <summary>
 /// Reads the platform users and their activity feeds from the MSSQL database through linq2db.
+/// Registered as a singleton, so every operation opens its own DI scope to obtain a fresh,
+/// thread-safe <see cref="UserDbContext"/> (required for the dashboard's parallel fan-out).
 /// </summary>
-internal sealed class DashboardUsersRepository(IServiceProvider serviceProvider, IConfiguration configuration) : IDashboardUsersRepository
+internal sealed class DashboardUsersRepository(IServiceScopeFactory scopeFactory, IConfiguration configuration) : IDashboardUsersRepository
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private readonly IConfiguration _configuration = configuration;
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<UserEntity>> GetUsersAsync()
     {
-        using var scope = _serviceProvider.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+        using var userScope = OpenUserContext();
 
-        return [.. (await db.Users.ToListAsync())
+        return [.. (await userScope.Db.Users.ToListAsync())
             .Select(u => new UserEntity
             {
                 Name = FormatUserName(u),
@@ -46,10 +47,9 @@ internal sealed class DashboardUsersRepository(IServiceProvider serviceProvider,
     /// <inheritdoc />
     public async Task<IReadOnlyList<UserActivityEntity>> GetUserActivitiesAsync()
     {
-        using var scope = _serviceProvider.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+        using var userScope = OpenUserContext();
 
-        return [.. (await db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
+        return [.. (await userScope.Db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
             .Select(a => new UserActivityEntity
             {
                 Id = a.Id.ToString(),
@@ -62,10 +62,9 @@ internal sealed class DashboardUsersRepository(IServiceProvider serviceProvider,
     /// <inheritdoc />
     public async Task<IReadOnlyList<RecentActivityEntity>> GetRecentActivityAsync()
     {
-        using var scope = _serviceProvider.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+        using var userScope = OpenUserContext();
 
-        return [.. (await db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
+        return [.. (await userScope.Db.UserActivities.OrderByDescending(a => a.Timestamp).ToListAsync())
             .Select(a => new RecentActivityEntity
             {
                 User = a.UserId,
@@ -74,9 +73,26 @@ internal sealed class DashboardUsersRepository(IServiceProvider serviceProvider,
             })];
     }
 
+    /// <summary>
+    /// Opens a fresh DI scope and returns a handle exposing the <see cref="UserDbContext" /> resolved from it.
+    /// Dispose the handle to release the scope (and its connection). Created per operation so concurrent
+    /// dashboard reads never share a single (non-thread-safe) DataConnection.
+    /// </summary>
+    private UserDbContextScope OpenUserContext() => new(_scopeFactory.CreateScope());
+
     private static string FormatUserName(User user)
     {
         var fullName = string.Join(" ", new[] { user.FirstName, user.LastName }.Where(s => !string.IsNullOrWhiteSpace(s)));
         return string.IsNullOrWhiteSpace(fullName) ? user.UserId : fullName;
+    }
+
+    /// <summary>
+    /// Owns a DI scope for the lifetime of a single database operation.
+    /// </summary>
+    private sealed class UserDbContextScope(IServiceScope scope) : IDisposable
+    {
+        public UserDbContext Db { get; } = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+
+        public void Dispose() => scope.Dispose();
     }
 }

@@ -33,11 +33,7 @@ else
             <div class="home-kpi-grid">
                 @foreach (var metric in _kpiMetrics)
                 {
-                    <div class="kpi-card">
-                        <div class="kpi-label">@metric.Label</div>
-                        <div class="kpi-value">@metric.Value</div>
-                        <div class="kpi-detail">@metric.Detail</div>
-                    </div>
+                    <KpiTile Label="@metric.Label" Value="@metric.Value" Sub="@metric.Detail" Icon="@metric.Icon" />
                 }
             </div>
         </section>

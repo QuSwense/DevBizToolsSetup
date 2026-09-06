@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using OrbitHub.Dashboard.Application.DTOs;
 using OrbitHub.Dashboard.Application.Services;
 using OrbitHub.Dashboard.UI.Components;
 using OrbitHub.Dashboard.UI.Models;
@@ -22,68 +23,16 @@ public partial class Dashboard
     private bool _isLoading = true;
     private string? _errorMessage;
 
-    private readonly IReadOnlyList<KpiMetric> _kpiMetrics =
-    [
-        new("Total Registered Applications", "36", "+4 this month"),
-        new("Total Active Users Today / Week / Month", "1,284 / 2,340 / 8,191", "+15% vs last month"),
-        new("Total Departments Using the Tool", "18", "+5 new departments"),
-        new("Requests Processed Today / Week / Month", "1,240 / 2,500 / 13,200", "95% success rate"),
-        new("Success Rate", "95.8%", "Stable execution quality"),
-        new("Number of Test Assets Managed", "1,284", "Across SOAP and REST"),
-        new("XML Files", "342", "Updated this month"),
-        new("Templates", "88", "21 ready for deployment"),
-        new("WSDL Versions", "27", "3 new this month")
-    ];
+    // Populated after the snapshot loads so each tile mirrors a DashboardMetricsDto
+    // property returned by the metrics repository (no hardcoded placeholder data).
+    private IReadOnlyList<KpiMetric> _kpiMetrics = [];
 
-    private readonly IReadOnlyList<ApplicationUsage> _topApplications =
-    [
-        new("Application A", 240, 42),
-        new("Application B", 185, 32),
-        new("Application C", 115, 19),
-        new("Application D", 55, 7)
-    ];
-
-    private readonly IReadOnlyList<GrowthMetric> _growthMetrics =
-    [
-        new("New Users Added", "146"),
-        new("New Applications Registered", "12"),
-        new("New XML Templates Created", "28"),
-        new("New WSDL Versions Published", "4")
-    ];
-
-    private readonly IReadOnlyList<ServiceHealthMetric> _serviceHealth =
-    [
-        new("Platform Availability", "Healthy", "healthy"),
-        new("Database Connectivity", "Healthy", "healthy"),
-        new("Authentication Service", "Healthy", "healthy"),
-        new("SOAP Execution Engine", "Healthy", "healthy")
-    ];
-
-    private readonly IReadOnlyList<string> _insights =
-    [
-        "15% growth in active users this month.",
-        "5 new departments onboarded.",
-        "2,500 requests processed this week.",
-        "95% of executions completed successfully.",
-        "Top consuming application: Claims Service."
-    ];
-
-    private readonly IReadOnlyList<ActivityItem> _recentActivities =
-    [
-        new("08:42 AM", "Claims Service processed 220 requests successfully."),
-        new("08:10 AM", "New XML template published for Billing API."),
-        new("Yesterday", "3 departments were onboarded to the platform."),
-        new("2 days ago", "WSDL version 4.8 was approved for release.")
-    ];
-
-    private readonly IReadOnlyList<string> _recentAccessLinks =
-    [
-        "Claims Service",
-        "Billing Gateway",
-        "Customer Compliance",
-        "REST Templates",
-        "SOAP Execution History"
-    ];
+    // Populated after the snapshot loads. Where no backing DTO exists yet, the matching
+    // Build method returns an empty list instead of fabricated placeholder data.
+    private IReadOnlyList<ApplicationUsage> _topApplications = [];
+    private IReadOnlyList<ServiceHealthMetric> _serviceHealth = [];
+    private IReadOnlyList<ActivityItem> _recentActivities = [];
+    private IReadOnlyList<string> _recentAccessLinks = [];
 
     // Per-card expand/collapse state, persisted to localStorage via JS interop.
     private readonly Dictionary<string, bool> _cardCollapsed = [];
@@ -115,6 +64,15 @@ public partial class Dashboard
                 TestSuiteHistory = snapshot.TestSuiteHistory,
                 ServiceUptime = snapshot.ServiceUptime
             };
+
+            // Project the DTO metric properties onto the KPI tile list.
+            _kpiMetrics = BuildKpiMetrics(snapshot.Metrics);
+
+            // Populate the remaining dashboard sections from their snapshot sources.
+            _topApplications = BuildTopApplications(snapshot.RequestExecutions);
+            _serviceHealth = BuildServiceHealth(snapshot.HealthServices);
+            _recentActivities = BuildRecentActivities(snapshot.RecentActivities);
+            _recentAccessLinks = BuildRecentAccessLinks(snapshot.RequestExecutions);
         }
         catch (Exception ex)
         {
@@ -196,6 +154,118 @@ public partial class Dashboard
 
     // ── ViewModel → Component parameter mappings ──────────────────────
 
+    /// <summary>
+    /// Projects each <see cref="DashboardMetricsDto"/> property onto a KPI tile so the
+    /// executive summary cards display repository metrics instead of placeholder data.
+    /// </summary>
+    private static IReadOnlyList<KpiMetric> BuildKpiMetrics(DashboardMetricsDto metrics)
+    {
+        int restDisabled = metrics.RestAppCount - metrics.RestAppsEnabled;
+        int soapDisabled = metrics.SoapAppCount - metrics.SoapAppsEnabled;
+        int failingCases = metrics.TotalCases - metrics.PassingCases;
+
+        return
+        [
+            new KpiMetric("Total REST Applications", metrics.RestAppCount.ToString("N0"),
+                $"{metrics.RestAppsEnabled} enabled · {restDisabled} disabled", "🌐"),
+            new KpiMetric("REST Applications Enabled", metrics.RestAppsEnabled.ToString("N0"),
+                $"of {metrics.RestAppCount} total", "✅"),
+            new KpiMetric("Total SOAP Applications", metrics.SoapAppCount.ToString("N0"),
+                $"{metrics.SoapAppsEnabled} enabled · {soapDisabled} disabled", "🧾"),
+            new KpiMetric("SOAP Applications Enabled", metrics.SoapAppsEnabled.ToString("N0"),
+                $"of {metrics.SoapAppCount} total", "✅"),
+            new KpiMetric("Test Suites", metrics.TestSuiteCount.ToString("N0"),
+                "across REST and SOAP", "🧪"),
+            new KpiMetric("Passing Test Cases", metrics.PassingCases.ToString("N0"),
+                $"{failingCases} failing", "✅"),
+            new KpiMetric("Total Test Cases", metrics.TotalCases.ToString("N0"),
+                "across all suites", "🔢")
+        ];
+    }
+
+    /// <summary>
+    /// Top applications by execution volume, derived from the request-execution history.
+    /// </summary>
+    private static IReadOnlyList<ApplicationUsage> BuildTopApplications(IReadOnlyList<RequestExecutionDto> executions)
+    {
+        var grouped = executions
+            .Where(e => !string.IsNullOrWhiteSpace(e.AppName))
+            .GroupBy(e => e.AppName, StringComparer.OrdinalIgnoreCase)
+            .Select(g => new { App = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(4)
+            .ToList();
+
+        int total = grouped.Sum(x => x.Count);
+
+        return [.. grouped
+            .Select(x => new ApplicationUsage(
+                x.App,
+                x.Count,
+                total == 0 ? 0 : (int)Math.Round(x.Count * 100d / total)))];
+    }
+
+    /// <summary>
+    /// Service health snapshot populated from the monitored health services.
+    /// </summary>
+    private static IReadOnlyList<ServiceHealthMetric> BuildServiceHealth(IReadOnlyList<ServiceHealthDto> health)
+    {
+        return [.. health
+            .Where(h => !string.IsNullOrWhiteSpace(h.Name))
+            .Select(h => new ServiceHealthMetric(
+                h.Name,
+                FormatServiceStatus(h.Status),
+                ServiceStatusClass(h.Status)))];
+    }
+
+    /// <summary>
+    /// Chronological activity log surfaced from the recent-activity data.
+    /// </summary>
+    private static IReadOnlyList<ActivityItem> BuildRecentActivities(IReadOnlyList<RecentActivityDto> activities)
+    {
+        return [.. activities
+            .Where(a => !string.IsNullOrWhiteSpace(a.Action))
+            .Take(6)
+            .Select(a => new ActivityItem(
+                a.TimeAgo,
+                string.IsNullOrWhiteSpace(a.User) ? a.Action : $"{a.User} — {a.Action}"))];
+    }
+
+    /// <summary>
+    /// Quick links to the most recently exercised applications, derived from the execution
+    /// history. Used as the recent-access proxy until a dedicated access log is tracked.
+    /// </summary>
+    private static IReadOnlyList<string> BuildRecentAccessLinks(IReadOnlyList<RequestExecutionDto> executions)
+    {
+        return [.. executions
+            .Where(e => !string.IsNullOrWhiteSpace(e.AppName))
+            .Select(e => e.AppName)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(5)];
+    }
+
+    private static string FormatServiceStatus(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "ok" or "healthy" => "Healthy",
+            "degraded" => "Degraded",
+            "down" or "unavailable" => "Down",
+            _ => string.IsNullOrWhiteSpace(status) ? "Unknown" : status
+        };
+    }
+
+    private static string ServiceStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "ok" or "healthy" => "healthy",
+            "degraded" => "degraded",
+            "down" or "unavailable" => "down",
+            _ => "unknown"
+        };
+    }
+
     private IReadOnlyList<RecentActivity.ActivityEntry> BuildActivityLog()
     {
         return [.. _viewModel.UserActivities
@@ -218,7 +288,7 @@ public partial class Dashboard
         new QuickActions.QuickActionItem("Execute History", "/Rest/ExecuteHistory", "bi bi-clock-history")
     };
 
-    private sealed record KpiMetric(string Label, string Value, string Detail);
+    private sealed record KpiMetric(string Label, string Value, string Detail, string Icon);
 
     private sealed record ApplicationUsage(string Name, int Executions, int Contribution);
 

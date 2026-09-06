@@ -277,6 +277,26 @@
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
 }
 
+.status-indicator.healthy {
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.status-indicator.degraded {
+    background: #eab308;
+    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.15);
+}
+
+.status-indicator.down {
+    background: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.status-indicator.unknown {
+    background: #94a3b8;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+}
+
 .insight-list {
     margin: 0;
     padding-left: 18px;
@@ -1094,7 +1114,7 @@
     line-height: 1.1;
     color: var(--sh-text);
 }
-    margin-top: 2px;
+    
 .kpi-sub {
     font-size: 11px;
     color: var(--sh-text-faint);
