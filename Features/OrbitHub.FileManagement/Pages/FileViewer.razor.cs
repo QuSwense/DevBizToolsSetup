@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Components;
 using LinqToDB.Async;
 using Microsoft.JSInterop;
 using OrbitHub.Common;
-using OrbitHub.Data.SoapManagement;
-using OrbitHub.Data.RestManagement;
+using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.FileManagement.Services;
 
 namespace OrbitHub.FileManagement.Pages;
 
@@ -16,10 +16,7 @@ public partial class FileViewer
     private IJSRuntime JS { get; set; } = default!;
 
     [Inject]
-    private SoapDbContext SoapDb { get; set; } = default!;
-
-    [Inject]
-    private RestDbContext RestDb { get; set; } = default!;
+    private FileStore FileStore { get; set; } = default!;
 
     private const string MonacoContainerId = "file-viewer-monaco";
 
@@ -79,57 +76,30 @@ public partial class FileViewer
 
             if (!string.IsNullOrWhiteSpace(appParam))
             {
-                // Try SOAP
-                var soapFile = await SoapDb.SoapRequestFiles
-                    .FirstOrDefaultAsync(f => f.FileName == fileParam && f.AppName == appParam);
-
-                if (soapFile is not null)
+                var file = await FileStore.GetFileAsync(appParam, fileParam);
+                if (file is not null)
                 {
-                    _fileId = soapFile.Id;
-                    _fileName = soapFile.FileName;
-                    _appName = soapFile.AppName;
-                    _operation = soapFile.ApiPath;
-                    _verb = soapFile.Verb;
-                    _description = soapFile.Description ?? "";
-                    _status = soapFile.Status;
-                    _createdBy = soapFile.CreatedBy;
-                    _createdAt = soapFile.CreatedAt;
-                    _updatedBy = soapFile.UpdatedBy ?? "";
-                    _updatedAt = soapFile.UpdatedAt ?? "";
-                    _fileContent = soapFile.Content ?? "";
+                    _fileId = file.Id.ToString();
+                    _fileName = file.FileName;
+                    _appName = file.ApplicationName;
+                    _operation = file.Operation;
+                    _verb = file.Verb;
+                    _description = file.Description;
+                    _status = file.IsActive ? "active" : "inactive";
+                    _createdBy = file.CreatedBy;
+                    _createdAt = file.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+                    _updatedBy = file.LastUpdatedBy ?? "";
+                    _updatedAt = file.LastUpdatedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "";
+                    _fileContent = file.Content;
                     _fileSize = FormatSize(_fileContent.Length);
-                    _isSoapFile = true;
+                    _isSoapFile = string.Equals(file.ServiceType, "SOAP", StringComparison.OrdinalIgnoreCase);
+                    _isRestFile = string.Equals(file.ServiceType, "REST", StringComparison.OrdinalIgnoreCase);
                     _language = GetLanguageFromExtension(_fileName);
                 }
                 else
                 {
-                    // Try REST
-                    var restFile = await RestDb.RestRequestFiles
-                        .FirstOrDefaultAsync(f => f.FileName == fileParam && f.AppName == appParam);
-
-                    if (restFile is not null)
-                    {
-                        _fileId = restFile.Id;
-                        _fileName = restFile.FileName;
-                        _appName = restFile.AppName;
-                        _operation = restFile.ApiPath;
-                        _verb = restFile.Verb;
-                        _description = restFile.Description ?? "";
-                        _status = restFile.Status;
-                        _createdBy = restFile.CreatedBy;
-                        _createdAt = restFile.CreatedAt;
-                        _updatedBy = restFile.UpdatedBy ?? "";
-                        _updatedAt = restFile.UpdatedAt ?? "";
-                        _fileContent = restFile.Content ?? "";
-                        _fileSize = FormatSize(_fileContent.Length);
-                        _isRestFile = true;
-                        _language = GetLanguageFromExtension(_fileName);
-                    }
-                    else
-                    {
-                        _hasError = true;
-                        _errorMessage = $"File '{fileParam}' not found for application '{appParam}'.";
-                    }
+                    _hasError = true;
+                    _errorMessage = $"File '{fileParam}' not found for application '{appParam}'.";
                 }
             }
             else

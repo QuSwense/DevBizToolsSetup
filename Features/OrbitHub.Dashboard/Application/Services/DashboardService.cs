@@ -1,254 +1,70 @@
 using OrbitHub.Dashboard.Application.DTOs;
-using OrbitHub.Dashboard.Core.Interfaces;
+using OrbitHub.Dashboard.Application.Services.Applications;
+using OrbitHub.Dashboard.Application.Services.Assets;
+using OrbitHub.Dashboard.Application.Services.Executions;
+using OrbitHub.Dashboard.Application.Services.Health;
+using OrbitHub.Dashboard.Application.Services.Metrics;
+using OrbitHub.Dashboard.Application.Services.TestSuites;
+using OrbitHub.Dashboard.Application.Services.Users;
 
 namespace OrbitHub.Dashboard.Application.Services;
 
 /// <summary>
-/// Provides dashboard data by aggregating from the underlying repository.
+/// Orchestrates the grouped dashboard services, fanning out every section call in
+/// parallel and assembling the results into a single <see cref="DashboardSnapshotDto"/>.
 /// </summary>
-internal sealed class DashboardService(IDashboardRepository repository) : IDashboardService
+internal sealed class DashboardService(
+    IDashboardMetricsService metricsService,
+    IDashboardApplicationsService applicationsService,
+    IDashboardAssetsService assetsService,
+    IDashboardUsersService usersService,
+    IDashboardTestSuitesService testSuitesService,
+    IDashboardExecutionsService executionsService,
+    IDashboardHealthService healthService) : IDashboardService
 {
-    private readonly IDashboardRepository _repository = repository;
-
     /// <inheritdoc />
-    public async Task<DashboardMetricsDto> GetMetricsAsync()
+    public async Task<DashboardSnapshotDto> GetDashboardAsync()
     {
-        var entity = await _repository.GetMetricsAsync();
+        // Fire every group call concurrently; each repository call opens its own DI scope.
+        var metricsTask = metricsService.GetMetricsAsync();
+        var healthTask = healthService.GetServiceHealthAsync();
+        var uptimeTask = healthService.GetServiceUptimeAsync();
+        var suitesTask = testSuitesService.GetTestSuitesAsync();
+        var suiteHistoryTask = testSuitesService.GetTestSuiteHistoryAsync();
+        var requestFilesTask = assetsService.GetRequestFilesAsync();
+        var restRequestFilesTask = assetsService.GetRestRequestFilesAsync();
+        var wsdlTask = assetsService.GetWsdlRecordsAsync();
+        var usersTask = usersService.GetUsersAsync();
+        var currentUserTask = usersService.GetCurrentUserAsync();
+        var recentActivityTask = usersService.GetRecentActivityAsync();
+        var userActivitiesTask = usersService.GetUserActivitiesAsync();
+        var restAppsTask = applicationsService.GetRestAppsAsync();
+        var soapAppsTask = applicationsService.GetSoapAppsAsync();
+        var executionsTask = executionsService.GetRequestExecutionsAsync();
 
-        return new DashboardMetricsDto
+        await Task.WhenAll(
+            metricsTask, healthTask, uptimeTask, suitesTask, suiteHistoryTask,
+            requestFilesTask, restRequestFilesTask, wsdlTask,
+            usersTask, currentUserTask, recentActivityTask, userActivitiesTask,
+            restAppsTask, soapAppsTask, executionsTask);
+
+        return new DashboardSnapshotDto
         {
-            RestAppCount = entity.RestAppCount,
-            RestAppsEnabled = entity.RestAppsEnabled,
-            SoapAppCount = entity.SoapAppCount,
-            SoapAppsEnabled = entity.SoapAppsEnabled,
-            TestSuiteCount = entity.TestSuiteCount,
-            PassingCases = entity.PassingCases,
-            TotalCases = entity.TotalCases
+            Metrics = metricsTask.Result,
+            HealthServices = healthTask.Result,
+            ServiceUptime = uptimeTask.Result,
+            TestSuites = suitesTask.Result,
+            TestSuiteHistory = suiteHistoryTask.Result,
+            RequestFiles = requestFilesTask.Result,
+            RestRequestFiles = restRequestFilesTask.Result,
+            WsdlRecords = wsdlTask.Result,
+            Users = usersTask.Result,
+            CurrentUser = currentUserTask.Result,
+            RecentActivities = recentActivityTask.Result,
+            UserActivities = userActivitiesTask.Result,
+            RestApps = restAppsTask.Result,
+            SoapApps = soapAppsTask.Result,
+            RequestExecutions = executionsTask.Result
         };
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<ServiceHealthDto>> GetServiceHealthAsync()
-    {
-        var entities = await _repository.GetServiceHealthAsync();
-
-        return [.. entities
-            .Select(e => new ServiceHealthDto
-            {
-                Name = e.Name,
-                Status = e.Status.ToString()
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<TestSuiteDto>> GetTestSuitesAsync()
-    {
-        var entities = await _repository.GetTestSuitesAsync();
-
-        return [.. entities
-            .Select(e => new TestSuiteDto
-            {
-                Name = e.Name,
-                TotalCases = e.TotalCases,
-                PassingCases = e.PassingCases,
-                TotalFiles = e.TotalFiles
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<RecentActivityDto>> GetRecentActivityAsync(int maxEntries = 10)
-    {
-        var entities = await _repository.GetRecentActivityAsync();
-
-        return [.. entities
-            .Select(e => new RecentActivityDto
-            {
-                User = e.User,
-                Action = e.Action,
-                TimeAgo = e.TimeAgo
-            })
-            .Take(maxEntries)];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<RequestFileDto>> GetRequestFilesAsync()
-    {
-        var entities = await _repository.GetRequestFilesAsync();
-
-        return [.. entities
-            .Select(e => new RequestFileDto
-            {
-                FileName = e.FileName,
-                AppName = e.AppName,
-                Verb = e.Verb,
-                Status = e.Status,
-                CreatedBy = e.CreatedBy
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<WsdlRecordDto>> GetWsdlRecordsAsync()
-    {
-        var entities = await _repository.GetWsdlRecordsAsync();
-
-        return [.. entities
-            .Select(e => new WsdlRecordDto
-            {
-                AppName = e.AppName,
-                SourceType = e.SourceType,
-                UploadedAt = e.UploadedAt,
-                Status = e.Status,
-                VersionCount = e.VersionCount
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
-    {
-        var entities = await _repository.GetUsersAsync();
-
-        return [.. entities
-            .Select(e => new UserDto
-            {
-                Name = e.Name,
-                Role = e.Role
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<UserDto?> GetCurrentUserAsync()
-    {
-        var entity = await _repository.GetCurrentUserAsync();
-
-        return entity is null
-            ? null
-            : new UserDto
-            {
-                Name = entity.Name,
-                Role = entity.Role
-            };
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<RestAppDto>> GetRestAppsAsync()
-    {
-        var entities = await _repository.GetRestAppsAsync();
-
-        return [.. entities
-            .Select(e => new RestAppDto
-            {
-                Id = e.Id,
-                Name = e.Name,
-                BaseUrl = e.BaseUrl,
-                Description = e.Description,
-                Status = e.Status,
-                CreatedBy = e.CreatedBy,
-                CreatedAt = e.CreatedAt,
-                UpdatedAt = e.UpdatedAt,
-                ApisCount = e.ApisCount
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<SoapAppDto>> GetSoapAppsAsync()
-    {
-        var entities = await _repository.GetSoapAppsAsync();
-
-        return [.. entities
-            .Select(e => new SoapAppDto
-            {
-                Id = e.Id,
-                Name = e.Name,
-                BaseUrl = e.BaseUrl,
-                Description = e.Description,
-                Status = e.Status,
-                CreatedBy = e.CreatedBy,
-                CreatedAt = e.CreatedAt,
-                UpdatedAt = e.UpdatedAt,
-                ApisCount = e.ApisCount
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<RequestFileDto>> GetRestRequestFilesAsync()
-    {
-        var entities = await _repository.GetRestRequestFilesAsync();
-
-        return [.. entities
-            .Select(e => new RequestFileDto
-            {
-                FileName = e.FileName,
-                AppName = e.AppName,
-                Verb = e.Verb,
-                Status = e.Status,
-                CreatedBy = e.CreatedBy
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<UserActivityDto>> GetUserActivitiesAsync()
-    {
-        var entities = await _repository.GetUserActivitiesAsync();
-
-        return [.. entities
-            .Select(e => new UserActivityDto
-            {
-                Id = e.Id,
-                UserName = e.UserName,
-                Action = e.Action,
-                Timestamp = e.Timestamp
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<RequestExecutionDto>> GetRequestExecutionsAsync()
-    {
-        var entities = await _repository.GetRequestExecutionsAsync();
-
-        return [.. entities
-            .Select(e => new RequestExecutionDto
-            {
-                Id = e.Id,
-                AppName = e.AppName,
-                AppType = e.AppType,
-                FileName = e.FileName,
-                Status = e.Status,
-                ExecutedAt = e.ExecutedAt,
-                DurationMs = e.DurationMs,
-                TriggeredBy = e.TriggeredBy
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<TestSuiteHistoryDto>> GetTestSuiteHistoryAsync()
-    {
-        var entities = await _repository.GetTestSuiteHistoryAsync();
-
-        return [.. entities
-            .Select(e => new TestSuiteHistoryDto
-            {
-                Id = e.Id,
-                SuiteName = e.SuiteName,
-                ExecutedAt = e.ExecutedAt,
-                Status = e.Status,
-                TotalCases = e.TotalCases,
-                PassingCases = e.PassingCases,
-                DurationMs = e.DurationMs
-            })];
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<ServiceUptimeDto>> GetServiceUptimeAsync()
-    {
-        var entities = await _repository.GetServiceUptimeAsync();
-
-        return [.. entities
-            .Select(e => new ServiceUptimeDto
-            {
-                Id = e.Id,
-                ServiceName = e.ServiceName,
-                Timestamp = e.Timestamp,
-                Status = e.Status
-            })];
     }
 }

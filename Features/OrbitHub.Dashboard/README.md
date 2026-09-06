@@ -10,22 +10,33 @@ Features/OrbitHub.Dashboard/
 ├── Core/                                    # Domain Layer
 │   ├── Entities/                            # Domain Entities
 │   │   ├── DashboardEntity.cs               # ServiceHealth, TestSuite entities
-│   ├── Interfaces/                          # Repository & Domain Service Interfaces
-│   │   └── IDashboardRepository.cs          # Data persistence contract
+│   ├── Interfaces/                          # Repository contracts, grouped by domain
+│   │   ├── Metrics/                         # IDashboardMetricsRepository
+│   │   ├── Applications/                    # IDashboardApplicationsRepository (REST + SOAP)
+│   │   ├── Assets/                          # IDashboardAssetsRepository (request files + WSDL)
+│   │   ├── Users/                           # IDashboardUsersRepository (users + activity)
+│   │   ├── TestSuites/                      # IDashboardTestSuitesRepository
+│   │   ├── Executions/                      # IDashboardExecutionsRepository
+│   │   └── Health/                          # IDashboardHealthRepository
 │   └── Enums/                               # Feature-specific Enums
 │       └── DashboardEnums.cs                # ServiceStatus, ChartType
 │
 ├── Infrastructure/                          # Data Access Layer
 │   ├── Data/                                # DbContext & Configurations (ready)
-│   └── Repositories/                        # Repository Implementations (ready)
+│   └── Repositories/                        # Grouped repository implementations
+│       ├── Metrics/Applications/Assets/     # One repository per domain group
+│       └── Users/TestSuites/Executions/Health/
 │
 ├── Application/                             # Application Layer (Business Logic)
 │   ├── DTOs/                                # Data Transfer Objects
 │   │   ├── DashboardMetricsDto.cs           # Aggregate metrics DTO
+│   │   ├── DashboardSnapshotDto.cs          # Full dashboard snapshot (all sections)
 │   │   └── RecentActivityDto.cs             # Activity log entry DTO
 │   ├── Services/                            # Application Services
-│   │   ├── IDashboardService.cs             # Service contract
-│   │   └── DashboardService.cs              # Default implementation
+│   │   ├── IDashboardService.cs             # Orchestrator contract (GetDashboardAsync)
+│   │   ├── DashboardService.cs              # Parallel fan-out across the group services
+│   │   ├── Metrics/Applications/Assets/     # One service per domain group
+│   │   └── Users/TestSuites/Executions/Health/
 │   ├── Validators/                          # Validation Logic (ready)
 │   └── Mappings/                            # AutoMapper/Manual Mappings (ready)
 │

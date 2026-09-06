@@ -7,9 +7,8 @@ using Microsoft.JSInterop;
 using Microsoft.Extensions.Configuration;
 using OrbitHub.Common;
 using OrbitHub.Ui.Components;
-using OrbitHub.Data.SoapManagement;
-using OrbitHub.Data.RestManagement;
-using OrbitHub.Data.FileVersionManagement;
+using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.FileManagement.Services;
 
 namespace OrbitHub.FileManagement.Pages;
 
@@ -28,13 +27,7 @@ public partial class FileEditor : IDisposable
     private OrbitHub.SoapApplications.Services.SoapAppStore AppStore { get; set; } = default!;
 
     [Inject]
-    private SoapDbContext SoapDb { get; set; } = default!;
-
-    [Inject]
-    private RestDbContext RestDb { get; set; } = default!;
-
-    [Inject]
-    private FileManagementDbContext FmDb { get; set; } = default!;
+    private FileStore FileStore { get; set; } = default!;
 
     private MonacoEditor? _monacoEditorRef;
 
@@ -109,66 +102,31 @@ public partial class FileEditor : IDisposable
             // Resolve: try SOAP first, then REST
             if (!string.IsNullOrWhiteSpace(appParam))
             {
-                // Try SOAP
-                var soapFile = await SoapDb.SoapRequestFiles
-                    .FirstOrDefaultAsync(f => f.FileName == _fileName && f.AppName == appParam);
-
-                if (soapFile is not null)
+                var file = await FileStore.GetFileAsync(appParam, _fileName);
+                if (file is not null)
                 {
-                    _fileId = soapFile.Id;
-                    _appName = soapFile.AppName;
-                    _operation = soapFile.ApiPath;
-                    _verb = soapFile.Verb;
-                    _editDescription = soapFile.Description ?? "";
-                    _editStatus = soapFile.Status;
-                    _createdBy = soapFile.CreatedBy;
-                    _createdAt = soapFile.CreatedAt;
-                    _lastUpdatedBy = soapFile.UpdatedBy ?? "";
-                    _lastUpdatedAt = soapFile.UpdatedAt ?? "";
-                    _fileContent = soapFile.Content ?? "";
+                    _fileId = file.Id.ToString();
+                    _appName = file.ApplicationName;
+                    _operation = file.Operation;
+                    _verb = file.Verb;
+                    _editDescription = file.Description;
+                    _editStatus = file.IsActive ? "active" : "inactive";
+                    _createdBy = file.CreatedBy;
+                    _createdAt = file.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+                    _lastUpdatedBy = file.LastUpdatedBy ?? "";
+                    _lastUpdatedAt = file.LastUpdatedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "";
+                    _fileContent = file.Content;
                     _originalContent = _fileContent;
-                    _isSoapFile = true;
+                    _isSoapFile = string.Equals(file.ServiceType, "SOAP", StringComparison.OrdinalIgnoreCase);
+                    _isRestFile = string.Equals(file.ServiceType, "REST", StringComparison.OrdinalIgnoreCase);
                     _language = GetLanguageFromExtension(_fileName);
-
-                    // Check for previous versions
-                    _versionNumber = await FmDb.FileVersions
-                        .Where(v => v.SourceType == "soap" && v.SourceId == _fileId)
-                        .MaxAsync(v => (int?)v.VersionNumber) ?? 0;
+                    _versionNumber = await FileStore.GetVersionCountAsync(file.Id);
                     _hasPreviousVersion = _versionNumber > 0;
                 }
                 else
                 {
-                    // Try REST
-                    var restFile = await RestDb.RestRequestFiles
-                        .FirstOrDefaultAsync(f => f.FileName == _fileName && f.AppName == appParam);
-
-                    if (restFile is not null)
-                    {
-                        _fileId = restFile.Id;
-                        _appName = restFile.AppName;
-                        _operation = restFile.ApiPath;
-                        _verb = restFile.Verb;
-                        _editDescription = restFile.Description ?? "";
-                        _editStatus = restFile.Status;
-                        _createdBy = restFile.CreatedBy;
-                        _createdAt = restFile.CreatedAt;
-                        _lastUpdatedBy = restFile.UpdatedBy ?? "";
-                        _lastUpdatedAt = restFile.UpdatedAt ?? "";
-                        _fileContent = restFile.Content ?? "";
-                        _originalContent = _fileContent;
-                        _isRestFile = true;
-                        _language = GetLanguageFromExtension(_fileName);
-
-                        _versionNumber = await FmDb.FileVersions
-                            .Where(v => v.SourceType == "rest" && v.SourceId == _fileId)
-                            .MaxAsync(v => (int?)v.VersionNumber) ?? 0;
-                        _hasPreviousVersion = _versionNumber > 0;
-                    }
-                    else
-                    {
-                        _hasError = true;
-                        _errorMessage = $"File '{_fileName}' not found for application '{appParam}'.";
-                    }
+                    _hasError = true;
+                    _errorMessage = $"File '{_fileName}' not found for application '{appParam}'.";
                 }
             }
             else
@@ -498,60 +456,12 @@ public partial class FileEditor : IDisposable
             var currentUser = Config["Users:CurrentUser"] ?? "Current User";
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            if (_isSoapFile)
-            {
-                var entity = await SoapDb.SoapRequestFiles.FirstOrDefaultAsync(f => f.Id == _fileId);
-                if (entity is null) return;
+            var file = await FileStore.GetFileAsync(_appName, _fileName);
+            if (file is null) return;
 
-                entity.FileName = _editFileName.Trim();
-                entity.Description = _editDescription.Trim();
-                entity.Status = _editStatus;
-                entity.UpdatedBy = currentUser;
-                entity.UpdatedAt = now;
-                entity.Content = _fileContent;
-                await SoapDb.UpdateAsync(entity);
-
-                // Snapshot version
-                _versionNumber++;
-                await FmDb.InsertAsync(new FileVersionEntity
-                {
-                    Id = $"fv-{Guid.NewGuid():N}"[..12],
-                    SourceType = "soap",
-                    SourceId = _fileId,
-                    FileName = _editFileName.Trim(),
-                    Content = _originalContent,
-                    SavedBy = currentUser,
-                    SavedAt = now,
-                    VersionNumber = _versionNumber
-                });
-            }
-            else if (_isRestFile)
-            {
-                var entity = await RestDb.RestRequestFiles.FirstOrDefaultAsync(f => f.Id == _fileId);
-                if (entity is null) return;
-
-                entity.FileName = _editFileName.Trim();
-                entity.Description = _editDescription.Trim();
-                entity.Status = _editStatus;
-                entity.UpdatedBy = currentUser;
-                entity.UpdatedAt = now;
-                entity.Content = _fileContent;
-                await RestDb.UpdateAsync(entity);
-
-                // Snapshot version
-                _versionNumber++;
-                await FmDb.InsertAsync(new FileVersionEntity
-                {
-                    Id = $"fv-{Guid.NewGuid():N}"[..12],
-                    SourceType = "rest",
-                    SourceId = _fileId,
-                    FileName = _editFileName.Trim(),
-                    Content = _originalContent,
-                    SavedBy = currentUser,
-                    SavedAt = now,
-                    VersionNumber = _versionNumber
-                });
-            }
+            await FileStore.SaveAsync(file, _editFileName.Trim(), _editDescription.Trim(),
+                string.Equals(_editStatus, "active", StringComparison.OrdinalIgnoreCase), _fileContent, currentUser);
+            _versionNumber++;
 
             _originalContent = _fileContent;
             _hasUnsavedChanges = false;

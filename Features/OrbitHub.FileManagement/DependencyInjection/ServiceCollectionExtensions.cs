@@ -13,7 +13,6 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddFileManagementFeature(this IServiceCollection services)
     {
-        // FileManagementDbContext is registered in Program.cs (shared MSSQL database via linq2db)
         services.AddSingleton<FileStore>();
         return services;
     }

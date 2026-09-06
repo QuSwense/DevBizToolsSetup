@@ -94,40 +94,26 @@ public partial class Dashboard
     {
         try
         {
-            var metricsTask = DashboardService.GetMetricsAsync();
-            var healthTask = DashboardService.GetServiceHealthAsync();
-            var suitesTask = DashboardService.GetTestSuitesAsync();
-            var requestFilesTask = DashboardService.GetRequestFilesAsync();
-            var wsdlTask = DashboardService.GetWsdlRecordsAsync();
-            var usersTask = DashboardService.GetUsersAsync();
-            var restAppsTask = DashboardService.GetRestAppsAsync();
-            var soapAppsTask = DashboardService.GetSoapAppsAsync();
-            var restRequestFilesTask = DashboardService.GetRestRequestFilesAsync();
-            var userActivitiesTask = DashboardService.GetUserActivitiesAsync();
-            var requestExecutionsTask = DashboardService.GetRequestExecutionsAsync();
-            var testSuiteHistoryTask = DashboardService.GetTestSuiteHistoryAsync();
-            var serviceUptimeTask = DashboardService.GetServiceUptimeAsync();
-
-            await Task.WhenAll(
-                metricsTask, healthTask, suitesTask, requestFilesTask, wsdlTask, usersTask,
-                restAppsTask, soapAppsTask, restRequestFilesTask, userActivitiesTask,
-                requestExecutionsTask, testSuiteHistoryTask, serviceUptimeTask);
+            // Single orchestrated load; the service fans out to the grouped services in parallel.
+            var snapshot = await DashboardService.GetDashboardAsync();
 
             _viewModel = new DashboardViewModel
             {
-                Metrics = metricsTask.Result,
-                HealthServices = healthTask.Result,
-                TestSuites = suitesTask.Result,
-                RequestFiles = requestFilesTask.Result,
-                WsdlRecords = wsdlTask.Result,
-                Users = usersTask.Result,
-                RestApps = restAppsTask.Result,
-                SoapApps = soapAppsTask.Result,
-                RestRequestFiles = restRequestFilesTask.Result,
-                UserActivities = userActivitiesTask.Result,
-                RequestExecutions = requestExecutionsTask.Result,
-                TestSuiteHistory = testSuiteHistoryTask.Result,
-                ServiceUptime = serviceUptimeTask.Result
+                Metrics = snapshot.Metrics,
+                HealthServices = snapshot.HealthServices,
+                TestSuites = snapshot.TestSuites,
+                RecentActivities = snapshot.RecentActivities,
+                RequestFiles = snapshot.RequestFiles,
+                WsdlRecords = snapshot.WsdlRecords,
+                Users = snapshot.Users,
+                CurrentUser = snapshot.CurrentUser,
+                RestApps = snapshot.RestApps,
+                SoapApps = snapshot.SoapApps,
+                RestRequestFiles = snapshot.RestRequestFiles,
+                UserActivities = snapshot.UserActivities,
+                RequestExecutions = snapshot.RequestExecutions,
+                TestSuiteHistory = snapshot.TestSuiteHistory,
+                ServiceUptime = snapshot.ServiceUptime
             };
         }
         catch (Exception ex)

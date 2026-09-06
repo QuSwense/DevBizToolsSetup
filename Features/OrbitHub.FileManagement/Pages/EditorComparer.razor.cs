@@ -5,9 +5,8 @@ using Microsoft.JSInterop;
 using OrbitHub.Common;
 using OrbitHub.Ui.Components;
 using OrbitHub.Ui.Models;
-using OrbitHub.Data.SoapManagement;
-using OrbitHub.Data.RestManagement;
-using OrbitHub.Data.FileVersionManagement;
+using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.FileManagement.Services;
 
 namespace OrbitHub.FileManagement.Pages;
 
@@ -17,13 +16,7 @@ public partial class EditorComparer
     private NavigationManager Nav { get; set; } = default!;
 
     [Inject]
-    private SoapDbContext SoapDb { get; set; } = default!;
-
-    [Inject]
-    private RestDbContext RestDb { get; set; } = default!;
-
-    [Inject]
-    private FileManagementDbContext FmDb { get; set; } = default!;
+    private FileStore FileStore { get; set; } = default!;
 
     private MonacoDiffEditor? _diffEditorRef;
 
@@ -80,70 +73,32 @@ public partial class EditorComparer
             _leftFileName = leftFile ?? "(unknown)";
             _leftLanguage = GetLanguageFromExtension(_leftFileName);
 
-            if (!string.IsNullOrWhiteSpace(leftApp))
+            if (!string.IsNullOrWhiteSpace(leftApp) && !string.IsNullOrWhiteSpace(leftFile))
             {
-                var soapFile = await SoapDb.SoapRequestFiles
-                    .FirstOrDefaultAsync(f => f.FileName == leftFile && f.AppName == leftApp);
-
-                if (soapFile is not null)
+                var file = await FileStore.GetFileAsync(leftApp, leftFile);
+                if (file is not null)
                 {
-                    _leftContent = soapFile.Content ?? "";
-                    _leftAuthor = soapFile.UpdatedBy ?? soapFile.CreatedBy;
-                    _leftTimestamp = soapFile.UpdatedAt ?? soapFile.CreatedAt;
-                }
-                else
-                {
-                    var restFile = await RestDb.RestRequestFiles
-                        .FirstOrDefaultAsync(f => f.FileName == leftFile && f.AppName == leftApp);
-
-                    if (restFile is not null)
-                    {
-                        _leftContent = restFile.Content ?? "";
-                        _leftAuthor = restFile.UpdatedBy ?? restFile.CreatedBy;
-                        _leftTimestamp = restFile.UpdatedAt ?? restFile.CreatedAt;
-                    }
+                    _leftContent = file.Content;
+                    _leftAuthor = file.LastUpdatedBy ?? file.CreatedBy;
+                    _leftTimestamp = (file.LastUpdatedAt ?? file.CreatedAt).ToString("yyyy-MM-dd HH:mm:ss");
                 }
             }
 
             // Load right file content
-            if (rightVersion == "previous" && !string.IsNullOrWhiteSpace(leftApp) && !string.IsNullOrWhiteSpace(leftFile))
+            if (rightVersion == "previous" && leftApp is not null && leftFile is not null)
             {
-                // Determine source type
-                var sourceType = "soap";
-                var soapExists = await SoapDb.SoapRequestFiles.AnyAsync(f => f.FileName == leftFile && f.AppName == leftApp);
-                if (!soapExists)
+                var source = await FileStore.GetFileAsync(leftApp, leftFile);
+                if (source is not null)
                 {
-                    sourceType = "rest";
-                }
-
-                // Find the source ID
-                string? sourceId = null;
-                if (soapExists)
-                {
-                    var src = await SoapDb.SoapRequestFiles
-                        .FirstOrDefaultAsync(f => f.FileName == leftFile && f.AppName == leftApp);
-                    sourceId = src?.Id;
-                }
-                else
-                {
-                    var src = await RestDb.RestRequestFiles
-                        .FirstOrDefaultAsync(f => f.FileName == leftFile && f.AppName == leftApp);
-                    sourceId = src?.Id;
-                }
-
-                if (sourceId is not null)
-                {
-                    var previousVersion = await FmDb.FileVersions
-                        .Where(v => v.SourceType == sourceType && v.SourceId == sourceId)
-                        .OrderByDescending(v => v.VersionNumber)
-                        .FirstOrDefaultAsync();
+                    var previousVersion = await FileStore.GetPreviousVersionAsync(source.Id);
 
                     if (previousVersion is not null)
                     {
-                        _rightContent = previousVersion.Content ?? "";
+                        _rightContent = previousVersion.Content;
                         _rightFileName = previousVersion.FileName;
-                        _rightAuthor = previousVersion.SavedBy;
-                        _rightTimestamp = previousVersion.SavedAt;
+                        _rightAuthor = previousVersion.LastUpdatedBy ?? previousVersion.CreatedBy;
+                        _rightTimestamp = (previousVersion.LastUpdatedAt ?? previousVersion.CreatedAt)
+                            .ToString("yyyy-MM-dd HH:mm:ss");
                     }
                     else
                     {
@@ -159,26 +114,12 @@ public partial class EditorComparer
 
                 if (!string.IsNullOrWhiteSpace(rightApp))
                 {
-                    var soapFile = await SoapDb.SoapRequestFiles
-                        .FirstOrDefaultAsync(f => f.FileName == rightFile && f.AppName == rightApp);
-
-                    if (soapFile is not null)
+                    var file = await FileStore.GetFileAsync(rightApp, rightFile);
+                    if (file is not null)
                     {
-                        _rightContent = soapFile.Content ?? "";
-                        _rightAuthor = soapFile.UpdatedBy ?? soapFile.CreatedBy;
-                        _rightTimestamp = soapFile.UpdatedAt ?? soapFile.CreatedAt;
-                    }
-                    else
-                    {
-                        var restFile = await RestDb.RestRequestFiles
-                            .FirstOrDefaultAsync(f => f.FileName == rightFile && f.AppName == rightApp);
-
-                        if (restFile is not null)
-                        {
-                            _rightContent = restFile.Content ?? "";
-                            _rightAuthor = restFile.UpdatedBy ?? restFile.CreatedBy;
-                            _rightTimestamp = restFile.UpdatedAt ?? restFile.CreatedAt;
-                        }
+                        _rightContent = file.Content;
+                        _rightAuthor = file.LastUpdatedBy ?? file.CreatedBy;
+                        _rightTimestamp = (file.LastUpdatedAt ?? file.CreatedAt).ToString("yyyy-MM-dd HH:mm:ss");
                     }
                 }
             }
