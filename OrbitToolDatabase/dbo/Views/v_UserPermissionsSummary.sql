@@ -37,8 +37,10 @@ SELECT
         WHERE ass.[UserId] = u.[UserId]
     ) AS AccessibleServices,
     MAX(sap.[LastUpdatedAt]) AS LastPermissionUpdate,
-    MAX(sap.[LastUpdatedBy]) AS LastPermissionUpdater
+    MAX(sap.[LastUpdatedBy]) AS LastPermissionUpdater,
+    MAX(sa_pub.[PublicId]) AS LastServicePublicId
 FROM [dbo].[Users] u
 LEFT JOIN [dbo].[ServiceAppPermissions] sap ON u.[UserId] = sap.[UserId]
+LEFT JOIN [dbo].[ServiceApplications] sa_pub ON sap.[ServiceApplicationId] = sa_pub.[Id]
 GROUP BY u.[UserId], CONCAT(u.[FirstName], ' ', u.[LastName]), u.[Email], u.[Department];
 GO

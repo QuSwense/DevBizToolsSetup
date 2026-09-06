@@ -60,7 +60,7 @@ public partial class RuleContextObject
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// Value of the LastUpdatedDate field for this RuleContextObjects record.
+	/// Date and time at which this record was last updated.
 	/// </summary>
 	[Column("LastUpdatedDate")]
 	public DateTime? LastUpdatedDate { get; set; } // datetime

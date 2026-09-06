@@ -83,5 +83,11 @@ public partial class ServiceTestSuite
 	/// </summary>
 	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteTestCaseLink.ServiceTestSuiteId))]
 	public IEnumerable<ServiceTestSuiteTestCaseLink> ServiceTestSuiteTestCaseLinks { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceTestSuitesPermissions_ServiceTestSuites_SuiteId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuitesPermission.ServiceTestSuiteId))]
+	public IEnumerable<ServiceTestSuitesPermission> ServiceTestSuitesPermissions { get; set; } = null!;
 	#endregion
 }

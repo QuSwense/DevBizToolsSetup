@@ -40,21 +40,22 @@ All data access uses **[linq2db](https://linq2db.github.io/) v6.4.0** with the `
 
 ## DbContexts (linq2db DataConnection subclasses)
 
-There are **11 focused DbContexts**, each in its own management subdirectory under `Infrastructure/OrbitHub.Data/`:
+There are **12 focused DbContexts**, each in its own management subdirectory under `Infrastructure/OrbitHub.Data/`:
 
 | # | DbContext | Subdirectory | Tables |
 |---|-----------|-------------|--------|
 | 1 | `CoreDbContext` | `CoreManagement/` | `GlobalSettings`, `UserSettings` |
 | 2 | `UserDbContext` | `UserManagement/` | `Users`, `UserActivities` |
-| 3 | `UiDbContext` | `UIManagement/` | `UiPages`, `UiActions`, `PermissionToUiPageMappings` |
+| 3 | `UiDbContext` | `UIManagement/` | `UIPages`, `UIActions`, `PermissionToUIPageMapping` |
 | 4 | `RuleDbContext` | `RuleManagement/` | `RuleSets`, `RuleContextObjects`, `RuleExecutionLogs`, `RuleSetContextObjectLinks` |
-| 5 | `WsdlDbContext` | `WsdlManagement/` | `WsdlRecords`, `WsdlVersions`, `WsdlTemplates`, `WsdlSyncHistory` |
-| 6 | `SoapDbContext` | `SoapManagement/` | `SoapApps`, `SoapApis`, `SoapRequestFiles`, `SoapExecutionGroups`, `SoapExecutionFiles`, `SoapExecutionLogs`, `SoapParsedFields`, `SoapExtractionResults`, `SoapTestCases`, `SoapExtractors` |
-| 7 | `TestDbContext` | `TestManagement/` | `ServiceApplications`, `ServiceOperations`, `ServiceRequestFiles`, `ServiceResponseFiles`, `ServiceTestSuites`, `ServiceTestCases`, `ServiceDefinitionSyncs`, `SoapNamespaces`, `ServiceAppAuthentications`, `ServiceOperationSchemas`, `ServiceRequestFileEmbeddings`, `ServiceResponseFileEmbeddings`, `ServiceTestCaseRuleSetLinks`, `ServiceTestSuiteTestCaseLinks`, `ServiceTestSuiteExecutionAudits`, `ServiceTestSuiteExecutionAuditTestCaseLinks`, `DirectExecutionAudits`, `DirectExecutionAuditResponseFileLinks` |
-| 8 | `IndexingDbContext` | `IndexingManagement/` | `BinaryEmbeddingsStores`, `IndexingFileElementSearches`, `IndexingFileElementTypes`, `IndexingJsonFileElements`, `IndexingJsonFileElementMappings`, `IndexingXmlFileElements`, `IndexingXmlFileElementMappings`, `ServiceRequestIndexingStatuses`, `ServiceResponseIndexingStatuses` |
-| 9 | `PermissionsDbContext` | `PermissionsManagement/` | `Roles`, `RolePermissions`, `UserPermissions`, `ResourcePermissions`, `ServiceAppPermissions`, `ServiceRequestFilesPermissions`, `ServiceTestCasesPermissions`, `ServiceTestSuitesPermissions`, `RuleSetsPermissions` |
-| 10 | `FileManagementDbContext` | `FileVersionManagement/` | `FileVersions` |
-| 11 | `RestDbContext` | `RestManagement/` | `RestRequestFiles` |
+| 5 | `ServiceAppDbContext` | `ServiceAppManagement/` | `ServiceApplications`, `ServiceOperations`, `ServiceOperationSchemas`, `ServiceAppAuthentications`, `ServiceDefinitionSyncs`, `ServiceRequestFiles`, `ServiceRequestFileEmbeddings`, `ServiceResponseFiles`, `ServiceResponseFileEmbeddings`, `DirectExecutionAudit`, `DirectExecutionAuditResponseFileLinks`, `SoapNamespaces` |
+| 6 | `TestDbContext` | `TestManagement/` | `ServiceTestSuites`, `ServiceTestCases`, `ServiceTestCasesPermissions`, `ServiceTestSuiteTestCaseLinks`, `ServiceTestCaseRuleSetLinks`, `ServiceTestSuiteExecutionAudits`, `ServiceTestSuiteExecutionAuditTestCaseLinks` |
+| 7 | `IndexingDbContext` | `IndexingManagement/` | `BinaryEmbeddingsStore`, `IndexingJsonFileElements`, `IndexingJsonFileElementMappings`, `IndexingJsonFileElementSearch`, `IndexingPdfFileElements`, `IndexingPdfFileElementMappings`, `IndexingPdfFileElementSearch`, `IndexingXmlFileElements`, `IndexingXmlFileElementMappings`, `IndexingXmlFileElementSearch`, `ServiceRequestIndexingStatus`, `ServiceResponseIndexingStatus` |
+| 8 | `PermissionsDbContext` | `PermissionsManagement/` | `Roles`, `RolePermissions`, `UserPermissions`, `ResourcePermissions`, `ServiceAppPermissions`, `ServiceRequestFilesPermissions`, `ServiceTestCasesPermissions`, `ServiceTestSuitesPermissions`, `RuleSetsPermissions` |
+| 9 | `FileManagementDbContext` | `FileVersionManagement/` | `FileVersions` |
+| 10 | `WsdlDbContext` | `WsdlManagement/` | `WsdlRecords`, `WsdlVersions`, `WsdlTemplates`, `WsdlSyncHistory` |
+| 11 | `SoapDbContext` | `SoapManagement/` | `SoapApps`, `SoapApis`, `SoapRequestFiles`, `SoapExecutionGroups`, `SoapExecutionFiles`, `SoapExecutionLogs`, `SoapParsedFields`, `SoapExtractionResults`, `SoapTestCases`, `SoapExtractors` |
+| 12 | `RestDbContext` | `RestManagement/` | `RestRequestFiles` |
 
 All are registered as scoped services in `ServiceHubDataConfig.cs` via `AddLinqToDBContext<T>()`:
 

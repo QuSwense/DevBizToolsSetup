@@ -6,6 +6,9 @@
 CREATE TABLE [dbo].[RuleContextObjects] (
     -- Primary Key and Identity
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_RuleContextObjects_PublicId DEFAULT NEWID(),
     -- Context Name, must be unique
     [ContextName] NVARCHAR(100) NOT NULL UNIQUE,  -- e.g., "Customer", "Order", "Product"
     -- Rule Type Identifier, linking to the specific rule type in .NET
@@ -21,6 +24,7 @@ CREATE TABLE [dbo].[RuleContextObjects] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_RuleContextObjects PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_RuleContextObjects_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UIX_RuleContextObjects_ContextName UNIQUE ([ContextName] ASC),
     
     CONSTRAINT FK_RuleContextObjects_Users_CreatedBy

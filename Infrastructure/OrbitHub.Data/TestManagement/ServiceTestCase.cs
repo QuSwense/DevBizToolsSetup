@@ -79,10 +79,10 @@ public partial class ServiceTestCase
 	public IEnumerable<ServiceTestCaseRuleSetLink> ServiceTestCaseRuleSetLinks { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceTestCases_ServiceRequestFiles_ServiceRequestFileId
+	/// FK_ServiceTestCasesPermissions_ServiceTestCases_TestCaseId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(ServiceRequestFileId), OtherKey = nameof(TestManagement.ServiceRequestFile.Id))]
-	public ServiceRequestFile? ServiceRequestFile { get; set; }
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestCasesPermission.ServiceTestCaseId))]
+	public IEnumerable<ServiceTestCasesPermission> ServiceTestCasesPermissions { get; set; } = null!;
 
 	/// <summary>
 	/// FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestCases_ServiceTestCaseId backreference

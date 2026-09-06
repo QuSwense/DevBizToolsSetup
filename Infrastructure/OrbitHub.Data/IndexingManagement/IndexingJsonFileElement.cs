@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------------------------------
 
 using LinqToDB.Mapping;
+using System;
 using System.Collections.Generic;
 
 #pragma warning disable 1573, 1591
@@ -17,40 +18,46 @@ namespace OrbitHub.Data.IndexingManagement;
 public partial class IndexingJsonFileElement
 {
 	/// <summary>
-	/// Identifier of the indexed element.
+	/// Unique identifier for this IndexingJsonFileElements record.
 	/// </summary>
-	[Column("ElementId", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
-	public long ElementId { get; set; } // bigint
+	[Column("Id", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
+	public long Id { get; set; } // bigint
+
+	/// <summary>
+	/// Name or key of the indexed element within the file.
+	/// </summary>
+	[Column("ElementName", CanBeNull = false)]
+	public string ElementName { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
 	/// JSON path key path of the indexed JSON element.
 	/// </summary>
-	[Column("JsonPathKeyPath", CanBeNull = false)]
-	public string JsonPathKeyPath { get; set; } = null!; // varchar(400)
-
-	/// <summary>
-	/// Scalar value of the indexed element.
-	/// </summary>
-	[Column("ElementValue", CanBeNull = false)]
-	public string ElementValue { get; set; } = null!; // nvarchar(450)
+	[Column("JsonPath", CanBeNull = false)]
+	public string JsonPath { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
 	/// Data type of the element value.
 	/// </summary>
 	[Column("ValueType", CanBeNull = false)]
-	public string ValueType { get; set; } = null!; // varchar(20)
+	public string ValueType { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// SHA-256 hash used for global single-instance element deduplication.
+	/// Date and time at which this record was created.
 	/// </summary>
-	[Column("ValueHash", CanBeNull = false)]
-	public byte[] ValueHash { get; set; } = null!; // binary(32)
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("UpdatedAt")]
+	public DateTime? UpdatedAt { get; set; } // datetime
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingJsonFileElementMappings_IndexingJsonFileElements backreference
+	/// FK_IndexingJsonFileElementSearch_IndexingJsonFileElements backreference
 	/// </summary>
-	[Association(ThisKey = nameof(ElementId), OtherKey = nameof(IndexingJsonFileElementMapping.ElementId))]
-	public IEnumerable<IndexingJsonFileElementMapping> IndexingJsonFileElementMappings { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingJsonFileElementSearch.IndexingJsonFileElementId))]
+	public IEnumerable<IndexingJsonFileElementSearch> IndexingJsonFileElementSearches { get; set; } = null!;
 	#endregion
 }

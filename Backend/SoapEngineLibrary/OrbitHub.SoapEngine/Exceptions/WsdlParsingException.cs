@@ -18,14 +18,8 @@ public class WsdlParsingException : SoapException
     }
 
     public WsdlParsingException(string message, string? wsdlUrl)
-        : base(message)
-    {
-        WsdlUrl = wsdlUrl;
-    }
+        : base(message) => WsdlUrl = wsdlUrl;
 
     public WsdlParsingException(string message, string? wsdlUrl, Exception innerException)
-        : base(message, innerException)
-    {
-        WsdlUrl = wsdlUrl;
-    }
+        : base(message, innerException) => WsdlUrl = wsdlUrl;
 }

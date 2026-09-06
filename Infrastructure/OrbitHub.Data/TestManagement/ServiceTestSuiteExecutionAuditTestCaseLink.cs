@@ -114,12 +114,6 @@ public partial class ServiceTestSuiteExecutionAuditTestCaseLink
 
 	#region Associations
 	/// <summary>
-	/// FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceResponseFiles_ServiceResponseFileId
-	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(ServiceResponseFileId), OtherKey = nameof(TestManagement.ServiceResponseFile.Id))]
-	public ServiceResponseFile ServiceResponseFile { get; set; } = null!;
-
-	/// <summary>
 	/// FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestCases_ServiceTestCaseId
 	/// </summary>
 	[Association(CanBeNull = false, ThisKey = nameof(ServiceTestCaseId), OtherKey = nameof(TestManagement.ServiceTestCase.Id))]

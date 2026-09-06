@@ -22,28 +22,28 @@ public partial class IndexingJsonFileElementMapping
 	public long Id { get; set; } // bigint
 
 	/// <summary>
-	/// Identifier of the related service request file record.
+	/// Identifier of the related ServiceRequestFiles record.
 	/// </summary>
 	[Column("RequestFileId")]
 	public int? RequestFileId { get; set; } // int
 
 	/// <summary>
-	/// Identifier of the related service response file record.
+	/// Identifier of the related ServiceResponseFiles record.
 	/// </summary>
 	[Column("ResponseFileId")]
 	public int? ResponseFileId { get; set; } // int
 
 	/// <summary>
-	/// Identifier of the related IndexingJsonFileElements record.
+	/// Identifier of the related IndexingJsonFileElementSearch record.
 	/// </summary>
-	[Column("ElementId")]
-	public long ElementId { get; set; } // bigint
+	[Column("IndexingJsonFileElementSearchId")]
+	public long IndexingJsonFileElementSearchId { get; set; } // bigint
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingJsonFileElementMappings_IndexingJsonFileElements
+	/// FK_IndexingJsonFileElementMappings_IndexingJsonFileElementSearch
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(ElementId), OtherKey = nameof(IndexingJsonFileElement.ElementId))]
-	public IndexingJsonFileElement Element { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(IndexingJsonFileElementSearchId), OtherKey = nameof(IndexingManagement.IndexingJsonFileElementSearch.Id))]
+	public IndexingJsonFileElementSearch IndexingJsonFileElementSearch { get; set; } = null!;
 	#endregion
 }

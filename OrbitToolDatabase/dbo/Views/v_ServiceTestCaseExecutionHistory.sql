@@ -21,6 +21,7 @@ SELECT
     l.[ExecutedBy] AS TestExecutedBy,
     
     -- Test case details
+    stc.[PublicId] AS TestCasePublicId,
     stc.[Name] AS TestCaseName,
     stc.[IsActive] AS TestCaseIsActive,
     
@@ -30,6 +31,7 @@ SELECT
     
     -- Suite details
     sts.[Id] AS SuiteId,
+    sts.[PublicId] AS SuitePublicId,
     sts.[Name] AS SuiteName,
     a.[ExecutionStatus] AS SuiteExecutionStatus,
     a.[ExecutedAt] AS SuiteExecutedAt,

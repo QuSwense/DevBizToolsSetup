@@ -19,50 +19,21 @@ namespace OrbitHub.Data.TestManagement;
 
 public partial class TestDbContext : DataConnection
 {
-	public TestDbContext()
-	{
-		InitDataContext();
-	}
+    public TestDbContext() => InitDataContext();
 
-	public TestDbContext(string configuration)
-		: base(configuration)
-	{
-		InitDataContext();
-	}
+    public TestDbContext(string configuration)
+        : base(configuration) => InitDataContext();
 
-	public TestDbContext(DataOptions<TestDbContext> options)
-		: base(options.Options)
-	{
-		InitDataContext();
-	}
+    public TestDbContext(DataOptions<TestDbContext> options)
+        : base(options.Options) => InitDataContext();
 
-	partial void InitDataContext();
-
-	public ITable<DirectExecutionAudit>                       DirectExecutionAudits                       => this.GetTable<DirectExecutionAudit>();
-
-	public ITable<DirectExecutionAuditResponseFileLink>       DirectExecutionAuditResponseFileLinks       => this.GetTable<DirectExecutionAuditResponseFileLink>();
-
-	public ITable<ServiceAppAuthentication>                   ServiceAppAuthentications                   => this.GetTable<ServiceAppAuthentication>();
-
-	public ITable<ServiceApplication>                         ServiceApplications                         => this.GetTable<ServiceApplication>();
-
-	public ITable<ServiceDefinitionSync>                      ServiceDefinitionSyncs                      => this.GetTable<ServiceDefinitionSync>();
-
-	public ITable<ServiceOperationSchema>                     ServiceOperationSchemas                     => this.GetTable<ServiceOperationSchema>();
-
-	public ITable<ServiceOperation>                           ServiceOperations                           => this.GetTable<ServiceOperation>();
-
-	public ITable<ServiceRequestFileEmbedding>                ServiceRequestFileEmbeddings                => this.GetTable<ServiceRequestFileEmbedding>();
-
-	public ITable<ServiceRequestFile>                         ServiceRequestFiles                         => this.GetTable<ServiceRequestFile>();
-
-	public ITable<ServiceResponseFileEmbedding>               ServiceResponseFileEmbeddings               => this.GetTable<ServiceResponseFileEmbedding>();
-
-	public ITable<ServiceResponseFile>                        ServiceResponseFiles                        => this.GetTable<ServiceResponseFile>();
+    partial void InitDataContext();
 
 	public ITable<ServiceTestCaseRuleSetLink>                 ServiceTestCaseRuleSetLinks                 => this.GetTable<ServiceTestCaseRuleSetLink>();
 
 	public ITable<ServiceTestCase>                            ServiceTestCases                            => this.GetTable<ServiceTestCase>();
+
+	public ITable<ServiceTestCasesPermission>                 ServiceTestCasesPermissions                 => this.GetTable<ServiceTestCasesPermission>();
 
 	public ITable<ServiceTestSuiteExecutionAuditTestCaseLink> ServiceTestSuiteExecutionAuditTestCaseLinks => this.GetTable<ServiceTestSuiteExecutionAuditTestCaseLink>();
 
@@ -72,122 +43,12 @@ public partial class TestDbContext : DataConnection
 
 	public ITable<ServiceTestSuite>                           ServiceTestSuites                           => this.GetTable<ServiceTestSuite>();
 
-	public ITable<SoapNamespace>                              SoapNamespaces                              => this.GetTable<SoapNamespace>();
+	public ITable<ServiceTestSuitesPermission>                ServiceTestSuitesPermissions                => this.GetTable<ServiceTestSuitesPermission>();
 }
 
 public static partial class ExtensionMethods
 {
 	#region Table Extensions
-	public static DirectExecutionAudit? Find(this ITable<DirectExecutionAudit> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<DirectExecutionAudit?> FindAsync(this ITable<DirectExecutionAudit> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static DirectExecutionAuditResponseFileLink? Find(this ITable<DirectExecutionAuditResponseFileLink> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<DirectExecutionAuditResponseFileLink?> FindAsync(this ITable<DirectExecutionAuditResponseFileLink> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceAppAuthentication? Find(this ITable<ServiceAppAuthentication> table, long id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceAppAuthentication?> FindAsync(this ITable<ServiceAppAuthentication> table, long id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceApplication? Find(this ITable<ServiceApplication> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceApplication?> FindAsync(this ITable<ServiceApplication> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceDefinitionSync? Find(this ITable<ServiceDefinitionSync> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceDefinitionSync?> FindAsync(this ITable<ServiceDefinitionSync> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceOperationSchema? Find(this ITable<ServiceOperationSchema> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceOperationSchema?> FindAsync(this ITable<ServiceOperationSchema> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceOperation? Find(this ITable<ServiceOperation> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceOperation?> FindAsync(this ITable<ServiceOperation> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceRequestFileEmbedding? Find(this ITable<ServiceRequestFileEmbedding> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceRequestFileEmbedding?> FindAsync(this ITable<ServiceRequestFileEmbedding> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceRequestFile? Find(this ITable<ServiceRequestFile> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceRequestFile?> FindAsync(this ITable<ServiceRequestFile> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceResponseFileEmbedding? Find(this ITable<ServiceResponseFileEmbedding> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceResponseFileEmbedding?> FindAsync(this ITable<ServiceResponseFileEmbedding> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceResponseFile? Find(this ITable<ServiceResponseFile> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceResponseFile?> FindAsync(this ITable<ServiceResponseFile> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
 	public static ServiceTestCaseRuleSetLink? Find(this ITable<ServiceTestCaseRuleSetLink> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
@@ -204,6 +65,16 @@ public static partial class ExtensionMethods
 	}
 
 	public static Task<ServiceTestCase?> FindAsync(this ITable<ServiceTestCase> table, int id, CancellationToken cancellationToken = default)
+	{
+		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+	}
+
+	public static ServiceTestCasesPermission? Find(this ITable<ServiceTestCasesPermission> table, int id)
+	{
+		return table.FirstOrDefault(e => e.Id == id);
+	}
+
+	public static Task<ServiceTestCasesPermission?> FindAsync(this ITable<ServiceTestCasesPermission> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
@@ -248,12 +119,12 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static SoapNamespace? Find(this ITable<SoapNamespace> table, int id)
+	public static ServiceTestSuitesPermission? Find(this ITable<ServiceTestSuitesPermission> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<SoapNamespace?> FindAsync(this ITable<SoapNamespace> table, int id, CancellationToken cancellationToken = default)
+	public static Task<ServiceTestSuitesPermission?> FindAsync(this ITable<ServiceTestSuitesPermission> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}

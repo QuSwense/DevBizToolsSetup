@@ -19,24 +19,15 @@ namespace ServiceHub.SoapEngine.Core.Data.Generated
 {
 	public partial class SoapEngineDataContext : DataConnection
 	{
-		public SoapEngineDataContext()
-		{
-			InitDataContext();
-		}
+        public SoapEngineDataContext() => InitDataContext();
 
-		public SoapEngineDataContext(string configuration)
-			: base(configuration)
-		{
-			InitDataContext();
-		}
+        public SoapEngineDataContext(string configuration)
+            : base(configuration) => InitDataContext();
 
-		public SoapEngineDataContext(DataOptions<SoapEngineDataContext> options)
-			: base(options.Options)
-		{
-			InitDataContext();
-		}
+        public SoapEngineDataContext(DataOptions<SoapEngineDataContext> options)
+            : base(options.Options) => InitDataContext();
 
-		partial void InitDataContext();
+        partial void InitDataContext();
 
 		public ITable<SoapAppAuthentication>   SoapAppAuthentications    => this.GetTable<SoapAppAuthentication>();
 		public ITable<SoapApplication>         SoapApplications          => this.GetTable<SoapApplication>();

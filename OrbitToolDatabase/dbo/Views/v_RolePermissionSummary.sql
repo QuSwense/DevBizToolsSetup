@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_RolePermissionSummary]
 AS
 SELECT 
     rp.[RoleId],
+    ro.[PublicId] AS RolePublicId,
     ro.[Name] AS Role,
     
     -- Permission counts
@@ -38,5 +39,5 @@ SELECT
 FROM [dbo].[RolePermissions] rp
 INNER JOIN [dbo].[Roles] ro ON rp.[RoleId] = ro.[Id]
 INNER JOIN [dbo].[ResourcePermissions] res ON rp.[ResourcePermissionId] = res.[Id]
-GROUP BY rp.[RoleId], ro.[Name];
+GROUP BY rp.[RoleId], ro.[PublicId], ro.[Name];
 GO

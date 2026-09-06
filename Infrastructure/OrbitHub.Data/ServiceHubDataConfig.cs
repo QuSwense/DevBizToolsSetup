@@ -9,6 +9,7 @@ using OrbitHub.Data.IndexingManagement;
 using OrbitHub.Data.PermissionsManagement;
 using OrbitHub.Data.Repositories;
 using OrbitHub.Data.RuleManagement;
+using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.SoapManagement;
 using OrbitHub.Data.TestManagement;
 using OrbitHub.Data.UIManagement;
@@ -47,6 +48,7 @@ public static class ServiceHubDataConfig
         services.AddLinqToDBContext<IndexingDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<PermissionsDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<RuleDbContext>((_, options) => UseSqlServer(options, connectionString));
+        services.AddLinqToDBContext<ServiceAppDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<SoapDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<TestDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<UiDbContext>((_, options) => UseSqlServer(options, connectionString));

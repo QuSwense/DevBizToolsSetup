@@ -525,6 +525,24 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_InsertServiceResponseFileEmbedding.sql
 GO
+:r ../dbo/StoredProcedures/usp_InsertOrGetXmlFileElement.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertOrGetXmlFileElementSearch.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertXmlFileElementMapping.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertOrGetJsonFileElement.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertOrGetJsonFileElementSearch.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertJsonFileElementMapping.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertOrGetPdfFileElement.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertOrGetPdfFileElementSearch.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertPdfFileElementMapping.sql
+GO
 :r ../dbo/StoredProcedures/usp_LinkRuleSetToContextObject.sql
 GO
 :r ../dbo/StoredProcedures/usp_LinkRuleSetToTestCase.sql

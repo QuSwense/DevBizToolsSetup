@@ -1,1 +1,1 @@
-./Rule.sh && ./Test.sh && ./User.sh && ./Core.sh && ./Indexing.sh && ./Permissions.sh && ./UI.sh
+./Rule.sh && ./Test.sh && ./ServiceApp.sh && ./User.sh && ./Core.sh && ./Indexing.sh && ./Permissions.sh && ./UI.sh

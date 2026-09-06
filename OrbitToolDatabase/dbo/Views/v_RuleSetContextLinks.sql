@@ -14,11 +14,13 @@ SELECT
     rl.[LastUpdatedBy],
     
     -- Rule Set details
+    rs.[PublicId] AS RuleSetPublicId,
     rs.[WorkflowName],
     rs.[IsActive] AS RuleSetIsActive,
     rs.[Description] AS RuleSetDescription,
     
     -- Context Object details
+    rco.[PublicId] AS ContextObjectPublicId,
     rco.[ContextName],
     rco.[RuleTypeId] AS ContextRuleTypeId,
     rco.[Description] AS ContextDescription,

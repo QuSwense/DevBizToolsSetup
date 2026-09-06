@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_ServiceTestSuitesWithDetails]
 AS
 SELECT 
     sts.[Id] AS TestSuiteId,
+    sts.[PublicId] AS TestSuitePublicId,
     sts.[Name] AS SuiteName,
     sts.[Description] AS SuiteDescription,
     sts.[IsActive] AS SuiteIsActive,

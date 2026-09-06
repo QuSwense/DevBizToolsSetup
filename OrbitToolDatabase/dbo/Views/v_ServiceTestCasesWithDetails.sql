@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_ServiceTestCasesWithDetails]
 AS
 SELECT 
     stc.[Id] AS TestCaseId,
+    stc.[PublicId] AS TestCasePublicId,
     stc.[Name] AS TestCaseName,
     stc.[ServiceRequestFileId],
     stc.[IsActive] AS TestCaseIsActive,

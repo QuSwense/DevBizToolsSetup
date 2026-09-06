@@ -4,6 +4,9 @@
 */
 CREATE TABLE [dbo].[ServiceTestSuites] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceTestSuites_PublicId DEFAULT NEWID(),
     [Name] NVARCHAR(200) NOT NULL,
     [Description] NVARCHAR(MAX) NULL,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestSuites_IsActive DEFAULT 1,
@@ -15,6 +18,7 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceTestSuites PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceTestSuites_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceTestSuites_Name UNIQUE ([Name] ASC),
     CONSTRAINT CK_ServiceTestSuites_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),

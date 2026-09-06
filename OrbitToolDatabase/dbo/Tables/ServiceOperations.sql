@@ -9,6 +9,9 @@
 CREATE TABLE [dbo].[ServiceOperations] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceOperations_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceApplications table
     [ServiceApplicationId] INT NOT NULL,
     -- Name of the service operation, e.g., 'GetUser', 'CreateOrder'
@@ -31,6 +34,7 @@ CREATE TABLE [dbo].[ServiceOperations] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceOperations_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceOperations_ServiceApplicationId_OperationName_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC),
 

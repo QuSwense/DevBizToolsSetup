@@ -4,6 +4,9 @@
 */
 CREATE TABLE [dbo].[ServiceTestCases] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceTestCases_PublicId DEFAULT NEWID(),
     [Name] NVARCHAR(200) NOT NULL,
     [ServiceRequestFileId] INT NULL,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestCases_IsActive DEFAULT 1,
@@ -16,6 +19,7 @@ CREATE TABLE [dbo].[ServiceTestCases] (
 
     -- Primary Key
     CONSTRAINT PK_ServiceTestCases PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceTestCases_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT CK_ServiceTestCases_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 

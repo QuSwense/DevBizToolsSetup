@@ -26,10 +26,7 @@ public class Result<T> : Result
 {
     public T? Data { get; }
 
-    private Result(bool isSuccess, T? data, string? errorMessage) : base(isSuccess, errorMessage)
-    {
-        Data = data;
-    }
+    private Result(bool isSuccess, T? data, string? errorMessage) : base(isSuccess, errorMessage) => Data = data;
 
     public static Result<T> Success(T data) => new(true, data, null);
     public static new Result<T> Failure(string errorMessage) => new(false, default, errorMessage);

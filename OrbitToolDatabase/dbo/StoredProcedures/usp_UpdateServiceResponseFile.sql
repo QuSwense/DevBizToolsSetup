@@ -35,7 +35,7 @@ BEGIN
         DECLARE @ExistingCompressedData VARBINARY(MAX);
         DECLARE @ExistingUncompressedSizeBytes INT;
         DECLARE @ExistingCompressionAlgorithmType VARCHAR(50);
-        DECLARE @ExistingFileHash VARCHAR(64);
+        DECLARE @ExistingContentHash VARCHAR(64);
         DECLARE @ExistingIsActive BIT;
         DECLARE @ServiceRequestFileId INT;
         DECLARE @RequestFileName NVARCHAR(250);

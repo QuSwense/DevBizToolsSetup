@@ -19,24 +19,15 @@ namespace OrbitHub.Data.UIManagement;
 
 public partial class UiDbContext : DataConnection
 {
-	public UiDbContext()
-	{
-		InitDataContext();
-	}
+    public UiDbContext() => InitDataContext();
 
-	public UiDbContext(string configuration)
-		: base(configuration)
-	{
-		InitDataContext();
-	}
+    public UiDbContext(string configuration)
+        : base(configuration) => InitDataContext();
 
-	public UiDbContext(DataOptions<UiDbContext> options)
-		: base(options.Options)
-	{
-		InitDataContext();
-	}
+    public UiDbContext(DataOptions<UiDbContext> options)
+        : base(options.Options) => InitDataContext();
 
-	partial void InitDataContext();
+    partial void InitDataContext();
 
 	public ITable<PermissionToUiPageMapping> PermissionToUiPageMappings => this.GetTable<PermissionToUiPageMapping>();
 

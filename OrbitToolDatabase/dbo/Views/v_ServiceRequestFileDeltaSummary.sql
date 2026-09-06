@@ -20,6 +20,7 @@ WITH DeltaStats AS (
 )
 SELECT 
     b.[Id] AS BaseFileId,
+    b.[PublicId] AS BaseFilePublicId,
     b.[Name] AS BaseFileName,
     b.[FileFormat],
     b.[UncompressedSizeBytes] AS BaseSize,

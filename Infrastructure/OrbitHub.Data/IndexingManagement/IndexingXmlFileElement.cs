@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------------------------------
 
 using LinqToDB.Mapping;
+using System;
 using System.Collections.Generic;
 
 #pragma warning disable 1573, 1591
@@ -17,34 +18,46 @@ namespace OrbitHub.Data.IndexingManagement;
 public partial class IndexingXmlFileElement
 {
 	/// <summary>
-	/// Identifier of the indexed element.
+	/// Unique identifier for this IndexingXmlFileElements record.
 	/// </summary>
-	[Column("ElementId", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
-	public long ElementId { get; set; } // bigint
+	[Column("Id", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
+	public long Id { get; set; } // bigint
+
+	/// <summary>
+	/// Name or key of the indexed element within the file.
+	/// </summary>
+	[Column("ElementName", CanBeNull = false)]
+	public string ElementName { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
 	/// XPath key path of the indexed XML element.
 	/// </summary>
-	[Column("XPathKeyPath", CanBeNull = false)]
-	public string XPathKeyPath { get; set; } = null!; // varchar(400)
+	[Column("XmlPath", CanBeNull = false)]
+	public string XmlPath { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
-	/// Scalar value of the indexed element.
+	/// Data type of the element value.
 	/// </summary>
-	[Column("ElementValue", CanBeNull = false)]
-	public string ElementValue { get; set; } = null!; // nvarchar(450)
+	[Column("ValueType", CanBeNull = false)]
+	public string ValueType { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// SHA-256 hash used for global single-instance element deduplication.
+	/// Date and time at which this record was created.
 	/// </summary>
-	[Column("ValueHash", CanBeNull = false)]
-	public byte[] ValueHash { get; set; } = null!; // binary(32)
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("UpdatedAt")]
+	public DateTime? UpdatedAt { get; set; } // datetime
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingXmlFileElementMappings_IndexingXmlFileElements backreference
+	/// FK_IndexingXmlFileElementSearch_IndexingXmlFileElements backreference
 	/// </summary>
-	[Association(ThisKey = nameof(ElementId), OtherKey = nameof(IndexingXmlFileElementMapping.ElementId))]
-	public IEnumerable<IndexingXmlFileElementMapping> IndexingXmlFileElementMappings { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingXmlFileElementSearch.IndexingXmlFileElementId))]
+	public IEnumerable<IndexingXmlFileElementSearch> IndexingXmlFileElementSearches { get; set; } = null!;
 	#endregion
 }

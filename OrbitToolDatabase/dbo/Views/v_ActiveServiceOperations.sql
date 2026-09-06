@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_ActiveServiceOperations]
 AS
 SELECT 
     so.[Id] AS OperationId,
+    so.[PublicId] AS OperationPublicId,
     so.[OperationName],
     so.[EndpointOrAction],
     so.[HttpMethod],

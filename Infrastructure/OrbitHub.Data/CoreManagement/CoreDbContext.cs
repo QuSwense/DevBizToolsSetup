@@ -19,24 +19,15 @@ namespace OrbitHub.Data.CoreManagement;
 
 public partial class CoreDbContext : DataConnection
 {
-	public CoreDbContext()
-	{
-		InitDataContext();
-	}
+    public CoreDbContext() => InitDataContext();
 
-	public CoreDbContext(string configuration)
-		: base(configuration)
-	{
-		InitDataContext();
-	}
+    public CoreDbContext(string configuration)
+        : base(configuration) => InitDataContext();
 
-	public CoreDbContext(DataOptions<CoreDbContext> options)
-		: base(options.Options)
-	{
-		InitDataContext();
-	}
+    public CoreDbContext(DataOptions<CoreDbContext> options)
+        : base(options.Options) => InitDataContext();
 
-	partial void InitDataContext();
+    partial void InitDataContext();
 
 	public ITable<GlobalSetting> GlobalSettings => this.GetTable<GlobalSetting>();
 

@@ -20,7 +20,7 @@ BEGIN
         [DeltaDepth],
         [UncompressedSizeBytes],
         [CompressionAlgorithmType],
-        [FileHash],
+        [ContentHash] AS FileHash,
         [RecordVersion],
         [IsActive],
         [CreatedAt],

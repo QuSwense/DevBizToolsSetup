@@ -6,6 +6,9 @@
 CREATE TABLE [dbo].[RuleSets] (
     -- Primary Key and Identity
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_RuleSets_PublicId DEFAULT NEWID(),
     -- Workflow and Rule Definition Name
     [WorkflowName] NVARCHAR(255) NOT NULL UNIQUE,
     -- JSON Rule Definition, only one rule set per workflow is allowed
@@ -26,6 +29,7 @@ CREATE TABLE [dbo].[RuleSets] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_RuleSets PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_RuleSets_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UIX_RuleSets_WorkflowName UNIQUE ([WorkflowName] ASC),
     CONSTRAINT CK_RuleSets_RuleContentJson
         CHECK (ISJSON([RuleContent]) = 1),

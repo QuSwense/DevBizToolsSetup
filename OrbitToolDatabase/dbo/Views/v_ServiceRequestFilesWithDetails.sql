@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_ServiceRequestFilesWithDetails]
 AS
 SELECT 
     srf.[Id] AS FileId,
+    srf.[PublicId] AS FilePublicId,
     srf.[ServiceOperationId],
     srf.[FileFormat],
     srf.[Name],

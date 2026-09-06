@@ -7,6 +7,7 @@
 
 using LinqToDB.Mapping;
 using System;
+using System.Collections.Generic;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -75,4 +76,12 @@ public partial class BinaryEmbeddingsStore
 	/// </summary>
 	[Column("LastUpdatedBy")]
 	public string? LastUpdatedBy { get; set; } // nvarchar(20)
+
+	#region Associations
+	/// <summary>
+	/// FK_IndexingPdfFileElementMappings_BinaryEmbeddingsStore backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingPdfFileElementMapping.BinaryEmbeddingsStoreId))]
+	public IEnumerable<IndexingPdfFileElementMapping> IndexingPdfFileElementMappings { get; set; } = null!;
+	#endregion
 }

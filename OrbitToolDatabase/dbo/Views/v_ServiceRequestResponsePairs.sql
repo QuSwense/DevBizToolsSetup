@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_ServiceRequestResponsePairs]
 AS
 SELECT 
     req.[Id] AS RequestFileId,
+    req.[PublicId] AS RequestFilePublicId,
     req.[Name] AS RequestFileName,
     req.[FileFormat] AS RequestFileFormat,
     req.[CreatedAt] AS RequestCreatedAt,

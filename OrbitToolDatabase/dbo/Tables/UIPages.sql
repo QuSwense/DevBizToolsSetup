@@ -17,7 +17,7 @@ CREATE TABLE [dbo].[UIPages] (
     -- Page/Route name (e.g., 'Dashboard', 'ServiceApplications')
     [Name] NVARCHAR(100) NOT NULL,
     -- Required permission for viewing this page
-    [RequiredPermissionKey] NVARCHAR(100) NULL,
+    [ResourcePermissionsId] BIGINT NOT NULL,
     -- Feature flag name (if feature-flagged)
     [FeatureFlag] NVARCHAR(100) NULL,
     -- Indicates if page is active
@@ -36,6 +36,7 @@ CREATE TABLE [dbo].[UIPages] (
 
     -- Foreign Keys
     CONSTRAINT FK_UIPages_ParentId FOREIGN KEY ([ParentId]) REFERENCES [dbo].[UIPages]([Id]),
+    CONSTRAINT FK_UIPages_ResourcePermissions FOREIGN KEY ([ResourcePermissionsId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_UIPages_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UIPages_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )

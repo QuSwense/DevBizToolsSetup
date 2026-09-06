@@ -22,28 +22,28 @@ public partial class IndexingXmlFileElementMapping
 	public long Id { get; set; } // bigint
 
 	/// <summary>
-	/// Identifier of the related service request file record.
+	/// Identifier of the related ServiceRequestFiles record.
 	/// </summary>
 	[Column("RequestFileId")]
 	public int? RequestFileId { get; set; } // int
 
 	/// <summary>
-	/// Identifier of the related service response file record.
+	/// Identifier of the related ServiceResponseFiles record.
 	/// </summary>
 	[Column("ResponseFileId")]
 	public int? ResponseFileId { get; set; } // int
 
 	/// <summary>
-	/// Identifier of the related IndexingXmlFileElements record.
+	/// Identifier of the related IndexingXmlFileElementSearch record.
 	/// </summary>
-	[Column("ElementId")]
-	public long ElementId { get; set; } // bigint
+	[Column("IndexingXmlFileElementSearchId")]
+	public long IndexingXmlFileElementSearchId { get; set; } // bigint
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingXmlFileElementMappings_IndexingXmlFileElements
+	/// FK_IndexingXmlFileElementMappings_IndexingXmlFileElementSearch
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(ElementId), OtherKey = nameof(IndexingXmlFileElement.ElementId))]
-	public IndexingXmlFileElement Element { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(IndexingXmlFileElementSearchId), OtherKey = nameof(IndexingManagement.IndexingXmlFileElementSearch.Id))]
+	public IndexingXmlFileElementSearch IndexingXmlFileElementSearch { get; set; } = null!;
 	#endregion
 }

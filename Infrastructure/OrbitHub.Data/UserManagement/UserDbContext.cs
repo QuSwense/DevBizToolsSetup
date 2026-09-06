@@ -19,24 +19,15 @@ namespace OrbitHub.Data.UserManagement;
 
 public partial class UserDbContext : DataConnection
 {
-	public UserDbContext()
-	{
-		InitDataContext();
-	}
+    public UserDbContext() => InitDataContext();
 
-	public UserDbContext(string configuration)
-		: base(configuration)
-	{
-		InitDataContext();
-	}
+    public UserDbContext(string configuration)
+        : base(configuration) => InitDataContext();
 
-	public UserDbContext(DataOptions<UserDbContext> options)
-		: base(options.Options)
-	{
-		InitDataContext();
-	}
+    public UserDbContext(DataOptions<UserDbContext> options)
+        : base(options.Options) => InitDataContext();
 
-	partial void InitDataContext();
+    partial void InitDataContext();
 
 	public ITable<UserActivity> UserActivities => this.GetTable<UserActivity>();
 

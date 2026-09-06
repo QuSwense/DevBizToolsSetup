@@ -18,7 +18,7 @@ CREATE TABLE [dbo].[UIActions] (
     -- Display name for the action (e.g., 'Create New', 'Edit', 'Delete')
     [DisplayName] NVARCHAR(100) NOT NULL,
     -- Required permission for this action
-    [RequiredPermissionKey] NVARCHAR(100) NOT NULL,
+    [ResourcePermissionsId] BIGINT NOT NULL,
     -- Action type (e.g., 'Button', 'MenuItem', 'Tab', 'Link')
     [ActionType] NVARCHAR(20) NOT NULL DEFAULT 'Button',
     -- CSS/UI identifier for the element
@@ -37,6 +37,7 @@ CREATE TABLE [dbo].[UIActions] (
 
     -- Foreign Keys
     CONSTRAINT FK_UIActions_UIPages_PageId FOREIGN KEY ([PageId]) REFERENCES [dbo].[UIPages]([Id]) ON DELETE CASCADE,
+    CONSTRAINT FK_UIActions_ResourcePermissions FOREIGN KEY ([ResourcePermissionsId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_UIActions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UIActions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )

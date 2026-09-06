@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_RuleContextObjectsWithUsage]
 AS
 SELECT 
     rco.[Id] AS ContextObjectId,
+    rco.[PublicId] AS ContextObjectPublicId,
     rco.[ContextName],
     rco.[RuleTypeId],
     rco.[Description],

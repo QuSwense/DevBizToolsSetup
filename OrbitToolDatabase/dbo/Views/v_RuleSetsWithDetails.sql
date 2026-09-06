@@ -6,6 +6,7 @@ CREATE VIEW [dbo].[v_RuleSetsWithDetails]
 AS
 SELECT 
     rs.[Id] AS RuleSetId,
+    rs.[PublicId] AS RuleSetPublicId,
     rs.[WorkflowName],
     rs.[RuleContent],
     rs.[OutputTypeId],
