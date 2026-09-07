@@ -44,6 +44,9 @@ public partial class ExecuteHistory
     {
         await base.OnInitializedAsync();
 
+        // Load app data into the store cache so the app filter below is populated.
+        await AppStore.LoadAsync();
+
         _groups = [.. ExecutionStore.Groups];
         // Request files are not yet backed by a database table — previously loaded from
         // mock JSON. TODO: load from MSSQL (SoapRequestFiles) once the schema exists.

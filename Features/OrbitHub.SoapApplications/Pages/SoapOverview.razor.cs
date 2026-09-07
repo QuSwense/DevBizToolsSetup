@@ -37,7 +37,12 @@ public partial class SoapOverview
         await base.OnInitializedAsync();
         try
         {
-            // Singleton stores are populated at construction; request files load async.
+            // Database-backed stores cache after an async load. Await those loads first —
+            // reading them synchronously inside the lifecycle would block the Blazor
+            // renderer and deadlock the page during prerendering.
+            await AppStore.LoadAsync();
+            await ExecutionStore.LoadExecutionsAsync();
+
             Apps = AppStore.Apps;
             Records = [.. WsdlStore.Records];
             Versions = [.. WsdlStore.Versions];

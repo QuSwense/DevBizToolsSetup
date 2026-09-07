@@ -273,6 +273,9 @@ public partial class WsdlSync
     {
         await base.OnInitializedAsync();
 
+        // Populate the app tree from the database cache before auto-selecting the first app.
+        await _appStore.LoadAsync();
+
         // WSDL comparison content previously came from mock JSON files; there is no
         // database table for it yet. TODO: load from MSSQL (WsdlVersions.Content) once
         // the schema exists.

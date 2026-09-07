@@ -167,6 +167,8 @@ public partial class Applications : IDisposable
             // Simulate network/server delay so the loading skeleton is visible
             await Task.Delay(1000);
 
+            // Refresh from the database, then read the in-memory cache.
+            await _appStore.LoadAsync();
             _allApps = _appStore.Apps;
         }
         catch (Exception ex)

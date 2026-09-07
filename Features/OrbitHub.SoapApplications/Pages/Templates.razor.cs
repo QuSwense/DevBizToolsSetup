@@ -258,6 +258,10 @@ public partial class Templates : IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        // Populate the app list (available-app filter) from the database cache.
+        await AppStore.LoadAsync();
+
         await LoadTemplatesAsync();
     }
 

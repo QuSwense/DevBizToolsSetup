@@ -244,6 +244,10 @@ public partial class RequestFiles : IDisposable
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        // Populate the app list (rendered from _appStore.Apps) from the database cache.
+        await _appStore.LoadAsync();
+
         await LoadFilesAsync();
     }
 

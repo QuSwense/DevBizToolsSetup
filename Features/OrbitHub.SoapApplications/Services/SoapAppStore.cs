@@ -17,25 +17,31 @@ public class SoapAppStore(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private SoapApp[]? _cached;
+    private Task? _loadTask;
 
-    /// <summary>Retrieves all SOAP applications, loading from current view data on first access.</summary>
-    public SoapApp[] Apps
+    /// <summary>
+    /// Returns the currently cached SOAP applications. Never touches the database:
+    /// pages must await <see cref="LoadAsync"/> first so they render from the in-memory
+    /// cache instead of blocking the Blazor renderer with sync-over-async database I/O
+    /// (which deadlocks the page during prerendering).
+    /// </summary>
+    public SoapApp[] Apps => _cached ?? [];
+
+    /// <summary>
+    /// Loads (once) and caches the SOAP applications from the current view repositories.
+    /// Safe for concurrent callers — concurrent calls share the same load task.
+    /// </summary>
+    public Task LoadAsync() => _loadTask ??= LoadAppsFromDataAsync();
+
+    public void InvalidateCache()
     {
-        get
-        {
-            if (_cached is not null)
-                return _cached;
-
-            _cached = LoadAppsFromData();
-            return _cached;
-        }
+        _cached = null;
+        _loadTask = null;
     }
-
-    public void InvalidateCache() => _cached = null;
 
     public void UpdateApps(SoapApp[] apps) => _cached = apps;
 
-    private SoapApp[] LoadAppsFromData()
+    private async Task LoadAppsFromDataAsync()
     {
         try
         {
@@ -43,11 +49,11 @@ public class SoapAppStore(IServiceProvider serviceProvider)
             var appsView = scope.ServiceProvider.GetRequiredService<LatestServiceApplicationWithAuthViewRepository>();
             var opsView = scope.ServiceProvider.GetRequiredService<ServiceOperationsSummaryViewRepository>();
 
-            var applications = ReadResult(appsView.GetAllAsync().GetAwaiter().GetResult());
-            var operations = ReadResult(opsView.GetAllAsync().GetAwaiter().GetResult());
+            var applications = ReadResult(await appsView.GetAllAsync());
+            var operations = ReadResult(await opsView.GetAllAsync());
             var operationsByApp = operations.ToLookup(o => o.ServicePublicId, StringComparer.OrdinalIgnoreCase);
 
-            return [..
+            _cached = [..
                 applications
                     .Where(a => a.ServiceType.Equals("SOAP", StringComparison.OrdinalIgnoreCase))
                     .Select(a => new SoapApp(
@@ -67,7 +73,9 @@ public class SoapAppStore(IServiceProvider serviceProvider)
         }
         catch
         {
-            return [];
+            // Keep an empty cache and reset the load task so a later refresh retries.
+            _cached = [];
+            _loadTask = null;
         }
     }
 
