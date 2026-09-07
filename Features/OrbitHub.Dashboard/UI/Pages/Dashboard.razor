@@ -92,23 +92,6 @@ else
                     }
                 </div>
             </div>
-
-            <div class="panel-column">
-                <div class="panel-header">
-                    <h2>Recent Platform Growth</h2>
-                    <span>Last 30 Days</span>
-                </div>
-
-                <div class="growth-grid">
-                    @foreach (var growth in _growthMetrics)
-                    {
-                        <div class="mini-metric">
-                            <div class="mini-label">@growth.Label</div>
-                            <div class="mini-value">@growth.Value</div>
-                        </div>
-                    }
-                </div>
-            </div>
         </section>
 
         <section class="home-panel">
@@ -128,19 +111,6 @@ else
                     </div>
                 }
             </div>
-        </section>
-
-        <section class="home-panel">
-            <div class="panel-header">
-                <h2>Adoption &amp; Efficiency Insights</h2>
-            </div>
-
-            <ul class="insight-list">
-                @foreach (var insight in _insights)
-                {
-                    <li>@insight</li>
-                }
-            </ul>
         </section>
 
         <section class="home-panel two-column-panel">
