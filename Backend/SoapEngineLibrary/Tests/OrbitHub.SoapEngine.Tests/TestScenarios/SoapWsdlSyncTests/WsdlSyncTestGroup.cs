@@ -8,7 +8,7 @@ using SoapApiProcessorTest.Configuration;
 
 public class WsdlSyncTestGroup(
     SoapApplicationService appService,
-    SoapOperationRepository operationRepository,
+    ServiceOperationRepository operationRepository,
     HttpClient httpClient,
     MockServicesOptions settings,
     ILogger<WsdlSyncTestGroup> logger)
@@ -70,14 +70,14 @@ public class WsdlSyncTestGroup(
             return;
         }
 
-        Console.WriteLine($" -> WSDL Synced. Snapshot ID: {syncResult.Data!.Id} | Version: {syncResult.Data.Version}");
+        Console.WriteLine($" -> WSDL Synced. Snapshot ID: {syncResult.Data!.Id} | Version: {syncResult.Data.RecordVersion}");
 
         var operations = await operationRepository.GetByAppIdAsync(appId);
         Console.WriteLine($" -> Operations Extracted: {operations.Count}");
 
         foreach (var op in operations)
         {
-            Console.WriteLine($"    • Operation: {op.OperationName} | Action: {op.SoapAction}");
+            Console.WriteLine($"    • Operation: {op.OperationName} | Action: {op.EndpointOrAction}");
         }
 
         if (operations.Count >= 4)

@@ -54,7 +54,7 @@ public class AppRegistrationTestGroup(
 
         if (result.IsSuccess)
         {
-            Console.WriteLine($" [PASS] Registered App ID: {result.Data!.Id} | AppName: '{appName}' | Version: {result.Data.Version}");
+            Console.WriteLine($" [PASS] Registered App ID: {result.Data!.Id} | AppName: '{appName}' | Version: {result.Data.RecordVersion}");
         }
         else
         {
@@ -80,7 +80,7 @@ public class AppRegistrationTestGroup(
 
         if (result.IsSuccess)
         {
-            Console.WriteLine($" [PASS] Registered App ID: {result.Data!.Id} | AppName: '{appName}' | Version: {result.Data.Version}");
+            Console.WriteLine($" [PASS] Registered App ID: {result.Data!.Id} | AppName: '{appName}' | Version: {result.Data.RecordVersion}");
         }
         else
         {

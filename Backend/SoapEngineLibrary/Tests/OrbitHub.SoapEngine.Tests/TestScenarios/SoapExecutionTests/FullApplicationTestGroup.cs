@@ -9,7 +9,7 @@ using SoapApiProcessorTest.Configuration;
 
 public class FullApplicationTestGroup(
     SoapApplicationService appService,
-    SoapOperationRepository operationRepository,
+    ServiceOperationRepository operationRepository,
     MockServicesOptions settings,
     ILogger<FullApplicationTestGroup> logger)
 {
@@ -70,7 +70,7 @@ public class FullApplicationTestGroup(
         var result = await appService.CreateFullApplicationAsync(createInput);
         if (result.IsSuccess)
         {
-            Console.WriteLine($" [PASS] Created App ID: {result.Data!.Id}, Version: {result.Data.Version}");
+            Console.WriteLine($" [PASS] Created App ID: {result.Data!.Id}, Version: {result.Data.RecordVersion}");
             var ops = await operationRepository.GetByAppIdAsync(result.Data.Id);
             Console.WriteLine($" -> Operations created: {ops.Count}");
         }

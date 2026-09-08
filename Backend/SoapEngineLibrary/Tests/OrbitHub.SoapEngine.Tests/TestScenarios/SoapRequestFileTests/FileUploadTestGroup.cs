@@ -105,10 +105,10 @@ public class FileUploadTestGroup(
         }
 
         var uploaded = result.Data!;
-        Console.WriteLine($" -> Stored File ID: {uploaded.Id} | Version Tag: {uploaded.Version}");
-        Console.WriteLine($" -> Uncompressed Size: {originalBytes.Length} bytes | Compressed Size: {uploaded.FileData.Length} bytes");
+        Console.WriteLine($" -> Stored File ID: {uploaded.Id} | Version Tag: {uploaded.RecordVersion}");
+        Console.WriteLine($" -> Uncompressed Size: {originalBytes.Length} bytes | Compressed Size: {uploaded.CompressedData.Length} bytes");
 
-        byte[] decompressedBytes = compressor.Decompress(uploaded.FileData);
+        byte[] decompressedBytes = compressor.Decompress(uploaded.CompressedData);
         string decompressedXml = Encoding.UTF8.GetString(decompressedBytes);
 
         if (string.Equals(rawXmlContent, decompressedXml, StringComparison.Ordinal))

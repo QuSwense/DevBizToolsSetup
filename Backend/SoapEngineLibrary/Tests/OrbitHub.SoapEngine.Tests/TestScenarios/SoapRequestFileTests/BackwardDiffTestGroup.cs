@@ -86,7 +86,7 @@ public class BackwardDiffTestGroup(
             var result = await appService.UploadRequestFileStreamAsync(uploadInput);
             if (result.IsSuccess)
             {
-                Console.WriteLine($" -> Version {v} Uploaded | File ID: {result.Data!.Id} | Version Tag: {result.Data.Version}");
+                Console.WriteLine($" -> Version {v} Uploaded | File ID: {result.Data!.Id} | Version Tag: {result.Data.RecordVersion}");
             }
             else
             {

@@ -17,8 +17,8 @@ public class QueryTestGroup(
         await ExecuteSafelyAsync("GetApplications", Test_GetApplications);
         await ExecuteSafelyAsync("GetOperations", Test_GetOperations);
         await ExecuteSafelyAsync("GetRequestFiles", Test_GetRequestFiles);
-        await ExecuteSafelyAsync("GetExecutionGroups", Test_GetExecutionGroups);
-        await ExecuteSafelyAsync("GetExecutionRuns", Test_GetExecutionRuns);
+        await ExecuteSafelyAsync("GetExecutionAudits", Test_GetExecutionAudits);
+        await ExecuteSafelyAsync("GetExecutionLinks", Test_GetExecutionLinks);
         await ExecuteSafelyAsync("GetResponseFiles", Test_GetResponseFiles);
         await ExecuteSafelyAsync("QueryService Methods", Test_QueryServiceMethods);
     }
@@ -48,7 +48,7 @@ public class QueryTestGroup(
         var result = await appService.GetApplicationsAsync(filter);
         Console.WriteLine($" -> Found {result.TotalCount} apps, returned {result.Items.Count} on page 1.");
         if (result.Items.Count > 0)
-            Console.WriteLine($"    First: {result.Items.First().AppName} (ID: {result.Items.First().Id})");
+            Console.WriteLine($"    First: {result.Items.First().Name} (ID: {result.Items.First().Id})");
     }
 
     public async Task Test_GetOperations()
@@ -77,29 +77,28 @@ public class QueryTestGroup(
         Console.WriteLine($" -> Found {result.TotalCount} active request files.");
     }
 
-    public async Task Test_GetExecutionGroups()
+    public async Task Test_GetExecutionAudits()
     {
-        logger.LogInformation("TEST: Retrieving paged execution groups...");
-        var filter = new ExecutionGroupFilter
-        {
-            PageNumber = 1,
-            PageSize = 5,
-            IsActive = true
-        };
-        var result = await appService.GetExecutionGroupsAsync(filter);
-        Console.WriteLine($" -> Found {result.TotalCount} active execution groups.");
-    }
-
-    public async Task Test_GetExecutionRuns()
-    {
-        logger.LogInformation("TEST: Retrieving paged execution runs...");
-        var filter = new ExecutionRunFilter
+        logger.LogInformation("TEST: Retrieving paged execution audits...");
+        var filter = new ExecutionAuditFilter
         {
             PageNumber = 1,
             PageSize = 5
         };
-        var result = await appService.GetExecutionRunsAsync(filter);
-        Console.WriteLine($" -> Found {result.TotalCount} execution runs.");
+        var result = await appService.GetExecutionAuditsAsync(filter);
+        Console.WriteLine($" -> Found {result.TotalCount} execution audits.");
+    }
+
+    public async Task Test_GetExecutionLinks()
+    {
+        logger.LogInformation("TEST: Retrieving paged execution links...");
+        var filter = new ExecutionAuditLinkFilter
+        {
+            PageNumber = 1,
+            PageSize = 5
+        };
+        var result = await appService.GetExecutionLinksAsync(filter);
+        Console.WriteLine($" -> Found {result.TotalCount} execution links.");
     }
 
     public async Task Test_GetResponseFiles()
@@ -115,12 +114,12 @@ public class QueryTestGroup(
         var appResult = await queryService.GetApplicationsAsync(new ApplicationFilter { PageSize = 1 });
         var opResult = await queryService.GetOperationsAsync(new OperationFilter { PageSize = 1 });
         var fileResult = await queryService.GetRequestFilesAsync(new RequestFileFilter { PageSize = 1 });
-        var groupResult = await queryService.GetExecutionGroupsAsync(new ExecutionGroupFilter { PageSize = 1 });
-        var runResult = await queryService.GetExecutionRunsAsync(new ExecutionRunFilter { PageSize = 1 });
+        var auditResult = await queryService.GetExecutionAuditsAsync(new ExecutionAuditFilter { PageSize = 1 });
+        var linkResult = await queryService.GetExecutionLinksAsync(new ExecutionAuditLinkFilter { PageSize = 1 });
         var responseResult = await queryService.GetResponseFilesAsync(null, 1, 1);
 
         if (appResult is not null && opResult is not null && fileResult is not null &&
-            groupResult is not null && runResult is not null && responseResult is not null)
+            auditResult is not null && linkResult is not null && responseResult is not null)
         {
             Console.WriteLine(" [PASS] All SoapQueryService methods returned results.");
         }

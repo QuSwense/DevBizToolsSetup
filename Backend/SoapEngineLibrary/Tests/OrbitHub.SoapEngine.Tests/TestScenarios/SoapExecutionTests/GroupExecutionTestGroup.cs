@@ -1,7 +1,7 @@
 namespace SoapApiProcessorTest.TestScenarios.SoapExecutionTests;
 
 using Microsoft.Extensions.Logging;
-using ServiceHub.SoapEngine.Core.Data.Generated;
+using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
@@ -9,8 +9,8 @@ using SoapApiProcessorTest.Configuration;
 
 public class GroupExecutionTestGroup(
     SoapApplicationService appService,
-    SoapOperationRepository operationRepository,
-    SoapExecutionRepository executionRepository,
+    ServiceOperationRepository operationRepository,
+    ServiceExecutionAuditRepository executionRepository,
     SoapExecutionGroupRunner runner,
     HttpClient httpClient,
     MockServicesOptions settings,
@@ -107,33 +107,26 @@ public class GroupExecutionTestGroup(
 
         int requestFileId = uploadResult.Data!.Id;
 
-        var group = new SoapExecutionGroup
-        {
-            AppId = appId,
-            GroupName = $"BatchGroup_{Guid.NewGuid():N}"[..25],
-            Description = "Automated Integration Test Batch Group",
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            CreatedBy = DefaultUserId
-        };
+        // Create execution audit (replaces old SoapExecutionGroup)
+        var audit = await executionRepository.CreateAuditAsync(
+            $"BatchGroup_{Guid.NewGuid():N}"[..25],
+            DefaultUserId);
 
-        var groupItems = new[]
+        // Create response file link (replaces old SoapExecutionGroupItem)
+        var link = new DirectExecutionAuditResponseFileLink
         {
-            new SoapExecutionGroupItem
-            {
-                RequestFileId = requestFileId,
-                ExecutionOrder = 1,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = DefaultUserId
-            }
+            DirectExecutionAuditId = audit.Id,
+            ServiceRequestFileId = requestFileId,
+            ExecutedAt = DateTime.UtcNow,
+            ExecutionStatus = "Pending"
         };
+        await executionRepository.AddResponseLinkAsync(link);
 
-        var createdGroup = await executionRepository.CreateGroupAsync(group, groupItems);
-        var runResult = await runner.RunGroupAsync(createdGroup.Id, executedBy: DefaultUserId);
+        var runResult = await runner.RunGroupAsync(audit.Id, executedBy: DefaultUserId);
 
         if (runResult.IsSuccess)
         {
-            Console.WriteLine($" [PASS] End-to-End Batch Run Succeeded. Run ID: {runResult.Data!.Id} | Status: {runResult.Data.RunStatus}");
+            Console.WriteLine($" [PASS] End-to-End Batch Run Succeeded. Run ID: {runResult.Data!.Id} | Status: {runResult.Data.ExecutionStatus}");
         }
         else
         {
