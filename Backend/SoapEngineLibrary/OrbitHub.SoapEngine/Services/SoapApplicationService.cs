@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
+using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Common;
-using ServiceHub.SoapEngine.Core.Data.Generated;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
@@ -11,13 +11,12 @@ using ServiceHub.SoapEngine.Core.Validation;
 namespace ServiceHub.SoapEngine.Core.Services;
 
 public class SoapApplicationService(
-    SoapApplicationRepository appRepository,
-    SoapWsdlSyncRepository wsdlRepository,
-    SoapOperationRepository operationRepository,
-    SoapRequestFileRepository requestFileRepository,
-    SoapExecutionRepository executionRepository,
+    ServiceApplicationRepository appRepository,
+    ServiceDefinitionSyncRepository definitionSyncRepository,
+    ServiceOperationRepository operationRepository,
+    ServiceRequestFileRepository requestFileRepository,
+    ServiceExecutionAuditRepository executionRepository,
     SoapEncryptionService encryptionService,
-    SoapVersionGeneratorService versionGenerator,
     WsdlParser wsdlParser,
     SoapFileCompressor compressor,
     SoapFileDeltaPatcher deltaPatcher,
@@ -80,13 +79,13 @@ public class SoapApplicationService(
     }
 
     // ---------- Application CRUD ----------
-    public async Task<Result<SoapApplication>> CreateFullApplicationAsync(
+    public async Task<Result<ServiceApplication>> CreateFullApplicationAsync(
         CreateFullApplicationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = createFullValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<SoapApplication>.Failure(string.Join("; ", validation.Errors));
+            return Result<ServiceApplication>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Creating full SOAP Application: {AppName}", input.AppName);
 
@@ -103,7 +102,7 @@ public class SoapApplicationService(
 
         var appResult = await RegisterApplicationAsync(regInput, cancellationToken);
         if (!appResult.IsSuccess)
-            return Result<SoapApplication>.Failure(appResult.ErrorMessage!);
+            return Result<ServiceApplication>.Failure(appResult.ErrorMessage!);
 
         var createdApp = appResult.Data!;
 
@@ -135,7 +134,7 @@ public class SoapApplicationService(
             await CreateManualOperationAsync(manualInput, cancellationToken);
         }
 
-        return Result<SoapApplication>.Success(createdApp);
+        return Result<ServiceApplication>.Success(createdApp);
     }
 
     public async Task<Result<bool>> UpdateFullApplicationAsync(
@@ -181,9 +180,7 @@ public class SoapApplicationService(
             if (existingDict.TryGetValue(opInput.OperationName, out var existingOp))
             {
                 existingOp.Description = opInput.Description;
-                existingOp.SoapAction = opInput.SoapAction;
-                existingOp.InputRootElementName = opInput.InputRootElementName;
-                existingOp.OutputRootElementName = opInput.OutputRootElementName;
+                existingOp.EndpointOrAction = opInput.SoapAction;
                 existingOp.IsActive = opInput.IsActive;
                 existingOp.LastUpdatedAt = DateTime.UtcNow;
                 existingOp.LastUpdatedBy = input.UpdatedBy;
@@ -211,27 +208,26 @@ public class SoapApplicationService(
     }
 
     // ---------- Sub‑methods ----------
-    public async Task<Result<SoapApplication>> RegisterApplicationAsync(
+    public async Task<Result<ServiceApplication>> RegisterApplicationAsync(
         RegisterApplicationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = registerValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<SoapApplication>.Failure(string.Join("; ", validation.Errors));
+            return Result<ServiceApplication>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Registering SOAP Application: {AppName}", input.AppName);
 
-        string version = versionGenerator.GenerateNextVersion();
-        var app = new SoapApplication
+        var app = new ServiceApplication
         {
-            AppName = input.AppName,
+            Name = input.AppName,
             BaseUrl = input.BaseUrl,
-            WsdlRelativeUrl = input.WsdlRelativeUrl,
+            DefinitionRelativeUrl = input.WsdlRelativeUrl,
             HealthcheckRelativeUrl = input.HealthcheckRelativeUrl,
             Description = input.Description,
-            Version = version,
+            ServiceType = "SOAP",
+            DefinitionType = "WSDL",
             IsActive = true,
-            CreatedAt = DateTime.UtcNow,
             CreatedBy = input.CreatedBy
         };
 
@@ -261,7 +257,7 @@ public class SoapApplicationService(
             await SyncWsdlAsync(syncInput, cancellationToken);
         }
 
-        return Result<SoapApplication>.Success(registeredApp);
+        return Result<ServiceApplication>.Success(registeredApp);
     }
 
     public async Task<Result<bool>> EditApplicationAsync(
@@ -278,13 +274,11 @@ public class SoapApplicationService(
         if (existingApp is null)
             return Result<bool>.Failure($"SOAP Application with ID {input.AppId} not found.");
 
-        string nextVersion = versionGenerator.GenerateNextVersion(existingApp.Version);
-        existingApp.AppName = input.AppName;
+        existingApp.Name = input.AppName;
         existingApp.BaseUrl = input.BaseUrl;
-        existingApp.WsdlRelativeUrl = input.WsdlRelativeUrl;
+        existingApp.DefinitionRelativeUrl = input.WsdlRelativeUrl;
         existingApp.HealthcheckRelativeUrl = input.HealthcheckRelativeUrl;
         existingApp.Description = input.Description;
-        existingApp.Version = nextVersion;
         existingApp.LastUpdatedAt = DateTime.UtcNow;
         existingApp.LastUpdatedBy = input.UpdatedBy;
 
@@ -292,13 +286,13 @@ public class SoapApplicationService(
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<SoapWsdlSync>> SyncWsdlAsync(
+    public async Task<Result<ServiceDefinitionSync>> SyncWsdlAsync(
         SyncWsdlInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = syncWsdlValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<SoapWsdlSync>.Failure(string.Join("; ", validation.Errors));
+            return Result<ServiceDefinitionSync>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Syncing WSDL for Application ID: {AppId}", input.AppId);
 
@@ -315,34 +309,36 @@ public class SoapApplicationService(
         }
         else
         {
-            return Result<SoapWsdlSync>.Failure("Either WsdlFileStream or WsdlUrl must be provided.");
+            return Result<ServiceDefinitionSync>.Failure("Either WsdlFileStream or WsdlUrl must be provided.");
         }
 
         var parsedMetadata = wsdlParser.ParseContent(wsdlContent);
-        string? latestWsdlVersion = await wsdlRepository.GetLatestWsdlVersionAsync(input.AppId, cancellationToken);
-        string version = versionGenerator.GenerateNextVersion(latestWsdlVersion);
+        string? latestVersion = await definitionSyncRepository.GetLatestVersionAsync(input.AppId, cancellationToken);
 
-        var wsdlSync = new SoapWsdlSync
+        var wsdlBytes = System.Text.Encoding.UTF8.GetBytes(wsdlContent);
+        var compressedContent = compressor.Compress(wsdlBytes);
+
+        var definitionSync = new ServiceDefinitionSync
         {
-            AppId = input.AppId,
-            WsdlUrl = input.WsdlUrl,
-            WsdlContent = wsdlContent,
-            Version = version,
-            SyncedAt = DateTime.UtcNow,
-            SyncedBy = input.SyncedBy
+            ServiceApplicationId = input.AppId,
+            DefinitionUrl = input.WsdlUrl,
+            CompressedContent = compressedContent,
+            UncompressedSizeBytes = wsdlBytes.Length,
+            CompressionAlgorithmType = "GZip",
+            CreatedBy = input.SyncedBy
         };
 
-        var savedSync = await wsdlRepository.SaveWsdlSyncAsync(wsdlSync, parsedMetadata, input.ChangeComment, cancellationToken);
-        return Result<SoapWsdlSync>.Success(savedSync);
+        var savedSync = await definitionSyncRepository.SaveDefinitionSyncAsync(definitionSync, parsedMetadata, input.ChangeComment, cancellationToken);
+        return Result<ServiceDefinitionSync>.Success(savedSync);
     }
 
-    public async Task<Result<SoapRequestFile>> UploadRequestFileStreamAsync(
+    public async Task<Result<ServiceRequestFile>> UploadRequestFileStreamAsync(
         UploadRequestFileInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = uploadValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<SoapRequestFile>.Failure(string.Join("; ", validation.Errors));
+            return Result<ServiceRequestFile>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Uploading Request File {FileName} for Operation ID: {OperationId}", input.FileName, input.OperationId);
 
@@ -355,54 +351,44 @@ public class SoapApplicationService(
 
         if (existingFile is null)
         {
-            string initialVersion = versionGenerator.GenerateNextVersion();
-            var requestFile = new SoapRequestFile
+            var requestFile = new ServiceRequestFile
             {
-                OperationId = input.OperationId,
-                FileName = input.FileName,
-                FileData = compressedNewBytes,
+                ServiceOperationId = input.OperationId,
+                Name = input.FileName,
+                FileFormat = "XML",
+                CompressedData = compressedNewBytes,
                 UncompressedSizeBytes = newRawBytes.Length,
-                Version = initialVersion,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
+                CompressionAlgorithmType = "GZip",
+                IsBaseSnapshot = true,
+                DeltaDepth = 0,
                 CreatedBy = input.CreatedBy
             };
             var savedFile = await requestFileRepository.AddAsync(requestFile, cancellationToken);
-            return Result<SoapRequestFile>.Success(savedFile);
+            return Result<ServiceRequestFile>.Success(savedFile);
         }
         else
         {
-            string priorVersion = existingFile.Version;
-            byte[] oldRawBytes = compressor.Decompress(existingFile.FileData);
-            int consecutiveDiffs = await requestFileRepository.GetConsecutiveDiffCountAsync(existingFile.Id, cancellationToken);
+            byte[] oldRawBytes = compressor.Decompress(existingFile.CompressedData);
+            int consecutiveDeltas = await requestFileRepository.GetConsecutiveDeltaCountAsync(existingFile.Id, cancellationToken);
 
-            byte[]? compressedBackwardDiff = null;
-            byte[]? compressedFullData = null;
+            byte[]? backwardDiffData = null;
 
-            if (consecutiveDiffs < 5)
+            if (consecutiveDeltas < 5)
             {
-                compressedBackwardDiff = deltaPatcher.CreateBackwardDiff(newRawBytes, oldRawBytes);
-            }
-            else
-            {
-                compressedFullData = compressor.Compress(oldRawBytes);
+                backwardDiffData = deltaPatcher.CreateBackwardDiff(newRawBytes, oldRawBytes);
             }
 
-            string nextVersion = versionGenerator.GenerateNextVersion(priorVersion);
-            existingFile.FileData = compressedNewBytes;
+            existingFile.CompressedData = compressedNewBytes;
             existingFile.UncompressedSizeBytes = newRawBytes.Length;
-            existingFile.Version = nextVersion;
             existingFile.LastUpdatedAt = DateTime.UtcNow;
             existingFile.LastUpdatedBy = input.CreatedBy;
 
-            await requestFileRepository.UpdateWithHistoryChainAsync(
+            await requestFileRepository.UpdateWithDeltaChainAsync(
                 existingFile,
-                priorVersion,
-                compressedBackwardDiff,
-                compressedFullData,
+                backwardDiffData,
                 cancellationToken);
 
-            return Result<SoapRequestFile>.Success(existingFile);
+            return Result<ServiceRequestFile>.Success(existingFile);
         }
     }
 
@@ -416,120 +402,92 @@ public class SoapApplicationService(
 
         string encryptedCredentialsJson = encryptionService.EncryptObject(input.Credentials);
 
-        var authEntity = new SoapAppAuthentication
+        var authEntity = new ServiceAppAuthentication
         {
-            AppId = input.AppId,
+            Name = $"SOAP-Auth-{input.AppId}",
             AuthenticationType = input.Credentials.AuthenticationType.ToString(),
-            EncryptedCredentialsJson = encryptedCredentialsJson,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
+            EncryptionAlgorithmType = "AES-256-GCM",
+            EncryptedJson = encryptedCredentialsJson,
             CreatedBy = input.ConfiguredBy
         };
 
-        await appRepository.SaveAuthenticationAsync(authEntity, cancellationToken);
+        await appRepository.SaveAuthenticationAsync(authEntity, input.AppId, cancellationToken);
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<SoapOperation>> CreateManualOperationAsync(
+    public async Task<Result<ServiceOperation>> CreateManualOperationAsync(
         CreateManualOperationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = manualOpValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<SoapOperation>.Failure(string.Join("; ", validation.Errors));
+            return Result<ServiceOperation>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Manually adding operation '{OpName}' to App ID: {AppId}", input.OperationName, input.AppId);
 
-        var latestSync = await wsdlRepository.GetLatestByAppIdAsync(input.AppId, cancellationToken);
-        int wsdlSyncId;
-
-        if (latestSync is null)
+        var operation = new ServiceOperation
         {
-            string version = versionGenerator.GenerateNextVersion();
-            var dummySync = new SoapWsdlSync
-            {
-                AppId = input.AppId,
-                WsdlContent = "<manual-operations-container />",
-                Version = version,
-                SyncedAt = DateTime.UtcNow,
-                SyncedBy = input.CreatedBy
-            };
-            var emptyMetadata = new Parsing.Models.ParsedWsdlMetadata
-            {
-                RawWsdlContent = dummySync.WsdlContent
-            };
-            var savedSync = await wsdlRepository.SaveWsdlSyncAsync(
-                dummySync,
-                emptyMetadata,
-                "Container created for manual operations.",
-                cancellationToken);
-            wsdlSyncId = savedSync.Id;
-        }
-        else
-        {
-            wsdlSyncId = latestSync.Id;
-        }
-
-        var operation = new SoapOperation
-        {
-            AppId = input.AppId,
-            WsdlSyncId = wsdlSyncId,
+            ServiceApplicationId = input.AppId,
             OperationName = input.OperationName,
             Description = input.Description,
-            SoapAction = input.SoapAction,
-            InputRootElementName = input.InputRootElementName,
-            OutputRootElementName = input.OutputRootElementName,
+            EndpointOrAction = input.SoapAction,
             IsActive = true,
-            CreatedAt = DateTime.UtcNow,
             CreatedBy = input.CreatedBy
         };
 
-        var createdOperation = await operationRepository.AddAsync(operation, input.TargetNamespace, input.RawXsdSchema, cancellationToken);
-        return Result<SoapOperation>.Success(createdOperation);
+        var createdOperation = await operationRepository.AddAsync(
+            operation,
+            inputRootElementName: input.InputRootElementName,
+            outputRootElementName: input.OutputRootElementName,
+            targetNamespace: input.TargetNamespace,
+            rawXsdSchema: input.RawXsdSchema,
+            cancellationToken: cancellationToken);
+
+        return Result<ServiceOperation>.Success(createdOperation);
     }
 
     // ---------- Query Methods (Data Retrieval) ----------
-    public async Task<PagedResult<SoapApplication>> GetApplicationsAsync(
+    public async Task<PagedResult<ServiceApplication>> GetApplicationsAsync(
         ApplicationFilter filter,
         CancellationToken cancellationToken = default)
     {
         return await appRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapOperation>> GetOperationsAsync(
+    public async Task<PagedResult<ServiceOperation>> GetOperationsAsync(
         OperationFilter filter,
         CancellationToken cancellationToken = default)
     {
         return await operationRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapRequestFile>> GetRequestFilesAsync(
+    public async Task<PagedResult<ServiceRequestFile>> GetRequestFilesAsync(
         RequestFileFilter filter,
         CancellationToken cancellationToken = default)
     {
         return await requestFileRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapExecutionGroup>> GetExecutionGroupsAsync(
-        ExecutionGroupFilter filter,
+    public async Task<PagedResult<DirectExecutionAudit>> GetExecutionAuditsAsync(
+        ExecutionAuditFilter filter,
         CancellationToken cancellationToken = default)
     {
-        return await executionRepository.GetGroupsPagedAsync(filter, cancellationToken);
+        return await executionRepository.GetAuditsPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapExecutionRun>> GetExecutionRunsAsync(
-        ExecutionRunFilter filter,
+    public async Task<PagedResult<DirectExecutionAuditResponseFileLink>> GetExecutionLinksAsync(
+        ExecutionAuditLinkFilter filter,
         CancellationToken cancellationToken = default)
     {
-        return await executionRepository.GetRunsPagedAsync(filter, cancellationToken);
+        return await executionRepository.GetResponseLinksPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapResponseFile>> GetResponseFilesAsync(
-        int? executionItemRunId,
+    public async Task<PagedResult<ServiceResponseFile>> GetResponseFilesAsync(
+        int? serviceRequestFileId,
         int pageNumber = 1,
         int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
-        return await executionRepository.GetResponseFilesPagedAsync(executionItemRunId, pageNumber, pageSize, cancellationToken);
+        return await executionRepository.GetResponseFilesPagedAsync(serviceRequestFileId, pageNumber, pageSize, cancellationToken);
     }
 }

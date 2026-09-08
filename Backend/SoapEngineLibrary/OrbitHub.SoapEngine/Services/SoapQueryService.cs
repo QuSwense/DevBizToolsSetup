@@ -1,56 +1,56 @@
-using ServiceHub.SoapEngine.Core.Data.Generated;
+using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 
 namespace ServiceHub.SoapEngine.Core.Services;
 
 public class SoapQueryService(
-    SoapApplicationRepository appRepository,
-    SoapOperationRepository operationRepository,
-    SoapRequestFileRepository requestFileRepository,
-    SoapExecutionRepository executionRepository)
+    ServiceApplicationRepository appRepository,
+    ServiceOperationRepository operationRepository,
+    ServiceRequestFileRepository requestFileRepository,
+    ServiceExecutionAuditRepository executionRepository)
 {
-    public async Task<PagedResult<SoapApplication>> GetApplicationsAsync(
+    public async Task<PagedResult<ServiceApplication>> GetApplicationsAsync(
         ApplicationFilter filter,
         CancellationToken cancellationToken = default)
     {
         return await appRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapOperation>> GetOperationsAsync(
+    public async Task<PagedResult<ServiceOperation>> GetOperationsAsync(
         OperationFilter filter,
         CancellationToken cancellationToken = default)
     {
         return await operationRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapRequestFile>> GetRequestFilesAsync(
+    public async Task<PagedResult<ServiceRequestFile>> GetRequestFilesAsync(
         RequestFileFilter filter,
         CancellationToken cancellationToken = default)
     {
         return await requestFileRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapExecutionGroup>> GetExecutionGroupsAsync(
-        ExecutionGroupFilter filter,
+    public async Task<PagedResult<DirectExecutionAudit>> GetExecutionAuditsAsync(
+        ExecutionAuditFilter filter,
         CancellationToken cancellationToken = default)
     {
-        return await executionRepository.GetGroupsPagedAsync(filter, cancellationToken);
+        return await executionRepository.GetAuditsPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapExecutionRun>> GetExecutionRunsAsync(
-        ExecutionRunFilter filter,
+    public async Task<PagedResult<DirectExecutionAuditResponseFileLink>> GetExecutionLinksAsync(
+        ExecutionAuditLinkFilter filter,
         CancellationToken cancellationToken = default)
     {
-        return await executionRepository.GetRunsPagedAsync(filter, cancellationToken);
+        return await executionRepository.GetResponseLinksPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<SoapResponseFile>> GetResponseFilesAsync(
-        int? executionItemRunId,
+    public async Task<PagedResult<ServiceResponseFile>> GetResponseFilesAsync(
+        int? serviceRequestFileId,
         int pageNumber = 1,
         int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
-        return await executionRepository.GetResponseFilesPagedAsync(executionItemRunId, pageNumber, pageSize, cancellationToken);
+        return await executionRepository.GetResponseFilesPagedAsync(serviceRequestFileId, pageNumber, pageSize, cancellationToken);
     }
 }

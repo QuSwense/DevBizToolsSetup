@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
+using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Common;
-using ServiceHub.SoapEngine.Core.Data.Generated;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Exceptions;
@@ -9,95 +9,93 @@ using ServiceHub.SoapEngine.Core.Models.Outputs;
 namespace ServiceHub.SoapEngine.Core.Services;
 
 public class SoapExecutionGroupRunner(
-    SoapExecutionRepository executionRepository,
-    SoapApplicationRepository appRepository,
-    SoapOperationRepository operationRepository,
-    SoapRequestFileRepository requestFileRepository,
+    ServiceExecutionAuditRepository executionRepository,
+    ServiceApplicationRepository appRepository,
+    ServiceOperationRepository operationRepository,
+    ServiceRequestFileRepository requestFileRepository,
     SoapClientService soapClientService,
     SoapFileCompressor compressor,
-    SoapVersionGeneratorService versionGenerator,
     ILogger<SoapExecutionGroupRunner> logger)
 {
-    public async Task<Result<SoapExecutionRun>> RunGroupAsync(
+    public async Task<Result<DirectExecutionAudit>> RunGroupAsync(
         int groupId,
         string executedBy,
         CancellationToken cancellationToken = default)
     {
         // Validate inputs
         if (groupId <= 0)
-            return Result<SoapExecutionRun>.Failure("groupId must be a positive integer.");
+            return Result<DirectExecutionAudit>.Failure("groupId must be a positive integer.");
         if (string.IsNullOrWhiteSpace(executedBy))
-            return Result<SoapExecutionRun>.Failure("executedBy is required.");
+            return Result<DirectExecutionAudit>.Failure("executedBy is required.");
 
         logger.LogInformation("Initiating batch execution run for Execution Group ID: {GroupId} by {ExecutedBy}", groupId, executedBy);
 
-        var group = await executionRepository.GetGroupByIdAsync(groupId, cancellationToken);
+        var group = await executionRepository.GetAuditByIdAsync(groupId, cancellationToken);
         if (group is null)
-            return Result<SoapExecutionRun>.Failure($"Execution group with ID {groupId} was not found.");
+            return Result<DirectExecutionAudit>.Failure($"Execution group with ID {groupId} was not found.");
 
-        var groupItems = await executionRepository.GetGroupItemsAsync(groupId, cancellationToken);
-        if (groupItems.Count == 0)
-            return Result<SoapExecutionRun>.Failure($"Execution group {groupId} contains no registered group items.");
+        var groupLinks = await executionRepository.GetLinksByAuditIdAsync(groupId, cancellationToken);
+        if (groupLinks.Count == 0)
+            return Result<DirectExecutionAudit>.Failure($"Execution group {groupId} contains no registered items.");
 
-        var run = await executionRepository.StartExecutionRunAsync(groupId, executedBy, cancellationToken);
         bool hasFailures = false;
 
         try
         {
-            foreach (var item in groupItems)
+            foreach (var link in groupLinks)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    logger.LogWarning("Execution run ID {RunId} cancelled by caller.", run.Id);
-                    await executionRepository.CompleteExecutionRunAsync(run.Id, EExecutionStatus.Cancelled, cancellationToken);
-                    return Result<SoapExecutionRun>.Failure("Execution run was cancelled.");
+                    logger.LogWarning("Execution run ID {RunId} cancelled by caller.", group.Id);
+                    await executionRepository.CompleteAuditAsync(group.Id, "Cancelled", cancellationToken: cancellationToken);
+                    return Result<DirectExecutionAudit>.Failure("Execution run was cancelled.");
                 }
 
-                bool itemSuccess = await ExecuteItemAsync(run.Id, item, executedBy, cancellationToken);
+                bool itemSuccess = await ExecuteItemAsync(group.Id, link, executedBy, cancellationToken);
                 if (!itemSuccess)
                     hasFailures = true;
             }
 
-            var finalStatus = hasFailures ? EExecutionStatus.Failed : EExecutionStatus.Completed;
-            await executionRepository.CompleteExecutionRunAsync(run.Id, finalStatus, cancellationToken);
-            run.RunStatus = finalStatus.ToDbString();
-            run.CompletedAt = DateTime.UtcNow;
-            return Result<SoapExecutionRun>.Success(run);
+            var finalStatus = hasFailures ? "Failed" : "Completed";
+            await executionRepository.CompleteAuditAsync(group.Id, finalStatus, cancellationToken: cancellationToken);
+            group.ExecutionStatus = finalStatus;
+            group.ExecutionCompletedAt = DateTime.UtcNow;
+            return Result<DirectExecutionAudit>.Success(group);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled failure during execution run ID {RunId}", run.Id);
-            await executionRepository.CompleteExecutionRunAsync(run.Id, EExecutionStatus.Failed, cancellationToken);
-            return Result<SoapExecutionRun>.Failure($"Execution run failed: {ex.Message}");
+            logger.LogError(ex, "Unhandled failure during execution run ID {RunId}", group.Id);
+            await executionRepository.CompleteAuditAsync(group.Id, "Failed", $"Unhandled error: {ex.Message}", cancellationToken);
+            return Result<DirectExecutionAudit>.Failure($"Execution run failed: {ex.Message}");
         }
     }
 
     private async Task<bool> ExecuteItemAsync(
-        int runId,
-        SoapExecutionGroupItem item,
+        int auditId,
+        DirectExecutionAuditResponseFileLink link,
         string executedBy,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Executing Group Item ID: {GroupItemId} (Request File ID: {RequestFileId}) in Run ID: {RunId}", item.Id, item.RequestFileId, runId);
+        logger.LogInformation("Executing Response Link ID: {LinkId} (Request File ID: {RequestFileId}) in Audit ID: {AuditId}", link.Id, link.ServiceRequestFileId, auditId);
 
-        var requestFile = await requestFileRepository.GetByIdAsync(item.RequestFileId, cancellationToken);
+        var requestFile = await requestFileRepository.GetByIdAsync(link.ServiceRequestFileId, cancellationToken);
         if (requestFile is null || !requestFile.IsActive)
         {
-            logger.LogError("Request file ID {RequestFileId} is inactive or missing.", item.RequestFileId);
+            logger.LogError("Request file ID {RequestFileId} is inactive or missing.", link.ServiceRequestFileId);
             return false;
         }
 
-        var operation = await operationRepository.GetByIdAsync(requestFile.OperationId, cancellationToken);
+        var operation = await operationRepository.GetByIdAsync(requestFile.ServiceOperationId, cancellationToken);
         if (operation is null)
         {
-            logger.LogError("Parent Operation ID {OperationId} missing for Request File {RequestFileId}.", requestFile.OperationId, item.RequestFileId);
+            logger.LogError("Parent Operation ID {OperationId} missing for Request File {RequestFileId}.", requestFile.ServiceOperationId, link.ServiceRequestFileId);
             return false;
         }
 
-        var application = await appRepository.GetByIdAsync(operation.AppId, cancellationToken);
+        var application = await appRepository.GetByIdAsync(operation.ServiceApplicationId, cancellationToken);
         if (application is null || !application.IsActive)
         {
-            logger.LogError("Parent Application ID {AppId} missing or inactive.", operation.AppId);
+            logger.LogError("Parent Application ID {AppId} missing or inactive.", operation.ServiceApplicationId);
             return false;
         }
 
@@ -106,62 +104,55 @@ public class SoapExecutionGroupRunner(
         if (authConfig is not null && Enum.TryParse<EAuthenticationType>(authConfig.AuthenticationType, out var parsedAuthType))
             authType = parsedAuthType;
 
-        var itemRun = new SoapExecutionItemRun
-        {
-            ExecutionRunId = runId,
-            ExecutionGroupItemId = item.Id,
-            ItemExecutionStatus = EItemExecutionStatus.InProgress.ToDbString(),
-            ExecutedAt = DateTime.UtcNow
-        };
-        itemRun = await executionRepository.AddItemRunAsync(itemRun, cancellationToken);
-
         try
         {
             SoapExecutionResponse response = await soapClientService.ExecuteAsync(
                 targetUrl: application.BaseUrl,
-                soapAction: operation.SoapAction,
-                requestBodyBytes: requestFile.FileData,
-                isCompressed: true,
-                encryptedAuthJson: authConfig?.EncryptedCredentialsJson,
+                soapAction: operation.EndpointOrAction,
+                requestBodyBytes: compressor.Decompress(requestFile.CompressedData),
+                isCompressed: false, // Already decompressed above
+                encryptedAuthJson: authConfig?.EncryptedJson,
                 authType: authType,
                 cancellationToken: cancellationToken);
 
             byte[] compressedResponseBytes = compressor.Compress(response.RawResponseBytes);
-            string responseVersion = versionGenerator.GenerateNextVersion();
 
-            var responseEntity = new SoapResponseFile
+            var responseEntity = new ServiceResponseFile
             {
-                ExecutionItemRunId = itemRun.Id,
-                ResponseFormat = response.ContentType?.Contains("xml", StringComparison.OrdinalIgnoreCase) == true
-                    ? EResponseFormat.XML.ToDbString()
-                    : EResponseFormat.BINARY.ToDbString(),
-                FileData = compressedResponseBytes,
+                ServiceRequestFileId = link.ServiceRequestFileId,
+                FileFormat = response.ContentType?.Contains("xml", StringComparison.OrdinalIgnoreCase) == true
+                    ? "XML"
+                    : "BINARY",
+                Name = $"response-{link.Id}",
+                CompressedData = compressedResponseBytes,
                 UncompressedSizeBytes = response.RawResponseBytes.Length,
-                Version = responseVersion,
-                CreatedAt = DateTime.UtcNow,
+                CompressionAlgorithmType = "GZip",
+                IsBaseSnapshot = true,
+                DeltaDepth = 0,
                 CreatedBy = executedBy
             };
-            await executionRepository.SaveResponseFileAsync(responseEntity, embeddings: null, cancellationToken);
+            await executionRepository.SaveResponseFileAsync(responseEntity, cancellationToken);
 
-            var itemStatus = response.IsSuccess ? EItemExecutionStatus.Success : EItemExecutionStatus.Failure;
-            await executionRepository.UpdateItemRunStatusAsync(
-                itemRunId: itemRun.Id,
-                status: itemStatus,
+            // Update the link with execution results
+            await executionRepository.UpdateResponseLinkStatusAsync(
+                linkId: link.Id,
+                status: response.IsSuccess ? "Success" : "Failure",
                 httpStatusCode: response.HttpStatusCode,
-                executionTimeMs: (int)response.LatencyMs,
+                httpRequestDurationMs: (int)response.LatencyMs,
+                httpContentType: response.ContentType,
                 cancellationToken: cancellationToken);
 
             return response.IsSuccess;
         }
         catch (SoapException ex)
         {
-            logger.LogError(ex, "SOAP execution failure on Item Run ID {ItemRunId}", itemRun.Id);
+            logger.LogError(ex, "SOAP execution failure on Link ID {LinkId}", link.Id);
             int? statusCode = ex is SoapHttpException httpEx ? (int?)httpEx.HttpStatusCode : null;
-            await executionRepository.UpdateItemRunStatusAsync(
-                itemRunId: itemRun.Id,
-                status: EItemExecutionStatus.Failure,
+            await executionRepository.UpdateResponseLinkStatusAsync(
+                linkId: link.Id,
+                status: "Failure",
                 httpStatusCode: statusCode,
-                executionTimeMs: null,
+                httpRequestDurationMs: null,
                 cancellationToken: cancellationToken);
             return false;
         }

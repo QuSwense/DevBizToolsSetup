@@ -5,7 +5,7 @@ using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
-using ServiceHub.SoapEngine.Core.Data.Generated;
+using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Parsing;
@@ -42,44 +42,45 @@ public static class ServiceCollectionExtensions
 
         // 1. Register Stateless Utilities & Cryptography (Singletons)
         services.AddSingleton(new SoapEncryptionService(encryptionBase64Key));
-        services.AddSingleton<SoapVersionGeneratorService>();
         services.AddSingleton<SoapFileCompressor>();
         services.AddSingleton<SoapFileDeltaPatcher>();
 
-        // 2. Register LINQ to DB Data Context
+        // 2. Register LINQ to DB Data Context (using ServiceAppDbContext from OrbitHub.Data)
         var baseOptions = new DataOptions()
             .UseSqlServer(
                 connectionString,
                 SqlServerVersion.v2012,
                 SqlServerProvider.MicrosoftDataSqlClient);
 
-        // 2. Wrap into typed DataOptions<SoapEngineDataContext> expected by the generated constructor
-        var typedOptions = new DataOptions<SoapEngineDataContext>(baseOptions);
+        var typedOptions = new DataOptions<ServiceAppDbContext>(baseOptions);
 
         // 3. Register options as Singleton
         services.AddSingleton(typedOptions);
         services.AddSingleton<DataOptions>(typedOptions.Options);
 
         // 4. Register Context as Scoped using typed options
-        services.AddScoped<SoapEngineDataContext>(sp =>
-            new SoapEngineDataContext(sp.GetRequiredService<DataOptions<SoapEngineDataContext>>()));
+        services.AddScoped<ServiceAppDbContext>(sp =>
+            new ServiceAppDbContext(sp.GetRequiredService<DataOptions<ServiceAppDbContext>>()));
 
-        // 3. Register Typed HttpClients for SOAP & WSDL fetching
+        // 5. Register Typed HttpClients for SOAP & WSDL fetching
         services.AddHttpClient<WsdlParser>();
         services.AddHttpClient<SoapClientService>();
 
-        // 4. Register Concrete Repositories (Scoped per Request/Unit of Work)
-        services.AddScoped<SoapApplicationRepository>();
-        services.AddScoped<SoapQueryService>();
-        services.AddScoped<SoapWsdlSyncRepository>();
-        services.AddScoped<SoapOperationRepository>();
-        services.AddScoped<SoapRequestFileRepository>();
-        services.AddScoped<SoapExecutionRepository>();
+        // 6. Register Repositories (Scoped per Request/Unit of Work)
+        services.AddScoped<ServiceApplicationRepository>();
+        services.AddScoped<ServiceOperationRepository>();
+        services.AddScoped<ServiceRequestFileRepository>();
+        services.AddScoped<ServiceDefinitionSyncRepository>();
+        services.AddScoped<ServiceExecutionAuditRepository>();
 
-        // 5. Register Concrete Parsing & Orchestration Services (Scoped)
+        // 7. Register Query Service
+        services.AddScoped<SoapQueryService>();
+
+        // 8. Register Orchestration Services (Scoped)
         services.AddScoped<SoapApplicationService>();
         services.AddScoped<SoapExecutionGroupRunner>();
 
+        // 9. Register Validators
         services.AddScoped<IValidator<RegisterApplicationInput>, RegisterApplicationInputValidator>();
         services.AddScoped<IValidator<CreateFullApplicationInput>, CreateFullApplicationInputValidator>();
         services.AddScoped<IValidator<UpdateFullApplicationInput>, UpdateFullApplicationInputValidator>();
