@@ -3,9 +3,11 @@ namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class AppRegistrationTestGroup(
     SoapApplicationService appService,
+    MockServicesOptions settings,
     ILogger<AppRegistrationTestGroup> logger)
 {
     private const string DefaultUserId = "1"; // Valid UserId matching FK_SoapApplications_CreatedBy_Users
@@ -42,7 +44,7 @@ public class AppRegistrationTestGroup(
         var input = new RegisterApplicationInput
         {
             AppName = appName,
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             WsdlRelativeUrl = "?wsdl",
             Description = "Live Basic Auth Customer Service",
             CreatedBy = DefaultUserId
@@ -68,7 +70,7 @@ public class AppRegistrationTestGroup(
         var input = new RegisterApplicationInput
         {
             AppName = appName,
-            BaseUrl = "http://localhost:7051/DocumentService.asmx",
+            BaseUrl = settings.OAuth2Service.BaseUrl,
             WsdlRelativeUrl = "?wsdl",
             Description = "Live OAuth2 Document Service",
             CreatedBy = DefaultUserId
@@ -94,7 +96,7 @@ public class AppRegistrationTestGroup(
         var input = new RegisterApplicationInput
         {
             AppName = duplicateName,
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             CreatedBy = DefaultUserId
         };
 
@@ -124,7 +126,7 @@ public class AppRegistrationTestGroup(
         var input = new RegisterApplicationInput
         {
             AppName = $"InvalidWsdlApp_{Guid.NewGuid():N}"[..25],
-            BaseUrl = "http://localhost:9999/NonExistentService.asmx",
+            BaseUrl = settings.UnreachableService.BaseUrl,
             WsdlRelativeUrl = "?wsdl",
             CreatedBy = DefaultUserId
         };

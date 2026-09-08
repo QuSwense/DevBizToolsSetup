@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../ServiceHub.SoapEngine.Core/ServiceHub.SoapEngine.Core.csproj" />
+    <ProjectReference Include="../../OrbitHub.SoapEngine/OrbitHub.SoapEngine.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

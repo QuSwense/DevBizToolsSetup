@@ -3,10 +3,12 @@ namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class InspectWsdlTestGroup(
     SoapApplicationService appService,
     HttpClient httpClient,
+    MockServicesOptions settings,
     ILogger<InspectWsdlTestGroup> logger)
 {
     public async Task RunAllAsync()
@@ -35,7 +37,7 @@ public class InspectWsdlTestGroup(
         logger.LogInformation("TEST: Inspecting WSDL from live URL (Port 7050)...");
         var input = new InspectWsdlInput
         {
-            WsdlUrl = "http://localhost:7050/CustomerService.asmx?wsdl"
+            WsdlUrl = settings.BasicAuthService.WsdlUrl
         };
 
         var result = await appService.InspectWsdlOperationsAsync(input);
@@ -54,7 +56,7 @@ public class InspectWsdlTestGroup(
     public async Task Test_InspectWsdl_FromFileStream()
     {
         logger.LogInformation("TEST: Inspecting WSDL from file stream (Port 7050)...");
-        using var response = await httpClient.GetAsync("http://localhost:7050/CustomerService.asmx?wsdl");
+        using var response = await httpClient.GetAsync(settings.BasicAuthService.WsdlUrl);
         using var stream = await response.Content.ReadAsStreamAsync();
 
         var input = new InspectWsdlInput

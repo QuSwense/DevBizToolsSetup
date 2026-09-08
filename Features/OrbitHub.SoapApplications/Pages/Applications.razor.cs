@@ -312,19 +312,13 @@ public partial class Applications : IDisposable
             _validationErrors.Add("WSDL path must be a partial path (e.g. '?wsdl', '/service?wsdl') and must not contain a URL.");
         }
 
-        if (_newApis.Count == 0)
+        // SOAP APIs are optional; only validate entries that were explicitly added.
+        foreach (var api in _newApis)
         {
-            _validationErrors.Add("At least one SOAP API must be added.");
-        }
-        else
-        {
-            foreach (var api in _newApis)
+            var name = api.Name.Trim();
+            if (!NamingConventionValidator.IsValidCSharpIdentifier(name))
             {
-                var name = api.Name.Trim();
-                if (!NamingConventionValidator.IsValidCSharpIdentifier(name))
-                {
-                    _validationErrors.Add($"API name '{api.Name}' is not a valid C# method name.");
-                }
+                _validationErrors.Add($"API name '{api.Name}' is not a valid C# method name.");
             }
         }
 

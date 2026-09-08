@@ -3,9 +3,11 @@ namespace SoapApiProcessorTest.TestScenarios.SoapRequestFileTests;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class BackwardDiffTestGroup(
     SoapApplicationService appService,
+    MockServicesOptions settings,
     ILogger<BackwardDiffTestGroup> logger)
 {
     private const string DefaultUserId = "1";
@@ -39,7 +41,7 @@ public class BackwardDiffTestGroup(
         var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInput
         {
             AppName = appName,
-            BaseUrl = "https://fake.service.local/",
+            BaseUrl = settings.OfflineService.BaseUrl,
             CreatedBy = DefaultUserId
         });
         if (!regResult.IsSuccess)

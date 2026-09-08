@@ -5,10 +5,12 @@ using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Exceptions;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class OutboundSoapClientTestGroup(
     SoapClientService soapClient,
     SoapEncryptionService encryptionService,
+    MockServicesOptions settings,
     ILogger<OutboundSoapClientTestGroup> logger)
 {
     public async Task RunAllAsync()
@@ -62,7 +64,7 @@ public class OutboundSoapClientTestGroup(
         });
 
         var response = await soapClient.ExecuteAsync(
-            targetUrl: "http://localhost:7050/CustomerService.asmx",
+            targetUrl: settings.BasicAuthService.BaseUrl,
             soapAction: "http://servicehub.org/customer/soap/ICustomerSoapService/GetCustomerProfile",
             requestBodyBytes: requestBytes,
             isCompressed: false,
@@ -99,14 +101,14 @@ public class OutboundSoapClientTestGroup(
         byte[] requestBytes = System.Text.Encoding.UTF8.GetBytes(requestXml);
         string encryptedAuth = encryptionService.EncryptObject(new OAuth2Credentials
         {
-            TokenEndpoint = "http://localhost:7051/connect/token",
+            TokenEndpoint = settings.OAuth2Service.TokenEndpoint,
             ClientId = "client_app_id_99",
             ClientSecret = "secret_key_888",
             GrantType = "client_credentials"
         });
 
         var response = await soapClient.ExecuteAsync(
-            targetUrl: "http://localhost:7051/DocumentService.asmx",
+            targetUrl: settings.OAuth2Service.BaseUrl,
             soapAction: "http://servicehub.org/document/soap/IDocumentSoapService/GetDocument",
             requestBodyBytes: requestBytes,
             isCompressed: false,
@@ -137,7 +139,7 @@ public class OutboundSoapClientTestGroup(
         try
         {
             await soapClient.ExecuteAsync(
-                targetUrl: "http://localhost:7050/CustomerService.asmx",
+                targetUrl: settings.BasicAuthService.BaseUrl,
                 soapAction: "http://servicehub.org/customer/soap/ICustomerSoapService/GetCustomerProfile",
                 requestBodyBytes: requestBytes,
                 isCompressed: false,
@@ -161,7 +163,7 @@ public class OutboundSoapClientTestGroup(
         try
         {
             await soapClient.ExecuteAsync(
-                targetUrl: "http://localhost:9999/NonExistent.asmx",
+                targetUrl: settings.UnreachableService.BaseUrl,
                 soapAction: "http://tempuri.org/Action",
                 requestBodyBytes: requestBytes,
                 isCompressed: false,

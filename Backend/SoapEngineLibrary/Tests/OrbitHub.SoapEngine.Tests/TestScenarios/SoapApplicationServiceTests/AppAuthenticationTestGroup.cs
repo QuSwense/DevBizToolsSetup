@@ -3,9 +3,11 @@ namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class AppAuthenticationTestGroup(
     SoapApplicationService appService,
+    MockServicesOptions settings,
     ILogger<AppAuthenticationTestGroup> logger)
 {
     private const string DefaultUserId = "1";
@@ -51,7 +53,7 @@ public class AppAuthenticationTestGroup(
         var reg = await appService.RegisterApplicationAsync(new RegisterApplicationInput
         {
             AppName = $"AuthTestApp_{Guid.NewGuid():N}"[..25],
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             CreatedBy = DefaultUserId
         });
 
@@ -87,7 +89,7 @@ public class AppAuthenticationTestGroup(
             ConfiguredBy = DefaultUserId,
             Credentials = new OAuth2Credentials
             {
-                TokenEndpoint = "http://localhost:7051/connect/token",
+                TokenEndpoint = settings.OAuth2Service.TokenEndpoint,
                 ClientId = "client_app_id_99",
                 ClientSecret = "secret_key_888",
                 GrantType = "client_credentials",

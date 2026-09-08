@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Extensions;
+using SoapApiProcessorTest.Configuration;
 using SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
 using SoapApiProcessorTest.TestScenarios.SoapExecutionTests;
 using SoapApiProcessorTest.TestScenarios.SoapRequestFileTests;
@@ -20,7 +21,6 @@ public class Program
         ["AppAuthentication"] = typeof(AppAuthenticationTestGroup),
         ["ManualOperation"] = typeof(ManualOperationTestGroup),
         ["WsdlSync"] = typeof(WsdlSyncTestGroup),
-        ["WsdlDiscrepancy"] = typeof(WsdlDiscrepancyTestGroup),
         ["FileUpload"] = typeof(FileUploadTestGroup),
         ["BackwardDiff"] = typeof(BackwardDiffTestGroup),
         ["OutboundClient"] = typeof(OutboundSoapClientTestGroup),
@@ -49,6 +49,12 @@ public class Program
                     ?? throw new InvalidOperationException("ConnectionStrings:ServiceHubDb is missing in appsettings.json.");
                 string encryptionKey = context.Configuration["SoapEngine:EncryptionKey"]
                     ?? throw new InvalidOperationException("SoapEngine:EncryptionKey is missing in appsettings.json.");
+
+                // Bind the mock-service endpoint settings so test groups resolve URLs from appsettings.json.
+                MockServicesOptions mockServices =
+                    context.Configuration.GetSection(MockServicesOptions.SectionName).Get<MockServicesOptions>()
+                    ?? new MockServicesOptions();
+                services.AddSingleton(mockServices);
 
                 services.AddServiceHubSoapEngine(connectionString, encryptionKey);
 

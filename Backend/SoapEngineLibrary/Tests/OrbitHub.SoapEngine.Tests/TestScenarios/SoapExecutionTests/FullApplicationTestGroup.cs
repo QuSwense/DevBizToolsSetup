@@ -5,10 +5,12 @@ using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class FullApplicationTestGroup(
     SoapApplicationService appService,
     SoapOperationRepository operationRepository,
+    MockServicesOptions settings,
     ILogger<FullApplicationTestGroup> logger)
 {
     private const string DefaultUserId = "1";
@@ -42,7 +44,7 @@ public class FullApplicationTestGroup(
         var createInput = new CreateFullApplicationInput
         {
             AppName = appName,
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             WsdlRelativeUrl = "?wsdl",
             Description = "Test full creation",
             CreatedBy = DefaultUserId,
@@ -87,7 +89,7 @@ public class FullApplicationTestGroup(
         var createInput = new CreateFullApplicationInput
         {
             AppName = appName,
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             CreatedBy = DefaultUserId,
             Operations = new List<SaveOperationInput>
             {
@@ -114,7 +116,7 @@ public class FullApplicationTestGroup(
         {
             AppId = appId,
             AppName = appName + "_Updated",
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             Description = "Updated description",
             UpdatedBy = DefaultUserId,
             UpdateAuthentication = true,

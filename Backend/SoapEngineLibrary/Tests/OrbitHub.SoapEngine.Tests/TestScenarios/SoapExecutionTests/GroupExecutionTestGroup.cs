@@ -5,6 +5,7 @@ using ServiceHub.SoapEngine.Core.Data.Generated;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class GroupExecutionTestGroup(
     SoapApplicationService appService,
@@ -12,6 +13,7 @@ public class GroupExecutionTestGroup(
     SoapExecutionRepository executionRepository,
     SoapExecutionGroupRunner runner,
     HttpClient httpClient,
+    MockServicesOptions settings,
     ILogger<GroupExecutionTestGroup> logger)
 {
     private const string DefaultUserId = "1";
@@ -40,7 +42,7 @@ public class GroupExecutionTestGroup(
         var appReg = await appService.RegisterApplicationAsync(new RegisterApplicationInput
         {
             AppName = appName,
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             CreatedBy = DefaultUserId
         });
 
@@ -63,7 +65,7 @@ public class GroupExecutionTestGroup(
             }
         });
 
-        using var response = await httpClient.GetAsync("http://localhost:7050/CustomerService.asmx?wsdl");
+        using var response = await httpClient.GetAsync(settings.BasicAuthService.WsdlUrl);
         using var wsdlStream = await response.Content.ReadAsStreamAsync();
         await appService.SyncWsdlAsync(new SyncWsdlInput
         {

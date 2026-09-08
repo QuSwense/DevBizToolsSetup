@@ -4,11 +4,13 @@ using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
+using SoapApiProcessorTest.Configuration;
 
 public class WsdlSyncTestGroup(
     SoapApplicationService appService,
     SoapOperationRepository operationRepository,
     HttpClient httpClient,
+    MockServicesOptions settings,
     ILogger<WsdlSyncTestGroup> logger)
 {
     private const string DefaultUserId = "1";
@@ -37,7 +39,7 @@ public class WsdlSyncTestGroup(
         var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInput
         {
             AppName = appName,
-            BaseUrl = "http://localhost:7050/CustomerService.asmx",
+            BaseUrl = settings.BasicAuthService.BaseUrl,
             CreatedBy = DefaultUserId
         });
 
@@ -49,7 +51,7 @@ public class WsdlSyncTestGroup(
 
         int appId = regResult.Data!.Id;
 
-        using var response = await httpClient.GetAsync("http://localhost:7050/CustomerService.asmx?wsdl");
+        using var response = await httpClient.GetAsync(settings.BasicAuthService.WsdlUrl);
         using var wsdlStream = await response.Content.ReadAsStreamAsync();
 
         var syncInput = new SyncWsdlInput
