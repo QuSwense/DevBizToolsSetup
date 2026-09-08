@@ -16,7 +16,7 @@ public class GroupExecutionTestGroup(
     MockServicesOptions settings,
     ILogger<GroupExecutionTestGroup> logger)
 {
-    private const string DefaultUserId = "1";
+    private const string DefaultUserId = "test_soap_user1";
 
     public async Task RunAllAsync()
     {

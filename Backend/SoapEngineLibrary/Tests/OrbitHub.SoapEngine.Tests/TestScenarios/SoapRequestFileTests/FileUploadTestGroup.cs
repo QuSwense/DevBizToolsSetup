@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class FileUploadTestGroup(
     SoapApplicationService appService,
@@ -12,7 +13,7 @@ public class FileUploadTestGroup(
     MockServicesOptions settings,
     ILogger<FileUploadTestGroup> logger)
 {
-    private const string DefaultUserId = "1";
+    private const string DefaultUserId = "test_soap_user1";
 
     public async Task RunAllAsync()
     {
@@ -20,18 +21,6 @@ public class FileUploadTestGroup(
         Console.WriteLine("    FILE UPLOAD & COMPRESSION TEST GROUP          ");
         Console.WriteLine("==================================================");
         await ExecuteSafelyAsync("Upload & Compress", Test_UploadRequestFile_CompressionAndDecompression);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_UploadRequestFile_CompressionAndDecompression()

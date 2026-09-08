@@ -6,6 +6,7 @@ using ServiceHub.SoapEngine.Core.Exceptions;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class OutboundSoapClientTestGroup(
     SoapClientService soapClient,
@@ -23,18 +24,6 @@ public class OutboundSoapClientTestGroup(
         await ExecuteSafelyAsync("OAuth2 Outbound Call (Port 7051)", Test_OAuth2Call_Port7051);
         await ExecuteSafelyAsync("Basic Auth Invalid Credentials Rejection", Test_BasicAuthCall_InvalidCredentials_ThrowsException);
         await ExecuteSafelyAsync("Unreachable Endpoint Rejection", Test_UnreachableEndpoint_ThrowsSoapHttpException);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_BasicAuthCall_Port7050()

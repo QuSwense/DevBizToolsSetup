@@ -4,13 +4,14 @@ using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class BackwardDiffTestGroup(
     SoapApplicationService appService,
     MockServicesOptions settings,
     ILogger<BackwardDiffTestGroup> logger)
 {
-    private const string DefaultUserId = "1";
+    private const string DefaultUserId = "test_soap_user1";
 
     public async Task RunAllAsync()
     {
@@ -18,18 +19,6 @@ public class BackwardDiffTestGroup(
         Console.WriteLine("    BACKWARD DELTA DIFF CHAIN TEST GROUP         ");
         Console.WriteLine("==================================================");
         await ExecuteSafelyAsync("Max 5 Diff Threshold", Test_Max5DiffThresholdChain);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_Max5DiffThresholdChain()

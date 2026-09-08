@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class InspectWsdlTestGroup(
     SoapApplicationService appService,
@@ -18,18 +19,6 @@ public class InspectWsdlTestGroup(
         Console.WriteLine("==================================================");
         await ExecuteSafelyAsync("Inspect from URL (Port 7050)", Test_InspectWsdl_FromUrl);
         await ExecuteSafelyAsync("Inspect from File Stream", Test_InspectWsdl_FromFileStream);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_InspectWsdl_FromUrl()

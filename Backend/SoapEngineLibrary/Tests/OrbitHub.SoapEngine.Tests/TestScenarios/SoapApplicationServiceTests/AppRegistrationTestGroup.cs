@@ -4,13 +4,14 @@ using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class AppRegistrationTestGroup(
     SoapApplicationService appService,
     MockServicesOptions settings,
     ILogger<AppRegistrationTestGroup> logger)
 {
-    private const string DefaultUserId = "1"; // Valid UserId matching FK_SoapApplications_CreatedBy_Users
+    private const string DefaultUserId = "test_soap_user1"; // Valid UserId matching FK_SoapApplications_CreatedBy_Users
 
     public async Task RunAllAsync()
     {
@@ -22,18 +23,6 @@ public class AppRegistrationTestGroup(
         await ExecuteSafelyAsync("Register OAuth2 App", Test_RegisterOAuthApp_WithLiveWsdlUrl);
         await ExecuteSafelyAsync("Register App Duplicate Name Block", Test_RegisterApp_DuplicateNameError);
         await ExecuteSafelyAsync("Register App Unreachable WSDL Block", Test_RegisterApp_InvalidWsdlUrlError);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_RegisterBasicAuthApp_WithLiveWsdlUrl()

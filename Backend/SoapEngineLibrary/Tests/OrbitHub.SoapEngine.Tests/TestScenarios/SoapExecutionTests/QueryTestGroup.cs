@@ -3,6 +3,7 @@ namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 using ServiceHub.SoapEngine.Core.Services;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class QueryTestGroup(
     SoapApplicationService appService,
@@ -21,18 +22,6 @@ public class QueryTestGroup(
         await ExecuteSafelyAsync("GetExecutionLinks", Test_GetExecutionLinks);
         await ExecuteSafelyAsync("GetResponseFiles", Test_GetResponseFiles);
         await ExecuteSafelyAsync("QueryService Methods", Test_QueryServiceMethods);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_GetApplications()

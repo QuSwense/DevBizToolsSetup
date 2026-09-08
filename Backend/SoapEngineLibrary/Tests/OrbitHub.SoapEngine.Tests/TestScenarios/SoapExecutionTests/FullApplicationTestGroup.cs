@@ -6,6 +6,7 @@ using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class FullApplicationTestGroup(
     SoapApplicationService appService,
@@ -13,7 +14,7 @@ public class FullApplicationTestGroup(
     MockServicesOptions settings,
     ILogger<FullApplicationTestGroup> logger)
 {
-    private const string DefaultUserId = "1";
+    private const string DefaultUserId = "test_soap_user1";
 
     public async Task RunAllAsync()
     {
@@ -22,18 +23,6 @@ public class FullApplicationTestGroup(
         Console.WriteLine("==================================================");
         await ExecuteSafelyAsync("CreateFullApplication", Test_CreateFullApplication);
         await ExecuteSafelyAsync("UpdateFullApplication", Test_UpdateFullApplication);
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     public async Task Test_CreateFullApplication()

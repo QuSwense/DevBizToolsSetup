@@ -13,7 +13,7 @@ public class WsdlSyncTestGroup(
     MockServicesOptions settings,
     ILogger<WsdlSyncTestGroup> logger)
 {
-    private const string DefaultUserId = "1";
+    private const string DefaultUserId = "test_soap_user1";
 
     public async Task RunAllAsync()
     {

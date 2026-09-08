@@ -4,13 +4,14 @@ using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Services;
 using SoapApiProcessorTest.Configuration;
+using static SoapApiProcessorTest.Helpers.TestHelper;
 
 public class AppAuthenticationTestGroup(
     SoapApplicationService appService,
     MockServicesOptions settings,
     ILogger<AppAuthenticationTestGroup> logger)
 {
-    private const string DefaultUserId = "1";
+    private const string DefaultUserId = "test_soap_user1";
 
     public async Task RunAllAsync()
     {
@@ -34,18 +35,6 @@ public class AppAuthenticationTestGroup(
         await ExecuteSafelyAsync("Configure Basic Auth", () => Test_ConfigureBasicAuthentication(appId));
         await ExecuteSafelyAsync("Configure OAuth2", () => Test_ConfigureOAuth2Authentication(appId));
         await ExecuteSafelyAsync("Configure API Key", () => Test_ConfigureApiKeyAuthentication(appId));
-    }
-
-    private static async Task ExecuteSafelyAsync(string testName, Func<Task> testAction)
-    {
-        try
-        {
-            await testAction();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" [ERROR] '{testName}' threw unhandled exception: {ex.GetType().Name} - {ex.Message}");
-        }
     }
 
     private async Task<int> CreateTestAppAsync()
