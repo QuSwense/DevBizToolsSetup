@@ -69,15 +69,6 @@ WebApp/OrbitHub.Web/servicehub.db-*
 # Local SQL Server container/database runtime files, not schema source.
 /servicehubdb/
 
-# Keep only the OrbitTool SQL project and schema source; ignore generated data.
-OrbitToolDatabase/*
-!OrbitToolDatabase/OrbitTool.sqlproj
-!OrbitToolDatabase/dbo/
-!OrbitToolDatabase/dbo/**
-!OrbitToolDatabase/scripts/
-OrbitToolDatabase/scripts/*
-!OrbitToolDatabase/scripts/OrbitTool_ResetAndRecreate.sql
-
 # Ignore all other SQL scripts in the Setup directory.
 Setup/data/
 Setup/dbDesign/
