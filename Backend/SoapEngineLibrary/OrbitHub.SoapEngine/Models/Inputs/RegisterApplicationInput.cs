@@ -4,13 +4,6 @@ namespace ServiceHub.SoapEngine.Core.Models.Inputs;
 /// Payload contract for registering a new SOAP application.
 /// Maps to the unified ServiceApplications table with ServiceType = "SOAP".
 /// </summary>
-public class RegisterApplicationInput
+public class RegisterApplicationInput : CreateApplicationInput
 {
-    public required string AppName { get; set; }
-    public required string BaseUrl { get; set; }
-    public string? WsdlRelativeUrl { get; set; }
-    public string? HealthcheckRelativeUrl { get; set; }
-    public string? Description { get; set; }
-    public required string CreatedBy { get; set; }
-    public Stream? DirectWsdlStream { get; set; }
 }
