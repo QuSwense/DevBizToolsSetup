@@ -31,7 +31,7 @@
     <Project Path="Backend/SoapEngineLibrary/OrbitHub.SoapEngine/OrbitHub.SoapEngine.Core.csproj" />
   </Folder>
   <Folder Name="/Common/">
-    <Project Path="Common/OrbitHub.Models/OrbitHub.Models.csproj" />
+    <Project Path="Common/OrbitHub.GenericModels/OrbitHub.GenericModels.csproj" />
   </Folder>
   <Folder Name="/Components/">
     <Project Path="Components/OrbitHub.Common/OrbitHub.Common.csproj" />

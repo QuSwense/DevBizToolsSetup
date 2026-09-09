@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using PdfProcessor.Models.Common;
 using PdfProcessor.Models.Fields;
 

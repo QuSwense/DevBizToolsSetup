@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
-using ServiceHub.SoapEngine.Core.Common;
+using OrbitHub.GenericModels.Models;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Exceptions;

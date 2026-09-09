@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
-using ServiceHub.SoapEngine.Core.Common;
+using OrbitHub.GenericModels.Models;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
@@ -31,7 +31,6 @@ public class SoapApplicationService(
     IValidator<ConfigureAuthInput> configureAuthValidator,
     IValidator<CreateManualOperationInput> manualOpValidator)
 {
-    // ---------- WSDL Inspection ----------
     public async Task<Result<List<ParsedWsdlOperationDto>>> InspectWsdlOperationsAsync(
         InspectWsdlInput input,
         CancellationToken cancellationToken = default)

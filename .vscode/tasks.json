@@ -119,6 +119,23 @@
 				"isDefault": false
 			},
 			"detail": "Builds the servicehubdb SQL project"
+		},
+		// ===== SoapEngine =====
+		{
+			"label": "build-soapengine",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"${workspaceFolder}/Backend/SoapEngineLibrary/OrbitHub.SoapEngine.slnx",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": "$msCompile",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
 		}
 	]
 }

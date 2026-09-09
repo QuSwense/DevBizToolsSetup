@@ -17,6 +17,78 @@
         "action": "openExternally",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
       }
+    },
+    // ===== SoapEngine =====
+    {
+      "name": "SoapEngine Tests: Run Interactive Suite",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-soapengine",
+      "program": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/OrbitHub.SoapEngine.Tests/bin/Debug/net10.0/OrbitHub.SoapEngine.Tests.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/OrbitHub.SoapEngine.Tests",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    },
+    {
+      "name": "SoapEngine Tests: Run Single Test (edit group/method args)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-soapengine",
+      "program": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/OrbitHub.SoapEngine.Tests/bin/Debug/net10.0/OrbitHub.SoapEngine.Tests.dll",
+      "args": [
+        "AppRegistration",
+        "Test_RegisterBasicAuthApp_WithLiveWsdlUrl"
+      ],
+      "cwd": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/OrbitHub.SoapEngine.Tests",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    },
+    {
+      "name": "SoapEngine Mock: Customer SOAP Service (:7050)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-soapengine",
+      "program": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/SoapServices/MockCustomerSoapService/bin/Debug/net10.0/MockCustomerSoapService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/SoapServices/MockCustomerSoapService",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    },
+    {
+      "name": "SoapEngine Mock: OAuth SOAP Service (:7051)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-soapengine",
+      "program": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/SoapServices/MockOAuthSoapService/bin/Debug/net10.0/MockOAuthSoapService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Backend/SoapEngineLibrary/Tests/SoapServices/MockOAuthSoapService",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ],
+  "compounds": [
+    {
+      "name": "SoapEngine: Start Mock Services (Customer + OAuth)",
+      "configurations": [
+        "SoapEngine Mock: Customer SOAP Service (:7050)",
+        "SoapEngine Mock: OAuth SOAP Service (:7051)"
+      ]
+    },
+    {
+      "name": "SoapEngine: Mocks + Interactive Test Suite",
+      "configurations": [
+        "SoapEngine Mock: Customer SOAP Service (:7050)",
+        "SoapEngine Mock: OAuth SOAP Service (:7051)",
+        "SoapEngine Tests: Run Interactive Suite"
+      ],
+      "stopAll": true
     }
   ]
 }

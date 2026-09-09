@@ -1,5 +1,3 @@
-using PdfProcessor.Models.Common;
-
 public record PageTextContent(
     int PageNumber,
     string FullText,
