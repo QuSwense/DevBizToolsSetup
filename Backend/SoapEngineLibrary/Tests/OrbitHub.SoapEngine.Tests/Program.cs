@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ServiceHub.SoapEngine.Core.Extensions;
 using SoapApiProcessorTest.Configuration;
+using SoapApiProcessorTest.Helpers;
 using SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
 using SoapApiProcessorTest.TestScenarios.SoapExecutionTests;
 using SoapApiProcessorTest.TestScenarios.SoapRequestFileTests;
@@ -165,7 +166,7 @@ public class Program
 
             if (input == "0" && runAllMethod != null)
             {
-                await ExecuteMethodAsync(service, runAllMethod);
+                await TestHelper.ExecuteSafelyAsync(runAllMethod.Name, () => (Task)runAllMethod.Invoke(service, null)!);
                 Console.WriteLine("\nPress any key to continue...");
                 Console.ReadKey();
                 continue;
@@ -174,7 +175,7 @@ public class Program
             if (int.TryParse(input, out int selected) && selected >= 1 && selected <= testMethods.Count)
             {
                 var method = testMethods[selected - 1];
-                await ExecuteMethodAsync(service, method);
+                await TestHelper.ExecuteSafelyAsync(method.Name, () => (Task)method.Invoke(service, null)!);
                 Console.WriteLine("\nPress any key to continue...");
                 Console.ReadKey();
             }
@@ -183,25 +184,6 @@ public class Program
                 Console.WriteLine("Invalid choice. Press any key to try again.");
                 Console.ReadKey();
             }
-        }
-    }
-
-    private static async Task ExecuteMethodAsync(object service, MethodInfo method)
-    {
-        Console.WriteLine($"\n--- Executing {method.Name} ---");
-        try
-        {
-            var task = (Task)method.Invoke(service, null)!;
-            await task;
-            Console.WriteLine($"--- {method.Name} completed ---");
-        }
-        catch (TargetInvocationException ex)
-        {
-            Console.WriteLine($"ERROR in {method.Name}: {ex.InnerException?.Message ?? ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ERROR in {method.Name}: {ex.Message}");
         }
     }
 
@@ -221,7 +203,7 @@ public class Program
             return;
         }
 
-        await ExecuteMethodAsync(service, method);
+        await TestHelper.ExecuteSafelyAsync(method.Name, () => (Task)method.Invoke(service, null)!);
     }
 
     private static async Task RunAllGroupsAsync()
@@ -234,7 +216,7 @@ public class Program
             var service = _serviceProvider!.GetRequiredService(type);
             var runAll = type.GetMethod("RunAllAsync");
             if (runAll != null)
-                await ExecuteMethodAsync(service, runAll);
+                await TestHelper.ExecuteSafelyAsync(runAll.Name, () => (Task)runAll.Invoke(service, null)!);
         }
         Console.WriteLine("\n--- All groups completed ---");
     }
