@@ -40,9 +40,9 @@ public partial class SoapAppsOverview
     /// </summary>
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
-    private DateRange _range = DateRange.LastDays(7);
+    private DateRangeModel _range = DateRangeModel.LastDays(7);
 
-    private void ApplyRange(DateRange? range) => _range = range ?? DateRange.LastDays(7);
+    private void ApplyRange(DateRangeModel? range) => _range = range ?? DateRangeModel.LastDays(7);
 
     private static DateTime? TryParseTimestamp(string value)
         => DateTime.TryParse(value, out var dt) ? dt : null;

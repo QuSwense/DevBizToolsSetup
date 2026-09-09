@@ -20,8 +20,8 @@ public partial class ExecuteHistory
     [Inject] private NavigationManager Nav { get; set; } = default!;
 
     private bool _isLoading = true;
-    private SoapExecutionGroup[] _groups = [];
-    private SoapRequestFile[] _files = [];
+    private SoapExecutionGroupModel[] _groups = [];
+    private SoapRequestFileModel[] _files = [];
 
     // Filter state
     private string _filterFile = "";
@@ -38,7 +38,7 @@ public partial class ExecuteHistory
     private string? _selectedGroupId;
     private string? _selectedFileId;
 
-    private List<GridColumn<SoapExecutionGroup>> _columns = [];
+    private List<GridColumn<SoapExecutionGroupModel>> _columns = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,7 +105,7 @@ public partial class ExecuteHistory
 
     // ── Derived data ──
 
-    private SoapExecutionGroup[] FilteredGroups
+    private SoapExecutionGroupModel[] FilteredGroups
     {
         get
         {
@@ -155,10 +155,10 @@ public partial class ExecuteHistory
         }
     }
 
-    private SoapExecutionGroup? SelectedGroup =>
+    private SoapExecutionGroupModel? SelectedGroup =>
         _groups.FirstOrDefault(g => g.Id == _selectedGroupId);
 
-    private SoapExecutionFile? SelectedFile =>
+    private SoapExecutionFileModel? SelectedFile =>
         SelectedGroup?.Files.FirstOrDefault(f => f.FileName == _selectedFileId)
         ?? SelectedGroup?.Files.FirstOrDefault();
 

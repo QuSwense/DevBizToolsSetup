@@ -8,7 +8,7 @@ namespace OrbitHub.SoapApplications.Core.Enums;
 /// via <see cref="AuthTypeJsonConverter"/>.
 /// </summary>
 [JsonConverter(typeof(AuthTypeJsonConverter))]
-public enum AuthType
+public enum EAuthType
 {
     None,
     Basic,

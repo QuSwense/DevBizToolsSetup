@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the access types for permission-to-page mappings.
 /// Maps to PermissionToUIPageMapping.AccessType: 'View', 'Edit', 'Full'.
 /// </summary>
-public enum AccessType
+public enum EAccessType
 {
     /// <summary>View-only access to the resource.</summary>
     View = 0,

@@ -7,8 +7,8 @@ namespace OrbitHub.SoapApplications.Core.Enums;
 /// Serialized to/from camelCase string values (e.g. "buildingRequest") in
 /// the database.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter<ExecutionStage>))]
-public enum ExecutionStage
+[JsonConverter(typeof(JsonStringEnumConverter<EExecutionStage>))]
+public enum EExecutionStage
 {
     Queued,
     BuildingRequest,

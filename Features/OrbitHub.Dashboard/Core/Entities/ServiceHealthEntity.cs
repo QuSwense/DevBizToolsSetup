@@ -8,5 +8,5 @@ namespace OrbitHub.Dashboard.Core.Entities;
 public sealed class ServiceHealthEntity
 {
     public string Name { get; set; } = string.Empty;
-    public ServiceStatus Status { get; set; }
+    public EServiceStatus Status { get; set; }
 }

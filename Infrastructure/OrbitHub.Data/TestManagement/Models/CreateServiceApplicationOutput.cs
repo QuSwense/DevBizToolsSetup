@@ -7,7 +7,7 @@ namespace OrbitHub.Data.Repositories.TestManagement.Models;
 
 public class CreateServiceApplicationOutput
 {
-    public int? ServiceApplicationId { get; set; }
+    public int? InternalId { get; set; }
     public Guid? PublicId { get; set; }
     public string? Name { get; set; }
     public string? ServiceType { get; set; }

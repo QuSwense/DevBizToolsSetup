@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines compression algorithms used for storing compressed binary content.
 /// Maps to CK_*_CompressionAlgorithmType: 'Zstandard', 'Brotli', 'Gzip', 'none'.
 /// </summary>
-public enum CompressionAlgorithm
+public enum ECompressionAlgorithm
 {
     /// <summary>Zstandard compression (high compression ratio with good speed).</summary>
     Zstandard = 0,

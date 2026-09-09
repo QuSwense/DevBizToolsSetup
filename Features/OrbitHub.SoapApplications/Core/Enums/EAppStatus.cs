@@ -7,7 +7,7 @@ namespace OrbitHub.SoapApplications.Core.Enums;
 /// Serialized to/from the "enabled"/"disabled" string values stored in the database.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum AppStatus
+public enum EAppStatus
 {
     Enabled,
     Disabled

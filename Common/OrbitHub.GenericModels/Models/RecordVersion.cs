@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Models;
 /// Represents the result of a record version calculation.
 /// Format: YY.QQ.NN (Year.Quarter.Revision).
 /// </summary>
-public sealed record RecordVersion
+public sealed record RecordVersionModel
 {
     /// <summary>Two-digit year (e.g., "26" for 2026).</summary>
     public required string Year { get; init; }
@@ -19,13 +19,13 @@ public sealed record RecordVersion
     public override string ToString() => $"{Year}.{Quarter}.{Revision}";
 
     /// <summary>Parses a version string in YY.QQ.NN format.</summary>
-    public static RecordVersion Parse(string version)
+    public static RecordVersionModel Parse(string version)
     {
         var parts = version.Split('.');
         if (parts.Length != 3)
             throw new FormatException($"Invalid record version format: '{version}'. Expected YY.QQ.NN.");
 
-        return new RecordVersion
+        return new RecordVersionModel
         {
             Year = parts[0],
             Quarter = parts[1],

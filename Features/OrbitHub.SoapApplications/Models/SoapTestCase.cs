@@ -2,11 +2,11 @@ namespace OrbitHub.SoapApplications.Models;
 
 /// <summary>
 /// A test case optionally attached to a SOAP request file. It automates
-/// verification of the response by running a set of <see cref="SoapExtractor"/>
+/// verification of the response by running a set of <see cref="SoapExtractorModel"/>
 /// definitions (XPath / JSON path / PDF field extraction) when the file executes.
 /// A request file may have multiple test cases.
 /// </summary>
-public class SoapTestCase
+public class SoapTestCaseModel
 {
     public string Id { get; set; } = "";
 
@@ -33,5 +33,5 @@ public class SoapTestCase
     public string? UpdatedAt { get; set; }
 
     /// <summary>Extractor definitions evaluated against request/response payloads.</summary>
-    public List<SoapExtractor> Extractors { get; set; } = [];
+    public List<SoapExtractorModel> Extractors { get; set; } = [];
 }

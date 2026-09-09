@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Models;
 /// Represents an indexing element entry for XML, JSON, or PDF file element indexing (EAV pattern).
 /// Shared structure across IndexingXmlFileElements, IndexingJsonFileElements, and IndexingPdfFileElements.
 /// </summary>
-public sealed record IndexingElement
+public sealed record IndexingElementModel
 {
     /// <summary>Name of the element (e.g., "customer", "orderId").</summary>
     public required string ElementName { get; init; }

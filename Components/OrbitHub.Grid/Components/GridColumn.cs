@@ -8,7 +8,7 @@ namespace OrbitHub.Grid.Components;
 /// Create instances in your <c>@code</c> block and pass as <c>Columns</c> parameter.
 /// Example:
 /// <code>
-/// var cols = new List&lt;GridColumn&lt;SoapApp&gt;&gt;
+/// var cols = new List&lt;GridColumn&lt;SoapAppModel&gt;&gt;
 /// {
 ///     new() { Title = "Name", Field = a => a.Name, Sortable = true },
 ///     new() { Title = "Status", Field = a => a.Status, Template = ctx => builder =&gt; { ... } }

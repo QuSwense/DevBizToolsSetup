@@ -6,16 +6,16 @@ namespace OrbitHub.SoapApplications.Models;
 /// Holds the authentication details for a SOAP application.
 /// Only the fields relevant to <see cref="Type"/> are populated:
 /// <list type="bullet">
-/// <item><see cref="AuthType.Basic"/>: <see cref="Username"/>, <see cref="Password"/></item>
-/// <item><see cref="AuthType.ApiKey"/>: <see cref="KeyName"/>, <see cref="KeyValue"/></item>
-/// <item><see cref="AuthType.Bearer"/>: <see cref="Token"/></item>
-/// <item><see cref="AuthType.Ntlm"/>: <see cref="Username"/>, <see cref="Password"/>, <see cref="Domain"/></item>
-/// <item><see cref="AuthType.None"/>: no fields</item>
+/// <item><see cref="EAuthType.Basic"/>: <see cref="Username"/>, <see cref="Password"/></item>
+/// <item><see cref="EAuthType.ApiKey"/>: <see cref="KeyName"/>, <see cref="KeyValue"/></item>
+/// <item><see cref="EAuthType.Bearer"/>: <see cref="Token"/></item>
+/// <item><see cref="EAuthType.Ntlm"/>: <see cref="Username"/>, <see cref="Password"/>, <see cref="Domain"/></item>
+/// <item><see cref="EAuthType.None"/>: no fields</item>
 /// </list>
 /// </summary>
-public class SoapAuthConfig
+public class SoapAuthConfigModel
 {
-    public AuthType Type { get; set; }
+    public EAuthType Type { get; set; }
 
     /// <summary>Basic/NTLM username.</summary>
     public string? Username { get; set; }

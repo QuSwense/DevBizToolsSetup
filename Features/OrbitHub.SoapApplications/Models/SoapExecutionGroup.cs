@@ -5,7 +5,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// (even a single-file run gets its own group id). Contains the per-file
 /// execution records, logs and results.
 /// </summary>
-public class SoapExecutionGroup
+public class SoapExecutionGroupModel
 {
     /// <summary>Unique execution-group id (e.g. "exg-..."), one per run trigger.</summary>
     public string Id { get; set; } = "";
@@ -26,7 +26,7 @@ public class SoapExecutionGroup
     public long DurationMs { get; set; }
 
     /// <summary>Files executed as part of this group.</summary>
-    public List<SoapExecutionFile> Files { get; set; } = [];
+    public List<SoapExecutionFileModel> Files { get; set; } = [];
 
     /// <summary>Number of files in the group (computed, not serialized).</summary>
     public int FileCount => Files.Count;

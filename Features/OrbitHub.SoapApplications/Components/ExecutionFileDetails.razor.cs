@@ -10,10 +10,10 @@ namespace OrbitHub.SoapApplications.Components;
 public partial class ExecutionFileDetails
 {
     /// <summary>The execution group the file belongs to (for context display).</summary>
-    [Parameter] public SoapExecutionGroup? Group { get; set; }
+    [Parameter] public SoapExecutionGroupModel? Group { get; set; }
 
     /// <summary>The execution file whose details are shown.</summary>
-    [Parameter] public SoapExecutionFile? File { get; set; }
+    [Parameter] public SoapExecutionFileModel? File { get; set; }
 
     private string _activeTab = "request";
 

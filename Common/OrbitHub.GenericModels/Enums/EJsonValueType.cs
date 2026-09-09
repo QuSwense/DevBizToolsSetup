@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the JSON value types used for indexing parsed JSON file element values.
 /// Maps to CK_IndexingJsonFileElements_ValueType: 'String', 'Number', 'Boolean', 'Null', 'Array', 'Object'.
 /// </summary>
-public enum JsonValueType
+public enum EJsonValueType
 {
     /// <summary>JSON string value.</summary>
     String = 0,

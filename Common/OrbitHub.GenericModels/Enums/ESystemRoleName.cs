@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the available system role names.
 /// Maps to Seeds/RolesSeed.sql: 'Developer', 'Admin', 'Viewer'.
 /// </summary>
-public enum SystemRoleName
+public enum ESystemRoleName
 {
     /// <summary>Developer role — full access to all resources including settings.</summary>
     Developer = 0,

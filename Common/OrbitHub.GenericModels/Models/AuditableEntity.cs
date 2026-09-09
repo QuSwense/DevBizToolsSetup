@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Models;
 /// Represents an audit-trail base record with common timestamp and user tracking columns.
 /// Shared pattern across all OrbitHub tables.
 /// </summary>
-public abstract class AuditableEntity
+public abstract class AuditableEntityModel
 {
     /// <summary>Timestamp when the record was created.</summary>
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

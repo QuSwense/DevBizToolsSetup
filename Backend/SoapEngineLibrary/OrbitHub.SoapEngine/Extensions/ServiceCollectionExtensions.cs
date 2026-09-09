@@ -5,7 +5,10 @@ using LinqToDB.Data;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OrbitHub.Data.Repositories;
+using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.Data.TestManagement;
 using OrbitHub.SoapEngine.Core.Services;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
@@ -45,7 +48,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SoapFileCompressor>();
         services.AddSingleton<SoapFileDeltaPatcher>();
 
-        // 2. Register ServiceAppDbContext for hybrid paged queries
+        // 2. Register Data Contexts for hybrid paged queries + SP repos
         var baseOptions = new DataOptions()
             .UseSqlServer(
                 connectionString,
@@ -53,20 +56,17 @@ public static class ServiceCollectionExtensions
                 SqlServerProvider.MicrosoftDataSqlClient);
 
         var typedOptions = new DataOptions<ServiceAppDbContext>(baseOptions);
+        var testTypedOptions = new DataOptions<TestDbContext>(baseOptions);
         services.AddSingleton(typedOptions);
+        services.AddSingleton(testTypedOptions);
         services.AddSingleton<DataOptions>(typedOptions.Options);
         services.AddScoped<ServiceAppDbContext>(sp =>
             new ServiceAppDbContext(sp.GetRequiredService<DataOptions<ServiceAppDbContext>>()));
+        services.AddScoped<TestDbContext>(sp =>
+            new TestDbContext(sp.GetRequiredService<DataOptions<TestDbContext>>()));
 
-        // 3. Register IUnitOfWork for transaction composition
-        services.AddScoped<IUnitOfWork>(sp =>
-        {
-            var dataConnection = new DataConnection(
-                new DataOptions()
-                    .UseSqlServer(connectionString, SqlServerVersion.v2012, SqlServerProvider.MicrosoftDataSqlClient));
-            var logger = sp.GetService<ILogger<UnitOfWork>>();
-            return new UnitOfWork(dataConnection, logger);
-        });
+        // 3. Register OrbitHub.Data SP repositories + IUnitOfWork
+        services.AddRepositories();
 
         // 4. Register Typed HttpClients for SOAP & WSDL fetching
         services.AddHttpClient<WsdlParser>();

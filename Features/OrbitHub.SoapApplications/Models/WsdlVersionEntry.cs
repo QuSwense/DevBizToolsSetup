@@ -3,7 +3,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// <summary>
 /// A specific version snapshot of a WSDL sync record.
 /// </summary>
-public class WsdlVersionEntry
+public class WsdlVersionEntryModel
 {
     public string Id { get; set; } = "";
     public string SyncRecordId { get; set; } = "";

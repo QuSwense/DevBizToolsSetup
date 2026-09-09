@@ -14,7 +14,7 @@ public partial class RequestFilesOverview
     /// <summary>
     /// Gets or sets the SOAP request files to display.
     /// </summary>
-    [Parameter] public IReadOnlyList<SoapRequestFile> Files { get; set; } = [];
+    [Parameter] public IReadOnlyList<SoapRequestFileModel> Files { get; set; } = [];
 
     /// <summary>
     /// Gets or sets whether the card is collapsed to its summary view.
@@ -26,11 +26,11 @@ public partial class RequestFilesOverview
     /// </summary>
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
-    private DateRange _range = DateRange.LastDays(7);
+    private DateRangeModel _range = DateRangeModel.LastDays(7);
 
-    private void ApplyRange(DateRange? range) => _range = range ?? DateRange.LastDays(7);
+    private void ApplyRange(DateRangeModel? range) => _range = range ?? DateRangeModel.LastDays(7);
 
-    private List<GridColumn<SoapRequestFile>> _columns = [];
+    private List<GridColumn<SoapRequestFileModel>> _columns = [];
 
     /// <summary>
     /// Represents a per-application file summary row.
@@ -61,7 +61,7 @@ public partial class RequestFilesOverview
         }
     }
 
-    private IEnumerable<SoapRequestFile> InRangeFiles(IEnumerable<SoapRequestFile> source)
+    private IEnumerable<SoapRequestFileModel> InRangeFiles(IEnumerable<SoapRequestFileModel> source)
         => source.Where(f => f.UpdatedAt.HasValue && _range.Includes(f.UpdatedAt.Value));
 
     /// <inheritdoc />

@@ -5,7 +5,7 @@ namespace OrbitHub.GenericModels.Models;
 /// Shared pattern across ServiceAppPermissions, ServiceRequestFilesPermissions,
 /// ServiceTestSuitesPermissions, ServiceTestCasesPermissions, and RuleSetsPermissions.
 /// </summary>
-public sealed record ResourcePermissionGrant
+public sealed record ResourcePermissionGrantModel
 {
     /// <summary>The user ID this permission is granted to, or null if granted to a role.</summary>
     public string? UserId { get; init; }

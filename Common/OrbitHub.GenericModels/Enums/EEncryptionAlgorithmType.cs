@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the encryption algorithms used for securing authentication credentials.
 /// Maps to CK_ServiceAppAuthentications_EncryptionAlgorithmType: 'AES-GCM', 'RSA', 'None'.
 /// </summary>
-public enum EncryptionAlgorithmType
+public enum EEncryptionAlgorithmType
 {
     /// <summary>AES-GCM (Advanced Encryption Standard in Galois/Counter Mode) — symmetric encryption.</summary>
     AES_GCM = 0,

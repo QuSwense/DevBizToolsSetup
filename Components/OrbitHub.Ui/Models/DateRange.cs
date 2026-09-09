@@ -3,17 +3,17 @@ namespace OrbitHub.Ui.Models;
 /// <summary>
 /// Represents an inclusive date range used to filter dashboard sections.
 /// </summary>
-public sealed record DateRange(DateTime? Start, DateTime? End)
+public sealed record DateRangeModel(DateTime? Start, DateTime? End)
 {
     /// <summary>
     /// Creates a range covering the last <paramref name="days"/> days (inclusive of today).
     /// </summary>
-    public static DateRange LastDays(int days) => new(DateTime.Today.AddDays(-(days - 1)), DateTime.Today);
+    public static DateRangeModel LastDays(int days) => new(DateTime.Today.AddDays(-(days - 1)), DateTime.Today);
 
     /// <summary>
     /// Represents "all time" (no filtering).
     /// </summary>
-    public static DateRange All => new(null, null);
+    public static DateRangeModel All => new(null, null);
 
     /// <summary>
     /// Gets whether this range applies no date filtering.

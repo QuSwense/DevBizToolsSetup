@@ -5,7 +5,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// surfaced separately for easy visibility and testing. Embedded fields (e.g.
 /// base64 blobs) are flagged and given a decoded preview.
 /// </summary>
-public class SoapParsedField
+public class SoapParsedFieldModel
 {
     /// <summary>Display name of the field (usually the XML/JSON element name).</summary>
     public string Name { get; set; } = "";

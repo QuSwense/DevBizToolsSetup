@@ -10,24 +10,24 @@ namespace OrbitHub.SoapApplications.Services;
 public class SoapTestCaseStore(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly List<SoapTestCase> _testCases = [];
+    private readonly List<SoapTestCaseModel> _testCases = [];
 
     /// <summary>All test cases, ordered by application then file name.</summary>
-    public IReadOnlyList<SoapTestCase> TestCases => [.. _testCases.OrderBy(t => t.AppName).ThenBy(t => t.FileName).ThenBy(t => t.Name)];
+    public IReadOnlyList<SoapTestCaseModel> TestCases => [.. _testCases.OrderBy(t => t.AppName).ThenBy(t => t.FileName).ThenBy(t => t.Name)];
 
     /// <summary>Returns enabled test cases attached to a specific file.</summary>
-    public IReadOnlyList<SoapTestCase> GetEnabledForFile(string appName, string fileName)
+    public IReadOnlyList<SoapTestCaseModel> GetEnabledForFile(string appName, string fileName)
         => [.. _testCases.Where(t => t.AppName == appName && t.FileName == fileName && t.Enabled)];
 
     /// <summary>Returns all test cases attached to a specific file (any enabled state).</summary>
-    public IReadOnlyList<SoapTestCase> GetForFile(string appName, string fileName)
+    public IReadOnlyList<SoapTestCaseModel> GetForFile(string appName, string fileName)
         => [.. _testCases.Where(t => t.AppName == appName && t.FileName == fileName)];
 
     /// <summary>Returns a test case by id, or null.</summary>
-    public SoapTestCase? GetTestCase(string id) => _testCases.FirstOrDefault(t => t.Id == id);
+    public SoapTestCaseModel? GetTestCase(string id) => _testCases.FirstOrDefault(t => t.Id == id);
 
     /// <summary>Adds a test case and persists to the in-memory catalog.</summary>
-    public Task AddTestCaseAsync(SoapTestCase testCase)
+    public Task AddTestCaseAsync(SoapTestCaseModel testCase)
     {
         _testCases.RemoveAll(t => t.Id == testCase.Id);
         _testCases.Add(testCase);
@@ -35,7 +35,7 @@ public class SoapTestCaseStore(IServiceProvider serviceProvider)
     }
 
     /// <summary>Updates an existing test case in memory.</summary>
-    public Task UpdateTestCaseAsync(SoapTestCase testCase)
+    public Task UpdateTestCaseAsync(SoapTestCaseModel testCase)
     {
         var existing = _testCases.FirstOrDefault(t => t.Id == testCase.Id);
         if (existing is null)
@@ -65,7 +65,7 @@ public class SoapTestCaseStore(IServiceProvider serviceProvider)
     }
 
     /// <summary>Writes all test cases to the in-memory catalog (full replacement).</summary>
-    public Task PersistAllAsync(IReadOnlyList<SoapTestCase> testCases)
+    public Task PersistAllAsync(IReadOnlyList<SoapTestCaseModel> testCases)
     {
         _testCases.Clear();
         _testCases.AddRange(testCases);

@@ -61,7 +61,7 @@ public partial class RequestFiles : IDisposable
     private bool _hasError;
     private string? _errorMessage;
 
-    private List<GridColumn<SoapRequestFile>> _columns = [];
+    private List<GridColumn<SoapRequestFileModel>> _columns = [];
     private HashSet<string> _expandedActionRows = [];
 
     private bool _showUploadModal = false;
@@ -89,9 +89,9 @@ public partial class RequestFiles : IDisposable
     private DateTime? _filterCreatedDateTo;
 
     private string[] _availableApps => [.. _appStore.Apps.Select(a => a.Name).OrderBy(a => a)];
-    private SoapApiEntry[] _availableOperations =>
+    private SoapApiEntryModel[] _availableOperations =>
         _appStore.Apps.FirstOrDefault(a => a.Name == _uploadAppName)?.Apis ?? [];
-    private SoapApiEntry[] EditAvailableOperations =>
+    private SoapApiEntryModel[] EditAvailableOperations =>
         _appStore.Apps.FirstOrDefault(a => a.Name == _editAppName)?.Apis ?? [];
 
     /// <summary>
@@ -99,7 +99,7 @@ public partial class RequestFiles : IDisposable
     /// operations plus the file's currently saved operation when it is no longer part of
     /// the app's operation list, so the select always shows the bound value.
     /// </summary>
-    private SoapApiEntry[] EditOperationOptions
+    private SoapApiEntryModel[] EditOperationOptions
     {
         get
         {
@@ -111,16 +111,16 @@ public partial class RequestFiles : IDisposable
 
             return ops.Any(o => o.Name == _editApiPath)
                 ? ops
-                : [.. ops, new SoapApiEntry { Name = _editApiPath, Description = "Previously selected operation" }];
+                : [.. ops, new SoapApiEntryModel { Name = _editApiPath, Description = "Previously selected operation" }];
         }
     }
 
-    private SoapRequestFile[] _files = [];
-    private ServiceHubGrid<SoapRequestFile>? _grid;
+    private SoapRequestFileModel[] _files = [];
+    private ServiceHubGrid<SoapRequestFileModel>? _grid;
     private HashSet<string> _selectedIds = [];
 
     private bool _showEditModal = false;
-    private SoapRequestFile? _editingFile = null;
+    private SoapRequestFileModel? _editingFile = null;
     private string _editFileName = "";
     private string _editAppName = "";
     private string _editApiPath = "";
@@ -134,20 +134,20 @@ public partial class RequestFiles : IDisposable
 
     // ── Execution state ──
     private bool _showExecutionProgress = false;
-    private SoapExecutionGroup? _activeGroup;
+    private SoapExecutionGroupModel? _activeGroup;
     private bool _executionFinished = false;
 
     // ── Test-case management state ──
     private bool _showTestCasesModal = false;
-    private SoapRequestFile? _tcFile;
-    private SoapTestCase[] _fileTestCases = [];
+    private SoapRequestFileModel? _tcFile;
+    private SoapTestCaseModel[] _fileTestCases = [];
 
     private bool _showTestCaseModal = false;
-    private SoapTestCase? _editingTestCase;
+    private SoapTestCaseModel? _editingTestCase;
     private string _tcName = "";
     private string _tcDescription = "";
     private bool _tcEnabled = true;
-    private List<SoapExtractor> _tcExtractors = [];
+    private List<SoapExtractorModel> _tcExtractors = [];
     private List<string> _tcValidationErrors = [];
 
     private static string GetVerbFromOperation(string operationName)
@@ -313,7 +313,7 @@ public partial class RequestFiles : IDisposable
     // ── Execution ──
 
     /// <summary>Executes a single request file (row action).</summary>
-    private async Task ExecuteFileAsync(SoapRequestFile file)
+    private async Task ExecuteFileAsync(SoapRequestFileModel file)
         => await ExecuteFilesAsync([file]);
 
     /// <summary>Executes all selected request files (Actions dropdown).</summary>
@@ -334,7 +334,7 @@ public partial class RequestFiles : IDisposable
     /// simulated engine while showing per-file stage progress, persists the group
     /// and navigates to the Execute &amp; History page with the group selected.
     /// </summary>
-    private async Task ExecuteFilesAsync(IReadOnlyList<SoapRequestFile> files)
+    private async Task ExecuteFilesAsync(IReadOnlyList<SoapRequestFileModel> files)
     {
         if (files.Count == 0)
         {
@@ -343,7 +343,7 @@ public partial class RequestFiles : IDisposable
         }
 
         var blocked = files.Where(f =>
-            _appStore.Apps.FirstOrDefault(a => a.Name == f.AppName)?.Status == AppStatus.Disabled).ToArray();
+            _appStore.Apps.FirstOrDefault(a => a.Name == f.AppName)?.Status == EAppStatus.Disabled).ToArray();
         if (blocked.Length > 0)
         {
             ShowToast($"Execution blocked — {blocked.Length} file(s) belong to a disabled application", "danger");
@@ -355,7 +355,7 @@ public partial class RequestFiles : IDisposable
         _executionFinished = false;
         _showExecutionProgress = true;
 
-        var progress = new Progress<SoapExecutionGroup>(g =>
+        var progress = new Progress<SoapExecutionGroupModel>(g =>
         {
             _activeGroup = g;
             _executionFinished = g.Status != "running";
@@ -378,17 +378,17 @@ public partial class RequestFiles : IDisposable
     }
 
     /// <summary>Navigates to the per-file execution history for a request file.</summary>
-    private void NavigateToFileHistory(SoapRequestFile file)
+    private void NavigateToFileHistory(SoapRequestFileModel file)
         => _nav.NavigateTo($"/soap/execute-history?file={Uri.EscapeDataString(file.FileName)}&app={Uri.EscapeDataString(file.AppName)}");
 
     /// <summary>Navigates to the generic file editor for a request file.</summary>
-    private void NavigateToEditor(SoapRequestFile file)
+    private void NavigateToEditor(SoapRequestFileModel file)
         => _nav.NavigateTo($"/file/editor?app={Uri.EscapeDataString(file.AppName)}&file={Uri.EscapeDataString(file.FileName)}");
 
     // ── Test cases ──
 
     /// <summary>Opens the test-case list modal for a request file.</summary>
-    private void OpenTestCasesModal(SoapRequestFile file)
+    private void OpenTestCasesModal(SoapRequestFileModel file)
     {
         _tcFile = file;
         _fileTestCases = [.. _testCaseStore.GetForFile(file.AppName, file.FileName)];
@@ -412,13 +412,13 @@ public partial class RequestFiles : IDisposable
         _showTestCaseModal = true;
     }
 
-    private void OpenEditTestCase(SoapTestCase testCase)
+    private void OpenEditTestCase(SoapTestCaseModel testCase)
     {
         _editingTestCase = testCase;
         _tcName = testCase.Name;
         _tcDescription = testCase.Description;
         _tcEnabled = testCase.Enabled;
-        _tcExtractors = [.. testCase.Extractors.Select(e => new SoapExtractor
+        _tcExtractors = [.. testCase.Extractors.Select(e => new SoapExtractorModel
         {
             Id = e.Id,
             Name = e.Name,
@@ -431,7 +431,7 @@ public partial class RequestFiles : IDisposable
         _showTestCaseModal = true;
     }
 
-    private static SoapExtractor NewExtractor() => new()
+    private static SoapExtractorModel NewExtractor() => new SoapExtractorModel()
     {
         Id = $"ex-{Guid.NewGuid():N}"[..10],
         Name = "",
@@ -492,7 +492,7 @@ public partial class RequestFiles : IDisposable
         }
         else
         {
-            var testCase = new SoapTestCase
+            var testCase = new SoapTestCaseModel
             {
                 Id = $"tc-{Guid.NewGuid():N}"[..12],
                 Name = _tcName.Trim(),
@@ -514,7 +514,7 @@ public partial class RequestFiles : IDisposable
         ShowToast(_editingTestCase is null ? "Test case created" : "Test case updated");
     }
 
-    private async Task ToggleTestCase(SoapTestCase testCase)
+    private async Task ToggleTestCase(SoapTestCaseModel testCase)
     {
         testCase.Enabled = !testCase.Enabled;
         testCase.UpdatedBy = CurrentUser;
@@ -526,7 +526,7 @@ public partial class RequestFiles : IDisposable
         }
     }
 
-    private async Task DeleteTestCaseAsync(SoapTestCase testCase)
+    private async Task DeleteTestCaseAsync(SoapTestCaseModel testCase)
     {
         var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete test case '{testCase.Name}'?");
         if (!confirmed)
@@ -541,7 +541,7 @@ public partial class RequestFiles : IDisposable
 
     // ── Progress stage helpers ──
 
-    private static string GetStageState(SoapExecutionFile file, ExecutionStage stage)
+    private static string GetStageState(SoapExecutionFileModel file, EExecutionStage stage)
     {
         var index = (int)stage;
         if (file.StagesCompleted > index)
@@ -551,15 +551,15 @@ public partial class RequestFiles : IDisposable
         return (int)file.Stage == index ? "active" : "pending";
     }
 
-    private static string GetStageLabel(ExecutionStage stage) => stage switch
+    private static string GetStageLabel(EExecutionStage stage) => stage switch
     {
-        ExecutionStage.Queued => "Queued",
-        ExecutionStage.BuildingRequest => "Building",
-        ExecutionStage.SendingRequest => "Sending",
-        ExecutionStage.AwaitingResponse => "Awaiting",
-        ExecutionStage.ParsingResponse => "Parsing",
-        ExecutionStage.RunningTestCases => "Tests",
-        ExecutionStage.Complete => "Complete",
+        EExecutionStage.Queued => "Queued",
+        EExecutionStage.BuildingRequest => "Building",
+        EExecutionStage.SendingRequest => "Sending",
+        EExecutionStage.AwaitingResponse => "Awaiting",
+        EExecutionStage.ParsingResponse => "Parsing",
+        EExecutionStage.RunningTestCases => "Tests",
+        EExecutionStage.Complete => "Complete",
         _ => stage.ToString()
     };
 
@@ -635,7 +635,7 @@ public partial class RequestFiles : IDisposable
         var verb = GetVerbFromOperation(_uploadApiPath);
         var now = DateTime.Now;
 
-        var newFiles = validFiles.Select(f => new SoapRequestFile(
+        var newFiles = validFiles.Select(f => new SoapRequestFileModel(
             f.FileName.Trim(),
             _uploadAppName.Trim(),
             _uploadApiPath.Trim(),
@@ -677,7 +677,7 @@ public partial class RequestFiles : IDisposable
     // ── Row Actions ──
 
 
-    private void OpenEditDialog(SoapRequestFile file)
+    private void OpenEditDialog(SoapRequestFileModel file)
     {
         _editingFile = file;
         _editFileName = file.FileName;
@@ -723,7 +723,7 @@ public partial class RequestFiles : IDisposable
 
         _files = [.._files.Select(f =>
             f.FileName == originalName
-                ? new SoapRequestFile(
+                ? new SoapRequestFileModel(
                     _editFileName.Trim(),
                     _editAppName.Trim(),
                     _editApiPath.Trim(),
@@ -744,7 +744,7 @@ public partial class RequestFiles : IDisposable
         ShowToast("Request file updated");
     }
 
-    private async Task ToggleFileStatus(SoapRequestFile file)
+    private async Task ToggleFileStatus(SoapRequestFileModel file)
     {
         var newStatus = file.Status == "active" ? "inactive" : "active";
         _files = [.._files.Select(f =>
@@ -756,7 +756,7 @@ public partial class RequestFiles : IDisposable
         ShowToast(newStatus == "active" ? "Request file enabled" : "Request file disabled");
     }
 
-    private async Task DeleteFileAsync(SoapRequestFile file)
+    private async Task DeleteFileAsync(SoapRequestFileModel file)
     {
         var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete request file '{file.FileName}'? This cannot be undone.");
         if (!confirmed) return;
@@ -823,7 +823,7 @@ public partial class RequestFiles : IDisposable
         ShowToast($"{files.Length} request file(s) exported as JSON");
     }
 
-    private static string BuildCsvRow(SoapRequestFile f)
+    private static string BuildCsvRow(SoapRequestFileModel f)
     {
         var fields = new[]
         {
@@ -927,7 +927,7 @@ public partial class RequestFiles : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private SoapRequestFile[] FilteredFiles
+    private SoapRequestFileModel[] FilteredFiles
     {
         get
         {

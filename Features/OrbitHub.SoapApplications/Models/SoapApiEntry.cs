@@ -1,6 +1,6 @@
 namespace OrbitHub.SoapApplications.Models;
 
-public class SoapApiEntry
+public class SoapApiEntryModel
 {
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";

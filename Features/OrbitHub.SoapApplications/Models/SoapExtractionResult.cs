@@ -1,10 +1,10 @@
 namespace OrbitHub.SoapApplications.Models;
 
 /// <summary>
-/// The outcome of running a single <see cref="SoapExtractor"/> against a
+/// The outcome of running a single <see cref="SoapExtractorModel"/> against a
 /// request/response payload during an execution.
 /// </summary>
-public class SoapExtractionResult
+public class SoapExtractionResultModel
 {
     public string ExtractorId { get; set; } = "";
 

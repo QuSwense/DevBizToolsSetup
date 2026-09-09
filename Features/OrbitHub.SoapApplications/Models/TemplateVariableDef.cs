@@ -3,7 +3,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// <summary>
 /// Describes a variable extracted from a template for the dynamic form.
 /// </summary>
-public class TemplateVariableDef
+public class TemplateVariableDefModel
 {
     public string Name { get; set; } = "";
     public string Label { get; set; } = "";

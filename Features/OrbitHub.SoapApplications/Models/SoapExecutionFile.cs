@@ -6,7 +6,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// A single request file inside an execution group, capturing its request/response
 /// payloads, parsed fields, test-case extractions and execution logs.
 /// </summary>
-public class SoapExecutionFile
+public class SoapExecutionFileModel
 {
     /// <summary>Request file name (matches the Request Files page).</summary>
     public string FileName { get; set; } = "";
@@ -21,7 +21,7 @@ public class SoapExecutionFile
     public string Status { get; set; } = "queued";
 
     /// <summary>Current stage of the execution pipeline.</summary>
-    public ExecutionStage Stage { get; set; } = ExecutionStage.Queued;
+    public EExecutionStage Stage { get; set; } = EExecutionStage.Queued;
 
     /// <summary>Number of pipeline stages completed so far.</summary>
     public int StagesCompleted { get; set; }
@@ -42,11 +42,11 @@ public class SoapExecutionFile
     public string ResponseMimeType { get; set; } = "text/xml";
 
     /// <summary>Fields parsed out of the request/response for separate visibility.</summary>
-    public List<SoapParsedField> ParsedFields { get; set; } = [];
+    public List<SoapParsedFieldModel> ParsedFields { get; set; } = [];
 
     /// <summary>Results of running attached test-case extractors.</summary>
-    public List<SoapExtractionResult> Extractions { get; set; } = [];
+    public List<SoapExtractionResultModel> Extractions { get; set; } = [];
 
     /// <summary>Execution log entries (info/warning/error/request/response/assertion).</summary>
-    public List<SoapExecutionLog> Logs { get; set; } = [];
+    public List<SoapExecutionLogModel> Logs { get; set; } = [];
 }

@@ -15,17 +15,17 @@ public partial class WsdlSyncOverview
     /// <summary>
     /// Gets or sets the WSDL sync records.
     /// </summary>
-    [Parameter] public IReadOnlyList<WsdlSyncRecord> Records { get; set; } = [];
+    [Parameter] public IReadOnlyList<WsdlSyncRecordModel> Records { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the WSDL version snapshots.
     /// </summary>
-    [Parameter] public IReadOnlyList<WsdlVersionEntry> Versions { get; set; } = [];
+    [Parameter] public IReadOnlyList<WsdlVersionEntryModel> Versions { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the WSDL sync history time series.
     /// </summary>
-    [Parameter] public IReadOnlyList<WsdlSyncHistoryPoint> SyncHistory { get; set; } = [];
+    [Parameter] public IReadOnlyList<WsdlSyncHistoryPointModel> SyncHistory { get; set; } = [];
 
     /// <summary>
     /// Gets or sets whether the card is collapsed to its summary view.
@@ -37,11 +37,11 @@ public partial class WsdlSyncOverview
     /// </summary>
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
-    private DateRange _range = DateRange.LastDays(7);
+    private DateRangeModel _range = DateRangeModel.LastDays(7);
 
-    private void ApplyRange(DateRange? range) => _range = range ?? DateRange.LastDays(7);
+    private void ApplyRange(DateRangeModel? range) => _range = range ?? DateRangeModel.LastDays(7);
 
-    private List<GridColumn<WsdlSyncRecord>> _columns = [];
+    private List<GridColumn<WsdlSyncRecordModel>> _columns = [];
 
     private int SyncedCount => Records.Count(r => r.Status.Equals("synced", StringComparison.OrdinalIgnoreCase));
     private int FailedCount => Records.Count(r => r.Status.Equals("failed", StringComparison.OrdinalIgnoreCase));

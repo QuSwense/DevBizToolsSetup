@@ -4,7 +4,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// A template for generating SOAP request files with {{var_name}} placeholders.
 /// A template can extend another template to inherit its content and variables.
 /// </summary>
-public class WsdlTemplate
+public class WsdlTemplateModel
 {
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";

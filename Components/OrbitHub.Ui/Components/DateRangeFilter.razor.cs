@@ -17,12 +17,12 @@ public partial class DateRangeFilter
     /// <summary>
     /// Gets or sets the currently applied date range.
     /// </summary>
-    [Parameter] public DateRange? Value { get; set; }
+    [Parameter] public DateRangeModel? Value { get; set; }
 
     /// <summary>
     /// Invoked when the user applies or clears a date range.
     /// </summary>
-    [Parameter] public EventCallback<DateRange?> ValueChanged { get; set; }
+    [Parameter] public EventCallback<DateRangeModel?> ValueChanged { get; set; }
 
     private DateTime? _startValue;
     private DateTime? _endValue;
@@ -50,13 +50,13 @@ public partial class DateRangeFilter
             return Value?.IsAll == true;
         }
 
-        var expected = DateRange.LastDays(preset.Days);
+        var expected = DateRangeModel.LastDays(preset.Days);
         return Value?.Start == expected.Start && Value?.End == expected.End;
     }
 
     private void ApplyPreset(Preset preset)
     {
-        var range = preset.Days == 0 ? DateRange.All : DateRange.LastDays(preset.Days);
+        var range = preset.Days == 0 ? DateRangeModel.All : DateRangeModel.LastDays(preset.Days);
         _startValue = range.Start;
         _endValue = range.End;
         _ = ValueChanged.InvokeAsync(range);
@@ -64,13 +64,13 @@ public partial class DateRangeFilter
 
     private void Apply()
     {
-        _ = ValueChanged.InvokeAsync(new DateRange(_startValue, _endValue));
+        _ = ValueChanged.InvokeAsync(new DateRangeModel(_startValue, _endValue));
     }
 
     private void Clear()
     {
         _startValue = null;
         _endValue = null;
-        _ = ValueChanged.InvokeAsync(DateRange.All);
+        _ = ValueChanged.InvokeAsync(DateRangeModel.All);
     }
 }

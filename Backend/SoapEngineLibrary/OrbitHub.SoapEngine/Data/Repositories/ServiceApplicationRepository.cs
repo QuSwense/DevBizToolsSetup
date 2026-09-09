@@ -2,6 +2,7 @@ namespace ServiceHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
+using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.TestManagement.Models;
 using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
@@ -78,11 +79,11 @@ public class ServiceApplicationRepository(
         var dto = result.Data;
         return new ServiceApplication
         {
-            Id = dto.ServiceApplicationId!.Value,
-            PublicId = dto.PublicId!.Value,
-            ServiceType = dto.ServiceType!,
-            Name = dto.Name!,
-            BaseUrl = dto.BaseUrl!,
+            Id = dto.InternalId ?? throw new InvalidOperationException("SP did not return a ServiceApplicationId."),
+            PublicId = dto.PublicId ?? Guid.Empty,
+            ServiceType = dto.ServiceType ?? "SOAP",
+            Name = dto.Name ?? string.Empty,
+            BaseUrl = dto.BaseUrl ?? string.Empty,
             DefinitionType = dto.DefinitionType,
             DefinitionRelativeUrl = dto.DefinitionRelativeUrl,
             HealthcheckRelativeUrl = dto.HealthcheckRelativeUrl,

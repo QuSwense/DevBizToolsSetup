@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the HTTP methods supported for REST service operations.
 /// Maps to CK_ServiceOperations_HttpMethod: 'GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'.
 /// </summary>
-public enum HttpMethodType
+public enum EHttpMethodType
 {
     /// <summary>GET — retrieve a resource.</summary>
     GET = 0,

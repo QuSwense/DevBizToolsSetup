@@ -5,18 +5,18 @@ using OrbitHub.Common.Helpers;
 /// <summary>
 /// Strongly-typed helper for EnumResources
 /// </summary>
-public class EnumResources : BaseResourceManager
+public class EnumResourcesModel : BaseResourceManager
 {
-    private static readonly Lazy<EnumResources> _instance = new(
-        () => new EnumResources(),
+    private static readonly Lazy<EnumResourcesModel> _instance = new(
+        () => new EnumResourcesModel(),
         LazyThreadSafetyMode.ExecutionAndPublication
     );
 
-    private EnumResources() : base(nameof(EnumResources))
+    private EnumResourcesModel() : base("EnumResources")
     {
     }
 
-    public static EnumResources Instance => _instance.Value;
+    public static EnumResourcesModel Instance => _instance.Value;
 
     // Resource properties
     public string WelcomeMessage => GetString(nameof(WelcomeMessage));

@@ -49,7 +49,7 @@ else if (_allApps.Length == 0)
 else
 {
     @* ── Loading Grid ── *@
-    <ServiceHubGrid TItem="SoapApp"
+    <ServiceHubGrid TItem="SoapAppModel"
                     @ref="_grid"
                     Id="soapAppsGrid"
                     Items="FilteredApps"
@@ -147,7 +147,7 @@ else
 
     <RowActions Context="app">
         @{
-            var isEnabled = app.Status == AppStatus.Enabled;
+            var isEnabled = app.Status == EAppStatus.Enabled;
         }
         <div class="row-actions-wrap blazor-managed@(_expandedActionRows.Contains(app.Id) ? " is-open" : "")">
             <button class="action-trigger" type="button" aria-label="More actions" data-tooltip="More actions"
@@ -181,7 +181,7 @@ else
 
     <DetailRow Context="app">
         @{
-            var isEnabled = app.Status == AppStatus.Enabled;
+            var isEnabled = app.Status == EAppStatus.Enabled;
         }
         <div class="detail-grid">
             <div>
@@ -220,11 +220,11 @@ else
                     <span class="d-inline-flex align-items-center fs-10 fw-semibold text-sh-accent" style="height:20px;padding:0 7px;background:var(--sh-accent-soft);border:1px solid var(--sh-border)">
                         @(app.Auth.Type switch
                         {
-                            AuthType.None => "None",
-                            AuthType.Basic => "Basic",
-                            AuthType.ApiKey => "API Key",
-                            AuthType.Bearer => "Bearer",
-                            AuthType.Ntlm => "NTLM",
+                            EAuthType.None => "None",
+                            EAuthType.Basic => "Basic",
+                            EAuthType.ApiKey => "API Key",
+                            EAuthType.Bearer => "Bearer",
+                            EAuthType.Ntlm => "NTLM",
                             _ => app.Auth.Type.ToString()
                         })
                     </span>
@@ -235,12 +235,12 @@ else
                 <div class="detail-value">
                     @(app.Auth.Type switch
                     {
-                        AuthType.None => "—",
-                        AuthType.ApiKey => app.Auth.KeyName,
-                        AuthType.Bearer => "Token configured",
+                        EAuthType.None => "—",
+                        EAuthType.ApiKey => app.Auth.KeyName,
+                        EAuthType.Bearer => "Token configured",
                         _ => string.IsNullOrEmpty(app.Auth.Username) ? "—" : app.Auth.Username
                     })
-                    @if (app.Auth.Type == AuthType.Ntlm && !string.IsNullOrEmpty(app.Auth.Domain))
+                    @if (app.Auth.Type == EAuthType.Ntlm && !string.IsNullOrEmpty(app.Auth.Domain))
                     {
                         <span class="text-sh-faint">(@app.Auth.Domain)</span>
                     }
@@ -374,8 +374,8 @@ else
                 <div class="form-group">
                     <label class="form-label">Status</label>
                     <select class="form-control-dg" @bind="_newAppStatus">
-                        <option value="@AppStatus.Enabled">Enabled</option>
-                        <option value="@AppStatus.Disabled">Disabled</option>
+                        <option value="@EAppStatus.Enabled">Enabled</option>
+                        <option value="@EAppStatus.Disabled">Disabled</option>
                     </select>
                 </div>
 
@@ -386,15 +386,15 @@ else
                 <div class="form-group">
                     <label class="form-label">Auth Type</label>
                     <select class="form-control-dg" @bind="_newAuth.Type">
-                        <option value="@AuthType.None">No Authentication</option>
-                        <option value="@AuthType.Basic">Basic Auth</option>
-                        <option value="@AuthType.ApiKey">API Key</option>
-                        <option value="@AuthType.Bearer">Bearer Token</option>
-                        <option value="@AuthType.Ntlm">NTLM</option>
+                        <option value="@EAuthType.None">No Authentication</option>
+                        <option value="@EAuthType.Basic">Basic Auth</option>
+                        <option value="@EAuthType.ApiKey">API Key</option>
+                        <option value="@EAuthType.Bearer">Bearer Token</option>
+                        <option value="@EAuthType.Ntlm">NTLM</option>
                     </select>
                 </div>
 
-                @if (_newAuth.Type == AuthType.Basic)
+                @if (_newAuth.Type == EAuthType.Basic)
                 {
                     <div class="form-group">
                         <label class="form-label">Username <span class="text-danger">*</span></label>
@@ -407,7 +407,7 @@ else
                                @bind="_newAuth.Password" @bind:event="oninput" />
                     </div>
                 }
-                else if (_newAuth.Type == AuthType.ApiKey)
+                else if (_newAuth.Type == EAuthType.ApiKey)
                 {
                     <div class="form-group">
                         <label class="form-label">Key Name <span class="text-danger">*</span></label>
@@ -420,7 +420,7 @@ else
                                @bind="_newAuth.KeyValue" @bind:event="oninput" />
                     </div>
                 }
-                else if (_newAuth.Type == AuthType.Bearer)
+                else if (_newAuth.Type == EAuthType.Bearer)
                 {
                     <div class="form-group">
                         <label class="form-label">Token <span class="text-danger">*</span></label>
@@ -428,7 +428,7 @@ else
                                @bind="_newAuth.Token" @bind:event="oninput" />
                     </div>
                 }
-                else if (_newAuth.Type == AuthType.Ntlm)
+                else if (_newAuth.Type == EAuthType.Ntlm)
                 {
                     <div class="form-group">
                         <label class="form-label">Username <span class="text-danger">*</span></label>

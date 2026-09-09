@@ -59,10 +59,10 @@ public partial class RecentActivity
     /// </summary>
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
-    private DateRange _range = DateRange.LastDays(7);
+    private DateRangeModel _range = DateRangeModel.LastDays(7);
     private string _userFilter = string.Empty;
 
-    private void ApplyRange(DateRange? range) => _range = range ?? DateRange.LastDays(7);
+    private void ApplyRange(DateRangeModel? range) => _range = range ?? DateRangeModel.LastDays(7);
 
     private IEnumerable<ActivityEntry> Filtered =>
         Activities

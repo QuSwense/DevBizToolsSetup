@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the types of UI action elements available on pages.
 /// Maps to UIActions.ActionType: 'Button', 'MenuItem', 'Tab', 'Link'.
 /// </summary>
-public enum UiActionType
+public enum EUiActionType
 {
     /// <summary>A button element.</summary>
     Button = 0,

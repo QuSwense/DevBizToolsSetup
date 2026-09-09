@@ -13,7 +13,7 @@ public partial class TemplatesOverview
     /// <summary>
     /// Gets or sets the request-file templates to display.
     /// </summary>
-    [Parameter] public IReadOnlyList<WsdlTemplate> Templates { get; set; } = [];
+    [Parameter] public IReadOnlyList<WsdlTemplateModel> Templates { get; set; } = [];
 
     /// <summary>
     /// Gets or sets whether the card is collapsed to its summary view.
@@ -25,7 +25,7 @@ public partial class TemplatesOverview
     /// </summary>
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
-    private List<GridColumn<WsdlTemplate>> _columns = [];
+    private List<GridColumn<WsdlTemplateModel>> _columns = [];
 
     private int ExtendingCount => Templates.Count(t => !string.IsNullOrEmpty(t.ExtendsTemplateId));
     private int TotalVariables => Templates.Sum(t => t.Variables.Length);

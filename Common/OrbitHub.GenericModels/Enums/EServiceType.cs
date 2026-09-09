@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the type of service application.
 /// Maps to CK_ServiceApplications_ServiceType: 'SOAP', 'REST'.
 /// </summary>
-public enum ServiceType
+public enum EServiceType
 {
     /// <summary>SOAP (Simple Object Access Protocol) service application.</summary>
     SOAP = 0,

@@ -4,7 +4,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// A single WSDL sync status point used for time-series timeline visualization.
 /// Dates are stored as "yyyy-MM-dd" strings (relative to today in mock data).
 /// </summary>
-public class WsdlSyncHistoryPoint
+public class WsdlSyncHistoryPointModel
 {
     public string Id { get; set; } = "";
     public string AppId { get; set; } = "";

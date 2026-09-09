@@ -3,7 +3,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// <summary>
 /// A SOAP request file associated with an application.
 /// </summary>
-public record SoapRequestFile(
+public record SoapRequestFileModel(
     string FileName,
     string AppName,
     string ApiPath,

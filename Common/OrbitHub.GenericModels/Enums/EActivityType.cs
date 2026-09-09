@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the types of user activities tracked in audit logs.
 /// Maps to UserActivities.ActivityType: 'Login', 'FeatureUsage'.
 /// </summary>
-public enum ActivityType
+public enum EActivityType
 {
     /// <summary>User login activity.</summary>
     Login = 0,

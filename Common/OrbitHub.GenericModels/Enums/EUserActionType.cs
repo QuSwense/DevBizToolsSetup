@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines granular user action types for activity logging.
 /// Maps to UserActivities.ActionType: 'Click', 'View', 'Edit'.
 /// </summary>
-public enum UserActionType
+public enum EUserActionType
 {
     /// <summary>User clicked on an element.</summary>
     Click = 0,

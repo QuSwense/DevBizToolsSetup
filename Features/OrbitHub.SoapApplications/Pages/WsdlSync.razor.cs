@@ -143,7 +143,7 @@ public partial class WsdlSync
             .OrderByDescending(r => r.UploadedAt)
             .FirstOrDefault();
 
-        WsdlSyncRecord record;
+        WsdlSyncRecordModel record;
         int nextVersionNumber;
         if (existingRecord is not null)
         {
@@ -164,7 +164,7 @@ public partial class WsdlSync
         }
         else
         {
-            record = new WsdlSyncRecord
+            record = new WsdlSyncRecordModel
             {
                 Id = $"wsdl-{Guid.NewGuid():N}"[..10],
                 AppId = app.Id,
@@ -182,7 +182,7 @@ public partial class WsdlSync
         }
 
         // Create version with auto-generated label
-        var version = new WsdlVersionEntry
+        var version = new WsdlVersionEntryModel
         {
             Id = $"wv-{Guid.NewGuid():N}"[..10],
             SyncRecordId = record.Id,
@@ -406,7 +406,7 @@ public partial class WsdlSync
                 if (parent is not null) parentName = parent.Name;
             }
 
-            _wsdlStore.Templates.Add(new WsdlTemplate
+            _wsdlStore.Templates.Add(new WsdlTemplateModel
             {
                 Id = $"tpl-{Guid.NewGuid():N}"[..10],
                 Name = _editTplName,
@@ -671,7 +671,7 @@ public partial class WsdlSync
                 .Select(v => v.VersionNumber)
                 .DefaultIfEmpty(0)
                 .Max();
-            var rollback = new WsdlVersionEntry
+            var rollback = new WsdlVersionEntryModel
             {
                 Id = $"wv-{Guid.NewGuid():N}"[..10],
                 SyncRecordId = record.Id,

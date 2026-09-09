@@ -5,7 +5,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Maps to CK_ServiceRequestFiles_Format / CK_ServiceResponseFiles_Format / CK_BinaryEmbeddingsStore_Format:
 /// 'XML', 'JSON', 'PDF', 'BINARY'.
 /// </summary>
-public enum FileFormat
+public enum EFileFormat
 {
     /// <summary>XML (Extensible Markup Language) format.</summary>
     XML = 0,

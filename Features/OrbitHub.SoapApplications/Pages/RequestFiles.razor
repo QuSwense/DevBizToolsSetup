@@ -64,7 +64,7 @@ else if (_files.Length == 0)
 }
 else
 {
-    <ServiceHubGrid TItem="SoapRequestFile"
+    <ServiceHubGrid TItem="SoapRequestFileModel"
                     Id="requestFilesGrid"
                     @ref="_grid"
                     Items="FilteredFiles"
@@ -350,7 +350,7 @@ else
                             </span>
                         </div>
                         <div class="exec-stage-strip">
-                            @foreach (var stage in Enum.GetValues<ExecutionStage>())
+                            @foreach (var stage in Enum.GetValues<EExecutionStage>())
                             {
                                 var state = GetStageState(file, stage);
                                 <div class="exec-stage exec-stage-@state" title="@GetStageLabel(stage)">

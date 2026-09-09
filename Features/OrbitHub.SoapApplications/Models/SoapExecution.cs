@@ -5,7 +5,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// Timestamps are stored as strings ("yyyy-MM-dd HH:mm:ss") because System.Text.Json
 /// does not parse the space-separated format directly into DateTime.
 /// </summary>
-public record SoapExecution(
+public record SoapExecutionModel(
     string Id,
     string AppName,
     string AppType,

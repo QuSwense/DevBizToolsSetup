@@ -3,7 +3,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// <summary>
 /// Represents a WSDL sync record linking a SOAP application to its WSDL source.
 /// </summary>
-public class WsdlSyncRecord
+public class WsdlSyncRecordModel
 {
     public string Id { get; set; } = "";
     public string AppId { get; set; } = "";

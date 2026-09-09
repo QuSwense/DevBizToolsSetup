@@ -51,13 +51,13 @@ public partial class Applications : IDisposable
         builder.CloseElement();
     }
 
-    private List<GridColumn<SoapApp>> _columns = [];
+    private List<GridColumn<SoapAppModel>> _columns = [];
 
     // ── Loading / Error State ──
     private bool _isLoading = true;
     private bool _hasError;
     private string? _errorMessage;
-    private SoapApp[] _allApps = [];
+    private SoapAppModel[] _allApps = [];
 
     private string _searchText = "";
     private string _filterName = "";
@@ -77,16 +77,16 @@ public partial class Applications : IDisposable
     private string _newAppUrl = "";
     private string _newAppWsdlPath = "";
     private string _newAppDescription = "";
-    private AppStatus _newAppStatus = AppStatus.Enabled;
-    private SoapAuthConfig _newAuth = new() { Type = AuthType.Basic };
-    private List<SoapApiEntry> _newApis = [];
+    private EAppStatus _newAppStatus = EAppStatus.Enabled;
+    private SoapAuthConfigModel _newAuth = new() { Type = EAuthType.Basic };
+    private List<SoapApiEntryModel> _newApis = [];
     private bool _showDropdown = false;
     private HashSet<string> _expandedActionRows = [];
     private HashSet<string> _selectedIds = [];
-    private SoapApp? _editingApp = null;
+    private SoapAppModel? _editingApp = null;
     private string _sortColumn = "";
     private bool _sortAscending = true;
-    private ServiceHubGrid<SoapApp>? _grid;
+    private ServiceHubGrid<SoapAppModel>? _grid;
     private string? _toastMessage;
     private string _toastType = "success";
     private CancellationTokenSource? _toastCts;
@@ -139,8 +139,8 @@ public partial class Applications : IDisposable
                 Field = a => a.Status,
                 Template = context => builder =>
                 {
-                    var badgeClass = context.Status == AppStatus.Enabled ? "status-enabled" : "status-disabled";
-                    var label = context.Status == AppStatus.Enabled ? "Enabled" : "Disabled";
+                    var badgeClass = context.Status == EAppStatus.Enabled ? "status-enabled" : "status-disabled";
+                    var label = context.Status == EAppStatus.Enabled ? "Enabled" : "Disabled";
                     builder.OpenElement(0, "span");
                     builder.AddAttribute(1, "class", $"status-badge {badgeClass}");
                     builder.AddContent(2, label);
@@ -188,7 +188,7 @@ public partial class Applications : IDisposable
         _errorMessage = null;
     }
 
-    private SoapApp[] FilteredApps
+    private SoapAppModel[] FilteredApps
     {
         get
         {
@@ -208,7 +208,7 @@ public partial class Applications : IDisposable
                 query = query.Where(a => a.Name.ToLower().Contains(_filterName.ToLower()));
             if (!string.IsNullOrWhiteSpace(_filterUrl))
                 query = query.Where(a => a.BaseUrl.ToLower().Contains(_filterUrl.ToLower()));
-            if (!string.IsNullOrWhiteSpace(_filterStatus) && Enum.TryParse<AppStatus>(_filterStatus, true, out var statusFilter))
+            if (!string.IsNullOrWhiteSpace(_filterStatus) && Enum.TryParse<EAppStatus>(_filterStatus, true, out var statusFilter))
                 query = query.Where(a => a.Status == statusFilter);
             if (!string.IsNullOrWhiteSpace(_filterUpdatedBy))
                 query = query.Where(a => a.UpdatedBy != null &&
@@ -247,7 +247,7 @@ public partial class Applications : IDisposable
         _currentPage = 1;
     }
 
-    private void OpenEditDialog(SoapApp app)
+    private void OpenEditDialog(SoapAppModel app)
     {
         _editingApp = app;
         _newAppName = app.Name;
@@ -255,7 +255,7 @@ public partial class Applications : IDisposable
         _newAppWsdlPath = app.WsdlPath;
         _newAppDescription = app.Description;
         _newAppStatus = app.Status;
-        _newAuth = new SoapAuthConfig
+        _newAuth = new SoapAuthConfigModel
         {
             Type = app.Auth.Type,
             Username = app.Auth.Username,
@@ -327,7 +327,7 @@ public partial class Applications : IDisposable
 
         if (_editingApp is not null)
         {
-            var updatedApp = new SoapApp(
+            var updatedApp = new SoapAppModel(
                 _editingApp.Id,
                 _newAppName.Trim(),
                 _newAppUrl.Trim(),
@@ -346,7 +346,7 @@ public partial class Applications : IDisposable
         else
         {
             var newId = $"s{_appStore.Apps.Length + 1}";
-            var newApp = new SoapApp(
+            var newApp = new SoapAppModel(
                 newId,
                 _newAppName.Trim(),
                 _newAppUrl.Trim(),
@@ -371,7 +371,7 @@ public partial class Applications : IDisposable
 
     private void AddApiEntry()
     {
-        _newApis.Add(new SoapApiEntry());
+        _newApis.Add(new SoapApiEntryModel());
     }
 
     private void RemoveApiEntry(int index)
@@ -386,37 +386,37 @@ public partial class Applications : IDisposable
         _newAppUrl = "";
         _newAppWsdlPath = "";
         _newAppDescription = "";
-        _newAppStatus = AppStatus.Enabled;
-        _newAuth = new SoapAuthConfig { Type = AuthType.Basic };
+        _newAppStatus = EAppStatus.Enabled;
+        _newAuth = new SoapAuthConfigModel { Type = EAuthType.Basic };
         _newApis = [];
     }
 
     /// <summary>
-    /// Builds a <see cref="SoapAuthConfig"/> from the current form state,
-    /// populating only the fields relevant to the selected <see cref="AuthType"/>.
+    /// Builds a <see cref="SoapAuthConfigModel"/> from the current form state,
+    /// populating only the fields relevant to the selected <see cref="EAuthType"/>.
     /// </summary>
-    private SoapAuthConfig BuildAuthConfig()
+    private SoapAuthConfigModel BuildAuthConfig()
     {
-        var auth = new SoapAuthConfig { Type = _newAuth.Type };
+        var auth = new SoapAuthConfigModel { Type = _newAuth.Type };
         switch (_newAuth.Type)
         {
-            case AuthType.Basic:
+            case EAuthType.Basic:
                 auth.Username = _newAuth.Username?.Trim();
                 auth.Password = _newAuth.Password?.Trim();
                 break;
-            case AuthType.ApiKey:
+            case EAuthType.ApiKey:
                 auth.KeyName = _newAuth.KeyName?.Trim();
                 auth.KeyValue = _newAuth.KeyValue?.Trim();
                 break;
-            case AuthType.Bearer:
+            case EAuthType.Bearer:
                 auth.Token = _newAuth.Token?.Trim();
                 break;
-            case AuthType.Ntlm:
+            case EAuthType.Ntlm:
                 auth.Username = _newAuth.Username?.Trim();
                 auth.Password = _newAuth.Password?.Trim();
                 auth.Domain = _newAuth.Domain?.Trim();
                 break;
-            case AuthType.None:
+            case EAuthType.None:
                 break;
         }
         return auth;
@@ -447,9 +447,9 @@ public partial class Applications : IDisposable
 
     // ── Context Menu ──
 
-    private Task<List<ContextMenuItem>> GetAppContextMenuItems(SoapApp app)
+    private Task<List<ContextMenuItem>> GetAppContextMenuItems(SoapAppModel app)
     {
-        var isEnabled = app.Status == AppStatus.Enabled;
+        var isEnabled = app.Status == EAppStatus.Enabled;
         return Task.FromResult(new List<ContextMenuItem>
         {
             new() { Action = "view", Label = "View Details", Icon = "bi-eye" },
@@ -463,7 +463,7 @@ public partial class Applications : IDisposable
         });
     }
 
-    private async Task HandleContextMenuAction((string action, SoapApp app) e)
+    private async Task HandleContextMenuAction((string action, SoapAppModel app) e)
     {
         switch (e.action)
         {
@@ -488,9 +488,9 @@ public partial class Applications : IDisposable
         }
     }
 
-    private void ToggleAppStatus(SoapApp app)
+    private void ToggleAppStatus(SoapAppModel app)
     {
-        var newStatus = app.Status == AppStatus.Enabled ? AppStatus.Disabled : AppStatus.Enabled;
+        var newStatus = app.Status == EAppStatus.Enabled ? EAppStatus.Disabled : EAppStatus.Enabled;
         var updated = app with
         {
             Status = newStatus,
@@ -499,10 +499,10 @@ public partial class Applications : IDisposable
         };
         _appStore.UpdateApps([.. _appStore.Apps.Select(a => a.Id == app.Id ? updated : a)]);
         _allApps = _appStore.Apps;
-        ShowToast(newStatus == AppStatus.Enabled ? "Application enabled" : "Application disabled");
+        ShowToast(newStatus == EAppStatus.Enabled ? "Application enabled" : "Application disabled");
     }
 
-    private async Task DeleteAppAsync(SoapApp app)
+    private async Task DeleteAppAsync(SoapAppModel app)
     {
         // Request files are not yet backed by a database table — previously counted from
         // mock JSON. TODO: count from MSSQL (SoapRequestFiles) once the schema exists.
@@ -533,7 +533,7 @@ public partial class Applications : IDisposable
     /// cases (persisted) and WSDL sync records + versions. Execution history is
     /// intentionally kept as a historical record.
     /// </summary>
-    private async Task CascadeDeleteAppAsync(SoapApp app)
+    private async Task CascadeDeleteAppAsync(SoapAppModel app)
     {
         // Request files are not yet backed by a database table — previously deleted via
         // mock JSON. TODO: delete from MSSQL (SoapRequestFiles) once the schema exists.
@@ -551,7 +551,7 @@ public partial class Applications : IDisposable
         _wsdlStore.Versions.RemoveAll(v => recordsToRemove.Contains(v.SyncRecordId));
     }
 
-    private async Task CopyRowAsync(SoapApp app, bool asCsv)
+    private async Task CopyRowAsync(SoapAppModel app, bool asCsv)
     {
         try
         {
@@ -566,11 +566,11 @@ public partial class Applications : IDisposable
     }
 
     /// <summary>Returns a copy of the app with secret auth values redacted.</summary>
-    private static SoapApp ToRedacted(SoapApp app)
+    private static SoapAppModel ToRedacted(SoapAppModel app)
     {
         return app with
         {
-            Auth = new SoapAuthConfig
+            Auth = new SoapAuthConfigModel
             {
                 Type = app.Auth.Type,
                 Username = app.Auth.Username,
@@ -584,11 +584,11 @@ public partial class Applications : IDisposable
     }
 
     /// <summary>Serializes the row as JSON, redacting secret auth values.</summary>
-    private static string BuildJsonRow(SoapApp app)
+    private static string BuildJsonRow(SoapAppModel app)
         => JsonSerializer.Serialize(ToRedacted(app), new JsonSerializerOptions { WriteIndented = true });
 
     /// <summary>Builds a single CSV line from the safe (non-secret) row fields.</summary>
-    private static string BuildCsvRow(SoapApp app)
+    private static string BuildCsvRow(SoapAppModel app)
     {
         var fields = new[]
         {

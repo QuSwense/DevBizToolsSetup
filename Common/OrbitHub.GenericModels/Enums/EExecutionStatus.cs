@@ -5,7 +5,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Maps to CK_ServiceTestSuiteExecutionAuditTestCaseLinks_ExecutionStatus:
 /// 'Pending', 'InProgress', 'Completed', 'Failed'.
 /// </summary>
-public enum ExecutionStatus
+public enum EExecutionStatus
 {
     /// <summary>Execution is queued and pending start.</summary>
     Pending = 0,

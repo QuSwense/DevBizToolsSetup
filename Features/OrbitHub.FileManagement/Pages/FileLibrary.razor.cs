@@ -42,13 +42,13 @@ public partial class FileLibrary
         builder.CloseElement();
     }
 
-    private List<GridColumn<FileItem>> _columns = [];
+    private List<GridColumn<FileItemModel>> _columns = [];
 
     // ── Loading / Error / Empty State ──
     private bool _isLoading = true;
     private bool _hasError;
     private string? _errorMessage;
-    private FileItem[] _allFiles = [];
+    private FileItemModel[] _allFiles = [];
 
     // ── Grid state ──
     private string _searchText = "";
@@ -56,7 +56,7 @@ public partial class FileLibrary
     private string _sortColumn = "";
     private bool _sortAscending = true;
     private HashSet<string> _selectedIds = [];
-    private ServiceHubGrid<FileItem>? _grid;
+    private ServiceHubGrid<FileItemModel>? _grid;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,18 +73,18 @@ public partial class FileLibrary
                     var file = context;
                     var typeColor = file.Type switch
                     {
-                        FileType.Json => "var(--sh-success)",
-                        FileType.Xml => "var(--sh-warning)",
-                        FileType.Wsdl => "var(--sh-accent)",
-                        FileType.Pdf => "var(--sh-error)",
+                        EFileType.Json => "var(--sh-success)",
+                        EFileType.Xml => "var(--sh-warning)",
+                        EFileType.Wsdl => "var(--sh-accent)",
+                        EFileType.Pdf => "var(--sh-error)",
                         _ => "var(--sh-text-faint)"
                     };
                     var icon = file.Type switch
                     {
-                        FileType.Json => "bi-filetype-json",
-                        FileType.Xml => "bi-filetype-xml",
-                        FileType.Wsdl => "bi-filetype-xml",
-                        FileType.Pdf => "bi-filetype-pdf",
+                        EFileType.Json => "bi-filetype-json",
+                        EFileType.Xml => "bi-filetype-xml",
+                        EFileType.Wsdl => "bi-filetype-xml",
+                        EFileType.Pdf => "bi-filetype-pdf",
                         _ => "bi-file-earmark-code"
                     };
                     builder.OpenElement(0, "div");
@@ -122,10 +122,10 @@ public partial class FileLibrary
                 {
                     var badgeClass = context.Type switch
                     {
-                        FileType.Json => "type-badge-json",
-                        FileType.Xml => "type-badge-xml",
-                        FileType.Wsdl => "type-badge-wsdl",
-                        FileType.Pdf => "type-badge-pdf",
+                        EFileType.Json => "type-badge-json",
+                        EFileType.Xml => "type-badge-xml",
+                        EFileType.Wsdl => "type-badge-wsdl",
+                        EFileType.Pdf => "type-badge-pdf",
                         _ => "type-badge-other"
                     };
                     builder.OpenElement(0, "span");
@@ -183,7 +183,7 @@ public partial class FileLibrary
                     Id = "1",
                     FileName = "payment_create_001.json",
                     AppName = "PaymentService",
-                    Type = FileType.Json,
+                    Type = EFileType.Json,
                     Size = "2.4 KB",
                     LinkedTo = "PaymentService /payments POST"
                 },
@@ -192,7 +192,7 @@ public partial class FileLibrary
                     Id = "2",
                     FileName = "user_list_filter.xml",
                     AppName = "UserManagement",
-                    Type = FileType.Xml,
+                    Type = EFileType.Xml,
                     Size = "1.8 KB",
                     LinkedTo = "UserManagement /users GET"
                 },
@@ -201,7 +201,7 @@ public partial class FileLibrary
                     Id = "3",
                     FileName = "invoice_create.xml",
                     AppName = "LegacyBilling",
-                    Type = FileType.Xml,
+                    Type = EFileType.Xml,
                     Size = "3.1 KB",
                     LinkedTo = "LegacyBilling CreateInvoice POST"
                 },
@@ -210,7 +210,7 @@ public partial class FileLibrary
                     Id = "4",
                     FileName = "stock_update_003.json",
                     AppName = "InventoryAPI",
-                    Type = FileType.Json,
+                    Type = EFileType.Json,
                     Size = "1.2 KB",
                     LinkedTo = "InventoryAPI /stock PUT"
                 }
@@ -233,7 +233,7 @@ public partial class FileLibrary
         _errorMessage = null;
     }
 
-    private FileItem[] FilteredFiles
+    private FileItemModel[] FilteredFiles
     {
         get
         {
@@ -266,17 +266,17 @@ public partial class FileLibrary
         }
     }
 
-    private void HandleViewFile(FileItem file)
+    private void HandleViewFile(FileItemModel file)
     {
         Nav.NavigateTo($"/file/viewer?app={file.AppName}&file={file.FileName}");
     }
 
-    private void HandleDownloadFile(FileItem file)
+    private void HandleDownloadFile(FileItemModel file)
     {
         // Placeholder for download — no logic change
     }
 
-    private void HandleDeleteFile(FileItem file)
+    private void HandleDeleteFile(FileItemModel file)
     {
         // Placeholder for delete — no logic change
     }

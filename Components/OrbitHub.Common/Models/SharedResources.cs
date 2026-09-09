@@ -5,18 +5,18 @@ using OrbitHub.Common.Helpers;
 /// <summary>
 /// Auto-generated or manually created resource accessor with lazy loading
 /// </summary>
-public class SharedResources : BaseResourceManager
+public class SharedResourcesModel : BaseResourceManager
 {
-    private static readonly Lazy<SharedResources> _instance = new(
-        () => new SharedResources(),
+    private static readonly Lazy<SharedResourcesModel> _instance = new(
+        () => new SharedResourcesModel(),
         LazyThreadSafetyMode.ExecutionAndPublication
     );
 
-    private SharedResources() : base(nameof(SharedResources))
+    private SharedResourcesModel() : base("SharedResources")
     {
     }
 
-    public static SharedResources Instance => _instance.Value;
+    public static SharedResourcesModel Instance => _instance.Value;
 
     // Resource properties
     public string WelcomeMessage => GetString(nameof(WelcomeMessage));

@@ -18,13 +18,13 @@ public partial class SoapOverview
 
     private bool _isLoading = true;
 
-    private SoapApp[] Apps = [];
-    private WsdlSyncRecord[] Records = [];
-    private WsdlVersionEntry[] Versions = [];
-    private WsdlSyncHistoryPoint[] SyncHistory = [];
-    private WsdlTemplate[] Templates = [];
-    private SoapExecution[] Executions = [];
-    private SoapRequestFile[] Files = [];
+    private SoapAppModel[] Apps = [];
+    private WsdlSyncRecordModel[] Records = [];
+    private WsdlVersionEntryModel[] Versions = [];
+    private WsdlSyncHistoryPointModel[] SyncHistory = [];
+    private WsdlTemplateModel[] Templates = [];
+    private SoapExecutionModel[] Executions = [];
+    private SoapRequestFileModel[] Files = [];
 
     // Per-card expand/collapse state, persisted to localStorage via JS interop.
     // Cards default to collapsed (compact summary) so the page stays short.

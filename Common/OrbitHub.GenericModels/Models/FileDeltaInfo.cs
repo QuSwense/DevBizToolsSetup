@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Models;
 /// Represents a file in a delta chain — either a base snapshot or a differential delta.
 /// Used by ServiceRequestFiles and ServiceResponseFiles.
 /// </summary>
-public sealed record FileDeltaInfo
+public sealed record FileDeltaInfoModel
 {
     /// <summary>True if this is a complete full payload snapshot; false for differential delta.</summary>
     public bool IsBaseSnapshot { get; init; } = true;

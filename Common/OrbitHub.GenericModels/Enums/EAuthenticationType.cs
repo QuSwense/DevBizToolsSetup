@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the authentication types supported for service application credentials.
 /// Maps to CK_ServiceAppAuthentications_Type: 'Basic', 'NTLM', 'APIKey', 'OAuth2', 'Bearer', 'Custom'.
 /// </summary>
-public enum AuthenticationType
+public enum EAuthenticationType
 {
     /// <summary>Basic HTTP authentication (username/password).</summary>
     Basic = 0,

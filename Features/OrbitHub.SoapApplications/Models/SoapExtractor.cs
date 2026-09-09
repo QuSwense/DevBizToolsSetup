@@ -6,7 +6,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// simulated PDF text/field extraction) and optionally asserts it equals
 /// <see cref="ExpectedValue"/>.
 /// </summary>
-public class SoapExtractor
+public class SoapExtractorModel
 {
     public string Id { get; set; } = "";
 

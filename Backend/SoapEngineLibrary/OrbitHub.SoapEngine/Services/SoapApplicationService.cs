@@ -31,13 +31,13 @@ public class SoapApplicationService(
     IValidator<ConfigureAuthInput> configureAuthValidator,
     IValidator<CreateManualOperationInput> manualOpValidator)
 {
-    public async Task<Result<List<ParsedWsdlOperationDto>>> InspectWsdlOperationsAsync(
+    public async Task<ResultModel<List<ParsedWsdlOperationDto>>> InspectWsdlOperationsAsync(
         InspectWsdlInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = inspectWsdlValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<List<ParsedWsdlOperationDto>>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<List<ParsedWsdlOperationDto>>.Failure(string.Join("; ", validation.Errors));
 
         try
         {
@@ -54,7 +54,7 @@ public class SoapApplicationService(
             }
             else
             {
-                return Result<List<ParsedWsdlOperationDto>>.Failure("Either WsdlUrl or WsdlFileStream must be provided.");
+                return ResultModel<List<ParsedWsdlOperationDto>>.Failure("Either WsdlUrl or WsdlFileStream must be provided.");
             }
 
             var parsedMetadata = wsdlParser.ParseContent(wsdlContent);
@@ -67,23 +67,23 @@ public class SoapApplicationService(
                 TargetNamespace = op.TargetNamespace
             }).ToList();
 
-            return Result<List<ParsedWsdlOperationDto>>.Success(operations);
+            return ResultModel<List<ParsedWsdlOperationDto>>.Success(operations);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error occurred while inspecting WSDL.");
-            return Result<List<ParsedWsdlOperationDto>>.Failure($"Failed to parse WSDL: {ex.Message}");
+            return ResultModel<List<ParsedWsdlOperationDto>>.Failure($"Failed to parse WSDL: {ex.Message}");
         }
     }
 
     // ---------- Application CRUD ----------
-    public async Task<Result<ServiceApplication>> CreateFullApplicationAsync(
+    public async Task<ResultModel<ServiceApplication>> CreateFullApplicationAsync(
         CreateFullApplicationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = createFullValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<ServiceApplication>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<ServiceApplication>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Creating full SOAP Application: {AppName}", input.AppName);
 
@@ -100,7 +100,7 @@ public class SoapApplicationService(
 
         var appResult = await RegisterApplicationAsync(regInput, cancellationToken);
         if (!appResult.IsSuccess)
-            return Result<ServiceApplication>.Failure(appResult.ErrorMessage!);
+            return ResultModel<ServiceApplication>.Failure(appResult.ErrorMessage!);
 
         var createdApp = appResult.Data!;
 
@@ -132,16 +132,16 @@ public class SoapApplicationService(
             await CreateManualOperationAsync(manualInput, cancellationToken);
         }
 
-        return Result<ServiceApplication>.Success(createdApp);
+        return ResultModel<ServiceApplication>.Success(createdApp);
     }
 
-    public async Task<Result<bool>> UpdateFullApplicationAsync(
+    public async Task<ResultModel<bool>> UpdateFullApplicationAsync(
         UpdateFullApplicationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = updateFullValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<bool>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<bool>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Updating full SOAP Application ID: {AppId}", input.AppId);
 
@@ -157,7 +157,7 @@ public class SoapApplicationService(
         };
         var editResult = await EditApplicationAsync(editInput, cancellationToken);
         if (!editResult.IsSuccess)
-            return Result<bool>.Failure(editResult.ErrorMessage!);
+            return ResultModel<bool>.Failure(editResult.ErrorMessage!);
 
         if (input.UpdateAuthentication && input.AuthType.HasValue && input.AuthCredentials is not null)
         {
@@ -202,17 +202,17 @@ public class SoapApplicationService(
             }
         }
 
-        return Result<bool>.Success(true);
+        return ResultModel<bool>.Success(true);
     }
 
     // ---------- Sub‑methods ----------
-    public async Task<Result<ServiceApplication>> RegisterApplicationAsync(
+    public async Task<ResultModel<ServiceApplication>> RegisterApplicationAsync(
         RegisterApplicationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = registerValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<ServiceApplication>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<ServiceApplication>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Registering SOAP Application: {AppName}", input.AppName);
 
@@ -255,22 +255,22 @@ public class SoapApplicationService(
             await SyncWsdlAsync(syncInput, cancellationToken);
         }
 
-        return Result<ServiceApplication>.Success(registeredApp);
+        return ResultModel<ServiceApplication>.Success(registeredApp);
     }
 
-    public async Task<Result<bool>> EditApplicationAsync(
+    public async Task<ResultModel<bool>> EditApplicationAsync(
         EditApplicationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = editValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<bool>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<bool>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Editing SOAP Application ID: {AppId}", input.AppId);
 
         var existingApp = await appRepository.GetByIdAsync(input.AppId, cancellationToken);
         if (existingApp is null)
-            return Result<bool>.Failure($"SOAP Application with ID {input.AppId} not found.");
+            return ResultModel<bool>.Failure($"SOAP Application with ID {input.AppId} not found.");
 
         existingApp.Name = input.AppName;
         existingApp.BaseUrl = input.BaseUrl;
@@ -281,16 +281,16 @@ public class SoapApplicationService(
         existingApp.LastUpdatedBy = input.UpdatedBy;
 
         await appRepository.UpdateAsync(existingApp, cancellationToken);
-        return Result<bool>.Success(true);
+        return ResultModel<bool>.Success(true);
     }
 
-    public async Task<Result<ServiceDefinitionSync>> SyncWsdlAsync(
+    public async Task<ResultModel<ServiceDefinitionSync>> SyncWsdlAsync(
         SyncWsdlInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = syncWsdlValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<ServiceDefinitionSync>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<ServiceDefinitionSync>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Syncing WSDL for Application ID: {AppId}", input.AppId);
 
@@ -307,7 +307,7 @@ public class SoapApplicationService(
         }
         else
         {
-            return Result<ServiceDefinitionSync>.Failure("Either WsdlFileStream or WsdlUrl must be provided.");
+            return ResultModel<ServiceDefinitionSync>.Failure("Either WsdlFileStream or WsdlUrl must be provided.");
         }
 
         var parsedMetadata = wsdlParser.ParseContent(wsdlContent);
@@ -327,16 +327,16 @@ public class SoapApplicationService(
         };
 
         var savedSync = await definitionSyncRepository.SaveDefinitionSyncAsync(definitionSync, parsedMetadata, input.ChangeComment, cancellationToken);
-        return Result<ServiceDefinitionSync>.Success(savedSync);
+        return ResultModel<ServiceDefinitionSync>.Success(savedSync);
     }
 
-    public async Task<Result<ServiceRequestFile>> UploadRequestFileStreamAsync(
+    public async Task<ResultModel<ServiceRequestFile>> UploadRequestFileStreamAsync(
         UploadRequestFileInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = uploadValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<ServiceRequestFile>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<ServiceRequestFile>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Uploading Request File {FileName} for Operation ID: {OperationId}", input.FileName, input.OperationId);
 
@@ -362,7 +362,7 @@ public class SoapApplicationService(
                 CreatedBy = input.CreatedBy
             };
             var savedFile = await requestFileRepository.AddAsync(requestFile, cancellationToken);
-            return Result<ServiceRequestFile>.Success(savedFile);
+            return ResultModel<ServiceRequestFile>.Success(savedFile);
         }
         else
         {
@@ -386,17 +386,17 @@ public class SoapApplicationService(
                 backwardDiffData,
                 cancellationToken);
 
-            return Result<ServiceRequestFile>.Success(existingFile);
+            return ResultModel<ServiceRequestFile>.Success(existingFile);
         }
     }
 
-    public async Task<Result<bool>> ConfigureAuthenticationAsync(
+    public async Task<ResultModel<bool>> ConfigureAuthenticationAsync(
         ConfigureAuthInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = configureAuthValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<bool>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<bool>.Failure(string.Join("; ", validation.Errors));
 
         string encryptedCredentialsJson = encryptionService.EncryptObject(input.Credentials);
 
@@ -410,16 +410,16 @@ public class SoapApplicationService(
         };
 
         await appRepository.SaveAuthenticationAsync(authEntity, input.AppId, cancellationToken);
-        return Result<bool>.Success(true);
+        return ResultModel<bool>.Success(true);
     }
 
-    public async Task<Result<ServiceOperation>> CreateManualOperationAsync(
+    public async Task<ResultModel<ServiceOperation>> CreateManualOperationAsync(
         CreateManualOperationInput input,
         CancellationToken cancellationToken = default)
     {
         var validation = manualOpValidator.Validate(input);
         if (!validation.IsValid)
-            return Result<ServiceOperation>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<ServiceOperation>.Failure(string.Join("; ", validation.Errors));
 
         logger.LogInformation("Manually adding operation '{OpName}' to App ID: {AppId}", input.OperationName, input.AppId);
 
@@ -441,7 +441,7 @@ public class SoapApplicationService(
             rawXsdSchema: input.RawXsdSchema,
             cancellationToken: cancellationToken);
 
-        return Result<ServiceOperation>.Success(createdOperation);
+        return ResultModel<ServiceOperation>.Success(createdOperation);
     }
 
     // ---------- Query Methods (Data Retrieval) ----------

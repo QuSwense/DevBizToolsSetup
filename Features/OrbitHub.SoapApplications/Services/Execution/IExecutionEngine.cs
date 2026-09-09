@@ -14,14 +14,14 @@ public interface IExecutionEngine
     /// Creates a new execution group for the given request files with a unique
     /// group id (even a single file gets its own group).
     /// </summary>
-    SoapExecutionGroup CreateGroup(IReadOnlyList<SoapRequestFile> files, string triggeredBy);
+    SoapExecutionGroupModel CreateGroup(IReadOnlyList<SoapRequestFileModel> files, string triggeredBy);
 
     /// <summary>
     /// Executes the group, advancing each file through the pipeline stages and
     /// reporting progress after each stage. Mutates the supplied group.
     /// </summary>
     Task RunAsync(
-        SoapExecutionGroup group,
-        IProgress<SoapExecutionGroup>? progress = null,
+        SoapExecutionGroupModel group,
+        IProgress<SoapExecutionGroupModel>? progress = null,
         CancellationToken cancellationToken = default);
 }

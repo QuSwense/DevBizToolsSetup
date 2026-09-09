@@ -59,7 +59,7 @@ public partial class MonacoEditorToolbar
     [Parameter] public IEnumerable<string> AvailableThemes { get; set; } = new[] { "vs-dark", "vs-light", "hc-black", "hc-light" };
 
     // ── Action Menu ──
-    [Parameter] public List<MenuGroup> ActionMenuGroups { get; set; } = DefaultActionMenuGroups();
+    [Parameter] public List<MenuGroupModel> ActionMenuGroups { get; set; } = DefaultActionMenuGroups();
     [Parameter] public EventCallback<string> OnActionMenuItem { get; set; }
 
     // ── Event callbacks ──
@@ -134,7 +134,7 @@ public partial class MonacoEditorToolbar
         };
     }
 
-    private static List<MenuGroup> DefaultActionMenuGroups()
+    private static List<MenuGroupModel> DefaultActionMenuGroups()
     {
         return
         [
@@ -143,7 +143,7 @@ public partial class MonacoEditorToolbar
                 Title = "File Operations",
                 Items =
                 [
-                    new() { Id = "new", Label = "New", Icon = "bi bi-file-earmark", Shortcut = "Ctrl+N" },
+                    new MenuItemModel() { Id = "new", Label = "New", Icon = "bi bi-file-earmark", Shortcut = "Ctrl+N" },
                     new() { Id = "open", Label = "Open", Icon = "bi bi-folder-open", Shortcut = "Ctrl+O" },
                     new() { Id = "recent", Label = "Recent Files", Icon = "bi bi-clock-history" },
                     new() { Id = "sep1", Label = "", IsSeparator = true },
@@ -152,52 +152,52 @@ public partial class MonacoEditorToolbar
                     new() { Id = "export", Label = "Export", Icon = "bi bi-box-arrow-up" },
                     new() { Id = "print", Label = "Print", Icon = "bi bi-printer", Shortcut = "Ctrl+P" },
                     new() { Id = "sep2", Label = "", IsSeparator = true },
-                    new() { Id = "close", Label = "Close", Icon = "bi bi-x", Shortcut = "Ctrl+W" }
+                    new MenuItemModel() { Id = "close", Label = "Close", Icon = "bi bi-x", Shortcut = "Ctrl+W" }
                 ]
             },
-            new()
+                new MenuGroupModel()
             {
                 Title = "Edit Operations",
                 Items =
                 [
-                    new() { Id = "undo", Label = "Undo", Icon = "bi bi-arrow-counterclockwise", Shortcut = "Ctrl+Z" },
+                    new MenuItemModel() { Id = "undo", Label = "Undo", Icon = "bi bi-arrow-counterclockwise", Shortcut = "Ctrl+Z" },
                     new() { Id = "redo", Label = "Redo", Icon = "bi bi-arrow-clockwise", Shortcut = "Ctrl+Y" },
                     new() { Id = "sep3", Label = "", IsSeparator = true },
                     new() { Id = "cut", Label = "Cut", Icon = "bi bi-scissors", Shortcut = "Ctrl+X" },
                     new() { Id = "copy", Label = "Copy", Icon = "bi bi-copy", Shortcut = "Ctrl+C" },
                     new() { Id = "paste", Label = "Paste", Icon = "bi bi-clipboard", Shortcut = "Ctrl+V" },
                     new() { Id = "select-all", Label = "Select All", Icon = "bi bi-ui-radios", Shortcut = "Ctrl+A" },
-                    new() { Id = "sep4", Label = "", IsSeparator = true },
+                    new MenuItemModel() { Id = "sep4", Label = "", IsSeparator = true },
                     new() { Id = "duplicate", Label = "Duplicate Line", Icon = "bi bi-files", Shortcut = "Shift+Alt+Down" },
                     new() { Id = "delete-line", Label = "Delete Line", Icon = "bi bi-trash", Shortcut = "Ctrl+Shift+K" },
                     new() { Id = "move-line-up", Label = "Move Line Up", Icon = "bi bi-arrow-up-short", Shortcut = "Alt+Up" },
-                    new() { Id = "move-line-down", Label = "Move Line Down", Icon = "bi bi-arrow-down-short", Shortcut = "Alt+Down" }
+                    new MenuItemModel() { Id = "move-line-down", Label = "Move Line Down", Icon = "bi bi-arrow-down-short", Shortcut = "Alt+Down" }
                 ]
             },
-            new()
+                new MenuGroupModel()
             {
                 Title = "Find & Replace",
                 Items =
                 [
-                    new() { Id = "find", Label = "Find", Icon = "bi bi-search", Shortcut = "Ctrl+F" },
+                    new MenuItemModel() { Id = "find", Label = "Find", Icon = "bi bi-search", Shortcut = "Ctrl+F" },
                     new() { Id = "find-next", Label = "Find Next", Icon = "bi bi-arrow-down", Shortcut = "F3" },
                     new() { Id = "find-prev", Label = "Find Previous", Icon = "bi bi-arrow-up", Shortcut = "Shift+F3" },
                     new() { Id = "replace", Label = "Replace", Icon = "bi bi-arrow-repeat", Shortcut = "Ctrl+H" },
                     new() { Id = "replace-all", Label = "Replace All", Icon = "bi bi-arrow-repeat-all" },
                     new() { Id = "sep5", Label = "", IsSeparator = true },
-                    new() { Id = "go-to-line", Label = "Go to Line", Icon = "bi bi-sign-turn-right", Shortcut = "Ctrl+G" },
+                    new MenuItemModel() { Id = "go-to-line", Label = "Go to Line", Icon = "bi bi-sign-turn-right", Shortcut = "Ctrl+G" },
                     new() { Id = "go-to-symbol", Label = "Go to Symbol", Icon = "bi bi-signpost-2", Shortcut = "Ctrl+Shift+O" }
                 ]
             },
-            new()
+                new MenuGroupModel()
             {
                 Title = "View & Appearance",
                 Items =
                 [
-                    new() { Id = "toggle-minimap", Label = "Toggle Minimap", Icon = "bi bi-map" },
+                    new MenuItemModel() { Id = "toggle-minimap", Label = "Toggle Minimap", Icon = "bi bi-map" },
                     new() { Id = "toggle-breadcrumbs", Label = "Toggle Breadcrumbs", Icon = "bi bi-signpost" },
                     new() { Id = "toggle-word-wrap", Label = "Toggle Word Wrap", Icon = "bi bi-text-wrap", Shortcut = "Alt+Z" },
-                    new() { Id = "sep6", Label = "", IsSeparator = true },
+                    new MenuItemModel() { Id = "sep6", Label = "", IsSeparator = true },
                     new() { Id = "theme-dark", Label = "Dark Theme", Icon = "bi bi-moon" },
                     new() { Id = "theme-light", Label = "Light Theme", Icon = "bi bi-sun" },
                     new() { Id = "theme-high-contrast", Label = "High Contrast", Icon = "bi bi-eye" }

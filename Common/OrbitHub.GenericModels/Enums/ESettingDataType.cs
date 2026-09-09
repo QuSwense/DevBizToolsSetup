@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the data types supported for global and user settings values.
 /// Maps to CK_GlobalSettings_DataType: 'String', 'Integer', 'Decimal', 'Boolean', 'Json', 'Xml', 'DateTime'.
 /// </summary>
-public enum SettingDataType
+public enum ESettingDataType
 {
     /// <summary>String value.</summary>
     String = 0,

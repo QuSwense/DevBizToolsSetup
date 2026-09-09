@@ -11,7 +11,7 @@ public record PdfButtonField(
     bool IsRequired,
     bool IsHidden,
     bool IsExportable,
-    ButtonType Type,
+    EButtonType Type,
     bool IsChecked,
     string OnStateExportValue,
     string? ActionTargetUrl

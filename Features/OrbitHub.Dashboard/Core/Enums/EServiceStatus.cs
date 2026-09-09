@@ -6,7 +6,7 @@ namespace OrbitHub.Dashboard.Core.Enums;
 /// Represents the operational status of a service tracked on the dashboard.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ServiceStatus
+public enum EServiceStatus
 {
     Unknown,
     Ok,

@@ -11,27 +11,27 @@ namespace OrbitHub.SoapApplications.Services;
 public class SoapExecutionStore(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly List<SoapExecutionGroup> _groups = [];
+    private readonly List<SoapExecutionGroupModel> _groups = [];
 
     /// <summary>All execution groups, newest first.</summary>
-    public IReadOnlyList<SoapExecutionGroup> Groups => [.. _groups.OrderByDescending(g => ParseDate(g.StartedAt))];
+    public IReadOnlyList<SoapExecutionGroupModel> Groups => [.. _groups.OrderByDescending(g => ParseDate(g.StartedAt))];
 
     /// <summary>Returns a single group by id, or null.</summary>
-    public SoapExecutionGroup? GetGroup(string id) => _groups.FirstOrDefault(g => g.Id == id);
+    public SoapExecutionGroupModel? GetGroup(string id) => _groups.FirstOrDefault(g => g.Id == id);
 
     /// <summary>
     /// Returns all groups that executed the given file (across applications),
     /// newest first.
     /// </summary>
-    public IReadOnlyList<SoapExecutionGroup> GetGroupsForFile(string fileName)
+    public IReadOnlyList<SoapExecutionGroupModel> GetGroupsForFile(string fileName)
         => [.. _groups.Where(g => g.Files.Any(f => f.FileName == fileName)).OrderByDescending(g => ParseDate(g.StartedAt))];
 
     /// <summary>Returns the per-file record for a file within a group, or null.</summary>
-    public SoapExecutionFile? GetFile(SoapExecutionGroup group, string fileName) =>
+    public SoapExecutionFileModel? GetFile(SoapExecutionGroupModel group, string fileName) =>
         group.Files.FirstOrDefault(f => f.FileName == fileName);
 
     /// <summary>Adds a group and persists to the in-memory catalog.</summary>
-    public Task AddGroupAsync(SoapExecutionGroup group)
+    public Task AddGroupAsync(SoapExecutionGroupModel group)
     {
         _groups.RemoveAll(g => g.Id == group.Id);
         _groups.Add(group);
@@ -39,7 +39,7 @@ public class SoapExecutionStore(IServiceProvider serviceProvider)
     }
 
     /// <summary>Updates an existing group in memory.</summary>
-    public Task UpdateGroupAsync(SoapExecutionGroup group)
+    public Task UpdateGroupAsync(SoapExecutionGroupModel group)
     {
         var index = _groups.FindIndex(g => g.Id == group.Id);
         if (index >= 0)

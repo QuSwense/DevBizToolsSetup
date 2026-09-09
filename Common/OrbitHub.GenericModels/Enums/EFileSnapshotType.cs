@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the file snapshot type for request/response file versioning.
 /// Maps to IsBaseSnapshot column semantics and stored procedure output: 'Base', 'Delta'.
 /// </summary>
-public enum FileSnapshotType
+public enum EFileSnapshotType
 {
     /// <summary>Complete full payload snapshot (base version).</summary>
     Base = 0,

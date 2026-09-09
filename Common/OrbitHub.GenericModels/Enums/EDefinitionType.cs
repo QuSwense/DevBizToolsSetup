@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the type of service definition used for a service application.
 /// Maps to CK_ServiceApplications_DefinitionType: 'WSDL', 'Swagger', 'OpenAPI'.
 /// </summary>
-public enum DefinitionType
+public enum EDefinitionType
 {
     /// <summary>WSDL (Web Services Description Language) — used for SOAP services.</summary>
     WSDL = 0,

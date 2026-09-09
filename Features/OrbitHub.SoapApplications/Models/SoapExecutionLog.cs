@@ -4,7 +4,7 @@ namespace OrbitHub.SoapApplications.Models;
 /// A single log entry produced while executing a SOAP request file.
 /// Timestamps are stored as "yyyy-MM-dd HH:mm:ss" strings.
 /// </summary>
-public class SoapExecutionLog
+public class SoapExecutionLogModel
 {
     /// <summary>Stable id for the log entry.</summary>
     public string Id { get; set; } = "";

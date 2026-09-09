@@ -147,8 +147,8 @@ public partial class Templates : IAsyncDisposable
     private DotNetObjectReference<Templates>? _monacoDotNetRef;
 
     // ── Application / Operation options ──
-    private SoapApp[] _availableApps => AppStore.Apps;
-    private SoapApp? _formSelectedApp => string.IsNullOrEmpty(_formModel.Category)
+    private SoapAppModel[] _availableApps => AppStore.Apps;
+    private SoapAppModel? _formSelectedApp => string.IsNullOrEmpty(_formModel.Category)
         ? null
         : _availableApps.FirstOrDefault(a =>
             string.Equals(a.Name, _formModel.Category, StringComparison.OrdinalIgnoreCase));

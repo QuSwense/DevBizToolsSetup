@@ -13,7 +13,7 @@ namespace OrbitHub.SoapApplications.Services;
 public class RequestExecutionStore(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private SoapExecution[]? _cached;
+    private SoapExecutionModel[]? _cached;
     private Task? _loadTask;
 
     /// <summary>
@@ -21,7 +21,7 @@ public class RequestExecutionStore(IServiceProvider serviceProvider)
     /// Callers must await <see cref="LoadExecutionsAsync"/> first so this renders from the
     /// in-memory cache instead of running synchronous database I/O inside the Blazor renderer.
     /// </summary>
-    public SoapExecution[] SoapExecutions => _cached ?? [];
+    public SoapExecutionModel[] SoapExecutions => _cached ?? [];
 
     /// <summary>
     /// Loads (once) and caches the SOAP executions from ServiceAppDbContext.
@@ -89,7 +89,7 @@ public class RequestExecutionStore(IServiceProvider serviceProvider)
                         ? fileInfo
                         : null;
 
-                    return new SoapExecution(
+                    return new SoapExecutionModel(
                         Id: $"ex-{audit.Id}",
                         AppName: file?.AppName ?? "soap",
                         AppType: "soap",
@@ -101,7 +101,7 @@ public class RequestExecutionStore(IServiceProvider serviceProvider)
                     );
                 })
                 .Where(e => e is not null)
-                .Cast<SoapExecution>()
+                .Cast<SoapExecutionModel>()
                 .OrderByDescending(e => e.TryGetTimestamp() ?? DateTime.MinValue)];
         }
         catch

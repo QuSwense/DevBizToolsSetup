@@ -16,7 +16,7 @@ namespace OrbitHub.SoapApplications.Services;
 public class SoapAppStore(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private SoapApp[]? _cached;
+    private SoapAppModel[]? _cached;
     private Task? _loadTask;
 
     /// <summary>
@@ -25,7 +25,7 @@ public class SoapAppStore(IServiceProvider serviceProvider)
     /// cache instead of blocking the Blazor renderer with sync-over-async database I/O
     /// (which deadlocks the page during prerendering).
     /// </summary>
-    public SoapApp[] Apps => _cached ?? [];
+    public SoapAppModel[] Apps => _cached ?? [];
 
     /// <summary>
     /// Loads (once) and caches the SOAP applications from the current view repositories.
@@ -39,7 +39,7 @@ public class SoapAppStore(IServiceProvider serviceProvider)
         _loadTask = null;
     }
 
-    public void UpdateApps(SoapApp[] apps) => _cached = apps;
+    public void UpdateApps(SoapAppModel[] apps) => _cached = apps;
 
     private async Task LoadAppsFromDataAsync()
     {
@@ -56,18 +56,18 @@ public class SoapAppStore(IServiceProvider serviceProvider)
             _cached = [..
                 applications
                     .Where(a => a.ServiceType.Equals("SOAP", StringComparison.OrdinalIgnoreCase))
-                    .Select(a => new SoapApp(
+                    .Select(a => new SoapAppModel(
                         Id: a.ServiceApplicationId,
                         Name: a.ServiceApplicationName,
                         BaseUrl: a.BaseUrl ?? string.Empty,
                         WsdlPath: a.DefinitionRelativeUrl ?? string.Empty,
                         Description: a.Description ?? string.Empty,
-                        Status: a.IsActive == true ? AppStatus.Enabled : AppStatus.Disabled,
+                        Status: a.IsActive == true ? EAppStatus.Enabled : EAppStatus.Disabled,
                         CreatedBy: a.ServiceAppCreatedBy ?? string.Empty,
                         CreatedAt: a.ServiceAppCreatedAt ?? DateTime.MinValue,
                         UpdatedBy: a.ServiceAppLastUpdatedBy,
                         UpdatedAt: a.ServiceAppLastUpdatedAt,
-                        Auth: new SoapAuthConfig { Type = ParseAuthType(a.AuthenticationType) },
+                        Auth: new SoapAuthConfigModel { Type = ParseAuthType(a.AuthenticationType) },
                         Apis: [.. BuildApIs(a, operationsByApp)]
                     ))];
         }
@@ -79,7 +79,7 @@ public class SoapAppStore(IServiceProvider serviceProvider)
         }
     }
 
-    private static IReadOnlyList<SoapApiEntry> BuildApIs(
+    private static IReadOnlyList<SoapApiEntryModel> BuildApIs(
         LatestServiceApplicationWithAuthView app,
         ILookup<string, ServiceOperationsSummaryView> operationsByApp)
     {
@@ -90,17 +90,17 @@ public class SoapAppStore(IServiceProvider serviceProvider)
             .ToArray();
 
         return names.Length == 0
-            ? [new SoapApiEntry { Name = app.ServiceApplicationName, Description = app.Description ?? string.Empty }]
-            : [.. names.Select(name => new SoapApiEntry { Name = name, Description = name })];
+            ? [new SoapApiEntryModel { Name = app.ServiceApplicationName, Description = app.Description ?? string.Empty }]
+            : [.. names.Select(name => new SoapApiEntryModel { Name = name, Description = name })];
     }
 
-    private static AuthType ParseAuthType(string? authenticationType) => authenticationType?.Trim() switch
+    private static EAuthType ParseAuthType(string? authenticationType) => authenticationType?.Trim() switch
     {
-        "Basic" => AuthType.Basic,
-        "Bearer" => AuthType.Bearer,
-        "ApiKey" => AuthType.ApiKey,
-        "Ntlm" => AuthType.Ntlm,
-        _ => AuthType.None
+        "Basic" => EAuthType.Basic,
+        "Bearer" => EAuthType.Bearer,
+        "ApiKey" => EAuthType.ApiKey,
+        "Ntlm" => EAuthType.Ntlm,
+        _ => EAuthType.None
     };
 
     private static List<T> ReadResult<T>(RepositoryResult<List<T>> result)
@@ -115,36 +115,36 @@ public class SoapAppStore(IServiceProvider serviceProvider)
 public class WsdlSyncStore(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private List<WsdlSyncRecord>? _records;
-    private List<WsdlVersionEntry>? _versions;
-    private List<WsdlTemplate>? _templates;
-    private List<WsdlSyncHistoryPoint>? _syncHistory;
+    private List<WsdlSyncRecordModel>? _records;
+    private List<WsdlVersionEntryModel>? _versions;
+    private List<WsdlTemplateModel>? _templates;
+    private List<WsdlSyncHistoryPointModel>? _syncHistory;
 
-    public List<WsdlSyncRecord> Records => _records ??= [];
-    public List<WsdlVersionEntry> Versions => _versions ??= [];
-    public List<WsdlTemplate> Templates => _templates ??= [];
-    public List<WsdlSyncHistoryPoint> SyncHistory => _syncHistory ??= [];
+    public List<WsdlSyncRecordModel> Records => _records ??= [];
+    public List<WsdlVersionEntryModel> Versions => _versions ??= [];
+    public List<WsdlTemplateModel> Templates => _templates ??= [];
+    public List<WsdlSyncHistoryPointModel> SyncHistory => _syncHistory ??= [];
 
     public Task SaveChangesAsync() => Task.CompletedTask;
 
-    public WsdlSyncRecord[] GetRecordsForApp(string appId) => [.. Records.Where(r => r.AppId == appId).OrderByDescending(r => r.UploadedAt)];
+    public WsdlSyncRecordModel[] GetRecordsForApp(string appId) => [.. Records.Where(r => r.AppId == appId).OrderByDescending(r => r.UploadedAt)];
 
-    public WsdlVersionEntry[] GetVersionsForSync(string syncId) => [.. Versions.Where(v => v.SyncRecordId == syncId).OrderByDescending(v => v.VersionNumber)];
+    public WsdlVersionEntryModel[] GetVersionsForSync(string syncId) => [.. Versions.Where(v => v.SyncRecordId == syncId).OrderByDescending(v => v.VersionNumber)];
 
-    public WsdlTemplate[] GetTemplates() => [.. Templates.OrderBy(t => t.Name)];
+    public WsdlTemplateModel[] GetTemplates() => [.. Templates.OrderBy(t => t.Name)];
 
-    public WsdlTemplate? GetTemplate(string id) => Templates.FirstOrDefault(t => t.Id == id);
+    public WsdlTemplateModel? GetTemplate(string id) => Templates.FirstOrDefault(t => t.Id == id);
 
-    public WsdlTemplate? ResolveEffectiveTemplate(WsdlTemplate template)
+    public WsdlTemplateModel? ResolveEffectiveTemplate(WsdlTemplateModel template)
     {
         if (string.IsNullOrEmpty(template.ExtendsTemplateId))
             return template;
         return GetTemplate(template.ExtendsTemplateId);
     }
 
-    public TemplateVariableDef[] ResolveVariables(WsdlTemplate template)
+    public TemplateVariableDefModel[] ResolveVariables(WsdlTemplateModel template)
     {
-        var allVars = new List<TemplateVariableDef>();
+        var allVars = new List<TemplateVariableDefModel>();
         var seen = new HashSet<string>();
 
         var current = template;
@@ -154,7 +154,7 @@ public class WsdlSyncStore(IServiceProvider serviceProvider)
             {
                 if (seen.Add(varName))
                 {
-                    allVars.Add(new TemplateVariableDef
+                    allVars.Add(new TemplateVariableDefModel
                     {
                         Name = varName,
                         Label = ToLabel(varName),
@@ -243,7 +243,7 @@ public class WsdlSyncStore(IServiceProvider serviceProvider)
         });
     }
 
-    public WsdlSyncHistoryPoint[] GetSyncHistoryForApp(string appId) => [.. SyncHistory.Where(h => h.AppId == appId).OrderByDescending(h => h.Date)];
+    public WsdlSyncHistoryPointModel[] GetSyncHistoryForApp(string appId) => [.. SyncHistory.Where(h => h.AppId == appId).OrderByDescending(h => h.Date)];
 
     public Task<string?> GetVersionContentAsync(string versionId)
     {
@@ -268,7 +268,7 @@ public class WsdlSyncStore(IServiceProvider serviceProvider)
         if (record is null)
             return Task.CompletedTask;
 
-        var version = new WsdlVersionEntry
+        var version = new WsdlVersionEntryModel
         {
             Id = $"wv-{Guid.NewGuid():N}"[..12],
             SyncRecordId = syncRecordId,
@@ -283,7 +283,7 @@ public class WsdlSyncStore(IServiceProvider serviceProvider)
         Versions.Add(version);
         if (_templates is not null)
         {
-            var template = _templates.FirstOrDefault(t => t.Id == record.Id) ?? new WsdlTemplate { Id = record.Id, Name = record.AppName, Content = content };
+            var template = _templates.FirstOrDefault(t => t.Id == record.Id) ?? new WsdlTemplateModel { Id = record.Id, Name = record.AppName, Content = content };
             template.Content = content;
             if (!_templates.Any(t => t.Id == template.Id))
                 _templates.Add(template);

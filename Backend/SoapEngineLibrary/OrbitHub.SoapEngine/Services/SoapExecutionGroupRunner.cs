@@ -17,26 +17,26 @@ public class SoapExecutionGroupRunner(
     SoapFileCompressor compressor,
     ILogger<SoapExecutionGroupRunner> logger)
 {
-    public async Task<Result<DirectExecutionAudit>> RunGroupAsync(
+    public async Task<ResultModel<DirectExecutionAudit>> RunGroupAsync(
         int groupId,
         string executedBy,
         CancellationToken cancellationToken = default)
     {
         // Validate inputs
         if (groupId <= 0)
-            return Result<DirectExecutionAudit>.Failure("groupId must be a positive integer.");
+            return ResultModel<DirectExecutionAudit>.Failure("groupId must be a positive integer.");
         if (string.IsNullOrWhiteSpace(executedBy))
-            return Result<DirectExecutionAudit>.Failure("executedBy is required.");
+            return ResultModel<DirectExecutionAudit>.Failure("executedBy is required.");
 
         logger.LogInformation("Initiating batch execution run for Execution Group ID: {GroupId} by {ExecutedBy}", groupId, executedBy);
 
         var group = await executionRepository.GetAuditByIdAsync(groupId, cancellationToken);
         if (group is null)
-            return Result<DirectExecutionAudit>.Failure($"Execution group with ID {groupId} was not found.");
+            return ResultModel<DirectExecutionAudit>.Failure($"Execution group with ID {groupId} was not found.");
 
         var groupLinks = await executionRepository.GetLinksByAuditIdAsync(groupId, cancellationToken);
         if (groupLinks.Count == 0)
-            return Result<DirectExecutionAudit>.Failure($"Execution group {groupId} contains no registered items.");
+            return ResultModel<DirectExecutionAudit>.Failure($"Execution group {groupId} contains no registered items.");
 
         bool hasFailures = false;
 
@@ -48,7 +48,7 @@ public class SoapExecutionGroupRunner(
                 {
                     logger.LogWarning("Execution run ID {RunId} cancelled by caller.", group.Id);
                     await executionRepository.CompleteAuditAsync(group.Id, "Cancelled", cancellationToken: cancellationToken);
-                    return Result<DirectExecutionAudit>.Failure("Execution run was cancelled.");
+                    return ResultModel<DirectExecutionAudit>.Failure("Execution run was cancelled.");
                 }
 
                 bool itemSuccess = await ExecuteItemAsync(group.Id, link, executedBy, cancellationToken);
@@ -60,13 +60,13 @@ public class SoapExecutionGroupRunner(
             await executionRepository.CompleteAuditAsync(group.Id, finalStatus, cancellationToken: cancellationToken);
             group.ExecutionStatus = finalStatus;
             group.ExecutionCompletedAt = DateTime.UtcNow;
-            return Result<DirectExecutionAudit>.Success(group);
+            return ResultModel<DirectExecutionAudit>.Success(group);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unhandled failure during execution run ID {RunId}", group.Id);
             await executionRepository.CompleteAuditAsync(group.Id, "Failed", $"Unhandled error: {ex.Message}", cancellationToken);
-            return Result<DirectExecutionAudit>.Failure($"Execution run failed: {ex.Message}");
+            return ResultModel<DirectExecutionAudit>.Failure($"Execution run failed: {ex.Message}");
         }
     }
 

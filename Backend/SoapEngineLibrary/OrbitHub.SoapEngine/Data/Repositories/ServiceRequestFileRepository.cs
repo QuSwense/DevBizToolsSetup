@@ -2,6 +2,7 @@ namespace ServiceHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
+using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.TestManagement.Models;
 using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
@@ -51,10 +52,10 @@ public class ServiceRequestFileRepository(
         var dto = result.Data;
         return new ServiceRequestFile
         {
-            Id = dto.FileId!.Value,
-            ServiceOperationId = dto.ServiceOperationId!.Value,
+            Id = dto.FileId ?? throw new InvalidOperationException("SP did not return a FileId."),
+            ServiceOperationId = dto.ServiceOperationId ?? throw new InvalidOperationException("SP did not return a ServiceOperationId."),
             FileFormat = dto.FileFormat,
-            Name = dto.Name!,
+            Name = dto.Name ?? string.Empty,
             IsBaseSnapshot = dto.IsBaseSnapshot ?? true,
             ParentBaseId = dto.ParentBaseId,
             ParentDeltaId = dto.ParentDeltaId,

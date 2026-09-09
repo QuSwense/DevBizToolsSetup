@@ -3,7 +3,7 @@ namespace OrbitHub.Ui.Models;
 /// <summary>
 /// Represents a single item in a menu group (used in the Monaco Editor action menu).
 /// </summary>
-public class MenuItem
+public class MenuItemModel
 {
     /// <summary>
     /// Unique identifier for the menu item.
@@ -39,7 +39,7 @@ public class MenuItem
 /// <summary>
 /// Represents a group of related menu items (used in the Monaco Editor action menu).
 /// </summary>
-public class MenuGroup
+public class MenuGroupModel
 {
     /// <summary>
     /// Group title displayed as a header.
@@ -49,5 +49,5 @@ public class MenuGroup
     /// <summary>
     /// Items in this group.
     /// </summary>
-    public List<MenuItem> Items { get; set; } = [];
+    public List<MenuItemModel> Items { get; set; } = [];
 }

@@ -13,7 +13,7 @@ public partial class ApplicationsOverview
     /// <summary>
     /// Gets or sets the SOAP applications to display.
     /// </summary>
-    [Parameter] public IReadOnlyList<SoapApp> Apps { get; set; } = [];
+    [Parameter] public IReadOnlyList<SoapAppModel> Apps { get; set; } = [];
 
     /// <summary>
     /// Gets or sets whether the card is collapsed to its summary view.
@@ -26,7 +26,7 @@ public partial class ApplicationsOverview
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
     private int TotalApps => Apps.Count;
-    private int EnabledApps => Apps.Count(a => a.Status == AppStatus.Enabled);
+    private int EnabledApps => Apps.Count(a => a.Status == EAppStatus.Enabled);
     private int DisabledApps => TotalApps - EnabledApps;
     private int TotalOperations => Apps.Sum(a => a.Apis.Length);
 }

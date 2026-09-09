@@ -5,7 +5,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Maps to CK_ServiceRequestIndexingStatus_Status / CK_ServiceResponseIndexingStatus_Status:
 /// 'Pending', 'Processing', 'Completed', 'Failed'.
 /// </summary>
-public enum IndexingStatus
+public enum EIndexingStatus
 {
     /// <summary>Indexing operation is queued and awaiting processing.</summary>
     Pending = 0,

@@ -3,7 +3,7 @@ namespace OrbitHub.FileManagement.Core.Enums;
 /// <summary>
 /// Represents the type of a file managed by the File Management feature.
 /// </summary>
-public enum FileType
+public enum EFileType
 {
     /// <summary>JSON file (.json)</summary>
     Json,

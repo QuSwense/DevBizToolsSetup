@@ -15,7 +15,7 @@ public partial class ExecutionsOverview
     /// <summary>
     /// Gets or sets the SOAP execution history (already filtered to appType == "soap").
     /// </summary>
-    [Parameter] public IReadOnlyList<SoapExecution> Executions { get; set; } = [];
+    [Parameter] public IReadOnlyList<SoapExecutionModel> Executions { get; set; } = [];
 
     /// <summary>
     /// Gets or sets whether the card is collapsed to its summary view.
@@ -27,16 +27,16 @@ public partial class ExecutionsOverview
     /// </summary>
     [Parameter] public EventCallback<bool> OnToggle { get; set; }
 
-    private DateRange _range = DateRange.LastDays(7);
+    private DateRangeModel _range = DateRangeModel.LastDays(7);
 
-    private void ApplyRange(DateRange? range) => _range = range ?? DateRange.LastDays(7);
+    private void ApplyRange(DateRangeModel? range) => _range = range ?? DateRangeModel.LastDays(7);
 
-    private List<GridColumn<SoapExecution>> _columns = [];
+    private List<GridColumn<SoapExecutionModel>> _columns = [];
     private string _searchText = "";
     private string? _sortColumn = null;
     private bool _sortAscending = true;
 
-    private IReadOnlyList<SoapExecution> InRangeExecutions
+    private IReadOnlyList<SoapExecutionModel> InRangeExecutions
     {
         get
         {

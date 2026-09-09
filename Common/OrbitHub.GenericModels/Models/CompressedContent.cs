@@ -5,7 +5,7 @@ namespace OrbitHub.GenericModels.Models;
 /// Shared pattern across ServiceRequestFiles, ServiceResponseFiles, ServiceDefinitionSyncs,
 /// ServiceOperationSchemas, SoapNamespaces, and RuleExecutionLogs.
 /// </summary>
-public sealed class CompressedContent
+public sealed class CompressedContentModel
 {
     /// <summary>The compressed binary data.</summary>
     public required byte[] CompressedData { get; init; }

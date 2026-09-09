@@ -5,7 +5,7 @@ namespace OrbitHub.FileManagement.Models;
 /// <summary>
 /// Represents a file item in the File Management feature.
 /// </summary>
-public class FileItem
+public class FileItemModel
 {
     /// <summary>Unique identifier for the file.</summary>
     public string Id { get; set; } = string.Empty;
@@ -17,7 +17,7 @@ public class FileItem
     public string AppName { get; set; } = string.Empty;
 
     /// <summary>File type classification.</summary>
-    public FileType Type { get; set; } = FileType.Other;
+    public EFileType Type { get; set; } = EFileType.Other;
 
     /// <summary>Human-readable file size (e.g. "2.4 KB").</summary>
     public string Size { get; set; } = string.Empty;

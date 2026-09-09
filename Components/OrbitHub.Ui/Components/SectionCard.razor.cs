@@ -27,12 +27,12 @@ public partial class SectionCard
     /// <summary>
     /// Gets or sets the active date-range filter; null hides the filter dialog.
     /// </summary>
-    [Parameter] public DateRange? Filter { get; set; }
+    [Parameter] public DateRangeModel? Filter { get; set; }
 
     /// <summary>
     /// Invoked when the user applies or clears the date-range filter.
     /// </summary>
-    [Parameter] public EventCallback<DateRange?> OnFilterChanged { get; set; }
+    [Parameter] public EventCallback<DateRangeModel?> OnFilterChanged { get; set; }
 
     /// <summary>
     /// Gets or sets optional header actions rendered beside the filter pill.
@@ -77,7 +77,7 @@ public partial class SectionCard
 
     private void CloseFilter() => _showFilter = false;
 
-    private async Task HandleFilterChanged(DateRange? range)
+    private async Task HandleFilterChanged(DateRangeModel? range)
     {
         _showFilter = false;
         await OnFilterChanged.InvokeAsync(range);

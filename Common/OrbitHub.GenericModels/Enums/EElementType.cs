@@ -4,7 +4,7 @@ namespace OrbitHub.GenericModels.Enums;
 /// Defines the element types used for file indexing.
 /// Maps to stored procedure parameters: 'XML', 'JSON', 'PDF'.
 /// </summary>
-public enum ElementType
+public enum EElementType
 {
     /// <summary>XML file elements.</summary>
     XML = 0,

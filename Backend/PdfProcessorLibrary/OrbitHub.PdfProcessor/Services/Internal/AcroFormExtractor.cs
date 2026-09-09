@@ -61,9 +61,9 @@ public class AcroFormExtractor(ILogger<AcroFormExtractor> logger)
             AcroTextField textField => new PdfTextField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, textField.Value ?? string.Empty, textField.Value ?? string.Empty, null, textField.IsMultiline, false),
             AcroComboBoxField comboBox => new PdfChoiceField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, comboBox.SelectedOptions ?? Array.Empty<string>(), new List<PdfChoiceOption>(), false, true),
             AcroListBoxField listBox => new PdfChoiceField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, listBox.SelectedOptions ?? Array.Empty<string>(), new List<PdfChoiceOption>(), true, false),
-            AcroCheckboxField chkField => new PdfButtonField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, ButtonType.CheckBox, chkField.IsChecked, chkField.CurrentValue?.Data ?? "Yes", null),
-            AcroPushButtonField => new PdfButtonField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, ButtonType.PushButton, false, string.Empty, null),
-            AcroSignatureField => new PdfButtonField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, ButtonType.PushButton, false, string.Empty, "Signature"),
+            AcroCheckboxField chkField => new PdfButtonField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, EButtonType.CheckBox, chkField.IsChecked, chkField.CurrentValue?.Data ?? "Yes", null),
+            AcroPushButtonField => new PdfButtonField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, EButtonType.PushButton, false, string.Empty, null),
+            AcroSignatureField => new PdfButtonField(fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, EButtonType.PushButton, false, string.Empty, "Signature"),
             _ => ProcessGenericField(field, fieldName, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable)
         };
     }
@@ -72,7 +72,7 @@ public class AcroFormExtractor(ILogger<AcroFormExtractor> logger)
     {
         if (field.FieldType == AcroFieldType.PushButton || field.FieldType == AcroFieldType.Checkbox || field.FieldType == AcroFieldType.RadioButton)
         {
-            return new PdfButtonField(name, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, ButtonType.RadioButton, false, string.Empty, null);
+            return new PdfButtonField(name, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, EButtonType.RadioButton, false, string.Empty, null);
         }
         return new PdfTextField(name, mappingName, alternateName, pageNum, bounds, isReadOnly, isRequired, isHidden, isExportable, string.Empty, string.Empty, null, false, false);
     }

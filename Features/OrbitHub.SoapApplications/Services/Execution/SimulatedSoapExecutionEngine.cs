@@ -31,22 +31,22 @@ public class SimulatedSoapExecutionEngine(
     private int StageDelayMs => 500;
 
     /// <inheritdoc />
-    public SoapExecutionGroup CreateGroup(IReadOnlyList<SoapRequestFile> files, string triggeredBy)
+    public SoapExecutionGroupModel CreateGroup(IReadOnlyList<SoapRequestFileModel> files, string triggeredBy)
     {
         var now = DateTime.Now;
-        var group = new SoapExecutionGroup
+        var group = new SoapExecutionGroupModel
         {
             Id = $"exg-{Guid.NewGuid():N}"[..12],
             StartedAt = FormatTimestamp(now),
             TriggeredBy = triggeredBy,
             Status = "running",
-            Files = [.. files.Select(f => new SoapExecutionFile
+            Files = [.. files.Select(f => new SoapExecutionFileModel
             {
                 FileName = f.FileName,
                 AppName = f.AppName,
                 Operation = f.ApiPath,
                 Status = "queued",
-                Stage = ExecutionStage.Queued,
+                Stage = EExecutionStage.Queued,
                 StagesCompleted = 0,
                 StagesTotal = 7,
                 RequestContent = f.Content ?? "",
@@ -62,8 +62,8 @@ public class SimulatedSoapExecutionEngine(
 
     /// <inheritdoc />
     public async Task RunAsync(
-        SoapExecutionGroup group,
-        IProgress<SoapExecutionGroup>? progress = null,
+        SoapExecutionGroupModel group,
+        IProgress<SoapExecutionGroupModel>? progress = null,
         CancellationToken cancellationToken = default)
     {
         var started = DateTime.Now;
@@ -86,9 +86,9 @@ public class SimulatedSoapExecutionEngine(
     }
 
     private async Task ExecuteFileAsync(
-        SoapExecutionGroup group,
-        SoapExecutionFile file,
-        IProgress<SoapExecutionGroup>? progress,
+        SoapExecutionGroupModel group,
+        SoapExecutionFileModel file,
+        IProgress<SoapExecutionGroupModel>? progress,
         CancellationToken cancellationToken)
     {
         var started = DateTime.Now;
@@ -96,7 +96,7 @@ public class SimulatedSoapExecutionEngine(
 
         // Guard: files of disabled applications are blocked.
         var app = _appStore.Apps.FirstOrDefault(a => a.Name == file.AppName);
-        if (app is not null && app.Status == AppStatus.Disabled)
+        if (app is not null && app.Status == EAppStatus.Disabled)
         {
             FailFile(file, "Application is disabled — execution blocked.");
             progress?.Report(group);
@@ -104,7 +104,7 @@ public class SimulatedSoapExecutionEngine(
         }
 
         // 1. BuildingRequest
-        await AdvanceAsync(file, ExecutionStage.BuildingRequest,
+        await AdvanceAsync(file, EExecutionStage.BuildingRequest,
             "Building SOAP request envelope.", cancellationToken, progress, group);
         if (string.IsNullOrWhiteSpace(file.RequestContent))
         {
@@ -113,11 +113,11 @@ public class SimulatedSoapExecutionEngine(
 
         // 2. SendingRequest
         var target = app is not null ? BuildTargetUrl(app) : file.AppName;
-        await AdvanceAsync(file, ExecutionStage.SendingRequest,
+        await AdvanceAsync(file, EExecutionStage.SendingRequest,
             $"Sending request to {target}.", cancellationToken, progress, group);
 
         // 3. AwaitingResponse
-        await AdvanceAsync(file, ExecutionStage.AwaitingResponse,
+        await AdvanceAsync(file, EExecutionStage.AwaitingResponse,
             "Awaiting response from the service...", cancellationToken, progress, group);
 
         // Deterministic simulated failure hook (for demo/test variety).
@@ -134,11 +134,11 @@ public class SimulatedSoapExecutionEngine(
         file.ParsedFields = ParseFields(file.ResponseContent, "response");
         file.Logs.Add(CreateLog("response", "Response received and parsed."));
         file.Logs.Add(CreateLog("info", $"{file.ParsedFields.Count} field(s) parsed from response."));
-        await AdvanceAsync(file, ExecutionStage.ParsingResponse,
+        await AdvanceAsync(file, EExecutionStage.ParsingResponse,
             "Parsing response payload.", cancellationToken, progress, group);
 
         // 5. RunningTestCases
-        await AdvanceAsync(file, ExecutionStage.RunningTestCases,
+        await AdvanceAsync(file, EExecutionStage.RunningTestCases,
             "Running attached test cases...", cancellationToken, progress, group);
         var testCases = _testCaseStore.GetEnabledForFile(file.AppName, file.FileName);
         file.Extractions = [.. testCases
@@ -159,7 +159,7 @@ public class SimulatedSoapExecutionEngine(
 
         // 6. Complete
         file.Status = "success";
-        file.Stage = ExecutionStage.Complete;
+        file.Stage = EExecutionStage.Complete;
         file.StagesCompleted = file.StagesTotal;
         file.DurationMs = (long)(DateTime.Now - started).TotalMilliseconds;
         file.Logs.Add(CreateLog("info", $"Execution completed in {file.DurationMs} ms."));
@@ -167,31 +167,31 @@ public class SimulatedSoapExecutionEngine(
     }
 
     private async Task AdvanceAsync(
-        SoapExecutionFile file,
-        ExecutionStage stage,
+        SoapExecutionFileModel file,
+        EExecutionStage stage,
         string logMessage,
         CancellationToken cancellationToken,
-        IProgress<SoapExecutionGroup>? progress,
-        SoapExecutionGroup group)
+        IProgress<SoapExecutionGroupModel>? progress,
+        SoapExecutionGroupModel group)
     {
         await Task.Delay(StageDelayMs, cancellationToken);
         file.Stage = stage;
         file.StagesCompleted = (int)stage;
-        file.Logs.Add(CreateLog(stage == ExecutionStage.SendingRequest ? "request" : "info", logMessage));
+        file.Logs.Add(CreateLog(stage == EExecutionStage.SendingRequest ? "request" : "info", logMessage));
         progress?.Report(group);
     }
 
-    private void FailFile(SoapExecutionFile file, string reason)
+    private void FailFile(SoapExecutionFileModel file, string reason)
     {
         file.Status = "failed";
-        file.Stage = ExecutionStage.Complete;
+        file.Stage = EExecutionStage.Complete;
         file.StagesCompleted = file.StagesTotal;
         file.Logs.Add(CreateLog("error", reason));
     }
 
     // ── Payload generation (deterministic per file) ──
 
-    private string BuildRequestEnvelope(SoapExecutionFile file, SoapApp? app)
+    private string BuildRequestEnvelope(SoapExecutionFileModel file, SoapAppModel? app)
     {
         var ns = $"urn:{(app?.Name ?? file.AppName).ToLowerInvariant().Replace(" ", "")}";
         var requestId = $"req-{StableHash(file.FileName):x8}";
@@ -207,7 +207,7 @@ public class SimulatedSoapExecutionEngine(
             """;
     }
 
-    private string GenerateResponseContent(SoapExecutionFile file)
+    private string GenerateResponseContent(SoapExecutionFileModel file)
     {
         var ns = $"urn:{(file.AppName.ToLowerInvariant().Replace(" ", ""))}";
         var status = "Success";
@@ -229,14 +229,14 @@ public class SimulatedSoapExecutionEngine(
             """;
     }
 
-    private static string BuildTargetUrl(SoapApp app)
+    private static string BuildTargetUrl(SoapAppModel app)
     {
         var wsdl = app.WsdlPath ?? "";
         var separator = wsdl.StartsWith('?') ? "" : "?";
         return $"{app.BaseUrl}{separator}{wsdl}";
     }
 
-    private static bool IsSimulatedFailure(SoapExecutionFile file)
+    private static bool IsSimulatedFailure(SoapExecutionFileModel file)
     {
         var probe = $"{file.FileName} {file.Operation}";
         return probe.Contains("fail", StringComparison.OrdinalIgnoreCase)
@@ -245,9 +245,9 @@ public class SimulatedSoapExecutionEngine(
 
     // ── Parsed fields ──
 
-    private static List<SoapParsedField> ParseFields(string xml, string source)
+    private static List<SoapParsedFieldModel> ParseFields(string xml, string source)
     {
-        var result = new List<SoapParsedField>();
+        var result = new List<SoapParsedFieldModel>();
         try
         {
             var doc = XDocument.Parse(xml);
@@ -256,7 +256,7 @@ public class SimulatedSoapExecutionEngine(
                 var value = element.Value.Trim();
                 var path = BuildElementPath(element);
                 var isEmbedded = IsLikelyBase64(value);
-                result.Add(new SoapParsedField
+                result.Add(new SoapParsedFieldModel
                 {
                     Name = element.Name.LocalName,
                     Source = source,
@@ -310,7 +310,7 @@ public class SimulatedSoapExecutionEngine(
 
     // ── Test-case extraction ──
 
-    private SoapExtractionResult EvaluateExtractor(SoapExtractor extractor, SoapExecutionFile file)
+    private SoapExtractionResultModel EvaluateExtractor(SoapExtractorModel extractor, SoapExecutionFileModel file)
     {
         var sourceContent = extractor.Source == "request" ? file.RequestContent : file.ResponseContent;
         var value = extractor.Type switch
@@ -323,7 +323,7 @@ public class SimulatedSoapExecutionEngine(
         var hasExpected = !string.IsNullOrWhiteSpace(extractor.ExpectedValue);
         var passed = !hasExpected
             || string.Equals(value.Trim(), extractor.ExpectedValue!.Trim(), StringComparison.OrdinalIgnoreCase);
-        return new SoapExtractionResult
+        return new SoapExtractionResultModel
         {
             ExtractorId = extractor.Id,
             Name = extractor.Name,
@@ -429,7 +429,7 @@ public class SimulatedSoapExecutionEngine(
     /// (or "text" to return the whole decoded preview). Real PDF parsing is a
     /// later-phase concern (requires a package decision).
     /// </summary>
-    private static string EvaluatePdf(SoapExecutionFile file, string path)
+    private static string EvaluatePdf(SoapExecutionFileModel file, string path)
     {
         var embedded = file.ParsedFields.FirstOrDefault(f => f.IsEmbedded && f.Source == "response");
         var text = embedded?.DecodedPreview ?? "";
@@ -452,7 +452,7 @@ public class SimulatedSoapExecutionEngine(
 
     // ── Helpers ──
 
-    private static SoapExecutionLog CreateLog(string type, string message) => new()
+    private static SoapExecutionLogModel CreateLog(string type, string message) => new SoapExecutionLogModel()
     {
         Id = $"log-{Guid.NewGuid():N}"[..10],
         Timestamp = FormatTimestamp(DateTime.Now),
