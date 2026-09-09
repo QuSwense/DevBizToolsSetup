@@ -2,13 +2,12 @@ using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Common;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
-using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 using ServiceHub.SoapEngine.Core.Parsing;
 using ServiceHub.SoapEngine.Core.Validation;
 
-namespace ServiceHub.SoapEngine.Core.Services;
+namespace OrbitHub.SoapEngine.Core.Services;
 
 public class SoapApplicationService(
     ServiceApplicationRepository appRepository,

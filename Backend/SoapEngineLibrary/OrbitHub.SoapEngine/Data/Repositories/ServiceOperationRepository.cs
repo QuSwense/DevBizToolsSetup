@@ -2,39 +2,71 @@ namespace ServiceHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
-using LinqToDB.Data;
+using OrbitHub.Data.Repositories.TestManagement.Models;
+using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
-/// Repository for managing SOAP service operations using the unified ServiceAppDbContext.
-/// Maps to ServiceOperations table with ServiceApplicationId FK.
+/// Repository for managing SOAP service operations using stored procedure repositories
+/// from OrbitHub.Data. Wraps SP calls and maps results to entity types.
+/// Paged/read queries use direct linq2db (hybrid approach).
 /// </summary>
-public class ServiceOperationRepository(ServiceAppDbContext context)
+public class ServiceOperationRepository(
+    CreateServiceOperationRepository createOpRepo,
+    CreateServiceOperationWithSchemaRepository createOpWithSchemaRepo,
+    UpdateServiceOperationRepository updateOpRepo,
+    GetServiceOperationByIdRepository getByIdRepo,
+    GetServiceOperationsRepository getOpsRepo,
+    ActivateServiceOperationRepository activateOpRepo,
+    IUnitOfWork unitOfWork,
+    ServiceAppDbContext context)
 {
     private ServiceAppDbContext Context { get; } = context;
 
     /// <summary>
-    /// Retrieves a ServiceOperation by its primary key identifier.
+    /// Retrieves a ServiceOperation by its primary key identifier via SP.
     /// </summary>
     public async Task<ServiceOperation?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await Context.ServiceOperations
-            .FirstOrDefaultAsync(op => op.Id == id, cancellationToken);
+        var result = await getByIdRepo.ExecuteAsync(
+            new GetServiceOperationByIdInput { Id = id }, cancellationToken);
+
+        if (!result.Success || result.Data is null)
+            return null;
+
+        return MapToEntity(result.Data);
     }
 
     /// <summary>
-    /// Retrieves all operations registered under a specific application ID.
+    /// Retrieves all operations registered under a specific application ID via SP.
     /// </summary>
     public async Task<List<ServiceOperation>> GetByAppIdAsync(int appId, CancellationToken cancellationToken = default)
     {
-        return await Context.ServiceOperations
-            .Where(op => op.ServiceApplicationId == appId && op.IsActive)
-            .ToListAsync(cancellationToken);
+        // First resolve the app's PublicId
+        var app = await Context.ServiceApplications
+            .Where(a => a.Id == appId)
+            .Select(a => new { a.PublicId })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (app is null)
+            return [];
+
+        var result = await getOpsRepo.ExecuteAsync(new GetServiceOperationsInput
+        {
+            ServiceApplicationPublicId = app.PublicId,
+            IncludeInactive = false,
+            OperationName = null
+        }, cancellationToken);
+
+        if (!result.Success || result.Data is null)
+            return [];
+
+        return result.Data.Select(MapFromOpsOutput).ToList();
     }
 
     /// <summary>
-    /// Adds a manually configured SOAP operation along with optional schema entries.
+    /// Adds a manually configured SOAP operation along with optional schema entries via composite SP.
     /// </summary>
     public async Task<ServiceOperation> AddAsync(
         ServiceOperation operation,
@@ -45,47 +77,26 @@ public class ServiceOperationRepository(ServiceAppDbContext context)
         int? definitionSyncId = null,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Context.BeginTransactionAsync(cancellationToken);
-
-        try
+        var result = await createOpWithSchemaRepo.ExecuteAsync(new CreateServiceOperationWithSchemaInput
         {
-            operation.RecordVersion = await GetNextVersionAsync(null, cancellationToken);
-            operation.CreatedAt = DateTime.UtcNow;
+            ServiceApplicationId = operation.ServiceApplicationId,
+            OperationName = operation.OperationName,
+            EndpointOrAction = operation.EndpointOrAction,
+            HttpMethod = null,
+            Description = operation.Description,
+            InputRootElementName = inputRootElementName,
+            OutputRootElementName = outputRootElementName,
+            TargetNamespace = targetNamespace,
+            CompressedSchemaContent = !string.IsNullOrWhiteSpace(rawXsdSchema)
+                ? System.Text.Encoding.UTF8.GetBytes(rawXsdSchema)
+                : null,
+            UserId = operation.CreatedBy
+        }, cancellationToken);
 
-            var opId = await Context.InsertWithInt32IdentityAsync(operation, token: cancellationToken);
-            operation.Id = opId;
+        if (!result.Success || result.Data is null)
+            throw new InvalidOperationException($"Failed to create operation: {result.ErrorMessage}");
 
-            // Insert schema entry if any schema-related data is provided
-            if (!string.IsNullOrWhiteSpace(inputRootElementName) ||
-                !string.IsNullOrWhiteSpace(outputRootElementName) ||
-                !string.IsNullOrWhiteSpace(rawXsdSchema))
-            {
-                var schema = new ServiceOperationSchema
-                {
-                    ServiceDefinitionSyncId = definitionSyncId ?? 0,
-                    ServiceOperationId = opId,
-                    InputRootElementName = inputRootElementName,
-                    OutputRootElementName = outputRootElementName,
-                    TargetNamespace = targetNamespace,
-                    CompressedContent = !string.IsNullOrWhiteSpace(rawXsdSchema)
-                        ? System.Text.Encoding.UTF8.GetBytes(rawXsdSchema)
-                        : [],
-                    CompressionAlgorithmType = "None",
-                    RecordVersion = await GetNextVersionAsync(null, cancellationToken),
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = operation.CreatedBy
-                };
-                await Context.InsertAsync(schema, token: cancellationToken);
-            }
-
-            await transaction.CommitAsync(cancellationToken);
-            return operation;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        return MapToEntity(result.Data);
     }
 
     /// <summary>
@@ -93,52 +104,58 @@ public class ServiceOperationRepository(ServiceAppDbContext context)
     /// </summary>
     public async Task AddRangeAsync(IEnumerable<ServiceOperation> operations, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Context.BeginTransactionAsync(cancellationToken);
-
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
             foreach (var op in operations)
             {
-                op.RecordVersion = await GetNextVersionAsync(null, cancellationToken);
-                op.CreatedAt = DateTime.UtcNow;
-                var id = await Context.InsertWithInt32IdentityAsync(op, token: cancellationToken);
-                op.Id = id;
+                var result = await createOpRepo.ExecuteAsync(new CreateServiceOperationInput
+                {
+                    ServiceApplicationPublicId = Guid.Empty, // Will be resolved by SP
+                    OperationName = op.OperationName,
+                    EndpointOrAction = op.EndpointOrAction,
+                    HttpMethod = null,
+                    Description = op.Description,
+                    UserId = op.CreatedBy
+                }, cancellationToken);
+
+                if (!result.Success)
+                    throw new InvalidOperationException($"Failed to create operation '{op.OperationName}': {result.ErrorMessage}");
             }
 
-            await transaction.CommitAsync(cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
         }
         catch
         {
-            await transaction.RollbackAsync(cancellationToken);
+            await unitOfWork.RollbackAsync(cancellationToken);
             throw;
         }
     }
 
     /// <summary>
-    /// Updates an existing operation's metadata and refreshes RecordVersion.
+    /// Updates an existing operation's metadata via UpdateServiceOperation SP.
     /// </summary>
     public async Task UpdateAsync(ServiceOperation operation, CancellationToken cancellationToken = default)
     {
-        operation.RecordVersion = await GetNextVersionAsync(operation.RecordVersion, cancellationToken);
-        operation.LastUpdatedAt = DateTime.UtcNow;
-        await Context.UpdateAsync(operation, token: cancellationToken);
+        var result = await updateOpRepo.ExecuteAsync(new UpdateServiceOperationInput
+        {
+            OperationId = operation.Id,
+            OperationName = operation.OperationName,
+            EndpointOrAction = operation.EndpointOrAction,
+            HttpMethod = operation.HttpMethod,
+            Description = operation.Description,
+            IsActive = operation.IsActive,
+            UserId = operation.LastUpdatedBy ?? operation.CreatedBy,
+            RecordVersion = operation.RecordVersion
+        }, cancellationToken);
+
+        if (!result.Success)
+            throw new InvalidOperationException($"Failed to update operation: {result.ErrorMessage}");
     }
 
     /// <summary>
-    /// Calls the database function dbo.fn_CalculateVersion to compute the next version string.
+    /// Paged query using direct linq2db (hybrid approach).
     /// </summary>
-    private async Task<string> GetNextVersionAsync(string? previousVersion, CancellationToken cancellationToken = default)
-    {
-        var param = previousVersion is not null
-            ? new DataParameter("@PreviousVersion", previousVersion)
-            : new DataParameter("@PreviousVersion", DBNull.Value);
-
-        var result = await Context.QueryAsync<string>(
-            "SELECT dbo.fn_CalculateVersion(@PreviousVersion)", param);
-
-        return result.FirstOrDefault() ?? "00.00.00";
-    }
-
     public async Task<PagedResult<ServiceOperation>> GetPagedAsync(
         OperationFilter filter,
         CancellationToken cancellationToken = default)
@@ -183,6 +200,44 @@ public class ServiceOperationRepository(ServiceAppDbContext context)
             "isactive" => descending ? query.OrderByDescending(o => o.IsActive) : query.OrderBy(o => o.IsActive),
             "endpointoraction" or "soapaction" => descending ? query.OrderByDescending(o => o.EndpointOrAction) : query.OrderBy(o => o.EndpointOrAction),
             _ => query.OrderBy(o => o.Id)
+        };
+    }
+
+    private static ServiceOperation MapToEntity(GetServiceOperationByIdOutput dto)
+    {
+        return new ServiceOperation
+        {
+            Id = dto.Id,
+            ServiceApplicationId = dto.ServiceApplicationId,
+            OperationName = dto.OperationName,
+            EndpointOrAction = dto.EndpointOrAction,
+            HttpMethod = dto.HttpMethod,
+            Description = dto.Description,
+            IsActive = dto.IsActive,
+            RecordVersion = dto.RecordVersion.ToString(),
+            CreatedAt = dto.CreatedAt,
+            CreatedBy = dto.CreatedBy,
+            LastUpdatedAt = dto.LastUpdatedAt,
+            LastUpdatedBy = dto.LastUpdatedBy
+        };
+    }
+
+    private static ServiceOperation MapFromOpsOutput(GetServiceOperationsOutput dto)
+    {
+        return new ServiceOperation
+        {
+            Id = dto.OperationId ?? 0,
+            ServiceApplicationId = dto.ServiceApplicationId ?? 0,
+            OperationName = dto.OperationName ?? string.Empty,
+            EndpointOrAction = dto.EndpointOrAction,
+            HttpMethod = dto.HttpMethod,
+            Description = dto.Description,
+            IsActive = dto.IsActive ?? true,
+            RecordVersion = dto.RecordVersion ?? "00.00.00",
+            CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
+            CreatedBy = dto.CreatedBy ?? "SYSTEM",
+            LastUpdatedAt = dto.LastUpdatedAt,
+            LastUpdatedBy = dto.LastUpdatedBy
         };
     }
 }

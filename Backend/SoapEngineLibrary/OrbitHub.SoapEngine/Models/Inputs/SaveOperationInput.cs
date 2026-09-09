@@ -1,7 +1,4 @@
 namespace ServiceHub.SoapEngine.Core.Models.Inputs;
-
-using ServiceHub.SoapEngine.Core.Enums;
-
 /// <summary>
 /// Represents a single SOAP operation definition supplied via UI.
 /// </summary>

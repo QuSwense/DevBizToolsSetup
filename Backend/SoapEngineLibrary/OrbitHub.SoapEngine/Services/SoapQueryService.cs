@@ -2,7 +2,7 @@ using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 
-namespace ServiceHub.SoapEngine.Core.Services;
+namespace OrbitHub.SoapEngine.Core.Services;
 
 public class SoapQueryService(
     ServiceApplicationRepository appRepository,

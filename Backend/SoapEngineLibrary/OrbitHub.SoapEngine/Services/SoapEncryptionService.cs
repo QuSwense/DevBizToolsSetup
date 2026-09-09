@@ -1,8 +1,7 @@
-namespace ServiceHub.SoapEngine.Core.Services;
-
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
+
+namespace OrbitHub.SoapEngine.Core.Services;
 
 /// <summary>
 /// Provides AES-256-GCM encryption and decryption for sensitive credential payloads.

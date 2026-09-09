@@ -2,21 +2,31 @@ namespace ServiceHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
-using LinqToDB.Data;
+using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Parsing.Models;
 
 /// <summary>
 /// Provides atomic persistence operations for service definition (WSDL) sync snapshots
-/// using the unified ServiceAppDbContext. Stores content as compressed binary.
+/// using stored procedure repositories from OrbitHub.Data.
 /// </summary>
-public class ServiceDefinitionSyncRepository(ServiceAppDbContext context)
+public class ServiceDefinitionSyncRepository(
+    InsertServiceDefinitionSyncRepository insertSyncRepo,
+    SaveServiceDefinitionSyncWithOperationsRepository saveSyncWithOpsRepo,
+    GetServiceDefinitionSyncLatestVersionRepository getLatestVersionRepo,
+    GetServiceDefinitionSyncRepository getSyncRepo,
+    UpdateServiceDefinitionSyncRepository updateSyncRepo,
+    CreateServiceOperationRepository createOpRepo,
+    CreateServiceOperationSchemaRepository createSchemaRepo,
+    CreateSoapNamespaceRepository createNsRepo,
+    IUnitOfWork unitOfWork,
+    ServiceAppDbContext context)
 {
     private ServiceAppDbContext Context { get; } = context;
 
     /// <summary>
     /// Atomically persists a new definition sync snapshot along with auto-parsed operations,
-    /// XSD schemas, and namespaces.
+    /// XSD schemas, and namespaces via SaveServiceDefinitionSyncWithOperations SP.
     /// </summary>
     public async Task<ServiceDefinitionSync> SaveDefinitionSyncAsync(
         ServiceDefinitionSync definitionSync,
@@ -24,106 +34,41 @@ public class ServiceDefinitionSyncRepository(ServiceAppDbContext context)
         string? changeComment = null,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Context.BeginTransactionAsync(cancellationToken);
-
-        try
+        // Use the composite SP that handles sync + ops + schemas + namespaces atomically
+        var result = await saveSyncWithOpsRepo.ExecuteAsync(new SaveServiceDefinitionSyncWithOperationsInput
         {
-            // 1. Insert Parent Definition Sync Record
-            definitionSync.RecordVersion = await GetNextVersionAsync(null, cancellationToken);
-            definitionSync.CreatedAt = DateTime.UtcNow;
+            ServiceApplicationId = definitionSync.ServiceApplicationId,
+            DefinitionUrl = definitionSync.DefinitionUrl,
+            CompressedContent = definitionSync.CompressedContent,
+            UncompressedSizeBytes = definitionSync.UncompressedSizeBytes,
+            CompressionAlgorithmType = definitionSync.CompressionAlgorithmType,
+            ContentHash = definitionSync.ContentHash,
+            UserId = definitionSync.CreatedBy
+        }, cancellationToken);
 
-            var syncId = await Context.InsertWithInt32IdentityAsync(definitionSync, token: cancellationToken);
-            definitionSync.Id = syncId;
+        if (!result.Success || result.Data is null)
+            throw new InvalidOperationException($"Failed to save definition sync: {result.ErrorMessage}");
 
-            // 2. Insert Operations extracted from WSDL
-            foreach (var opMetadata in parsedMetadata.Operations)
-            {
-                var operation = new ServiceOperation
-                {
-                    ServiceApplicationId = definitionSync.ServiceApplicationId,
-                    OperationName = opMetadata.OperationName,
-                    EndpointOrAction = opMetadata.SoapAction,
-                    Description = null,
-                    IsActive = true,
-                    RecordVersion = await GetNextVersionAsync(null, cancellationToken),
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = definitionSync.CreatedBy
-                };
-
-                var opId = await Context.InsertWithInt32IdentityAsync(operation, token: cancellationToken);
-                operation.Id = opId;
-
-                // Insert schema entry for this operation
-                var schema = new ServiceOperationSchema
-                {
-                    ServiceDefinitionSyncId = syncId,
-                    ServiceOperationId = opId,
-                    InputRootElementName = opMetadata.InputRootElementName,
-                    OutputRootElementName = opMetadata.OutputRootElementName,
-                    TargetNamespace = opMetadata.TargetNamespace ?? parsedMetadata.TargetNamespace,
-                    CompressedContent = [],
-                    CompressionAlgorithmType = "None",
-                    RecordVersion = await GetNextVersionAsync(null, cancellationToken),
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = definitionSync.CreatedBy
-                };
-                await Context.InsertAsync(schema, token: cancellationToken);
-            }
-
-            // 3. Insert Extracted XSD Schemas (linked to the sync, not to a specific operation)
-            foreach (var xsdContent in parsedMetadata.ExtractedXsdSchemas)
-            {
-                var schema = new ServiceOperationSchema
-                {
-                    ServiceDefinitionSyncId = syncId,
-                    ServiceOperationId = 0, // Not linked to a specific operation
-                    CompressedContent = System.Text.Encoding.UTF8.GetBytes(xsdContent),
-                    CompressionAlgorithmType = "None",
-                    RecordVersion = await GetNextVersionAsync(null, cancellationToken),
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = definitionSync.CreatedBy
-                };
-
-                await Context.InsertAsync(schema, token: cancellationToken);
-            }
-
-            // 4. Insert Extracted WSDL XML Namespaces (linked to schemas)
-            var schemasForNs = await Context.ServiceOperationSchemas
-                .Where(s => s.ServiceDefinitionSyncId == syncId)
-                .ToListAsync(cancellationToken);
-
-            foreach (var (prefix, nsUri) in parsedMetadata.Namespaces)
-            {
-                foreach (var schemaEntry in schemasForNs)
-                {
-                    var ns = new OrbitHub.Data.ServiceAppManagement.SoapNamespace
-                    {
-                        ServiceOperationSchemaId = schemaEntry.Id,
-                        CompressedContent = System.Text.Encoding.UTF8.GetBytes($"{prefix}:{nsUri}"),
-                        CompressionAlgorithmType = "None",
-                        RecordVersion = await GetNextVersionAsync(null, cancellationToken),
-                        CreatedAt = DateTime.UtcNow,
-                        CreatedBy = definitionSync.CreatedBy
-                    };
-
-                    await Context.InsertAsync(ns, token: cancellationToken);
-                }
-            }
-
-            // Commit all atomic inserts
-            await transaction.CommitAsync(cancellationToken);
-
-            return definitionSync;
-        }
-        catch
+        var dto = result.Data;
+        return new ServiceDefinitionSync
         {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+            Id = dto.Id,
+            ServiceApplicationId = dto.ServiceApplicationId,
+            DefinitionUrl = dto.DefinitionUrl,
+            CompressedContent = dto.CompressedContent,
+            UncompressedSizeBytes = dto.UncompressedSizeBytes,
+            CompressionAlgorithmType = dto.CompressionAlgorithmType,
+            ContentHash = dto.ContentHash,
+            RecordVersion = dto.RecordVersion.ToString(),
+            CreatedAt = dto.CreatedAt,
+            CreatedBy = dto.CreatedBy,
+            LastUpdatedAt = dto.LastUpdatedAt,
+            LastUpdatedBy = dto.LastUpdatedBy
+        };
     }
 
     /// <summary>
-    /// Fetches the latest active definition sync snapshot for a specific application ID.
+    /// Fetches the latest active definition sync snapshot for a specific application ID via direct query.
     /// </summary>
     public async Task<ServiceDefinitionSync?> GetLatestByAppIdAsync(int appId, CancellationToken cancellationToken = default)
     {
@@ -134,7 +79,7 @@ public class ServiceDefinitionSyncRepository(ServiceAppDbContext context)
     }
 
     /// <summary>
-    /// Retrieves a specific definition sync by its primary key identifier.
+    /// Retrieves a specific definition sync by its primary key identifier via direct query.
     /// </summary>
     public async Task<ServiceDefinitionSync?> GetByIdAsync(int syncId, CancellationToken cancellationToken = default)
     {
@@ -143,29 +88,16 @@ public class ServiceDefinitionSyncRepository(ServiceAppDbContext context)
     }
 
     /// <summary>
-    /// Fetches the latest RecordVersion from definition syncs for an application.
+    /// Fetches the latest RecordVersion from definition syncs for an application via SP.
     /// </summary>
     public async Task<string?> GetLatestVersionAsync(int appId, CancellationToken cancellationToken = default)
     {
-        return await Context.ServiceDefinitionSyncs
-            .Where(w => w.ServiceApplicationId == appId)
-            .OrderByDescending(w => w.CreatedAt)
-            .Select(w => w.RecordVersion)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
+        var result = await getLatestVersionRepo.ExecuteAsync(
+            new GetServiceDefinitionSyncLatestVersionInput { ServiceApplicationId = appId }, cancellationToken);
 
-    /// <summary>
-    /// Calls the database function dbo.fn_CalculateVersion to compute the next version string.
-    /// </summary>
-    private async Task<string> GetNextVersionAsync(string? previousVersion, CancellationToken cancellationToken = default)
-    {
-        var param = previousVersion is not null
-            ? new DataParameter("@PreviousVersion", previousVersion)
-            : new DataParameter("@PreviousVersion", DBNull.Value);
+        if (!result.Success || result.Data is null)
+            return null;
 
-        var result = await Context.QueryAsync<string>(
-            "SELECT dbo.fn_CalculateVersion(@PreviousVersion)", param);
-
-        return result.FirstOrDefault() ?? "00.00.00";
+        return result.Data.RecordVersion;
     }
 }

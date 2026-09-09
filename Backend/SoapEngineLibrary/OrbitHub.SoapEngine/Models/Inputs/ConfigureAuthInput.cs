@@ -1,5 +1,3 @@
-using ServiceHub.SoapEngine.Core.Enums;
-
 namespace ServiceHub.SoapEngine.Core.Models.Inputs;
 
 public class ConfigureAuthInput

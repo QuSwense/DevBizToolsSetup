@@ -18,6 +18,12 @@ public class RepositoryResult<T>
 
     public static RepositoryResult<T> Fail(string errorMessage)
         => new() { Success = false, ErrorMessage = errorMessage };
+
+    public static RepositoryResult<T> CreateSuccess(T data)
+        => new() { Success = true, Data = data };
+
+    public static RepositoryResult<T> CreateFailure(Exception ex)
+        => new() { Success = false, ErrorMessage = ex.Message };
 }
 
 /// <summary>
@@ -34,4 +40,10 @@ public class RepositoryResult
 
     public static RepositoryResult Fail(string errorMessage)
         => new() { Success = false, ErrorMessage = errorMessage };
+
+    public static RepositoryResult CreateSuccess()
+        => new() { Success = true };
+
+    public static RepositoryResult CreateFailure(Exception ex)
+        => new() { Success = false, ErrorMessage = ex.Message };
 }

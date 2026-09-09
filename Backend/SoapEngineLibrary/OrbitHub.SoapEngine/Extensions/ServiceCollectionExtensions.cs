@@ -1,15 +1,15 @@
 namespace ServiceHub.SoapEngine.Core.Extensions;
 
 using LinqToDB;
-using LinqToDB.AspNet;
-using LinqToDB.AspNet.Logging;
+using LinqToDB.Data;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.SoapEngine.Core.Services;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Parsing;
-using ServiceHub.SoapEngine.Core.Services;
 using ServiceHub.SoapEngine.Core.Validation;
 
 /// <summary>
@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SoapFileCompressor>();
         services.AddSingleton<SoapFileDeltaPatcher>();
 
-        // 2. Register LINQ to DB Data Context (using ServiceAppDbContext from OrbitHub.Data)
+        // 2. Register ServiceAppDbContext for hybrid paged queries
         var baseOptions = new DataOptions()
             .UseSqlServer(
                 connectionString,
@@ -53,34 +53,40 @@ public static class ServiceCollectionExtensions
                 SqlServerProvider.MicrosoftDataSqlClient);
 
         var typedOptions = new DataOptions<ServiceAppDbContext>(baseOptions);
-
-        // 3. Register options as Singleton
         services.AddSingleton(typedOptions);
         services.AddSingleton<DataOptions>(typedOptions.Options);
-
-        // 4. Register Context as Scoped using typed options
         services.AddScoped<ServiceAppDbContext>(sp =>
             new ServiceAppDbContext(sp.GetRequiredService<DataOptions<ServiceAppDbContext>>()));
 
-        // 5. Register Typed HttpClients for SOAP & WSDL fetching
+        // 3. Register IUnitOfWork for transaction composition
+        services.AddScoped<IUnitOfWork>(sp =>
+        {
+            var dataConnection = new DataConnection(
+                new DataOptions()
+                    .UseSqlServer(connectionString, SqlServerVersion.v2012, SqlServerProvider.MicrosoftDataSqlClient));
+            var logger = sp.GetService<ILogger<UnitOfWork>>();
+            return new UnitOfWork(dataConnection, logger);
+        });
+
+        // 4. Register Typed HttpClients for SOAP & WSDL fetching
         services.AddHttpClient<WsdlParser>();
         services.AddHttpClient<SoapClientService>();
 
-        // 6. Register Repositories (Scoped per Request/Unit of Work)
+        // 5. Register Wrapper Repositories (Scoped per Request/Unit of Work)
         services.AddScoped<ServiceApplicationRepository>();
         services.AddScoped<ServiceOperationRepository>();
         services.AddScoped<ServiceRequestFileRepository>();
         services.AddScoped<ServiceDefinitionSyncRepository>();
         services.AddScoped<ServiceExecutionAuditRepository>();
 
-        // 7. Register Query Service
+        // 6. Register Query Service
         services.AddScoped<SoapQueryService>();
 
-        // 8. Register Orchestration Services (Scoped)
+        // 7. Register Orchestration Services (Scoped)
         services.AddScoped<SoapApplicationService>();
         services.AddScoped<SoapExecutionGroupRunner>();
 
-        // 9. Register Validators
+        // 8. Register Validators
         services.AddScoped<IValidator<RegisterApplicationInput>, RegisterApplicationInputValidator>();
         services.AddScoped<IValidator<CreateFullApplicationInput>, CreateFullApplicationInputValidator>();
         services.AddScoped<IValidator<UpdateFullApplicationInput>, UpdateFullApplicationInputValidator>();

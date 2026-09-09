@@ -6,7 +6,7 @@ using ServiceHub.SoapEngine.Core.Enums;
 using ServiceHub.SoapEngine.Core.Exceptions;
 using ServiceHub.SoapEngine.Core.Models.Outputs;
 
-namespace ServiceHub.SoapEngine.Core.Services;
+namespace OrbitHub.SoapEngine.Core.Services;
 
 public class SoapExecutionGroupRunner(
     ServiceExecutionAuditRepository executionRepository,

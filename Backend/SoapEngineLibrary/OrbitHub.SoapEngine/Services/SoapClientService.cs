@@ -9,7 +9,7 @@ using ServiceHub.SoapEngine.Core.Exceptions;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using ServiceHub.SoapEngine.Core.Models.Outputs;
 
-namespace ServiceHub.SoapEngine.Core.Services;
+namespace OrbitHub.SoapEngine.Core.Services;
 
 public class SoapClientService(
     HttpClient httpClient,

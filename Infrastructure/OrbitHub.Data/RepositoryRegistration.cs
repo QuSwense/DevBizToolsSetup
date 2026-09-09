@@ -4,6 +4,7 @@
 #nullable enable
 
 using Microsoft.Extensions.DependencyInjection;
+using LinqToDB.Data;
 using OrbitHub.Data.Repositories.CoreManagement.Repositories;
 using OrbitHub.Data.Repositories.IndexingManagement.Repositories;
 using OrbitHub.Data.Repositories.IndexingManagement.Views;
@@ -14,6 +15,7 @@ using OrbitHub.Data.Repositories.RuleManagement.Views;
 using OrbitHub.Data.Repositories.ServiceAppManagement.Views;
 using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.Repositories.TestManagement.Views;
+using OrbitHub.Data.TestManagement;
 
 namespace OrbitHub.Data.Repositories;
 
@@ -117,6 +119,36 @@ public static class RepositoryRegistration
         services.AddScoped<UpdateSoapNamespaceRepository>();
         services.AddScoped<UpdateTestCaseExecutionRepository>();
         services.AddScoped<UpsertServiceApplicationRepository>();
+
+        // TestManagement - Execution Audit
+        services.AddScoped<CreateDirectExecutionAuditRepository>();
+        services.AddScoped<CompleteDirectExecutionAuditRepository>();
+        services.AddScoped<GetDirectExecutionAuditByIdRepository>();
+        services.AddScoped<CreateDirectExecutionAuditResponseFileLinkRepository>();
+        services.AddScoped<UpdateDirectExecutionAuditResponseFileLinkStatusRepository>();
+        services.AddScoped<GetDirectExecutionAuditResponseFileLinksByAuditIdRepository>();
+
+        // TestManagement - Lookup SPs
+        services.AddScoped<GetServiceApplicationByIdRepository>();
+        services.AddScoped<GetServiceOperationByIdRepository>();
+        services.AddScoped<GetServiceRequestFileByIdRepository>();
+        services.AddScoped<GetServiceRequestFileByOperationAndNameRepository>();
+        services.AddScoped<GetServiceRequestFileConsecutiveDeltaCountRepository>();
+        services.AddScoped<GetServiceDefinitionSyncLatestVersionRepository>();
+        services.AddScoped<GetServiceAppAuthenticationByAppIdRepository>();
+
+        // TestManagement - Composite SPs
+        services.AddScoped<CreateServiceOperationWithSchemaRepository>();
+        services.AddScoped<SaveServiceDefinitionSyncWithOperationsRepository>();
+        services.AddScoped<UpdateServiceRequestFileWithDeltaChainRepository>();
+
+        // UnitOfWork
+        services.AddScoped<OrbitHub.Data.Repositories.Common.IUnitOfWork>(sp =>
+        {
+            var ctx = sp.GetRequiredService<TestDbContext>();
+            var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<OrbitHub.Data.Repositories.Common.UnitOfWork>>();
+            return new OrbitHub.Data.Repositories.Common.UnitOfWork((DataConnection)ctx, logger);
+        });
 
         // Views - ServiceAppManagement
         services.AddScoped<ServiceApplicationAuditViewRepository>();

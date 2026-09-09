@@ -1,6 +1,6 @@
-namespace ServiceHub.SoapEngine.Core.Services;
-
 using System.IO.Compression;
+
+namespace OrbitHub.SoapEngine.Core.Services;
 
 /// <summary>
 /// Provides GZip stream and byte array compression and decompression services

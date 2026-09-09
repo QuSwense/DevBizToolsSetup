@@ -2,62 +2,114 @@ namespace ServiceHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
-using LinqToDB.Data;
+using OrbitHub.Data.Repositories.TestManagement.Models;
+using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
-/// Repository for managing SOAP service applications using the unified ServiceAppDbContext.
-/// All queries filter by ServiceType = "SOAP".
-/// Version generation is delegated to the database function dbo.fn_CalculateVersion.
+/// Repository for managing SOAP service applications using stored procedure repositories
+/// from OrbitHub.Data. Wraps SP calls and maps results to entity types.
+/// Paged/read queries use direct linq2db (hybrid approach).
 /// </summary>
-public class ServiceApplicationRepository(ServiceAppDbContext context)
+public class ServiceApplicationRepository(
+    CreateServiceApplicationRepository createAppRepo,
+    GetServiceApplicationByIdRepository getByIdRepo,
+    UpsertServiceApplicationRepository upsertRepo,
+    UpdateServiceAppAuthenticationRepository updateAuthRepo,
+    GetServiceAppAuthenticationByAppIdRepository getAuthByAppIdRepo,
+    ToggleServiceApplicationActiveRepository toggleActiveRepo,
+    IUnitOfWork unitOfWork,
+    ServiceAppDbContext context)
 {
     private ServiceAppDbContext Context { get; } = context;
 
     /// <summary>
     /// Retrieves the active authentication configuration for a specific application ID.
-    /// Uses the ServiceAppAuthenticationId FK on ServiceApplication.
+    /// Uses the GetServiceAppAuthenticationByAppId SP.
     /// </summary>
     public async Task<ServiceAppAuthentication?> GetAuthenticationByAppIdAsync(int appId, CancellationToken cancellationToken = default)
     {
-        var app = await Context.ServiceApplications
-            .FirstOrDefaultAsync(a => a.Id == appId, cancellationToken);
+        var result = await getAuthByAppIdRepo.ExecuteAsync(
+            new GetServiceAppAuthenticationByAppIdInput { ServiceApplicationId = appId }, cancellationToken);
 
-        if (app?.ServiceAppAuthenticationId is null)
+        if (!result.Success || result.Data is null)
             return null;
 
-        return await Context.ServiceAppAuthentications
-            .FirstOrDefaultAsync(a => a.Id == app.ServiceAppAuthenticationId.Value && a.IsActive, cancellationToken);
+        var dto = result.Data;
+        return new ServiceAppAuthentication
+        {
+            Id = dto.Id,
+            PublicId = dto.PublicId,
+            Name = dto.Name,
+            AuthenticationType = dto.AuthenticationType,
+            EncryptionAlgorithmType = dto.EncryptionAlgorithmType,
+            EncryptedJson = dto.EncryptedJson,
+            IsActive = dto.IsActive,
+            RecordVersion = dto.RecordVersion.ToString(),
+            CreatedAt = dto.CreatedAt,
+            CreatedBy = dto.CreatedBy,
+            LastUpdatedAt = dto.LastUpdatedAt,
+            LastUpdatedBy = dto.LastUpdatedBy
+        };
     }
 
     /// <summary>
-    /// Inserts a new SOAP application record with ServiceType = "SOAP", a generated PublicId,
-    /// and a RecordVersion computed by the database function.
+    /// Inserts a new SOAP application record via usp_CreateServiceApplication SP.
     /// </summary>
     public async Task<ServiceApplication> AddAsync(ServiceApplication app, CancellationToken cancellationToken = default)
     {
-        app.ServiceType = "SOAP";
-        app.PublicId = Guid.NewGuid();
-        app.RecordVersion = await GetNextVersionAsync(null, cancellationToken);
-        app.CreatedAt = DateTime.UtcNow;
+        var result = await createAppRepo.ExecuteAsync(new CreateServiceApplicationInput
+        {
+            ServiceType = "SOAP",
+            ServiceAppAuthenticationId = null,
+            Name = app.Name,
+            BaseUrl = app.BaseUrl,
+            DefinitionType = "WSDL",
+            DefinitionRelativeUrl = app.DefinitionRelativeUrl,
+            HealthcheckRelativeUrl = app.HealthcheckRelativeUrl,
+            Description = app.Description,
+            UserId = app.CreatedBy
+        }, cancellationToken);
 
-        var generatedId = await Context.InsertWithInt32IdentityAsync(app, token: cancellationToken);
-        app.Id = generatedId;
-        return app;
+        if (!result.Success || result.Data is null)
+            throw new InvalidOperationException($"Failed to create application: {result.ErrorMessage}");
+
+        var dto = result.Data;
+        return new ServiceApplication
+        {
+            Id = dto.ServiceApplicationId!.Value,
+            PublicId = dto.PublicId!.Value,
+            ServiceType = dto.ServiceType!,
+            Name = dto.Name!,
+            BaseUrl = dto.BaseUrl!,
+            DefinitionType = dto.DefinitionType,
+            DefinitionRelativeUrl = dto.DefinitionRelativeUrl,
+            HealthcheckRelativeUrl = dto.HealthcheckRelativeUrl,
+            Description = dto.Description,
+            IsActive = dto.IsActive ?? true,
+            RecordVersion = dto.RecordVersion ?? "00.00.00",
+            CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
+            CreatedBy = dto.CreatedBy ?? app.CreatedBy
+        };
     }
 
     /// <summary>
-    /// Retrieves a ServiceApplication by its primary key identifier.
+    /// Retrieves a ServiceApplication by its primary key identifier via SP.
     /// </summary>
     public async Task<ServiceApplication?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await Context.ServiceApplications
-            .FirstOrDefaultAsync(app => app.Id == id, cancellationToken);
+        var result = await getByIdRepo.ExecuteAsync(
+            new GetServiceApplicationByIdInput { Id = id }, cancellationToken);
+
+        if (!result.Success || result.Data is null)
+            return null;
+
+        return MapToEntity(result.Data);
     }
 
     /// <summary>
-    /// Retrieves a ServiceApplication by its unique name.
+    /// Retrieves a ServiceApplication by its unique name via direct query.
     /// </summary>
     public async Task<ServiceApplication?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
@@ -77,87 +129,100 @@ public class ServiceApplicationRepository(ServiceAppDbContext context)
     }
 
     /// <summary>
-    /// Updates an existing ServiceApplication record and refreshes its RecordVersion.
+    /// Updates an existing ServiceApplication record via UpsertServiceApplication SP.
     /// </summary>
     public async Task UpdateAsync(ServiceApplication app, CancellationToken cancellationToken = default)
     {
-        app.RecordVersion = await GetNextVersionAsync(app.RecordVersion, cancellationToken);
-        app.LastUpdatedAt = DateTime.UtcNow;
-        await Context.UpdateAsync(app, token: cancellationToken);
+        var result = await upsertRepo.ExecuteAsync(new UpsertServiceApplicationInput
+        {
+            PublicId = app.PublicId,
+            RecordVersion = app.RecordVersion,
+            ServiceType = app.ServiceType,
+            ServiceAppAuthenticationId = null, // Auth is managed separately via SaveAuthenticationAsync
+            Name = app.Name,
+            BaseUrl = app.BaseUrl,
+            DefinitionType = app.DefinitionType,
+            DefinitionRelativeUrl = app.DefinitionRelativeUrl,
+            HealthcheckRelativeUrl = app.HealthcheckRelativeUrl,
+            Description = app.Description,
+            UserId = app.LastUpdatedBy ?? app.CreatedBy,
+            IsActive = app.IsActive,
+            ActivityNotes = $"Updated application: {app.Name}"
+        }, cancellationToken);
+
+        if (!result.Success)
+            throw new InvalidOperationException($"Failed to update application: {result.ErrorMessage}");
     }
 
     /// <summary>
-    /// Updates active state status and audit tracking columns for a targeted application ID.
+    /// Updates active state status via ToggleServiceApplicationActive SP.
     /// </summary>
     public async Task UpdateStatusAsync(int appId, bool isActive, string updatedBy, CancellationToken cancellationToken = default)
     {
-        var nextVersion = await GetNextVersionAsync(null, cancellationToken);
-        await Context.ServiceApplications
-            .Where(app => app.Id == appId)
-            .Set(app => app.IsActive, isActive)
-            .Set(app => app.RecordVersion, nextVersion)
-            .Set(app => app.LastUpdatedAt, DateTime.UtcNow)
-            .Set(app => app.LastUpdatedBy, updatedBy)
-            .UpdateAsync(token: cancellationToken);
+        // First resolve the app's PublicId
+        var appResult = await getByIdRepo.ExecuteAsync(
+            new GetServiceApplicationByIdInput { Id = appId }, cancellationToken);
+
+        if (!appResult.Success || appResult.Data is null)
+            throw new InvalidOperationException($"Application with ID {appId} not found.");
+
+        var appPublicId = appResult.Data.PublicId;
+
+        var result = await toggleActiveRepo.ExecuteAsync(new ToggleServiceApplicationActiveInput
+        {
+            PublicId = appPublicId,
+            IsActive = isActive,
+            UserId = updatedBy
+        }, cancellationToken);
+
+        if (!result.Success)
+            throw new InvalidOperationException($"Failed to update application status: {result.ErrorMessage}");
     }
 
     /// <summary>
-    /// Inserts or updates authentication configuration for a SOAP application.
-    /// Sets the ServiceAppAuthenticationId FK on the ServiceApplication record.
+    /// Inserts or updates authentication configuration via UpdateServiceAppAuthentication SP.
     /// </summary>
     public async Task SaveAuthenticationAsync(ServiceAppAuthentication auth, int appId, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Context.BeginTransactionAsync(cancellationToken);
-
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
-            // Deactivate any existing active auth records for this app
-            await Context.ServiceAppAuthentications
-                .Where(a => a.ServiceApplications.Any(sa => sa.Id == appId) && a.IsActive)
-                .Set(a => a.IsActive, false)
-                .Set(a => a.LastUpdatedAt, DateTime.UtcNow)
-                .UpdateAsync(token: cancellationToken);
+            // First, get the current app to resolve its PublicId
+            var appResult = await getByIdRepo.ExecuteAsync(
+                new GetServiceApplicationByIdInput { Id = appId }, cancellationToken);
 
-            // Insert new auth record
-            auth.PublicId = Guid.NewGuid();
-            auth.RecordVersion = await GetNextVersionAsync(null, cancellationToken);
-            auth.CreatedAt = DateTime.UtcNow;
-            auth.IsActive = true;
+            if (!appResult.Success || appResult.Data is null)
+                throw new InvalidOperationException($"Application with ID {appId} not found.");
 
-            var authId = await Context.InsertWithInt64IdentityAsync(auth, token: cancellationToken);
-            auth.Id = authId;
+            var app = appResult.Data;
 
-            // Update the ServiceApplication FK
-            await Context.ServiceApplications
-                .Where(app => app.Id == appId)
-                .Set(app => app.ServiceAppAuthenticationId, authId)
-                .Set(app => app.LastUpdatedAt, DateTime.UtcNow)
-                .UpdateAsync(token: cancellationToken);
+            // Update auth via SP
+            var authResult = await updateAuthRepo.ExecuteAsync(new UpdateServiceAppAuthenticationInput
+            {
+                PublicId = app.PublicId,
+                Name = auth.Name,
+                AuthenticationType = auth.AuthenticationType,
+                EncryptionAlgorithmType = auth.EncryptionAlgorithmType,
+                EncryptedJson = auth.EncryptedJson,
+                UserId = auth.CreatedBy,
+                ActivityNotes = $"Configured authentication for application ID {appId}"
+            }, cancellationToken);
 
-            await transaction.CommitAsync(cancellationToken);
+            if (!authResult.Success)
+                throw new InvalidOperationException($"Failed to save authentication: {authResult.ErrorMessage}");
+
+            await unitOfWork.CommitAsync(cancellationToken);
         }
         catch
         {
-            await transaction.RollbackAsync(cancellationToken);
+            await unitOfWork.RollbackAsync(cancellationToken);
             throw;
         }
     }
 
     /// <summary>
-    /// Calls the database function dbo.fn_CalculateVersion to compute the next version string.
+    /// Paged query using direct linq2db (hybrid approach).
     /// </summary>
-    public async Task<string> GetNextVersionAsync(string? previousVersion, CancellationToken cancellationToken = default)
-    {
-        var param = previousVersion is not null
-            ? new DataParameter("@PreviousVersion", previousVersion)
-            : new DataParameter("@PreviousVersion", DBNull.Value);
-
-        var result = await Context.QueryAsync<string>(
-            "SELECT dbo.fn_CalculateVersion(@PreviousVersion)", param);
-
-        return result.FirstOrDefault() ?? "00.00.00";
-    }
-
     public async Task<PagedResult<ServiceApplication>> GetPagedAsync(
         ApplicationFilter filter,
         CancellationToken cancellationToken = default)
@@ -202,12 +267,34 @@ public class ServiceApplicationRepository(ServiceAppDbContext context)
 
         return (sortBy.ToLowerInvariant()) switch
         {
-            "appname" or "name" => descending ? query.OrderByDescending(a => a.Name) : query.OrderBy(a => a.Name),
+            "name" => descending ? query.OrderByDescending(a => a.Name) : query.OrderBy(a => a.Name),
             "createdat" => descending ? query.OrderByDescending(a => a.CreatedAt) : query.OrderBy(a => a.CreatedAt),
             "createdby" => descending ? query.OrderByDescending(a => a.CreatedBy) : query.OrderBy(a => a.CreatedBy),
             "isactive" => descending ? query.OrderByDescending(a => a.IsActive) : query.OrderBy(a => a.IsActive),
-            "version" or "recordversion" => descending ? query.OrderByDescending(a => a.RecordVersion) : query.OrderBy(a => a.RecordVersion),
             _ => query.OrderBy(a => a.Id)
+        };
+    }
+
+    private static ServiceApplication MapToEntity(GetServiceApplicationByIdOutput dto)
+    {
+        return new ServiceApplication
+        {
+            Id = dto.Id,
+            PublicId = dto.PublicId,
+            ServiceType = dto.ServiceType,
+            ServiceAppAuthenticationId = dto.ServiceAppAuthenticationId,
+            Name = dto.Name,
+            BaseUrl = dto.BaseUrl,
+            DefinitionType = dto.DefinitionType,
+            DefinitionRelativeUrl = dto.DefinitionRelativeUrl,
+            HealthcheckRelativeUrl = dto.HealthcheckRelativeUrl,
+            Description = dto.Description,
+            IsActive = dto.IsActive,
+            RecordVersion = dto.RecordVersion.ToString(),
+            CreatedAt = dto.CreatedAt,
+            CreatedBy = dto.CreatedBy,
+            LastUpdatedAt = dto.LastUpdatedAt,
+            LastUpdatedBy = dto.LastUpdatedBy
         };
     }
 }

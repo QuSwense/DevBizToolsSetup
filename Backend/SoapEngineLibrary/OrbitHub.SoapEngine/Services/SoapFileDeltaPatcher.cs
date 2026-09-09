@@ -1,10 +1,9 @@
-namespace ServiceHub.SoapEngine.Core.Services;
-
 using System.Text;
 using DiffPlex;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
-using ServiceHub.SoapEngine.Core.Data.Generated;
+
+namespace OrbitHub.SoapEngine.Core.Services;
 
 /// <summary>
 /// Provides backward diff generation and historical payload reconstruction services for XML/SOAP files using DiffPlex.
@@ -98,43 +97,6 @@ public class SoapFileDeltaPatcher(SoapFileCompressor compressor)
         }
 
         return sb.ToString().TrimEnd('\r', '\n');
-    }
-
-    /// <summary>
-    /// Reconstructs a targeted historical payload version from a sequence of history records 
-    /// and the current active file payload.
-    /// </summary>
-    public byte[] ReconstructHistoricalVersion(
-        SoapRequestFile currentActiveFile,
-        List<SoapRequestFileHistory> historyChain,
-        int targetHistoryId)
-    {
-        byte[] currentBytes = compressor.Decompress(currentActiveFile.FileData);
-
-        // Order history from newest to oldest
-        var orderedHistory = historyChain.OrderByDescending(h => h.CreatedAt).ToList();
-
-        foreach (var historyRecord in orderedHistory)
-        {
-            if (historyRecord.FileData != null)
-            {
-                // Found full snapshot anchor - reset baseline bytes
-                currentBytes = compressor.Decompress(historyRecord.FileData);
-            }
-            else if (historyRecord.DiffData != null)
-            {
-                // Apply backward patch
-                currentBytes = ApplyBackwardDiff(currentBytes, historyRecord.DiffData);
-            }
-
-            // Stop when we reach the target version
-            if (historyRecord.Id == targetHistoryId)
-            {
-                break;
-            }
-        }
-
-        return currentBytes;
     }
 
     #endregion

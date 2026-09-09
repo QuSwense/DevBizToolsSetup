@@ -2,100 +2,115 @@ namespace ServiceHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
-using LinqToDB.Data;
+using OrbitHub.Data.Repositories.TestManagement.Models;
+using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
 using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
-/// Provides database access for SOAP request files using the unified ServiceAppDbContext.
-/// Uses the delta chain pattern (IsBaseSnapshot/ParentBaseId/ParentDeltaId/DeltaDepth)
-/// instead of the legacy separate history table.
+/// Provides database access for SOAP request files using stored procedure repositories
+/// from OrbitHub.Data. Uses the delta chain pattern (IsBaseSnapshot/ParentBaseId/ParentDeltaId/DeltaDepth).
+/// Paged/read queries use direct linq2db (hybrid approach).
 /// </summary>
-public class ServiceRequestFileRepository(ServiceAppDbContext context)
+public class ServiceRequestFileRepository(
+    InsertServiceRequestFileRepository insertFileRepo,
+    UpdateServiceRequestFileRepository updateFileRepo,
+    UpdateServiceRequestFileWithDeltaChainRepository updateDeltaChainRepo,
+    GetServiceRequestFileByIdRepository getByIdRepo,
+    GetServiceRequestFileByOperationAndNameRepository getByOpAndNameRepo,
+    GetServiceRequestFileConsecutiveDeltaCountRepository getDeltaCountRepo,
+    InsertServiceRequestFileEmbeddingRepository insertEmbeddingRepo,
+    IUnitOfWork unitOfWork,
+    ServiceAppDbContext context)
 {
     private ServiceAppDbContext Context { get; } = context;
 
     /// <summary>
-    /// Inserts a new request file as a base snapshot (DeltaDepth = 0) in the delta chain.
+    /// Inserts a new request file as a base snapshot via usp_InsertServiceRequestFile SP.
     /// </summary>
     public async Task<ServiceRequestFile> AddAsync(ServiceRequestFile requestFile, CancellationToken cancellationToken = default)
     {
-        requestFile.RecordVersion = await GetNextVersionAsync(null, cancellationToken);
-        requestFile.IsBaseSnapshot = true;
-        requestFile.DeltaDepth = 0;
-        requestFile.CreatedAt = DateTime.UtcNow;
-        requestFile.IsActive = true;
+        var result = await insertFileRepo.ExecuteAsync(new InsertServiceRequestFileInput
+        {
+            ServiceOperationId = requestFile.ServiceOperationId,
+            Name = requestFile.Name,
+            FileFormat = requestFile.FileFormat,
+            IsBaseSnapshot = true,
+            ParentBaseId = null,
+            ParentDeltaId = null,
+            CompressedData = requestFile.CompressedData,
+            UncompressedSizeBytes = requestFile.UncompressedSizeBytes,
+            CompressionAlgorithmType = requestFile.CompressionAlgorithmType,
+            ContentHash = requestFile.ContentHash,
+            UserId = requestFile.CreatedBy
+        }, cancellationToken);
 
-        var fileId = await Context.InsertWithInt32IdentityAsync(requestFile, token: cancellationToken);
-        requestFile.Id = fileId;
-        return requestFile;
+        if (!result.Success || result.Data is null)
+            throw new InvalidOperationException($"Failed to insert request file: {result.ErrorMessage}");
+
+        var dto = result.Data;
+        return new ServiceRequestFile
+        {
+            Id = dto.FileId!.Value,
+            ServiceOperationId = dto.ServiceOperationId!.Value,
+            FileFormat = dto.FileFormat,
+            Name = dto.Name!,
+            IsBaseSnapshot = dto.IsBaseSnapshot ?? true,
+            ParentBaseId = dto.ParentBaseId,
+            ParentDeltaId = dto.ParentDeltaId,
+            DeltaDepth = dto.DeltaDepth ?? 0,
+            CompressedData = dto.CompressedData ?? requestFile.CompressedData,
+            UncompressedSizeBytes = dto.UncompressedSizeBytes,
+            CompressionAlgorithmType = dto.CompressionAlgorithmType,
+            ContentHash = dto.ContentHash,
+            RecordVersion = dto.RecordVersion ?? "00.00.00",
+            IsActive = true,
+            CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
+            CreatedBy = dto.CreatedBy ?? requestFile.CreatedBy
+        };
     }
 
     /// <summary>
-    /// Updates an existing request file by creating a new delta chain entry.
-    /// The previous version is preserved as a delta record (IsBaseSnapshot = false),
-    /// and the active record is updated with the new payload.
+    /// Updates an existing request file via usp_UpdateServiceRequestFileWithDeltaChain SP.
     /// </summary>
     public async Task<ServiceRequestFile> UpdateWithDeltaChainAsync(
         ServiceRequestFile activeFile,
         byte[]? backwardDiffData,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Context.BeginTransactionAsync(cancellationToken);
-
-        try
+        var result = await updateDeltaChainRepo.ExecuteAsync(new UpdateServiceRequestFileWithDeltaChainInput
         {
-            // 1. Find the base snapshot ID for this delta chain
-            int baseId = activeFile.ParentBaseId ?? activeFile.Id;
+            FileId = activeFile.Id,
+            CompressedData = activeFile.CompressedData,
+            UncompressedSizeBytes = activeFile.UncompressedSizeBytes,
+            CompressionAlgorithmType = activeFile.CompressionAlgorithmType,
+            ContentHash = activeFile.ContentHash,
+            BackwardDiffData = backwardDiffData,
+            UserId = activeFile.LastUpdatedBy ?? activeFile.CreatedBy
+        }, cancellationToken);
 
-            // 2. Create a delta record preserving the old version
-            var deltaRecord = new ServiceRequestFile
-            {
-                ServiceOperationId = activeFile.ServiceOperationId,
-                FileFormat = activeFile.FileFormat,
-                Name = activeFile.Name,
-                IsBaseSnapshot = false,
-                ParentBaseId = baseId,
-                ParentDeltaId = activeFile.Id,
-                DeltaDepth = activeFile.DeltaDepth + 1,
-                CompressedData = backwardDiffData ?? activeFile.CompressedData,
-                UncompressedSizeBytes = activeFile.UncompressedSizeBytes,
-                CompressionAlgorithmType = backwardDiffData is not null ? null : activeFile.CompressionAlgorithmType,
-                ContentHash = activeFile.ContentHash,
-                RecordVersion = activeFile.RecordVersion,
-                IsActive = false, // Historical record
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = activeFile.LastUpdatedBy ?? activeFile.CreatedBy
-            };
+        if (!result.Success)
+            throw new InvalidOperationException($"Failed to update request file with delta chain: {result.ErrorMessage}");
 
-            await Context.InsertAsync(deltaRecord, token: cancellationToken);
-
-            // 3. Update the active file record with new payload
-            activeFile.RecordVersion = await GetNextVersionAsync(activeFile.RecordVersion, cancellationToken);
-            activeFile.LastUpdatedAt = DateTime.UtcNow;
-            await Context.UpdateAsync(activeFile, token: cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
-            return activeFile;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        return activeFile;
     }
 
     /// <summary>
-    /// Retrieves a request file by its primary key identifier.
+    /// Retrieves a request file by its primary key identifier via SP.
     /// </summary>
     public async Task<ServiceRequestFile?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await Context.ServiceRequestFiles
-            .FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
+        var result = await getByIdRepo.ExecuteAsync(
+            new GetServiceRequestFileByIdInput { Id = id }, cancellationToken);
+
+        if (!result.Success || result.Data is null)
+            return null;
+
+        return MapToEntity(result.Data);
     }
 
     /// <summary>
-    /// Retrieves all active request files associated with a target operation ID.
+    /// Retrieves all active request files associated with a target operation ID via direct query.
     /// </summary>
     public async Task<List<ServiceRequestFile>> GetByOperationIdAsync(int operationId, CancellationToken cancellationToken = default)
     {
@@ -105,17 +120,25 @@ public class ServiceRequestFileRepository(ServiceAppDbContext context)
     }
 
     /// <summary>
-    /// Retrieves a request file by operation ID and file name.
+    /// Retrieves a request file by operation ID and file name via SP.
     /// </summary>
     public async Task<ServiceRequestFile?> GetByOperationAndNameAsync(int operationId, string fileName, CancellationToken cancellationToken = default)
     {
-        return await Context.ServiceRequestFiles
-            .Where(f => f.ServiceOperationId == operationId && f.Name == fileName && f.IsActive)
-            .FirstOrDefaultAsync(cancellationToken);
+        var result = await getByOpAndNameRepo.ExecuteAsync(
+            new GetServiceRequestFileByOperationAndNameInput
+            {
+                ServiceOperationId = operationId,
+                Name = fileName
+            }, cancellationToken);
+
+        if (!result.Success || result.Data is null)
+            return null;
+
+        return MapToEntity(result.Data);
     }
 
     /// <summary>
-    /// Fetches the full delta chain for a given request file (base snapshot + all deltas).
+    /// Fetches the full delta chain for a given request file via direct query.
     /// </summary>
     public async Task<List<ServiceRequestFile>> GetDeltaChainAsync(int requestFileId, CancellationToken cancellationToken = default)
     {
@@ -132,22 +155,23 @@ public class ServiceRequestFileRepository(ServiceAppDbContext context)
     }
 
     /// <summary>
-    /// Toggles active state for a specific request file.
+    /// Toggles active state for a specific request file via UpdateServiceRequestFile SP.
     /// </summary>
     public async Task UpdateStatusAsync(int fileId, bool isActive, string updatedBy, CancellationToken cancellationToken = default)
     {
-        var nextVersion = await GetNextVersionAsync(null, cancellationToken);
-        await Context.ServiceRequestFiles
-            .Where(f => f.Id == fileId)
-            .Set(f => f.IsActive, isActive)
-            .Set(f => f.RecordVersion, nextVersion)
-            .Set(f => f.LastUpdatedAt, DateTime.UtcNow)
-            .Set(f => f.LastUpdatedBy, updatedBy)
-            .UpdateAsync(token: cancellationToken);
+        var result = await updateFileRepo.ExecuteAsync(new UpdateServiceRequestFileInput
+        {
+            FileId = fileId,
+            IsActive = isActive,
+            UserId = updatedBy
+        }, cancellationToken);
+
+        if (!result.Success)
+            throw new InvalidOperationException($"Failed to update request file status: {result.ErrorMessage}");
     }
 
     /// <summary>
-    /// Fetches the latest RecordVersion string for request files under an operation.
+    /// Fetches the latest RecordVersion string for request files under an operation via direct query.
     /// </summary>
     public async Task<string?> GetLatestFileVersionAsync(int operationId, CancellationToken cancellationToken = default)
     {
@@ -159,37 +183,22 @@ public class ServiceRequestFileRepository(ServiceAppDbContext context)
     }
 
     /// <summary>
-    /// Gets the count of consecutive delta records since the most recent base snapshot.
+    /// Gets the count of consecutive delta records since the most recent base snapshot via SP.
     /// </summary>
     public async Task<int> GetConsecutiveDeltaCountAsync(int requestFileId, CancellationToken cancellationToken = default)
     {
-        var file = await GetByIdAsync(requestFileId, cancellationToken);
-        if (file is null)
+        var result = await getDeltaCountRepo.ExecuteAsync(
+            new GetServiceRequestFileConsecutiveDeltaCountInput { RequestFileId = requestFileId }, cancellationToken);
+
+        if (!result.Success || result.Data is null)
             return 0;
 
-        int baseId = file.ParentBaseId ?? file.Id;
-
-        // Count all non-base records in this delta chain
-        return await Context.ServiceRequestFiles
-            .Where(f => f.ParentBaseId == baseId && !f.IsBaseSnapshot)
-            .CountAsync(cancellationToken);
+        return result.Data.DeltaCount;
     }
 
     /// <summary>
-    /// Calls the database function dbo.fn_CalculateVersion to compute the next version string.
+    /// Paged query using direct linq2db (hybrid approach).
     /// </summary>
-    private async Task<string> GetNextVersionAsync(string? previousVersion, CancellationToken cancellationToken = default)
-    {
-        var param = previousVersion is not null
-            ? new DataParameter("@PreviousVersion", previousVersion)
-            : new DataParameter("@PreviousVersion", DBNull.Value);
-
-        var result = await Context.QueryAsync<string>(
-            "SELECT dbo.fn_CalculateVersion(@PreviousVersion)", param);
-
-        return result.FirstOrDefault() ?? "00.00.00";
-    }
-
     public async Task<PagedResult<ServiceRequestFile>> GetPagedAsync(
         RequestFileFilter filter,
         CancellationToken cancellationToken = default)
@@ -228,12 +237,36 @@ public class ServiceRequestFileRepository(ServiceAppDbContext context)
 
         return (sortBy.ToLowerInvariant()) switch
         {
-            "filename" or "name" => descending ? query.OrderByDescending(f => f.Name) : query.OrderBy(f => f.Name),
+            "name" => descending ? query.OrderByDescending(f => f.Name) : query.OrderBy(f => f.Name),
             "createdat" => descending ? query.OrderByDescending(f => f.CreatedAt) : query.OrderBy(f => f.CreatedAt),
             "createdby" => descending ? query.OrderByDescending(f => f.CreatedBy) : query.OrderBy(f => f.CreatedBy),
             "isactive" => descending ? query.OrderByDescending(f => f.IsActive) : query.OrderBy(f => f.IsActive),
-            "version" or "recordversion" => descending ? query.OrderByDescending(f => f.RecordVersion) : query.OrderBy(f => f.RecordVersion),
             _ => query.OrderBy(f => f.Id)
+        };
+    }
+
+    private static ServiceRequestFile MapToEntity(GetServiceRequestFileByIdOutput dto)
+    {
+        return new ServiceRequestFile
+        {
+            Id = dto.Id,
+            ServiceOperationId = dto.ServiceOperationId,
+            FileFormat = dto.FileFormat,
+            Name = dto.Name,
+            IsBaseSnapshot = dto.IsBaseSnapshot,
+            ParentBaseId = dto.ParentBaseId,
+            ParentDeltaId = dto.ParentDeltaId,
+            DeltaDepth = dto.DeltaDepth,
+            CompressedData = dto.CompressedData,
+            UncompressedSizeBytes = dto.UncompressedSizeBytes,
+            CompressionAlgorithmType = dto.CompressionAlgorithmType,
+            ContentHash = dto.ContentHash,
+            RecordVersion = dto.RecordVersion.ToString(),
+            IsActive = dto.IsActive,
+            CreatedAt = dto.CreatedAt,
+            CreatedBy = dto.CreatedBy,
+            LastUpdatedAt = dto.LastUpdatedAt,
+            LastUpdatedBy = dto.LastUpdatedBy
         };
     }
 }
