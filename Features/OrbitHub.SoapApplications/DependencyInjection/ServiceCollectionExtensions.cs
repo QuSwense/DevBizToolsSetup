@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.SoapApplications.Services;
 using OrbitHub.SoapApplications.Services.Execution;
 
-namespace OrbitHub.SoapApplications;
+namespace OrbitHub.SoapApplications.DependencyInjection;
 
 /// <summary>
 /// Extension methods for registering SOAP Applications feature services.

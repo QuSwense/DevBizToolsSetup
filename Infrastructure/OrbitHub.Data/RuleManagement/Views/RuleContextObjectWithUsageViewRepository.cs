@@ -9,7 +9,7 @@ using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.RuleManagement.Views;
 using OrbitHub.Data.RuleManagement;
 
-namespace OrbitHub.Data.Repositories.RuleManagement.Views;
+namespace OrbitHub.Data.RuleManagement.Views;
 
 public class RuleContextObjectWithUsageViewRepository
 {

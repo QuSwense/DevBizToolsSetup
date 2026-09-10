@@ -1,10 +1,10 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-public class EditApplicationInputValidator : IValidator<EditApplicationInput>
+public class EditApplicationInputValidator : IValidator<EditApplicationInputModel>
 {
-    public ValidationResult Validate(EditApplicationInput input)
+    public ValidationResult Validate(EditApplicationInputModel input)
     {
         var errors = new List<string>();
 

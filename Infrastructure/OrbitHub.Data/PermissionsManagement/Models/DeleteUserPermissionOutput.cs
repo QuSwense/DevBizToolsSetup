@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.PermissionsManagement.Models;
+namespace OrbitHub.Data.PermissionsManagement.Models;
 
 public class DeleteUserPermissionOutput
 {

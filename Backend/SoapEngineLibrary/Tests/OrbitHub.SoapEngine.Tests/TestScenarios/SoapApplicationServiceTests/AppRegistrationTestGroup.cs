@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapApplicationServiceTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.SoapEngine.Core.Services;
@@ -30,7 +30,7 @@ public class AppRegistrationTestGroup(
         logger.LogInformation("TEST: Registering Application via Live Basic Auth WSDL (Port 7050)...");
 
         string appName = $"CustomerService_Basic_{Guid.NewGuid():N}"[..30];
-        var input = new RegisterApplicationInput
+        var input = new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.BasicAuthService.BaseUrl,
@@ -56,7 +56,7 @@ public class AppRegistrationTestGroup(
         logger.LogInformation("TEST: Registering Application via Live OAuth2 WSDL (Port 7051)...");
 
         string appName = $"DocumentService_OAuth_{Guid.NewGuid():N}"[..30];
-        var input = new RegisterApplicationInput
+        var input = new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.OAuth2Service.BaseUrl,
@@ -82,7 +82,7 @@ public class AppRegistrationTestGroup(
         logger.LogInformation("TEST [Error Case]: Registering application with duplicate AppName...");
 
         string duplicateName = $"DuplicateApp_{Guid.NewGuid():N}"[..25];
-        var input = new RegisterApplicationInput
+        var input = new RegisterApplicationInputModel
         {
             AppName = duplicateName,
             BaseUrl = settings.BasicAuthService.BaseUrl,
@@ -112,7 +112,7 @@ public class AppRegistrationTestGroup(
     {
         logger.LogInformation("TEST [Error Case]: Registering app with unreachable WSDL URL...");
 
-        var input = new RegisterApplicationInput
+        var input = new RegisterApplicationInputModel
         {
             AppName = $"InvalidWsdlApp_{Guid.NewGuid():N}"[..25],
             BaseUrl = settings.UnreachableService.BaseUrl,

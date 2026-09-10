@@ -1,4 +1,4 @@
-namespace OrbitHub.Common;
+namespace OrbitHub.Common.Helpers;
 
 public static class FileFormatHelper
 {

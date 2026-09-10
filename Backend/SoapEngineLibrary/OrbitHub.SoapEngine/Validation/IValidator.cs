@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Validation;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
 public interface IValidator<T>
 {

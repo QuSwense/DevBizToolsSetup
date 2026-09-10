@@ -1,10 +1,8 @@
 using Microsoft.Extensions.Logging;
-using PdfProcessor.Models.Common;
-using PdfProcessor.Models.Fields;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.AcroForms.Fields;
 
-namespace PdfProcessor.Services.Internal;
+namespace OrbitHub.PdfProcessor.Core.Services.Internal;
 
 public class AcroFormExtractor(ILogger<AcroFormExtractor> logger)
 {

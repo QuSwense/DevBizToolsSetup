@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Parsing.Models;
+namespace OrbitHub.SoapEngine.Core.Parsing.Models;
 
 /// <summary>
 /// Holds operation-level metadata parsed directly from WSDL binding definitions.

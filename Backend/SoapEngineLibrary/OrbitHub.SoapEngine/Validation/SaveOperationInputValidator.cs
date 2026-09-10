@@ -1,10 +1,8 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
-
-public class SaveOperationInputValidator : IValidator<SaveOperationInput>
+public class SaveOperationInputValidator : IValidator<SaveOperationInputModel>
 {
-    public ValidationResult Validate(SaveOperationInput input)
+    public ValidationResult Validate(SaveOperationInputModel input)
     {
         var errors = new List<string>();
 

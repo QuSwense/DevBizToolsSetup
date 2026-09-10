@@ -1,6 +1,4 @@
-using PdfProcessor.Models.Common;
-
-namespace PdfProcessor.Models.Fields;
+namespace OrbitHub.PdfProcessor.Core.Models.Fields;
 
 public record PdfTextField(
     string Name,

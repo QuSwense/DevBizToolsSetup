@@ -1,10 +1,10 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-public class ConfigureAuthInputValidator : IValidator<ConfigureAuthInput>
+public class ConfigureAuthInputValidator : IValidator<ConfigureAuthInputModel>
 {
-    public ValidationResult Validate(ConfigureAuthInput input)
+    public ValidationResult Validate(ConfigureAuthInputModel input)
     {
         var errors = new List<string>();
 
@@ -18,35 +18,35 @@ public class ConfigureAuthInputValidator : IValidator<ConfigureAuthInput>
         // Additional checks for specific credential types
         if (input.Credentials != null)
         {
-            if (input.Credentials is BasicAuthCredentials basic)
+            if (input.Credentials is BasicAuthCredentialsInputModel basic)
             {
                 if (string.IsNullOrWhiteSpace(basic.Username))
-                    errors.Add("BasicAuthCredentials: Username is required.");
+                    errors.Add("BasicAuthCredentialsInputModel: Username is required.");
                 if (string.IsNullOrWhiteSpace(basic.Password))
-                    errors.Add("BasicAuthCredentials: Password is required.");
+                    errors.Add("BasicAuthCredentialsInputModel: Password is required.");
             }
-            else if (input.Credentials is ApiKeyAuthCredentials apiKey)
+            else if (input.Credentials is ApiKeyAuthCredentialsInputModel apiKey)
             {
                 if (string.IsNullOrWhiteSpace(apiKey.HeaderName))
-                    errors.Add("ApiKeyAuthCredentials: HeaderName is required.");
+                    errors.Add("ApiKeyAuthCredentialsInputModel: HeaderName is required.");
                 if (string.IsNullOrWhiteSpace(apiKey.ApiKey))
-                    errors.Add("ApiKeyAuthCredentials: ApiKey is required.");
+                    errors.Add("ApiKeyAuthCredentialsInputModel: ApiKey is required.");
             }
-            else if (input.Credentials is OAuth2Credentials oauth)
+            else if (input.Credentials is OAuth2CredentialsInputModel oauth)
             {
                 if (string.IsNullOrWhiteSpace(oauth.TokenEndpoint))
-                    errors.Add("OAuth2Credentials: TokenEndpoint is required.");
+                    errors.Add("OAuth2CredentialsInputModel: TokenEndpoint is required.");
                 if (string.IsNullOrWhiteSpace(oauth.ClientId))
-                    errors.Add("OAuth2Credentials: ClientId is required.");
+                    errors.Add("OAuth2CredentialsInputModel: ClientId is required.");
                 if (string.IsNullOrWhiteSpace(oauth.ClientSecret))
-                    errors.Add("OAuth2Credentials: ClientSecret is required.");
+                    errors.Add("OAuth2CredentialsInputModel: ClientSecret is required.");
             }
-            else if (input.Credentials is NtlmAuthCredentials ntlm)
+            else if (input.Credentials is NtlmAuthCredentialsInputModel ntlm)
             {
                 if (string.IsNullOrWhiteSpace(ntlm.Username))
-                    errors.Add("NtlmAuthCredentials: Username is required.");
+                    errors.Add("NtlmAuthCredentialsInputModel: Username is required.");
                 if (string.IsNullOrWhiteSpace(ntlm.Password))
-                    errors.Add("NtlmAuthCredentials: Password is required.");
+                    errors.Add("NtlmAuthCredentialsInputModel: Password is required.");
             }
         }
 

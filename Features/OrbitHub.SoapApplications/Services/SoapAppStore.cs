@@ -1,7 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.TestManagement.Views;
 using OrbitHub.SoapApplications.Core.Enums;
 using OrbitHub.SoapApplications.Models;
 

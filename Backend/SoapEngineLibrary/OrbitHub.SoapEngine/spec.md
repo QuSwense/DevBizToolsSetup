@@ -57,7 +57,7 @@ All tables are defined in the provided SQL script. The library interacts with:
 ### 1. WSDL Inspection
 - **Input**: `InspectWsdlInput` (WsdlUrl or WsdlFileStream)  
 - **Method**: `SoapApplicationService.InspectWsdlOperationsAsync`  
-- **Returns**: List of `ParsedWsdlOperationDto` (includes `TargetNamespace`).
+- **Returns**: List of `ParsedWsdlOperationDtoInputModel` (includes `TargetNamespace`).
 
 ### 2. Full Application Creation
 - **Input**: `CreateFullApplicationInput` (metadata, auth type & credentials, operations list)  
@@ -101,8 +101,8 @@ These methods support optional filtering (e.g., `IsActive`, date ranges, user‑
 
 ## Authentication Models
 
-- **AuthCredentialsBase** (abstract) – defines `AuthenticationType` and `CredentialsPayload`.
-- Concrete types: `BasicAuthCredentials`, `ApiKeyAuthCredentials`, `OAuth2Credentials`, `NtlmAuthCredentials`.
+- **AuthCredentialsBaseInputModel** (abstract) – defines `AuthenticationType` and `CredentialsPayload`.
+- Concrete types: `BasicAuthCredentialsInputModel`, `ApiKeyAuthCredentialsInputModel`, `OAuth2CredentialsInputModel`, `NtlmAuthCredentialsInputModel`.
 - The `GenericAuthCredentialsWrapper` is **removed**; authentication configuration now uses the concrete types directly via the `Credentials` property in `ConfigureAuthInput` and `CreateFullApplicationInput`.
 
 ---

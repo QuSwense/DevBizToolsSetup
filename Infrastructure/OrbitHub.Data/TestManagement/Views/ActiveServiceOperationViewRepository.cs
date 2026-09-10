@@ -9,7 +9,7 @@ using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.TestManagement.Views;
 using OrbitHub.Data.TestManagement;
 
-namespace OrbitHub.Data.Repositories.TestManagement.Views;
+namespace OrbitHub.Data.TestManagement.Views;
 
 public class ActiveServiceOperationViewRepository
 {

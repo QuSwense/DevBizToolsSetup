@@ -1,6 +1,7 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapApplicationServiceTests;
 
 using Microsoft.Extensions.Logging;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 using OrbitHub.SoapEngine.Core.Services;
 using ServiceHub.SoapEngine.Core.Models.Inputs;
 using SoapApiProcessorTest.Configuration;
@@ -39,7 +40,7 @@ public class AppAuthenticationTestGroup(
 
     private async Task<int> CreateTestAppAsync()
     {
-        var reg = await appService.RegisterApplicationAsync(new RegisterApplicationInput
+        var reg = await appService.RegisterApplicationAsync(new RegisterApplicationInputModel
         {
             AppName = $"AuthTestApp_{Guid.NewGuid():N}"[..25],
             BaseUrl = settings.BasicAuthService.BaseUrl,
@@ -53,11 +54,11 @@ public class AppAuthenticationTestGroup(
     {
         logger.LogInformation("TEST: Encrypting and saving Basic Auth credentials...");
 
-        var input = new ConfigureAuthInput
+        var input = new ConfigureAuthInputModel
         {
             AppId = appId,
             ConfiguredBy = DefaultUserId,
-            Credentials = new BasicAuthCredentials
+            Credentials = new BasicAuthCredentialsInputModel
             {
                 Username = "admin_user",
                 Password = "SuperSecretPassword123!"
@@ -72,11 +73,11 @@ public class AppAuthenticationTestGroup(
     {
         logger.LogInformation("TEST: Encrypting and saving OAuth2 Client Credentials...");
 
-        var input = new ConfigureAuthInput
+        var input = new ConfigureAuthInputModel
         {
             AppId = appId,
             ConfiguredBy = DefaultUserId,
-            Credentials = new OAuth2Credentials
+            Credentials = new OAuth2CredentialsInputModel
             {
                 TokenEndpoint = settings.OAuth2Service.TokenEndpoint,
                 ClientId = "client_app_id_99",
@@ -94,11 +95,11 @@ public class AppAuthenticationTestGroup(
     {
         logger.LogInformation("TEST: Encrypting and saving API Key Credentials...");
 
-        var input = new ConfigureAuthInput
+        var input = new ConfigureAuthInputModel
         {
             AppId = appId,
             ConfiguredBy = DefaultUserId,
-            Credentials = new ApiKeyAuthCredentials
+            Credentials = new ApiKeyAuthCredentialsInputModel
             {
                 HeaderName = "X-API-KEY",
                 ApiKey = "secret_api_key_12345",

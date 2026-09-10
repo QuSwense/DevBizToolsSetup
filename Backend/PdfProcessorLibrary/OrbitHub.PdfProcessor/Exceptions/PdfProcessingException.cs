@@ -1,4 +1,4 @@
-namespace PdfProcessor.Exceptions;
+namespace OrbitHub.PdfProcessor.Core.Exceptions;
 
 /// <summary>
 /// Custom application-wide exception wrapper for PDF processing failures.

@@ -1,4 +1,4 @@
-namespace PdfProcessor.Models.Editor;
+namespace OrbitHub.PdfProcessor.Core.Models.Editor;
 
 /// <summary>
 /// Result summary of an AcroForm field update operation.

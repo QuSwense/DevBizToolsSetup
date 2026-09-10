@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Logging;
-using PdfProcessor.Models.Common;
 using System.Text.RegularExpressions;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 
-namespace PdfProcessor.Services.Internal;
+namespace OrbitHub.PdfProcessor.Core.Services.Internal;
 
 public class PdfSearchEngine(ILogger<PdfSearchEngine> logger)
 {

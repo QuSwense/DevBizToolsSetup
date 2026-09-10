@@ -1,10 +1,8 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
-
-public class SyncWsdlInputValidator : IValidator<SyncWsdlInput>
+public class SyncWsdlInputValidator : IValidator<SyncWsdlInputModel>
 {
-    public ValidationResult Validate(SyncWsdlInput input)
+    public ValidationResult Validate(SyncWsdlInputModel input)
     {
         var errors = new List<string>();
 

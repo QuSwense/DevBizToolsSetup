@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.Configuration;
+namespace OrbitHub.SoapEngine.Tests.Configuration;
 
 /// <summary>Endpoint URLs for a mock service referenced by a test group.</summary>
 public class MockServiceEndpoint

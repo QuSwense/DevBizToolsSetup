@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapExecutionTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapExecutionTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
@@ -39,7 +39,7 @@ public class GroupExecutionTestGroup(
         logger.LogInformation("TEST: Setting up full execution group and running batch execution against Port 7050...");
 
         string appName = $"BatchExecApp_{Guid.NewGuid():N}"[..25];
-        var appReg = await appService.RegisterApplicationAsync(new RegisterApplicationInput
+        var appReg = await appService.RegisterApplicationAsync(new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.BasicAuthService.BaseUrl,
@@ -54,11 +54,11 @@ public class GroupExecutionTestGroup(
 
         int appId = appReg.Data!.Id;
 
-        await appService.ConfigureAuthenticationAsync(new ConfigureAuthInput
+        await appService.ConfigureAuthenticationAsync(new ConfigureAuthInputModel
         {
             AppId = appId,
             ConfiguredBy = DefaultUserId,
-            Credentials = new BasicAuthCredentials
+            Credentials = new BasicAuthCredentialsInputModel
             {
                 Username = "admin_user",
                 Password = "SuperSecretPassword123!"
@@ -67,7 +67,7 @@ public class GroupExecutionTestGroup(
 
         using var response = await httpClient.GetAsync(settings.BasicAuthService.WsdlUrl);
         using var wsdlStream = await response.Content.ReadAsStreamAsync();
-        await appService.SyncWsdlAsync(new SyncWsdlInput
+        await appService.SyncWsdlAsync(new SyncWsdlInputModel
         {
             AppId = appId,
             WsdlFileStream = wsdlStream,
@@ -97,7 +97,7 @@ public class GroupExecutionTestGroup(
             """;
 
         using var fileStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestXml));
-        var uploadResult = await appService.UploadRequestFileStreamAsync(new UploadRequestFileInput
+        var uploadResult = await appService.UploadRequestFileStreamAsync(new UploadRequestFileInputModel
         {
             OperationId = operations[0].Id,
             FileName = "BatchRequest.xml",

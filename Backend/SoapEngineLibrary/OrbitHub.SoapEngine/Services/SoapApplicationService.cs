@@ -1,11 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.GenericModels.Models;
-using ServiceHub.SoapEngine.Core.Data.Repositories;
-using ServiceHub.SoapEngine.Core.Models.Inputs;
-using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
-using ServiceHub.SoapEngine.Core.Parsing;
-using ServiceHub.SoapEngine.Core.Validation;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 
 namespace OrbitHub.SoapEngine.Core.Services;
 
@@ -21,23 +17,23 @@ public class SoapApplicationService(
     SoapFileDeltaPatcher deltaPatcher,
     ILogger<SoapApplicationService> logger,
     // Validators
-    IValidator<RegisterApplicationInput> registerValidator,
-    IValidator<CreateFullApplicationInput> createFullValidator,
-    IValidator<UpdateFullApplicationInput> updateFullValidator,
-    IValidator<EditApplicationInput> editValidator,
-    IValidator<SyncWsdlInput> syncWsdlValidator,
-    IValidator<InspectWsdlInput> inspectWsdlValidator,
-    IValidator<UploadRequestFileInput> uploadValidator,
-    IValidator<ConfigureAuthInput> configureAuthValidator,
-    IValidator<CreateManualOperationInput> manualOpValidator)
+    IValidator<RegisterApplicationInputModel> registerValidator,
+    IValidator<CreateFullApplicationInputModel> createFullValidator,
+    IValidator<UpdateFullApplicationInputModel> updateFullValidator,
+    IValidator<EditApplicationInputModel> editValidator,
+    IValidator<SyncWsdlInputModel> syncWsdlValidator,
+    IValidator<InspectWsdlInputModel> inspectWsdlValidator,
+    IValidator<UploadRequestFileInputModel> uploadValidator,
+    IValidator<ConfigureAuthInputModel> configureAuthValidator,
+    IValidator<CreateManualOperationInputModel> manualOpValidator)
 {
-    public async Task<ResultModel<List<ParsedWsdlOperationDto>>> InspectWsdlOperationsAsync(
-        InspectWsdlInput input,
+    public async Task<ResultModel<List<ParsedWsdlOperationDtoInputModel>>> InspectWsdlOperationsAsync(
+        InspectWsdlInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = inspectWsdlValidator.Validate(input);
         if (!validation.IsValid)
-            return ResultModel<List<ParsedWsdlOperationDto>>.Failure(string.Join("; ", validation.Errors));
+            return ResultModel<List<ParsedWsdlOperationDtoInputModel>>.Failure(string.Join("; ", validation.Errors));
 
         try
         {
@@ -54,11 +50,11 @@ public class SoapApplicationService(
             }
             else
             {
-                return ResultModel<List<ParsedWsdlOperationDto>>.Failure("Either WsdlUrl or WsdlFileStream must be provided.");
+                return ResultModel<List<ParsedWsdlOperationDtoInputModel>>.Failure("Either WsdlUrl or WsdlFileStream must be provided.");
             }
 
             var parsedMetadata = wsdlParser.ParseContent(wsdlContent);
-            var operations = parsedMetadata.Operations.Select(op => new ParsedWsdlOperationDto
+            var operations = parsedMetadata.Operations.Select(op => new ParsedWsdlOperationDtoInputModel
             {
                 OperationName = op.OperationName,
                 SoapAction = op.SoapAction,
@@ -67,18 +63,18 @@ public class SoapApplicationService(
                 TargetNamespace = op.TargetNamespace
             }).ToList();
 
-            return ResultModel<List<ParsedWsdlOperationDto>>.Success(operations);
+            return ResultModel<List<ParsedWsdlOperationDtoInputModel>>.Success(operations);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error occurred while inspecting WSDL.");
-            return ResultModel<List<ParsedWsdlOperationDto>>.Failure($"Failed to parse WSDL: {ex.Message}");
+            return ResultModel<List<ParsedWsdlOperationDtoInputModel>>.Failure($"Failed to parse WSDL: {ex.Message}");
         }
     }
 
     // ---------- Application CRUD ----------
     public async Task<ResultModel<ServiceApplication>> CreateFullApplicationAsync(
-        CreateFullApplicationInput input,
+        CreateFullApplicationInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = createFullValidator.Validate(input);
@@ -87,7 +83,7 @@ public class SoapApplicationService(
 
         logger.LogInformation("Creating full SOAP Application: {AppName}", input.AppName);
 
-        var regInput = new RegisterApplicationInput
+        var regInput = new RegisterApplicationInputModel
         {
             AppName = input.AppName,
             BaseUrl = input.BaseUrl,
@@ -106,7 +102,7 @@ public class SoapApplicationService(
 
         if (input.AuthType.HasValue && input.AuthCredentials is not null)
         {
-            var authInput = new ConfigureAuthInput
+            var authInput = new ConfigureAuthInputModel
             {
                 AppId = createdApp.Id,
                 ConfiguredBy = input.CreatedBy,
@@ -117,7 +113,7 @@ public class SoapApplicationService(
 
         foreach (var opInput in input.Operations)
         {
-            var manualInput = new CreateManualOperationInput
+            var manualInput = new CreateManualOperationInputModel
             {
                 AppId = createdApp.Id,
                 OperationName = opInput.OperationName,
@@ -136,7 +132,7 @@ public class SoapApplicationService(
     }
 
     public async Task<ResultModel<bool>> UpdateFullApplicationAsync(
-        UpdateFullApplicationInput input,
+        UpdateFullApplicationInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = updateFullValidator.Validate(input);
@@ -145,7 +141,7 @@ public class SoapApplicationService(
 
         logger.LogInformation("Updating full SOAP Application ID: {AppId}", input.AppId);
 
-        var editInput = new EditApplicationInput
+        var editInput = new EditApplicationInputModel
         {
             AppId = input.AppId,
             AppName = input.AppName,
@@ -161,7 +157,7 @@ public class SoapApplicationService(
 
         if (input.UpdateAuthentication && input.AuthType.HasValue && input.AuthCredentials is not null)
         {
-            var authInput = new ConfigureAuthInput
+            var authInput = new ConfigureAuthInputModel
             {
                 AppId = input.AppId,
                 ConfiguredBy = input.UpdatedBy,
@@ -186,7 +182,7 @@ public class SoapApplicationService(
             }
             else
             {
-                var manualInput = new CreateManualOperationInput
+                var manualInput = new CreateManualOperationInputModel
                 {
                     AppId = input.AppId,
                     OperationName = opInput.OperationName,
@@ -207,7 +203,7 @@ public class SoapApplicationService(
 
     // ---------- Sub‑methods ----------
     public async Task<ResultModel<ServiceApplication>> RegisterApplicationAsync(
-        RegisterApplicationInput input,
+        RegisterApplicationInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = registerValidator.Validate(input);
@@ -233,7 +229,7 @@ public class SoapApplicationService(
 
         if (input.DirectWsdlStream is not null)
         {
-            var syncInput = new SyncWsdlInput
+            var syncInput = new SyncWsdlInputModel
             {
                 AppId = registeredApp.Id,
                 WsdlFileStream = input.DirectWsdlStream,
@@ -245,7 +241,7 @@ public class SoapApplicationService(
         else if (!string.IsNullOrWhiteSpace(input.WsdlRelativeUrl))
         {
             var fullWsdlUrl = new Uri(new Uri(input.BaseUrl), input.WsdlRelativeUrl).ToString();
-            var syncInput = new SyncWsdlInput
+            var syncInput = new SyncWsdlInputModel
             {
                 AppId = registeredApp.Id,
                 WsdlUrl = fullWsdlUrl,
@@ -259,7 +255,7 @@ public class SoapApplicationService(
     }
 
     public async Task<ResultModel<bool>> EditApplicationAsync(
-        EditApplicationInput input,
+        EditApplicationInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = editValidator.Validate(input);
@@ -285,7 +281,7 @@ public class SoapApplicationService(
     }
 
     public async Task<ResultModel<ServiceDefinitionSync>> SyncWsdlAsync(
-        SyncWsdlInput input,
+        SyncWsdlInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = syncWsdlValidator.Validate(input);
@@ -331,7 +327,7 @@ public class SoapApplicationService(
     }
 
     public async Task<ResultModel<ServiceRequestFile>> UploadRequestFileStreamAsync(
-        UploadRequestFileInput input,
+        UploadRequestFileInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = uploadValidator.Validate(input);
@@ -391,7 +387,7 @@ public class SoapApplicationService(
     }
 
     public async Task<ResultModel<bool>> ConfigureAuthenticationAsync(
-        ConfigureAuthInput input,
+        ConfigureAuthInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = configureAuthValidator.Validate(input);
@@ -414,7 +410,7 @@ public class SoapApplicationService(
     }
 
     public async Task<ResultModel<ServiceOperation>> CreateManualOperationAsync(
-        CreateManualOperationInput input,
+        CreateManualOperationInputModel input,
         CancellationToken cancellationToken = default)
     {
         var validation = manualOpValidator.Validate(input);

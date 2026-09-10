@@ -1,9 +1,6 @@
 using LinqToDB.Data;
-using OrbitHub.Data.CoreManagement;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.CoreManagement.Models;
 
-namespace OrbitHub.Data.Repositories.CoreManagement.Repositories;
+namespace OrbitHub.Data.CoreManagement.Repositories;
 
 public class InsertUserActivityRepository(CoreDbContext ctx)
 {

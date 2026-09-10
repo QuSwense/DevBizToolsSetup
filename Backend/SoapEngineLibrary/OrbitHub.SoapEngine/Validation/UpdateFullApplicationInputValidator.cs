@@ -1,10 +1,8 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
-
-public class UpdateFullApplicationInputValidator : IValidator<UpdateFullApplicationInput>
+public class UpdateFullApplicationInputValidator : IValidator<UpdateFullApplicationInputModel>
 {
-    public ValidationResult Validate(UpdateFullApplicationInput input)
+    public ValidationResult Validate(UpdateFullApplicationInputModel input)
     {
         var errors = new List<string>();
 

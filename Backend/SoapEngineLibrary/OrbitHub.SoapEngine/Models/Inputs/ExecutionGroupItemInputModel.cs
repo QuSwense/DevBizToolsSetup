@@ -1,6 +1,6 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
-public class ExecutionGroupItemInput
+public class ExecutionGroupItemInputModel
 {
     public required int RequestFileId { get; set; }
     public int? RequestFileHistoryId { get; set; } // Target specific historical version if desired

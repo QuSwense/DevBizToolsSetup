@@ -1,6 +1,3 @@
-using PdfProcessor.Models.Common;
-using PdfProcessor.Models.Fields;
-
 public record PdfButtonField(
     string Name,
     string? MappingName,

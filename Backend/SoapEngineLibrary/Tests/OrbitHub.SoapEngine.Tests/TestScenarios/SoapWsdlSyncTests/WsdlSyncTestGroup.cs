@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapWsdlSyncTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapWsdlSyncTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.SoapEngine.Core.Services;
@@ -36,7 +36,7 @@ public class WsdlSyncTestGroup(
         logger.LogInformation("TEST: Syncing Live CustomerService WSDL (Port 7050) & verifying multi-schema extraction...");
 
         string appName = $"MultiSchemaApp_{Guid.NewGuid():N}"[..28];
-        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInput
+        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.BasicAuthService.BaseUrl,
@@ -54,7 +54,7 @@ public class WsdlSyncTestGroup(
         using var response = await httpClient.GetAsync(settings.BasicAuthService.WsdlUrl);
         using var wsdlStream = await response.Content.ReadAsStreamAsync();
 
-        var syncInput = new SyncWsdlInput
+        var syncInput = new SyncWsdlInputModel
         {
             AppId = appId,
             WsdlFileStream = wsdlStream,

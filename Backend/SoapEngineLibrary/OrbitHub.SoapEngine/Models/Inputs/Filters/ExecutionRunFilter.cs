@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
 public class ExecutionRunFilter : PagedRequest
 {

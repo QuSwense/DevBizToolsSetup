@@ -4,10 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using ServiceHub.SoapEngine.Core.Enums;
-using ServiceHub.SoapEngine.Core.Exceptions;
-using ServiceHub.SoapEngine.Core.Models.Inputs;
-using ServiceHub.SoapEngine.Core.Models.Outputs;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 
 namespace OrbitHub.SoapEngine.Core.Services;
 
@@ -17,7 +14,7 @@ public class SoapClientService(
     SoapFileCompressor compressor,
     ILogger<SoapClientService> logger)
 {
-    public async Task<SoapExecutionResponse> ExecuteAsync(
+    public async Task<SoapExecutionResponseOutputModel> ExecuteAsync(
         string targetUrl,
         string? soapAction,
         byte[] requestBodyBytes,
@@ -70,7 +67,7 @@ public class SoapClientService(
         if (!response.IsSuccessStatusCode)
             CheckAndThrowSoapFault(responseBody, response.StatusCode, targetUrl);
 
-        return new SoapExecutionResponse
+        return new SoapExecutionResponseOutputModel
         {
             HttpStatusCode = statusCode,
             ResponseBody = responseBody,
@@ -90,7 +87,7 @@ public class SoapClientService(
         switch (authType)
         {
             case EAuthenticationType.Basic:
-                var basicCreds = encryptionService.DecryptObject<BasicAuthCredentials>(encryptedAuthJson);
+                var basicCreds = encryptionService.DecryptObject<BasicAuthCredentialsInputModel>(encryptedAuthJson);
                 if (basicCreds is not null)
                 {
                     string rawToken = $"{basicCreds.Username}:{basicCreds.Password}";
@@ -99,7 +96,7 @@ public class SoapClientService(
                 }
                 break;
             case EAuthenticationType.APIKey:
-                var apiKeyCreds = encryptionService.DecryptObject<ApiKeyAuthCredentials>(encryptedAuthJson);
+                var apiKeyCreds = encryptionService.DecryptObject<ApiKeyAuthCredentialsInputModel>(encryptedAuthJson);
                 if (apiKeyCreds is not null)
                 {
                     if (apiKeyCreds.SendInHeader)
@@ -118,7 +115,7 @@ public class SoapClientService(
                 }
                 break;
             case EAuthenticationType.OAuth2:
-                var oauthCreds = encryptionService.DecryptObject<OAuth2Credentials>(encryptedAuthJson);
+                var oauthCreds = encryptionService.DecryptObject<OAuth2CredentialsInputModel>(encryptedAuthJson);
                 if (oauthCreds is not null)
                 {
                     string token = await FetchOAuth2TokenAsync(oauthCreds, cancellationToken);
@@ -131,7 +128,7 @@ public class SoapClientService(
         }
     }
 
-    private async Task<string> FetchOAuth2TokenAsync(OAuth2Credentials creds, CancellationToken cancellationToken)
+    private async Task<string> FetchOAuth2TokenAsync(OAuth2CredentialsInputModel creds, CancellationToken cancellationToken)
     {
         using var tokenRequest = new HttpRequestMessage(HttpMethod.Post, creds.TokenEndpoint);
         var dict = new Dictionary<string, string>

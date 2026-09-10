@@ -1,10 +1,6 @@
-using PdfProcessor.Exceptions;
-using PdfProcessor.Models.Common;
-using PdfProcessor.Models.Fields;
-using PdfProcessor.Services.Internal;
 using UglyToad.PdfPig;
 
-namespace PdfProcessor.Services;
+namespace OrbitHub.PdfProcessor.Core.Services;
 
 public sealed class PdfDocumentContext : IDisposable, IAsyncDisposable
 {

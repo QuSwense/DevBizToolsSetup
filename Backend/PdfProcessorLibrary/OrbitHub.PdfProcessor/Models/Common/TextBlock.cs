@@ -1,3 +1,3 @@
-namespace PdfProcessor.Models.Common;
+namespace OrbitHub.PdfProcessor.Core.Models.Common;
 
 public record TextBlock(string Text, BoundingBox Bounds, int PageNumber);

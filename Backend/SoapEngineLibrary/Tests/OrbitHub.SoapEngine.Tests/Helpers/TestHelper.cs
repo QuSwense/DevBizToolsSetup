@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.Helpers;
+namespace OrbitHub.SoapEngine.Tests.Helpers;
 
 /// <summary>
 /// Shared utility methods for test groups.

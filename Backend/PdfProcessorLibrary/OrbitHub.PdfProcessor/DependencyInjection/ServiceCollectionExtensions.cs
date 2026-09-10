@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using PdfProcessor.Services;
 
-namespace PdfProcessor.DependencyInjection;
+namespace OrbitHub.PdfProcessor.Core.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {

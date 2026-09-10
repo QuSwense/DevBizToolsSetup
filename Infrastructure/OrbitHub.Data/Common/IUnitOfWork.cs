@@ -1,6 +1,6 @@
 using LinqToDB.Data;
 
-namespace OrbitHub.Data.Repositories.Common;
+namespace OrbitHub.Data.Common;
 
 /// <summary>
 /// Provides a unit-of-work scope for composing multiple stored procedure calls

@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.TestManagement.Models;
+namespace OrbitHub.Data.TestManagement.Models;
 
 public class CreateSoapNamespaceOutput
 {

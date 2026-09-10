@@ -1,6 +1,6 @@
-namespace ServiceHub.SoapEngine.Core.Models.Outputs;
+namespace OrbitHub.SoapEngine.Core.Models.Outputs;
 
-public record SoapExecutionResponse
+public record SoapExecutionResponseOutputModel
 {
     public required int HttpStatusCode { get; init; }
     public required string ResponseBody { get; init; }

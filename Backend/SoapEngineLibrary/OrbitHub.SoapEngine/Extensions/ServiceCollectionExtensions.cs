@@ -1,19 +1,12 @@
-namespace ServiceHub.SoapEngine.Core.Extensions;
+namespace OrbitHub.SoapEngine.Core.Extensions;
 
 using LinqToDB;
-using LinqToDB.Data;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using OrbitHub.Data.Repositories;
-using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.TestManagement;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 using OrbitHub.SoapEngine.Core.Services;
-using ServiceHub.SoapEngine.Core.Data.Repositories;
-using ServiceHub.SoapEngine.Core.Models.Inputs;
-using ServiceHub.SoapEngine.Core.Parsing;
-using ServiceHub.SoapEngine.Core.Validation;
 
 /// <summary>
 /// Extension methods for registering LINQ to DB context, repositories, and SOAP engine core services.
@@ -87,18 +80,18 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SoapExecutionGroupRunner>();
 
         // 8. Register Validators
-        services.AddScoped<IValidator<RegisterApplicationInput>, RegisterApplicationInputValidator>();
-        services.AddScoped<IValidator<CreateFullApplicationInput>, CreateFullApplicationInputValidator>();
-        services.AddScoped<IValidator<UpdateFullApplicationInput>, UpdateFullApplicationInputValidator>();
-        services.AddScoped<IValidator<EditApplicationInput>, EditApplicationInputValidator>();
-        services.AddScoped<IValidator<SyncWsdlInput>, SyncWsdlInputValidator>();
-        services.AddScoped<IValidator<InspectWsdlInput>, InspectWsdlInputValidator>();
-        services.AddScoped<IValidator<UploadRequestFileInput>, UploadRequestFileInputValidator>();
-        services.AddScoped<IValidator<ConfigureAuthInput>, ConfigureAuthInputValidator>();
-        services.AddScoped<IValidator<CreateManualOperationInput>, CreateManualOperationInputValidator>();
-        services.AddScoped<IValidator<CreateExecutionGroupInput>, CreateExecutionGroupInputValidator>();
-        services.AddScoped<IValidator<ExecuteGroupRunInput>, ExecuteGroupRunInputValidator>();
-        services.AddScoped<IValidator<SaveOperationInput>, SaveOperationInputValidator>();
+        services.AddScoped<IValidator<RegisterApplicationInputModel>, RegisterApplicationInputValidator>();
+        services.AddScoped<IValidator<CreateFullApplicationInputModel>, CreateFullApplicationInputValidator>();
+        services.AddScoped<IValidator<UpdateFullApplicationInputModel>, UpdateFullApplicationInputValidator>();
+        services.AddScoped<IValidator<EditApplicationInputModel>, EditApplicationInputValidator>();
+        services.AddScoped<IValidator<SyncWsdlInputModel>, SyncWsdlInputValidator>();
+        services.AddScoped<IValidator<InspectWsdlInputModel>, InspectWsdlInputValidator>();
+        services.AddScoped<IValidator<UploadRequestFileInputModel>, UploadRequestFileInputValidator>();
+        services.AddScoped<IValidator<ConfigureAuthInputModel>, ConfigureAuthInputValidator>();
+        services.AddScoped<IValidator<CreateManualOperationInputModel>, CreateManualOperationInputValidator>();
+        services.AddScoped<IValidator<CreateExecutionGroupInputModel>, CreateExecutionGroupInputValidator>();
+        services.AddScoped<IValidator<ExecuteGroupRunInputModel>, ExecuteGroupRunInputValidator>();
+        services.AddScoped<IValidator<SaveOperationInputModel>, SaveOperationInputValidator>();
 
         return services;
     }

@@ -9,7 +9,7 @@ using OrbitHub.Data.TestManagement;
 using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.TestManagement.Models;
 
-namespace OrbitHub.Data.Repositories.TestManagement.Repositories;
+namespace OrbitHub.Data.TestManagement.Repositories;
 
 public class UnlinkRuleSetFromTestCaseRepository
 {

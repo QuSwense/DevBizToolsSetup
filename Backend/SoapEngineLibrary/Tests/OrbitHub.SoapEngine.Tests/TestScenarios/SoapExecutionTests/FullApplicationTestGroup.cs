@@ -1,6 +1,7 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapExecutionTests;
 
 using Microsoft.Extensions.Logging;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 using OrbitHub.SoapEngine.Core.Services;
 using ServiceHub.SoapEngine.Core.Data.Repositories;
 using ServiceHub.SoapEngine.Core.Enums;
@@ -30,7 +31,7 @@ public class FullApplicationTestGroup(
         logger.LogInformation("TEST: Creating full application with auth and operations...");
 
         string appName = $"FullApp_{Guid.NewGuid():N}"[..25];
-        var createInput = new CreateFullApplicationInput
+        var createInput = new CreateFullApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.BasicAuthService.BaseUrl,
@@ -38,14 +39,14 @@ public class FullApplicationTestGroup(
             Description = "Test full creation",
             CreatedBy = DefaultUserId,
             AuthType = EAuthenticationType.Basic,
-            AuthCredentials = new BasicAuthCredentials
+            AuthCredentials = new BasicAuthCredentialsInputModel
             {
                 Username = "admin_user",
                 Password = "SuperSecretPassword123!"
             },
             Operations =
             [
-                new SaveOperationInput
+                new SaveOperationInputModel
                 {
                     OperationName = "GetCustomerProfile",
                     SoapAction = "http://servicehub.org/customer/soap/ICustomerSoapService/GetCustomerProfile",
@@ -75,14 +76,14 @@ public class FullApplicationTestGroup(
 
         // First create an app
         string appName = $"UpdateApp_{Guid.NewGuid():N}"[..25];
-        var createInput = new CreateFullApplicationInput
+        var createInput = new CreateFullApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.BasicAuthService.BaseUrl,
             CreatedBy = DefaultUserId,
-            Operations = new List<SaveOperationInput>
+            Operations = new List<SaveOperationInputModel>
             {
-                new SaveOperationInput
+                new SaveOperationInputModel
                 {
                     OperationName = "InitialOp",
                     SoapAction = "http://tempuri.org/InitialOp",
@@ -101,7 +102,7 @@ public class FullApplicationTestGroup(
         int appId = createResult.Data!.Id;
 
         // Now update
-        var updateInput = new UpdateFullApplicationInput
+        var updateInput = new UpdateFullApplicationInputModel
         {
             AppId = appId,
             AppName = appName + "_Updated",
@@ -110,7 +111,7 @@ public class FullApplicationTestGroup(
             UpdatedBy = DefaultUserId,
             UpdateAuthentication = true,
             AuthType = EAuthenticationType.APIKey,
-            AuthCredentials = new ApiKeyAuthCredentials
+            AuthCredentials = new ApiKeyAuthCredentialsInputModel
             {
                 HeaderName = "X-API-KEY",
                 ApiKey = "new_key_123",
@@ -118,7 +119,7 @@ public class FullApplicationTestGroup(
             },
             Operations =
             [
-                new SaveOperationInput
+                new SaveOperationInputModel
                 {
                     OperationName = "InitialOp", // existing – will be updated
                     Description = "Updated description",
@@ -128,7 +129,7 @@ public class FullApplicationTestGroup(
                     OutputRootElementName = "InitialOpResponse",
                     TargetNamespace = "http://tempuri.org/"
                 },
-                new SaveOperationInput // new operation
+                new SaveOperationInputModel // new operation
                 {
                     OperationName = "NewOp",
                     SoapAction = "http://tempuri.org/NewOp",

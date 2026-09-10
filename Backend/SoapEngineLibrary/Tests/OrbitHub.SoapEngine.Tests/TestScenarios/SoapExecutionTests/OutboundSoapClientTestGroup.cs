@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapExecutionTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapExecutionTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.SoapEngine.Core.Services;
@@ -46,7 +46,7 @@ public class OutboundSoapClientTestGroup(
             """;
 
         byte[] requestBytes = System.Text.Encoding.UTF8.GetBytes(requestXml);
-        string encryptedAuth = encryptionService.EncryptObject(new BasicAuthCredentials
+        string encryptedAuth = encryptionService.EncryptObject(new BasicAuthCredentialsInputModel
         {
             Username = "admin_user",
             Password = "SuperSecretPassword123!"
@@ -88,7 +88,7 @@ public class OutboundSoapClientTestGroup(
             """;
 
         byte[] requestBytes = System.Text.Encoding.UTF8.GetBytes(requestXml);
-        string encryptedAuth = encryptionService.EncryptObject(new OAuth2Credentials
+        string encryptedAuth = encryptionService.EncryptObject(new OAuth2CredentialsInputModel
         {
             TokenEndpoint = settings.OAuth2Service.TokenEndpoint,
             ClientId = "client_app_id_99",
@@ -119,7 +119,7 @@ public class OutboundSoapClientTestGroup(
         logger.LogInformation("TEST [Error Case]: Invoking port 7050 with wrong password...");
 
         byte[] requestBytes = "<soap:Envelope/>"u8.ToArray();
-        string encryptedAuth = encryptionService.EncryptObject(new BasicAuthCredentials
+        string encryptedAuth = encryptionService.EncryptObject(new BasicAuthCredentialsInputModel
         {
             Username = "admin_user",
             Password = "WrongPassword123"

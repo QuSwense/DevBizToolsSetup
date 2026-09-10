@@ -2,10 +2,8 @@ using Microsoft.Extensions.Logging;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.AcroForms;
 using PdfSharpCore.Pdf.IO;
-using PdfProcessor.Exceptions;
-using PdfProcessor.Models.Editor;
 
-namespace PdfProcessor.Services;
+namespace OrbitHub.PdfProcessor.Core.Services;
 
 public sealed class PdfEditorContext : IDisposable, IAsyncDisposable
 {

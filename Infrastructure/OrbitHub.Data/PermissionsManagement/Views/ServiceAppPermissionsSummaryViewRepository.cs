@@ -9,7 +9,7 @@ using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.PermissionsManagement.Views;
 using OrbitHub.Data.PermissionsManagement;
 
-namespace OrbitHub.Data.Repositories.PermissionsManagement.Views;
+namespace OrbitHub.Data.PermissionsManagement.Views;
 
 public class ServiceAppPermissionsSummaryViewRepository
 {

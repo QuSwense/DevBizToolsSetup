@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Logging;
-using PdfProcessor.Models.Common;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 
-namespace PdfProcessor.Services.Internal;
+namespace OrbitHub.PdfProcessor.Core.Services.Internal;
 
 public class SpatialTextExtractor(ILogger<SpatialTextExtractor> logger)
 {

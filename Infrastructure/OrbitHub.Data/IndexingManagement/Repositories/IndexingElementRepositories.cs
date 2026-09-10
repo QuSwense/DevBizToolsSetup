@@ -1,9 +1,6 @@
 using LinqToDB.Data;
-using OrbitHub.Data.IndexingManagement;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.IndexingManagement.Models;
 
-namespace OrbitHub.Data.Repositories.IndexingManagement.Repositories;
+namespace OrbitHub.Data.IndexingManagement.Repositories;
 
 public class InsertOrGetXmlFileElementRepository(IndexingDbContext ctx)
 {

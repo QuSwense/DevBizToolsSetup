@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.TestManagement.Views;
+namespace OrbitHub.Data.TestManagement.Views;
 
 public class ServiceResponseFileDeltaSummaryView
 {

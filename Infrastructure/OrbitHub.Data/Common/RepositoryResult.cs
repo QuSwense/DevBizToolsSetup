@@ -1,4 +1,4 @@
-namespace OrbitHub.Data.Repositories.Common;
+namespace OrbitHub.Data.Common;
 
 /// <summary>
 /// Generic result wrapper for stored procedure executions.

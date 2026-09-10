@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapRequestFileTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapRequestFileTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.SoapEngine.Core.Services;
@@ -27,7 +27,7 @@ public class BackwardDiffTestGroup(
 
         // 1. Create test app and operation
         string appName = $"DiffTestApp_{Guid.NewGuid():N}"[..25];
-        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInput
+        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.OfflineService.BaseUrl,
@@ -40,7 +40,7 @@ public class BackwardDiffTestGroup(
         }
         int appId = regResult.Data!.Id;
 
-        var opInput = new CreateManualOperationInput
+        var opInput = new CreateManualOperationInputModel
         {
             AppId = appId,
             OperationName = "GetCustomer",
@@ -64,7 +64,7 @@ public class BackwardDiffTestGroup(
         {
             string xmlContent = $"<soap:Envelope><soap:Body><GetCustomer id=\"{v}\" name=\"Customer_V{v}\"/></soap:Body></soap:Envelope>";
             using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmlContent));
-            var uploadInput = new UploadRequestFileInput
+            var uploadInput = new UploadRequestFileInputModel
             {
                 OperationId = operationId,
                 FileName = fileName,

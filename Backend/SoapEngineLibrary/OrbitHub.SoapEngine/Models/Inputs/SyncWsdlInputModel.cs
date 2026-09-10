@@ -1,9 +1,9 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
 /// <summary>
 /// Payload contract for syncing WSDL from a remote URL or direct file stream.
 /// </summary>
-public class SyncWsdlInput
+public class SyncWsdlInputModel
 {
     public required int AppId { get; set; }
     public string? WsdlUrl { get; set; }

@@ -1,10 +1,10 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
 /// <summary>
 /// Base class carrying common SOAP operation metadata fields shared across
 /// manual operation creation and save-operation input models.
 /// </summary>
-public class OperationMetadata
+public class OperationMetadataInputModel
 {
     public required string OperationName { get; set; }
     public string? Description { get; set; }

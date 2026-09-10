@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapApplicationServiceTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.SoapEngine.Core.Services;
@@ -27,7 +27,7 @@ public class ManualOperationTestGroup(
 
         // 1. Create a test application
         string appName = $"ManualOpApp_{Guid.NewGuid():N}"[..25];
-        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInput
+        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.OfflineService.BaseUrl,
@@ -42,7 +42,7 @@ public class ManualOperationTestGroup(
         Console.WriteLine($" -> Test App Created (ID: {appId})");
 
         // 2. Create manual operation
-        var input = new CreateManualOperationInput
+        var input = new CreateManualOperationInputModel
         {
             AppId = appId,
             OperationName = "ExecuteManualTransfer",

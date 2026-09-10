@@ -9,7 +9,7 @@ using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.IndexingManagement.Views;
 using OrbitHub.Data.IndexingManagement;
 
-namespace OrbitHub.Data.Repositories.IndexingManagement.Views;
+namespace OrbitHub.Data.IndexingManagement.Views;
 
 public class BinaryEmbeddingsStoreWithUsageViewRepository
 {

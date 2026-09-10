@@ -1,5 +1,4 @@
 using DocIntercept.Formatting;
-using DocIntercept.Settings;
 
 namespace DocIntercept.Cli;
 

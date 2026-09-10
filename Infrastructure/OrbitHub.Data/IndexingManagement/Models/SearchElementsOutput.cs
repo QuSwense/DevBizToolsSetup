@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.IndexingManagement.Models;
+namespace OrbitHub.Data.IndexingManagement.Models;
 
 public class SearchElementsOutput
 {

@@ -1,9 +1,9 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
 /// <summary>
 /// Payload contract for uploading a request file stream to an operation.
 /// </summary>
-public class UploadRequestFileInput
+public class UploadRequestFileInputModel
 {
     public required int OperationId { get; set; }
     public required string FileName { get; set; }

@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.RuleManagement.Views;
+namespace OrbitHub.Data.RuleManagement.Views;
 
 public class RuleExecutionLogWithDetailsView
 {

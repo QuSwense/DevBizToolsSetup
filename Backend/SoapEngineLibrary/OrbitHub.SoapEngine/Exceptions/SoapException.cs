@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Exceptions;
+namespace OrbitHub.SoapEngine.Core.Exceptions;
 
 /// <summary>
 /// Base domain exception for all SOAP engine processing errors.

@@ -1,12 +1,8 @@
-namespace ServiceHub.SoapEngine.Core.Data.Repositories;
+namespace OrbitHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.TestManagement.Models;
-using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.ServiceAppManagement;
-using ServiceHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
 /// Provides database access for SOAP request files using stored procedure repositories

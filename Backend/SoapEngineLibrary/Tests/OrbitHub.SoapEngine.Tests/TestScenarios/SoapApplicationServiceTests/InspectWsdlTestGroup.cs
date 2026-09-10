@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapApplicationServiceTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapApplicationServiceTests;
 
 using Microsoft.Extensions.Logging;
 using OrbitHub.SoapEngine.Core.Services;
@@ -24,7 +24,7 @@ public class InspectWsdlTestGroup(
     public async Task Test_InspectWsdl_FromUrl()
     {
         logger.LogInformation("TEST: Inspecting WSDL from live URL (Port 7050)...");
-        var input = new InspectWsdlInput
+        var input = new InspectWsdlInputModel
         {
             WsdlUrl = settings.BasicAuthService.WsdlUrl
         };
@@ -48,7 +48,7 @@ public class InspectWsdlTestGroup(
         using var response = await httpClient.GetAsync(settings.BasicAuthService.WsdlUrl);
         using var stream = await response.Content.ReadAsStreamAsync();
 
-        var input = new InspectWsdlInput
+        var input = new InspectWsdlInputModel
         {
             WsdlFileStream = stream
         };

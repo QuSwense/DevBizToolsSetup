@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.IndexingManagement.Views;
+namespace OrbitHub.Data.IndexingManagement.Views;
 
 public class BinaryEmbeddingsByFormatView
 {

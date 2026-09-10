@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.RuleManagement.Models;
+namespace OrbitHub.Data.RuleManagement.Models;
 
 public class UpdateRuleContextObjectOutput
 {

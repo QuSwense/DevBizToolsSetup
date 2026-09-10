@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace OrbitHub.Common;
+namespace OrbitHub.Common.Helpers;
 
 public static partial class NamingConventionValidator
 {

@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Exceptions;
+namespace OrbitHub.SoapEngine.Core.Exceptions;
 
 using System.Net;
 

@@ -1,4 +1,4 @@
-namespace OrbitHub.Data.Repositories.CoreManagement.Models;
+namespace OrbitHub.Data.CoreManagement.Models;
 
 public class UpdateGlobalSettingInput
 {

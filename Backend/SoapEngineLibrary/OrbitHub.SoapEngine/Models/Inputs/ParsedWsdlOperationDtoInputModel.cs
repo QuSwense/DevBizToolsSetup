@@ -1,6 +1,6 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
-public class ParsedWsdlOperationDto
+public class ParsedWsdlOperationDtoInputModel
 {
     public required string OperationName { get; set; }
     public string? SoapAction { get; set; }

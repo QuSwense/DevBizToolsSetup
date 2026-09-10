@@ -1,4 +1,4 @@
-namespace PdfProcessor.Models.Editor;
+namespace OrbitHub.PdfProcessor.Core.Models.Editor;
 
 /// <summary>
 /// Configuration flags for PDF export/save operations.

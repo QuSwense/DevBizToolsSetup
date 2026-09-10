@@ -22,7 +22,7 @@ using OrbitHub.Dashboard.Infrastructure.Repositories.Metrics;
 using OrbitHub.Dashboard.Infrastructure.Repositories.TestSuites;
 using OrbitHub.Dashboard.Infrastructure.Repositories.Users;
 
-namespace OrbitHub.Dashboard;
+namespace OrbitHub.Dashboard.DependencyInjection;
 
 /// <summary>
 /// Extension methods for registering Dashboard feature services.

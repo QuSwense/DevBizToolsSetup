@@ -1,11 +1,9 @@
-using ServiceHub.SoapEngine.Core.Enums;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
-
-public class CreateFullApplicationInput : CreateApplicationInput
+public class CreateFullApplicationInputModel : CreateApplicationInputModel
 {
     public bool IsActive { get; set; } = true;
     public EAuthenticationType? AuthType { get; set; }
-    public AuthCredentialsBase? AuthCredentials { get; set; }
-    public List<SaveOperationInput> Operations { get; set; } = [];
+    public AuthCredentialsBaseInputModel? AuthCredentials { get; set; }
+    public List<SaveOperationInputModel> Operations { get; set; } = [];
 }

@@ -3,7 +3,7 @@
 // </auto-generated>
 #nullable enable
 
-namespace OrbitHub.Data.Repositories.PermissionsManagement.Views;
+namespace OrbitHub.Data.PermissionsManagement.Views;
 
 public class UserPermissionsWithDetailsView
 {

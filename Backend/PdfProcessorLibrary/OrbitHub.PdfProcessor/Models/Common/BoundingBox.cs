@@ -1,4 +1,4 @@
-namespace PdfProcessor.Models.Common;
+namespace OrbitHub.PdfProcessor.Core.Models.Common;
 
 /// <summary>
 /// Immutable spatial bounding box coordinates for PDF elements.

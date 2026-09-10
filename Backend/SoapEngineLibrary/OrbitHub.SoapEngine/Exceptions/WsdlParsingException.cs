@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Exceptions;
+namespace OrbitHub.SoapEngine.Core.Exceptions;
 
 /// <summary>
 /// Thrown when WSDL retrieval, XML schema validation, or operation extraction fails.

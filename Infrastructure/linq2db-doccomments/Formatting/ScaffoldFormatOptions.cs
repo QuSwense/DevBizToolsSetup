@@ -1,4 +1,4 @@
-namespace DocIntercept.Settings;
+namespace DocIntercept.Formatting;
 
 /// <summary>
 /// Toggles that drive the post-scaffold entity formatter. Mirrors (and extends)

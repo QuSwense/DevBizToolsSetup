@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace PdfProcessor.Services;
+namespace OrbitHub.PdfProcessor.Core.Services;
 
 public class PdfEditorContextFactory(ILoggerFactory loggerFactory)
 {

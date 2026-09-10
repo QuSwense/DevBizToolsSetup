@@ -1,4 +1,4 @@
-namespace PdfProcessor.Models.Common;
+namespace OrbitHub.PdfProcessor.Core.Models.Common;
 
 public record PdfSearchResult(
     string MatchedTerm,

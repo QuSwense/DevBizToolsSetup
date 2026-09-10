@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Data.CoreManagement;
 using OrbitHub.Data.IndexingManagement;
 using OrbitHub.Data.PermissionsManagement;
-using OrbitHub.Data.Repositories;
 using OrbitHub.Data.RuleManagement;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.TestManagement;

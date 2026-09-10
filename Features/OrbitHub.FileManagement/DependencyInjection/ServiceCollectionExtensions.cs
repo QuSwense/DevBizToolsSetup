@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.FileManagement.Services;
 
-namespace OrbitHub.FileManagement;
+namespace OrbitHub.FileManagement.DependencyInjection;
 
 /// <summary>
 /// Extension methods for registering File Management feature services.

@@ -1,8 +1,6 @@
-using ServiceHub.SoapEngine.Core.Enums;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
-
-public class ApiKeyAuthCredentials : AuthCredentialsBase
+public class ApiKeyAuthCredentialsInputModel : AuthCredentialsBaseInputModel
 {
     public override EAuthenticationType AuthenticationType => EAuthenticationType.APIKey;
     public required string HeaderName { get; set; }

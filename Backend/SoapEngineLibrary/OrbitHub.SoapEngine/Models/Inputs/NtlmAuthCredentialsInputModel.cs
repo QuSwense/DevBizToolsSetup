@@ -1,8 +1,6 @@
-using ServiceHub.SoapEngine.Core.Enums;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
-
-public class NtlmAuthCredentials : AuthCredentialsBase
+public class NtlmAuthCredentialsInputModel : AuthCredentialsBaseInputModel
 {
     public override EAuthenticationType AuthenticationType => EAuthenticationType.NTLM;
     public required string Username { get; set; }

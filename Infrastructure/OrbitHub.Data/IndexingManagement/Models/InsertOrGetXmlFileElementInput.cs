@@ -1,4 +1,4 @@
-namespace OrbitHub.Data.Repositories.IndexingManagement.Models;
+namespace OrbitHub.Data.IndexingManagement.Models;
 
 public class InsertOrGetXmlFileElementInput
 {

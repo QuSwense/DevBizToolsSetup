@@ -1,9 +1,9 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
 /// <summary>
 /// Payload contract for updating application metadata.
 /// </summary>
-public class EditApplicationInput : UpdateApplicationInput
+public class EditApplicationInputModel : UpdateApplicationInputModel
 {
     public string? Comment { get; set; }
 }

@@ -9,7 +9,7 @@ using OrbitHub.Data.PermissionsManagement;
 using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.PermissionsManagement.Models;
 
-namespace OrbitHub.Data.Repositories.PermissionsManagement.Repositories;
+namespace OrbitHub.Data.PermissionsManagement.Repositories;
 
 public class GetAvailablePermissionsRepository
 {

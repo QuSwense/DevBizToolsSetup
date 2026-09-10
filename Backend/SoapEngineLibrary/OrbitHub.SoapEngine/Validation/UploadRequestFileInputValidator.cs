@@ -1,10 +1,8 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
-
-public class UploadRequestFileInputValidator : IValidator<UploadRequestFileInput>
+public class UploadRequestFileInputValidator : IValidator<UploadRequestFileInputModel>
 {
-    public ValidationResult Validate(UploadRequestFileInput input)
+    public ValidationResult Validate(UploadRequestFileInputModel input)
     {
         var errors = new List<string>();
 

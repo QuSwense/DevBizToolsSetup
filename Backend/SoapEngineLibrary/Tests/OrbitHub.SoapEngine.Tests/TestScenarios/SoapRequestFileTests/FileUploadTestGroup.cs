@@ -1,4 +1,4 @@
-namespace SoapApiProcessorTest.TestScenarios.SoapRequestFileTests;
+namespace OrbitHub.SoapEngine.Tests.TestScenarios.SoapRequestFileTests;
 
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -29,7 +29,7 @@ public class FileUploadTestGroup(
 
         // 1. Create a test app and a manual operation
         string appName = $"FileUploadApp_{Guid.NewGuid():N}"[..25];
-        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInput
+        var regResult = await appService.RegisterApplicationAsync(new RegisterApplicationInputModel
         {
             AppName = appName,
             BaseUrl = settings.OfflineService.BaseUrl,
@@ -42,7 +42,7 @@ public class FileUploadTestGroup(
         }
         int appId = regResult.Data!.Id;
 
-        var opInput = new CreateManualOperationInput
+        var opInput = new CreateManualOperationInputModel
         {
             AppId = appId,
             OperationName = "GetCustomerProfile",
@@ -78,7 +78,7 @@ public class FileUploadTestGroup(
         byte[] originalBytes = Encoding.UTF8.GetBytes(rawXmlContent);
         using var stream = new MemoryStream(originalBytes);
 
-        var uploadInput = new UploadRequestFileInput
+        var uploadInput = new UploadRequestFileInputModel
         {
             OperationId = operationId,
             FileName = fileName,

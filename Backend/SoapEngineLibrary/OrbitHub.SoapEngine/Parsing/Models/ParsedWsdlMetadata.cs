@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Parsing.Models;
+namespace OrbitHub.SoapEngine.Core.Parsing.Models;
 
 /// <summary>
 /// Container holding parsed operations, extracted XSD schemas, namespaces, and raw WSDL XML content.

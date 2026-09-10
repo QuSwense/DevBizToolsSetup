@@ -1,8 +1,8 @@
-using ServiceHub.SoapEngine.Core.Enums;
+using OrbitHub.GenericModels.Enums;
 
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
-public class OAuth2Credentials : AuthCredentialsBase
+public class OAuth2CredentialsInputModel : AuthCredentialsBaseInputModel
 {
     public override EAuthenticationType AuthenticationType => EAuthenticationType.OAuth2;
     public required string TokenEndpoint { get; set; }

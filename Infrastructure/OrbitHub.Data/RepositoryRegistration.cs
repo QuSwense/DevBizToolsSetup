@@ -17,7 +17,7 @@ using OrbitHub.Data.Repositories.TestManagement.Repositories;
 using OrbitHub.Data.Repositories.TestManagement.Views;
 using OrbitHub.Data.TestManagement;
 
-namespace OrbitHub.Data.Repositories;
+namespace OrbitHub.Data;
 
 /// <summary>
 /// Registers all stored procedure repository classes with the DI container.

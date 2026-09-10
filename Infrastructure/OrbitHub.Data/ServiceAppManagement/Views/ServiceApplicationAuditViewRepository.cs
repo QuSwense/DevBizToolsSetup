@@ -9,7 +9,7 @@ using OrbitHub.Data.Repositories.Common;
 using OrbitHub.Data.Repositories.ServiceAppManagement.Views;
 using OrbitHub.Data.ServiceAppManagement;
 
-namespace OrbitHub.Data.Repositories.ServiceAppManagement.Views;
+namespace OrbitHub.Data.ServiceAppManagement.Views;
 
 public class ServiceApplicationAuditViewRepository
 {

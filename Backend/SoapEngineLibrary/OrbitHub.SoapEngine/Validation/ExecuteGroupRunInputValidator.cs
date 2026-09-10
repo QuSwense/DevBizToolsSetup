@@ -1,10 +1,10 @@
-using ServiceHub.SoapEngine.Core.Models.Inputs;
+using OrbitHub.SoapEngine.Core.Models.Inputs;
 
-namespace ServiceHub.SoapEngine.Core.Validation;
+namespace OrbitHub.SoapEngine.Core.Validation;
 
-public class ExecuteGroupRunInputValidator : IValidator<ExecuteGroupRunInput>
+public class ExecuteGroupRunInputValidator : IValidator<ExecuteGroupRunInputModel>
 {
-    public ValidationResult Validate(ExecuteGroupRunInput input)
+    public ValidationResult Validate(ExecuteGroupRunInputModel input)
     {
         var errors = new List<string>();
 

@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Exceptions;
+namespace OrbitHub.SoapEngine.Core.Exceptions;
 
 /// <summary>
 /// Thrown when the remote endpoint returns an explicit &lt;soap:Fault&gt; XML payload.

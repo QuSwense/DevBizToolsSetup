@@ -1,6 +1,5 @@
 using System.Text;
 using DocIntercept.Formatting.Transformations;
-using DocIntercept.Settings;
 
 namespace DocIntercept.Formatting;
 

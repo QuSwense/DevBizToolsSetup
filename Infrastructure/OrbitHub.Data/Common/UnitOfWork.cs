@@ -1,7 +1,7 @@
 using LinqToDB.Data;
 using Microsoft.Extensions.Logging;
 
-namespace OrbitHub.Data.Repositories.Common;
+namespace OrbitHub.Data.Common;
 
 /// <summary>
 /// Default implementation of <see cref="IUnitOfWork"/> that wraps a linq2db <see cref="DataConnection"/>

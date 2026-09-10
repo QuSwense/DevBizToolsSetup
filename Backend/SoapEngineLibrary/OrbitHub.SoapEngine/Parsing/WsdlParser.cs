@@ -1,9 +1,7 @@
 using System.Xml;
 using System.Xml.Linq;
-using ServiceHub.SoapEngine.Core.Exceptions;
-using ServiceHub.SoapEngine.Core.Parsing.Models;
 
-namespace ServiceHub.SoapEngine.Core.Parsing;
+namespace OrbitHub.SoapEngine.Core.Parsing;
 
 public class WsdlParser(HttpClient httpClient)
 {

@@ -1,6 +1,4 @@
-using PdfProcessor.Models.Common;
-
-namespace PdfProcessor.Models.Fields;
+namespace OrbitHub.PdfProcessor.Core.Models.Fields;
 
 /// <summary>
 /// Abstract base class representing common PDF AcroForm field properties.

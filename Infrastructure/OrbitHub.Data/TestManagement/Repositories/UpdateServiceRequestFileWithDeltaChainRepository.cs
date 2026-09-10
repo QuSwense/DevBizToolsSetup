@@ -1,9 +1,6 @@
 using LinqToDB.Data;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.TestManagement.Models;
-using OrbitHub.Data.TestManagement;
 
-namespace OrbitHub.Data.Repositories.TestManagement.Repositories;
+namespace OrbitHub.Data.TestManagement.Repositories;
 
 public sealed class UpdateServiceRequestFileWithDeltaChainRepository(TestDbContext ctx)
 {

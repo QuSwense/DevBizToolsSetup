@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace DocIntercept.Settings;
+namespace DocIntercept.Formatting;
 
 /// <summary>
 /// Settings for the <c>--customize</c> doc-comment interceptor

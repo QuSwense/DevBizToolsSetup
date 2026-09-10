@@ -1,4 +1,4 @@
-namespace ServiceHub.SoapEngine.Core.Enums;
+namespace OrbitHub.GenericModels.Enums;
 
 /// <summary>
 /// Execution status states for an individual SoapExecutionItemRun.

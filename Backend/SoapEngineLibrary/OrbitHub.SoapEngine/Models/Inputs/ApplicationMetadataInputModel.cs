@@ -1,10 +1,10 @@
-namespace ServiceHub.SoapEngine.Core.Models.Inputs;
+namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
 /// <summary>
 /// Base class carrying common application metadata fields shared across
 /// create, update, and registration input models.
 /// </summary>
-public class ApplicationMetadata
+public class ApplicationMetadataInputModel
 {
     public required string AppName { get; set; }
     public required string BaseUrl { get; set; }

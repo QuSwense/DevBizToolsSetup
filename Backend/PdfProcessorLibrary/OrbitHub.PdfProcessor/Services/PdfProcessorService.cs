@@ -1,7 +1,4 @@
-using PdfProcessor.Models.Common;
-using PdfProcessor.Models.Fields;
-
-namespace PdfProcessor.Services;
+namespace OrbitHub.PdfProcessor.Core.Services;
 
 public class PdfProcessorService(PdfContextFactory contextFactory)
 {
