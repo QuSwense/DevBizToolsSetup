@@ -2,7 +2,11 @@ namespace OrbitHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.Data.TestManagement.Models;
+using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
 /// Provides database access for SOAP request files using stored procedure repositories
@@ -196,8 +200,8 @@ public class ServiceRequestFileRepository(
     /// <summary>
     /// Paged query using direct linq2db (hybrid approach).
     /// </summary>
-    public async Task<PagedResult<ServiceRequestFile>> GetPagedAsync(
-        RequestFileFilter filter,
+    public async Task<PagedResultModel<ServiceRequestFile>> GetPagedAsync(
+        RequestFileFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         var query = Context.ServiceRequestFiles.AsQueryable();
@@ -218,7 +222,7 @@ public class ServiceRequestFileRepository(
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<ServiceRequestFile>
+        return new PagedResultModel<ServiceRequestFile>
         {
             Items = items,
             TotalCount = total,

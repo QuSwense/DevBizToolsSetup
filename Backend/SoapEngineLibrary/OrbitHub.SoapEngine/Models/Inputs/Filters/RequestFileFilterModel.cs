@@ -1,6 +1,6 @@
 namespace OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
-public class RequestFileFilter : PagedRequest
+public class RequestFileFilterModel : PagedRequestModel
 {
     public int? OperationId { get; set; }
     public string? FileName { get; set; }

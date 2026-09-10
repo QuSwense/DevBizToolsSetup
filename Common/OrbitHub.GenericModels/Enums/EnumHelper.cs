@@ -1,5 +1,5 @@
 // EnumHelper.cs
-namespace OrbitHub.Common.Enums;
+namespace OrbitHub.GenericModels.Enums;
 
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
@@ -157,7 +157,6 @@ public static class EnumHelper<T> where T : struct, Enum
     private static FrozenDictionary<int, T> BuildIntToValueMap()
     {
         var values = _enumValues.Value;
-        var underlyingType = Enum.GetUnderlyingType(typeof(T));
 
         var builder = new Dictionary<int, T>(values.Length);
         foreach (var value in values)

@@ -1,8 +1,12 @@
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.GenericModels.Enums;
 using OrbitHub.GenericModels.Models;
 using OrbitHub.SoapEngine.Core.Data.Repositories;
 using OrbitHub.SoapEngine.Core.Models.Inputs;
+using OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
+using OrbitHub.SoapEngine.Core.Parsing;
+using OrbitHub.SoapEngine.Core.Validation;
 
 namespace OrbitHub.SoapEngine.Core.Services;
 
@@ -350,10 +354,10 @@ public class SoapApplicationService(
             {
                 ServiceOperationId = input.OperationId,
                 Name = input.FileName,
-                FileFormat = "XML",
+                FileFormat = EnumHelper<EFileFormat>.GetName(EFileFormat.XML),
                 CompressedData = compressedNewBytes,
                 UncompressedSizeBytes = newRawBytes.Length,
-                CompressionAlgorithmType = "GZip",
+                CompressionAlgorithmType = EnumHelper<ECompressionAlgorithm>.GetName(ECompressionAlgorithm.Gzip),
                 IsBaseSnapshot = true,
                 DeltaDepth = 0,
                 CreatedBy = input.CreatedBy
@@ -441,43 +445,42 @@ public class SoapApplicationService(
         return ResultModel<ServiceOperation>.Success(createdOperation);
     }
 
-    // ---------- Query Methods (Data Retrieval) ----------
-    public async Task<PagedResult<ServiceApplication>> GetApplicationsAsync(
-        ApplicationFilter filter,
+    public async Task<PagedResultModel<ServiceApplication>> GetApplicationsAsync(
+        ApplicationFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         return await appRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<ServiceOperation>> GetOperationsAsync(
-        OperationFilter filter,
+    public async Task<PagedResultModel<ServiceOperation>> GetOperationsAsync(
+        OperationFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         return await operationRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<ServiceRequestFile>> GetRequestFilesAsync(
-        RequestFileFilter filter,
+    public async Task<PagedResultModel<ServiceRequestFile>> GetRequestFilesAsync(
+        RequestFileFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         return await requestFileRepository.GetPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<DirectExecutionAudit>> GetExecutionAuditsAsync(
-        ExecutionAuditFilter filter,
+    public async Task<PagedResultModel<DirectExecutionAudit>> GetExecutionAuditsAsync(
+        ExecutionAuditFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         return await executionRepository.GetAuditsPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<DirectExecutionAuditResponseFileLink>> GetExecutionLinksAsync(
-        ExecutionAuditLinkFilter filter,
+    public async Task<PagedResultModel<DirectExecutionAuditResponseFileLink>> GetExecutionLinksAsync(
+        ExecutionAuditLinkFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         return await executionRepository.GetResponseLinksPagedAsync(filter, cancellationToken);
     }
 
-    public async Task<PagedResult<ServiceResponseFile>> GetResponseFilesAsync(
+    public async Task<PagedResultModel<ServiceResponseFile>> GetResponseFilesAsync(
         int? serviceRequestFileId,
         int pageNumber = 1,
         int pageSize = 20,

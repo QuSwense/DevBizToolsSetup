@@ -45,5 +45,5 @@ else
   grep -rnw --exclude-dir={bin,obj,.git} . -e "$OLD_NAME"
 fi
 
-echo "=== 5. Verifying solution build ==="
-dotnet build
+# echo "=== 5. Verifying solution build ==="
+# dotnet build

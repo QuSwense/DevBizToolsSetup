@@ -2,7 +2,11 @@ namespace OrbitHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.Data.TestManagement.Models;
+using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
 /// Repository for managing SOAP service operations using stored procedure repositories
@@ -153,8 +157,8 @@ public class ServiceOperationRepository(
     /// <summary>
     /// Paged query using direct linq2db (hybrid approach).
     /// </summary>
-    public async Task<PagedResult<ServiceOperation>> GetPagedAsync(
-        OperationFilter filter,
+    public async Task<PagedResultModel<ServiceOperation>> GetPagedAsync(
+        OperationFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         var query = Context.ServiceOperations.AsQueryable();
@@ -175,7 +179,7 @@ public class ServiceOperationRepository(
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<ServiceOperation>
+        return new PagedResultModel<ServiceOperation>
         {
             Items = items,
             TotalCount = total,

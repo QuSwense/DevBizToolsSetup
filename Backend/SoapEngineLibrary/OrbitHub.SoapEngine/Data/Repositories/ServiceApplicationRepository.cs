@@ -6,6 +6,8 @@ using OrbitHub.Data.Common;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.TestManagement.Models;
 using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.GenericModels.Enums;
+using OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
 /// Repository for managing SOAP service applications using stored procedure repositories
@@ -46,7 +48,7 @@ public class ServiceApplicationRepository(
             EncryptionAlgorithmType = dto.EncryptionAlgorithmType,
             EncryptedJson = dto.EncryptedJson,
             IsActive = dto.IsActive,
-            RecordVersion = dto.RecordVersion.ToString(),
+            RecordVersion = dto.RecordVersion,
             CreatedAt = dto.CreatedAt,
             CreatedBy = dto.CreatedBy,
             LastUpdatedAt = dto.LastUpdatedAt,
@@ -61,11 +63,11 @@ public class ServiceApplicationRepository(
     {
         var result = await createAppRepo.ExecuteAsync(new CreateServiceApplicationInput
         {
-            ServiceType = "SOAP",
+            ServiceType = EServiceType.SOAP.ToStringCached(),
             ServiceAppAuthenticationId = null,
             Name = app.Name,
             BaseUrl = app.BaseUrl,
-            DefinitionType = "WSDL",
+            DefinitionType = EDefinitionType.WSDL.ToStringCached(),
             DefinitionRelativeUrl = app.DefinitionRelativeUrl,
             HealthcheckRelativeUrl = app.HealthcheckRelativeUrl,
             Description = app.Description,
@@ -80,16 +82,16 @@ public class ServiceApplicationRepository(
         {
             Id = dto.InternalId ?? throw new InvalidOperationException("SP did not return a ServiceApplicationId."),
             PublicId = dto.PublicId ?? Guid.Empty,
-            ServiceType = dto.ServiceType ?? "SOAP",
+            ServiceType = dto.ServiceType ?? EServiceType.SOAP.ToStringCached(),
             Name = dto.Name ?? string.Empty,
             BaseUrl = dto.BaseUrl ?? string.Empty,
-            DefinitionType = dto.DefinitionType,
+            DefinitionType = dto.DefinitionType ?? EDefinitionType.WSDL.ToStringCached(),
             DefinitionRelativeUrl = dto.DefinitionRelativeUrl,
             HealthcheckRelativeUrl = dto.HealthcheckRelativeUrl,
             Description = dto.Description,
             IsActive = dto.IsActive ?? true,
-            RecordVersion = dto.RecordVersion ?? "00.00.00",
-            CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
+            RecordVersion = dto.RecordVersion!,
+            CreatedAt = dto.CreatedAt ?? DateTime.Now,
             CreatedBy = dto.CreatedBy ?? app.CreatedBy
         };
     }
@@ -223,8 +225,8 @@ public class ServiceApplicationRepository(
     /// <summary>
     /// Paged query using direct linq2db (hybrid approach).
     /// </summary>
-    public async Task<PagedResult<ServiceApplication>> GetPagedAsync(
-        ApplicationFilter filter,
+    public async Task<PagedResultModel<ServiceApplication>> GetPagedAsync(
+        ApplicationFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         var query = Context.ServiceApplications
@@ -251,7 +253,7 @@ public class ServiceApplicationRepository(
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<ServiceApplication>
+        return new PagedResultModel<ServiceApplication>
         {
             Items = items,
             TotalCount = total,

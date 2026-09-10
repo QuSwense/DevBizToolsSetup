@@ -3,7 +3,7 @@ namespace OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 /// <summary>
 /// Filter for paged queries against DirectExecutionAudit.
 /// </summary>
-public class ExecutionAuditFilter : PagedRequest
+public class ExecutionAuditFilterModel : PagedRequestModel
 {
     public string? Name { get; set; }
     public string? ExecutionStatus { get; set; }

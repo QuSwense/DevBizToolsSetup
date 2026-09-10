@@ -27,7 +27,7 @@ public class QueryTestGroup(
     public async Task Test_GetApplications()
     {
         logger.LogInformation("TEST: Retrieving paged applications...");
-        var filter = new ApplicationFilter
+        var filter = new ApplicationFilterModel
         {
             PageNumber = 1,
             PageSize = 5,
@@ -43,7 +43,7 @@ public class QueryTestGroup(
     public async Task Test_GetOperations()
     {
         logger.LogInformation("TEST: Retrieving paged operations...");
-        var filter = new OperationFilter
+        var filter = new OperationFilterModel
         {
             PageNumber = 1,
             PageSize = 5,
@@ -56,7 +56,7 @@ public class QueryTestGroup(
     public async Task Test_GetRequestFiles()
     {
         logger.LogInformation("TEST: Retrieving paged request files...");
-        var filter = new RequestFileFilter
+        var filter = new RequestFileFilterModel
         {
             PageNumber = 1,
             PageSize = 5,
@@ -69,7 +69,7 @@ public class QueryTestGroup(
     public async Task Test_GetExecutionAudits()
     {
         logger.LogInformation("TEST: Retrieving paged execution audits...");
-        var filter = new ExecutionAuditFilter
+        var filter = new ExecutionAuditFilterModel
         {
             PageNumber = 1,
             PageSize = 5
@@ -81,7 +81,7 @@ public class QueryTestGroup(
     public async Task Test_GetExecutionLinks()
     {
         logger.LogInformation("TEST: Retrieving paged execution links...");
-        var filter = new ExecutionAuditLinkFilter
+        var filter = new ExecutionAuditLinkFilterModel
         {
             PageNumber = 1,
             PageSize = 5
@@ -100,11 +100,11 @@ public class QueryTestGroup(
     public async Task Test_QueryServiceMethods()
     {
         logger.LogInformation("TEST: Verifying SoapQueryService methods...");
-        var appResult = await queryService.GetApplicationsAsync(new ApplicationFilter { PageSize = 1 });
-        var opResult = await queryService.GetOperationsAsync(new OperationFilter { PageSize = 1 });
-        var fileResult = await queryService.GetRequestFilesAsync(new RequestFileFilter { PageSize = 1 });
-        var auditResult = await queryService.GetExecutionAuditsAsync(new ExecutionAuditFilter { PageSize = 1 });
-        var linkResult = await queryService.GetExecutionLinksAsync(new ExecutionAuditLinkFilter { PageSize = 1 });
+        var appResult = await queryService.GetApplicationsAsync(new ApplicationFilterModel { PageSize = 1 });
+        var opResult = await queryService.GetOperationsAsync(new OperationFilterModel { PageSize = 1 });
+        var fileResult = await queryService.GetRequestFilesAsync(new RequestFileFilterModel { PageSize = 1 });
+        var auditResult = await queryService.GetExecutionAuditsAsync(new ExecutionAuditFilterModel { PageSize = 1 });
+        var linkResult = await queryService.GetExecutionLinksAsync(new ExecutionAuditLinkFilterModel { PageSize = 1 });
         var responseResult = await queryService.GetResponseFilesAsync(null, 1, 1);
 
         if (appResult is not null && opResult is not null && fileResult is not null &&

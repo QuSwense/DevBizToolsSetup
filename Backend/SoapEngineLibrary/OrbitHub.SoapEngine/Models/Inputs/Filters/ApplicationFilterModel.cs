@@ -1,6 +1,6 @@
 namespace OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
-public class ApplicationFilter : PagedRequest
+public class ApplicationFilterModel : PagedRequestModel
 {
     public string? AppName { get; set; }
     public bool? IsActive { get; set; }

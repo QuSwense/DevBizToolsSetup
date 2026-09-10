@@ -1,6 +1,6 @@
 namespace OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
-public class PagedResult<T>
+public class PagedResultModel<T>
 {
     public List<T> Items { get; set; } = [];
     public int TotalCount { get; set; }

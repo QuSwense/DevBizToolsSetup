@@ -244,8 +244,8 @@ public class ServiceExecutionAuditRepository(
 
     #region Paged Queries (Hybrid — direct linq2db)
 
-    public async Task<PagedResult<DirectExecutionAudit>> GetAuditsPagedAsync(
-        ExecutionAuditFilter filter,
+    public async Task<PagedResultModel<DirectExecutionAudit>> GetAuditsPagedAsync(
+        ExecutionAuditFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         var query = Context.DirectExecutionAudits.AsQueryable();
@@ -270,7 +270,7 @@ public class ServiceExecutionAuditRepository(
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<DirectExecutionAudit>
+        return new PagedResultModel<DirectExecutionAudit>
         {
             Items = items,
             TotalCount = total,
@@ -279,8 +279,8 @@ public class ServiceExecutionAuditRepository(
         };
     }
 
-    public async Task<PagedResult<DirectExecutionAuditResponseFileLink>> GetResponseLinksPagedAsync(
-        ExecutionAuditLinkFilter filter,
+    public async Task<PagedResultModel<DirectExecutionAuditResponseFileLink>> GetResponseLinksPagedAsync(
+        ExecutionAuditLinkFilterModel filter,
         CancellationToken cancellationToken = default)
     {
         var query = Context.DirectExecutionAuditResponseFileLinks.AsQueryable();
@@ -299,7 +299,7 @@ public class ServiceExecutionAuditRepository(
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<DirectExecutionAuditResponseFileLink>
+        return new PagedResultModel<DirectExecutionAuditResponseFileLink>
         {
             Items = items,
             TotalCount = total,
@@ -308,7 +308,7 @@ public class ServiceExecutionAuditRepository(
         };
     }
 
-    public async Task<PagedResult<ServiceResponseFile>> GetResponseFilesPagedAsync(
+    public async Task<PagedResultModel<ServiceResponseFile>> GetResponseFilesPagedAsync(
         int? serviceRequestFileId,
         int pageNumber = 1,
         int pageSize = 20,
@@ -328,7 +328,7 @@ public class ServiceExecutionAuditRepository(
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<ServiceResponseFile>
+        return new PagedResultModel<ServiceResponseFile>
         {
             Items = items,
             TotalCount = total,

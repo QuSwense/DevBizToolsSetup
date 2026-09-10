@@ -11,7 +11,7 @@ public sealed record SaveServiceDefinitionSyncWithOperationsOutput
     public int? UncompressedSizeBytes { get; init; }
     public string? CompressionAlgorithmType { get; init; }
     public string? ContentHash { get; init; }
-    public required int RecordVersion { get; init; }
+    public required string RecordVersion { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required string CreatedBy { get; init; }
     public DateTime? LastUpdatedAt { get; init; }

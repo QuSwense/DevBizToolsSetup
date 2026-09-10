@@ -1,6 +1,6 @@
 namespace OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
-public class ExecutionRunFilter : PagedRequest
+public class ExecutionRunFilterModel : PagedRequestModel
 {
     public int? ExecutionGroupId { get; set; }
     public string? RunStatus { get; set; }

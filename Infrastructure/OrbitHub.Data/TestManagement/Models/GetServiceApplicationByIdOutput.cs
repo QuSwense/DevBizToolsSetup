@@ -15,7 +15,7 @@ public sealed record GetServiceApplicationByIdOutput
     public string? HealthcheckRelativeUrl { get; init; }
     public string? Description { get; init; }
     public required bool IsActive { get; init; }
-    public required int RecordVersion { get; init; }
+    public required string RecordVersion { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required string CreatedBy { get; init; }
     public DateTime? LastUpdatedAt { get; init; }
