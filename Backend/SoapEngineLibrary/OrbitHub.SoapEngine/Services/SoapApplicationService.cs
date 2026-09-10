@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.GenericModels.Models;
+using OrbitHub.SoapEngine.Core.Data.Repositories;
 using OrbitHub.SoapEngine.Core.Models.Inputs;
 
 namespace OrbitHub.SoapEngine.Core.Services;

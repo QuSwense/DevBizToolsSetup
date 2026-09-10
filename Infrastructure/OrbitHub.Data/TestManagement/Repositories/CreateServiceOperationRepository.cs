@@ -6,8 +6,8 @@
 using LinqToDB;
 using LinqToDB.Data;
 using OrbitHub.Data.TestManagement;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.TestManagement.Models;
+using OrbitHub.Data.Common;
+using OrbitHub.Data.TestManagement.Models;
 
 namespace OrbitHub.Data.TestManagement.Repositories;
 

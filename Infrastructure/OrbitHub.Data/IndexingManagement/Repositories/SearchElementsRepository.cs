@@ -6,7 +6,7 @@
 using LinqToDB;
 using LinqToDB.Data;
 using OrbitHub.Data.IndexingManagement;
-using OrbitHub.Data.Repositories.Common;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.Repositories.IndexingManagement.Models;
 
 namespace OrbitHub.Data.IndexingManagement.Repositories;

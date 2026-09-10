@@ -2,7 +2,10 @@ namespace OrbitHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.Data.TestManagement.Models;
+using OrbitHub.Data.TestManagement.Repositories;
 
 /// <summary>
 /// Provides data access for SOAP execution auditing using stored procedure repositories

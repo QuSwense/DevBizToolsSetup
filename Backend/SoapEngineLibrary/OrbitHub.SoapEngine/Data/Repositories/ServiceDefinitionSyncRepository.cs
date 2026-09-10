@@ -2,7 +2,11 @@ namespace OrbitHub.SoapEngine.Core.Data.Repositories;
 
 using LinqToDB;
 using LinqToDB.Async;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.Data.TestManagement.Models;
+using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.SoapEngine.Core.Parsing.Models;
 
 /// <summary>
 /// Provides atomic persistence operations for service definition (WSDL) sync snapshots
