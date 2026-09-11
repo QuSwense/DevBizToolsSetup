@@ -1,3 +1,5 @@
+using OrbitHub.GenericModels.Enums;
+
 namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 
 public class UpdateFullApplicationInputModel : UpdateApplicationInputModel

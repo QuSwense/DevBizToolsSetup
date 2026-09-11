@@ -12,8 +12,10 @@ CREATE TABLE [dbo].[ServiceOperations] (
     -- Public Identifier for UI/Secure Operations (GUID)
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_ServiceOperations_PublicId DEFAULT NEWID(),
-    -- Foreign Key to ServiceApplications table
+    -- Foreign Key to ServiceApplications table, sometimes user may not have wsdl extracted from application
     [ServiceApplicationId] INT NOT NULL,
+    -- Foreign Key to ServiceDefinitionSyncs table, sometimes user may want to link the operation to a specific service definition sync
+    [ServiceDefinitionSyncId] INT NULL,
     -- Name of the service operation, e.g., 'GetUser', 'CreateOrder'
     [OperationName] NVARCHAR(200) NOT NULL,
     -- Endpoint Url for REST e.g., '/api/users' or action Name for soap e.g., 'GetUserDetails'
@@ -36,7 +38,7 @@ CREATE TABLE [dbo].[ServiceOperations] (
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceOperations_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceOperations_ServiceApplicationId_OperationName_RecordVersion
-        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC),
+        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC, [ServiceDefinitionSyncId] ASC),
 
     CONSTRAINT CK_ServiceOperations_HttpMethod
         CHECK ([HttpMethod] IS NULL OR [HttpMethod] IN ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')),
@@ -46,6 +48,8 @@ CREATE TABLE [dbo].[ServiceOperations] (
     -- Foreign keys
     CONSTRAINT FK_ServiceOperations_ServiceApplications_ServiceApplicationId
         FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]),
+    CONSTRAINT FK_ServiceOperations_ServiceDefinitionSyncs_ServiceDefinitionSyncId
+        FOREIGN KEY ([ServiceDefinitionSyncId]) REFERENCES [dbo].[ServiceDefinitionSyncs]([Id]),
     CONSTRAINT FK_ServiceOperations_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceOperations_Users_LastUpdatedBy

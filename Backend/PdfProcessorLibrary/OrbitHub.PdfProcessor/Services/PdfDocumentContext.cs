@@ -1,3 +1,7 @@
+using OrbitHub.PdfProcessor.Core.Exceptions;
+using OrbitHub.PdfProcessor.Core.Models.Common;
+using OrbitHub.PdfProcessor.Core.Models.Fields;
+using OrbitHub.PdfProcessor.Core.Services.Internal;
 using UglyToad.PdfPig;
 
 namespace OrbitHub.PdfProcessor.Core.Services;

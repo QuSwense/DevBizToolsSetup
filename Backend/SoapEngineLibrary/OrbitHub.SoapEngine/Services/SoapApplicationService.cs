@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OrbitHub.Data.ServiceAppManagement;
+using OrbitHub.Data.TestManagement.Models;
 using OrbitHub.GenericModels.Enums;
 using OrbitHub.GenericModels.Models;
 using OrbitHub.SoapEngine.Core.Data.Repositories;
@@ -77,7 +78,6 @@ public class SoapApplicationService(
         }
     }
 
-    // ---------- Application CRUD ----------
     public async Task<ResultModel<ServiceApplication>> CreateFullApplicationAsync(
         CreateFullApplicationInputModel input,
         CancellationToken cancellationToken = default)
@@ -206,7 +206,6 @@ public class SoapApplicationService(
         return ResultModel<bool>.Success(true);
     }
 
-    // ---------- Sub‑methods ----------
     public async Task<ResultModel<ServiceApplication>> RegisterApplicationAsync(
         RegisterApplicationInputModel input,
         CancellationToken cancellationToken = default)
@@ -217,20 +216,33 @@ public class SoapApplicationService(
 
         logger.LogInformation("Registering SOAP Application: {AppName}", input.AppName);
 
-        var app = new ServiceApplication
+        /* var app = new ServiceApplication
         {
             Name = input.AppName,
             BaseUrl = input.BaseUrl,
             DefinitionRelativeUrl = input.WsdlRelativeUrl,
             HealthcheckRelativeUrl = input.HealthcheckRelativeUrl,
             Description = input.Description,
-            ServiceType = "SOAP",
-            DefinitionType = "WSDL",
+            ServiceType = EServiceType.SOAP.ToStringCached(),
+            DefinitionType = EDefinitionType.WSDL.ToStringCached(),
             IsActive = true,
             CreatedBy = input.CreatedBy
+        }; */
+
+        var createServiceApplicationWithoutAuth = new CreateServiceApplicationInput
+        {
+            ServiceType = EServiceType.SOAP.ToStringCached(),
+            ServiceAppAuthenticationId = null,
+            Name = input.AppName,
+            BaseUrl = input.BaseUrl,
+            DefinitionType = EDefinitionType.WSDL.ToStringCached(),
+            DefinitionRelativeUrl = input.WsdlRelativeUrl,
+            HealthcheckRelativeUrl = input.HealthcheckRelativeUrl,
+            Description = input.Description,
+            UserId = input.CreatedBy
         };
 
-        var registeredApp = await appRepository.AddAsync(app, cancellationToken);
+        var registeredApp = await appRepository.AddAsync(createServiceApplicationWithoutAuth, cancellationToken);
 
         if (input.DirectWsdlStream is not null)
         {
@@ -403,7 +415,7 @@ public class SoapApplicationService(
 
         var authEntity = new ServiceAppAuthentication
         {
-            Name = $"SOAP-Auth-{input.AppId}",
+            Name = input.Credentials.Name ?? $"SOAP-Auth-{input.AppId}",
             AuthenticationType = input.Credentials.AuthenticationType.ToString(),
             EncryptionAlgorithmType = "AES-256-GCM",
             EncryptedJson = encryptedCredentialsJson,

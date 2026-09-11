@@ -141,7 +141,6 @@ BEGIN
         -- Insert new sync record
         INSERT INTO [dbo].[ServiceDefinitionSyncs] (
             [ServiceApplicationId],
-            [DefinitionUrl],
             [CompressedContent],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],

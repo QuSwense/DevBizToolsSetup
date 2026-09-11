@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Dashboard.Core.Entities;
 using OrbitHub.Dashboard.Core.Interfaces.TestSuites;
+using OrbitHub.Data.TestManagement.Views;
 
 namespace OrbitHub.Dashboard.Infrastructure.Repositories.TestSuites;
 

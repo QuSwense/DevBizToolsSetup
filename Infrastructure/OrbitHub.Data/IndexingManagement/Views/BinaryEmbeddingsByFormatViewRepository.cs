@@ -5,8 +5,7 @@
 
 using LinqToDB;
 using LinqToDB.Data;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.IndexingManagement.Views;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.IndexingManagement;
 
 namespace OrbitHub.Data.IndexingManagement.Views;

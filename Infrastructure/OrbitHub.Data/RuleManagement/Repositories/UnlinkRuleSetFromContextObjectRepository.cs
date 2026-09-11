@@ -7,7 +7,7 @@ using LinqToDB;
 using LinqToDB.Data;
 using OrbitHub.Data.RuleManagement;
 using OrbitHub.Data.Common;
-using OrbitHub.Data.Repositories.RuleManagement.Models;
+using OrbitHub.Data.RuleManagement.Models;
 
 namespace OrbitHub.Data.RuleManagement.Repositories;
 

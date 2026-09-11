@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using OrbitHub.PdfProcessor.Core.Exceptions;
+using OrbitHub.PdfProcessor.Core.Models.Editor;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.AcroForms;
 using PdfSharpCore.Pdf.IO;

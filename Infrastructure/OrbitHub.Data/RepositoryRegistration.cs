@@ -5,17 +5,18 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using LinqToDB.Data;
-using OrbitHub.Data.Repositories.CoreManagement.Repositories;
-using OrbitHub.Data.Repositories.IndexingManagement.Repositories;
-using OrbitHub.Data.Repositories.IndexingManagement.Views;
-using OrbitHub.Data.Repositories.PermissionsManagement.Repositories;
-using OrbitHub.Data.Repositories.PermissionsManagement.Views;
-using OrbitHub.Data.Repositories.RuleManagement.Repositories;
-using OrbitHub.Data.Repositories.RuleManagement.Views;
-using OrbitHub.Data.Repositories.ServiceAppManagement.Views;
-using OrbitHub.Data.Repositories.TestManagement.Repositories;
-using OrbitHub.Data.Repositories.TestManagement.Views;
 using OrbitHub.Data.TestManagement;
+using OrbitHub.Data.CoreManagement.Repositories;
+using OrbitHub.Data.IndexingManagement.Repositories;
+using OrbitHub.Data.PermissionsManagement.Repositories;
+using OrbitHub.Data.RuleManagement.Repositories;
+using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.Data.Common;
+using OrbitHub.Data.ServiceAppManagement.Views;
+using OrbitHub.Data.IndexingManagement.Views;
+using OrbitHub.Data.PermissionsManagement.Views;
+using OrbitHub.Data.RuleManagement.Views;
+using OrbitHub.Data.TestManagement.Views;
 
 namespace OrbitHub.Data;
 
@@ -143,11 +144,11 @@ public static class RepositoryRegistration
         services.AddScoped<UpdateServiceRequestFileWithDeltaChainRepository>();
 
         // UnitOfWork
-        services.AddScoped<OrbitHub.Data.Repositories.Common.IUnitOfWork>(sp =>
+        services.AddScoped<IUnitOfWork>(sp =>
         {
             var ctx = sp.GetRequiredService<TestDbContext>();
-            var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<OrbitHub.Data.Repositories.Common.UnitOfWork>>();
-            return new OrbitHub.Data.Repositories.Common.UnitOfWork((DataConnection)ctx, logger);
+            var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<UnitOfWork>>();
+            return new UnitOfWork((DataConnection)ctx, logger);
         });
 
         // Views - ServiceAppManagement

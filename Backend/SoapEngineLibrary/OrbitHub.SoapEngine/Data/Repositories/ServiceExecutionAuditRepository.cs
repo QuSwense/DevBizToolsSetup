@@ -6,6 +6,7 @@ using OrbitHub.Data.Common;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.TestManagement.Models;
 using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.SoapEngine.Core.Models.Inputs.Filters;
 
 /// <summary>
 /// Provides data access for SOAP execution auditing using stored procedure repositories
@@ -173,7 +174,7 @@ public class ServiceExecutionAuditRepository(
         if (!result.Success || result.Data is null)
             return [];
 
-        return result.Data.Select(dto => new DirectExecutionAuditResponseFileLink
+        return [.. result.Data.Select(dto => new DirectExecutionAuditResponseFileLink
         {
             Id = dto.Id,
             DirectExecutionAuditId = dto.DirectExecutionAuditId,
@@ -186,7 +187,7 @@ public class ServiceExecutionAuditRepository(
             HttpResponseHeaders = dto.HttpResponseHeaders,
             ExecutedAt = dto.ExecutedAt,
             ExecutionCompletedAt = dto.ExecutionCompletedAt
-        }).ToList();
+        })];
     }
 
     #endregion

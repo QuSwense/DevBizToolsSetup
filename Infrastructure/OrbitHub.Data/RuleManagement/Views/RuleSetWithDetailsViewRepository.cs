@@ -5,9 +5,8 @@
 
 using LinqToDB;
 using LinqToDB.Data;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.RuleManagement.Views;
 using OrbitHub.Data.RuleManagement;
+using OrbitHub.Data.Common;
 
 namespace OrbitHub.Data.RuleManagement.Views;
 

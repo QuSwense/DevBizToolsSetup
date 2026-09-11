@@ -7,6 +7,7 @@ using LinqToDB;
 using LinqToDB.Data;
 using OrbitHub.Data.PermissionsManagement;
 using OrbitHub.Data.Common;
+using OrbitHub.Data.PermissionsManagement.Models;
 
 namespace OrbitHub.Data.PermissionsManagement.Repositories;
 

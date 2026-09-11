@@ -59,7 +59,7 @@ public class ServiceApplicationRepository(
     /// <summary>
     /// Inserts a new SOAP application record via usp_CreateServiceApplication SP.
     /// </summary>
-    public async Task<ServiceApplication> AddAsync(ServiceApplication app, CancellationToken cancellationToken = default)
+    public async Task<ServiceApplication> AddAsync(CreateServiceApplicationInput app, CancellationToken cancellationToken = default)
     {
         var result = await createAppRepo.ExecuteAsync(new CreateServiceApplicationInput
         {
@@ -71,7 +71,7 @@ public class ServiceApplicationRepository(
             DefinitionRelativeUrl = app.DefinitionRelativeUrl,
             HealthcheckRelativeUrl = app.HealthcheckRelativeUrl,
             Description = app.Description,
-            UserId = app.CreatedBy
+            UserId = app.UserId
         }, cancellationToken);
 
         if (!result.Success || result.Data is null)
@@ -92,7 +92,7 @@ public class ServiceApplicationRepository(
             IsActive = dto.IsActive ?? true,
             RecordVersion = dto.RecordVersion!,
             CreatedAt = dto.CreatedAt ?? DateTime.Now,
-            CreatedBy = dto.CreatedBy ?? app.CreatedBy
+            CreatedBy = dto.CreatedBy ?? app.UserId
         };
     }
 

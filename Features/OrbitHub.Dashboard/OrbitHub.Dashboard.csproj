@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Common/OrbitHub.GenericModels/OrbitHub.GenericModels.csproj" />
     <ProjectReference Include="..\..\Infrastructure\OrbitHub.Data\OrbitHub.Data.csproj" />
     <ProjectReference Include="..\..\Components\OrbitHub.Ui\OrbitHub.Ui.csproj" />
   </ItemGroup>

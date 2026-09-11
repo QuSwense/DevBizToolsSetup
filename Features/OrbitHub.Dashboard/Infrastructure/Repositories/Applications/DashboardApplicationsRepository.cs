@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Dashboard.Core.Entities;
 using OrbitHub.Dashboard.Core.Interfaces.Applications;
+using OrbitHub.Data.TestManagement.Views;
+using OrbitHub.GenericModels.Enums;
 
 namespace OrbitHub.Dashboard.Infrastructure.Repositories.Applications;
 
@@ -29,7 +31,7 @@ internal sealed class DashboardApplicationsRepository(IServiceProvider servicePr
         var (applications, operationsByApp) = await LoadApplicationsAsync();
 
         return [.. applications
-            .Where(a => a.ServiceType.Equals("SOAP", StringComparison.OrdinalIgnoreCase))
+            .Where(a => a.ServiceType.Equals(EServiceType.SOAP.ToStringCached(), StringComparison.OrdinalIgnoreCase))
             .Select(a => ToSoapEntity(a, operationsByApp))];
     }
 

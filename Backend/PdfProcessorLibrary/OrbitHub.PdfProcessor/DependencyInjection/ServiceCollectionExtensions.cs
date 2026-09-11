@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using OrbitHub.PdfProcessor.Core.Services;
 
 namespace OrbitHub.PdfProcessor.Core.DependencyInjection;
 

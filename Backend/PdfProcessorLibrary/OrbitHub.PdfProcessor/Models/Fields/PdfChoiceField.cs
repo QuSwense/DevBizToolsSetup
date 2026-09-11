@@ -1,3 +1,7 @@
+using OrbitHub.PdfProcessor.Core.Models.Common;
+
+namespace OrbitHub.PdfProcessor.Core.Models.Fields;
+
 public record PdfChoiceField(
     string Name,
     string? MappingName,

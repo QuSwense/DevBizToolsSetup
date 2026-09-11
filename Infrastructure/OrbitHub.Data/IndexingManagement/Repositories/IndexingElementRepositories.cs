@@ -1,5 +1,6 @@
 using LinqToDB.Data;
 using OrbitHub.Data.Common;
+using OrbitHub.Data.IndexingManagement.Models;
 
 namespace OrbitHub.Data.IndexingManagement.Repositories;
 

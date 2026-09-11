@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using OrbitHub.PdfProcessor.Core.Models.Common;
 using System.Text.RegularExpressions;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;

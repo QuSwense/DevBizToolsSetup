@@ -1,3 +1,5 @@
+namespace OrbitHub.PdfProcessor.Core.Models.Common;
+
 public record PageTextContent(
     int PageNumber,
     string FullText,

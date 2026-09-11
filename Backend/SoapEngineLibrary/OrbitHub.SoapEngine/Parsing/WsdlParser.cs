@@ -1,5 +1,7 @@
 using System.Xml;
 using System.Xml.Linq;
+using OrbitHub.SoapEngine.Core.Exceptions;
+using OrbitHub.SoapEngine.Core.Parsing.Models;
 
 namespace OrbitHub.SoapEngine.Core.Parsing;
 

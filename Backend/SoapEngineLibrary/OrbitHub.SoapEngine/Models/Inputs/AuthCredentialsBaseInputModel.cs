@@ -11,4 +11,5 @@ namespace OrbitHub.SoapEngine.Core.Models.Inputs;
 public abstract class AuthCredentialsBaseInputModel
 {
     public abstract EAuthenticationType AuthenticationType { get; }
+    public string Name { get; set; } = default!;
 }

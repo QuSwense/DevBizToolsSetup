@@ -9,8 +9,6 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     -- Foreign Key to ServiceApplications table
     [ServiceApplicationId] INT NOT NULL,
-    -- Built from BaseUrl + DefinitionRelativeUrl
-    [DefinitionUrl] NVARCHAR(500) NULL,
     -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
     [CompressedContent] VARBINARY(MAX) NOT NULL,
     -- uncompressed size of the definition file in bytes

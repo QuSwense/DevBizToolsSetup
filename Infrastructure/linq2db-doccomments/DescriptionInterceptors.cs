@@ -15,6 +15,7 @@
 // DocIntercept.settings.json (see Formatting/DocInterceptSettings.cs).
 // ---------------------------------------------------------------------------------------------------
 
+using DocIntercept.Formatting;
 using LinqToDB.CodeModel;
 using LinqToDB.DataModel;
 using LinqToDB.Scaffold;

@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using OrbitHub.PdfProcessor.Core.Models.Common;
+using OrbitHub.PdfProcessor.Core.Models.Fields;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.AcroForms.Fields;
 

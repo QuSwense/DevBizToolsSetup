@@ -1,3 +1,5 @@
+using OrbitHub.SoapEngine.Core.Models.Inputs;
+
 namespace OrbitHub.SoapEngine.Core.Validation;
 
 public class SaveOperationInputValidator : IValidator<SaveOperationInputModel>

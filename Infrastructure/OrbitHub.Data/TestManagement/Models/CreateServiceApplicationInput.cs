@@ -15,5 +15,5 @@ public class CreateServiceApplicationInput
     public string? DefinitionRelativeUrl { get; set; } = default!;
     public string? HealthcheckRelativeUrl { get; set; } = default!;
     public string? Description { get; set; } = default!;
-    public string? UserId { get; set; } = default!;
+    public string UserId { get; set; } = default!;
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using OrbitHub.PdfProcessor.Core.Services.Internal;
 
 namespace OrbitHub.PdfProcessor.Core.Services;
 

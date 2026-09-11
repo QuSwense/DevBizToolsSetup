@@ -1,3 +1,5 @@
+using OrbitHub.Data.Common;
+
 namespace OrbitHub.Dashboard.Infrastructure.Repositories;
 
 /// <summary>

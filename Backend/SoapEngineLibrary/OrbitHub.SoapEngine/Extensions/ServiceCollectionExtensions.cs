@@ -5,8 +5,11 @@ using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.TestManagement;
+using OrbitHub.SoapEngine.Core.Data.Repositories;
 using OrbitHub.SoapEngine.Core.Models.Inputs;
+using OrbitHub.SoapEngine.Core.Parsing;
 using OrbitHub.SoapEngine.Core.Services;
+using OrbitHub.SoapEngine.Core.Validation;
 
 /// <summary>
 /// Extension methods for registering LINQ to DB context, repositories, and SOAP engine core services.
@@ -57,9 +60,6 @@ public static class ServiceCollectionExtensions
             new ServiceAppDbContext(sp.GetRequiredService<DataOptions<ServiceAppDbContext>>()));
         services.AddScoped<TestDbContext>(sp =>
             new TestDbContext(sp.GetRequiredService<DataOptions<TestDbContext>>()));
-
-        // 3. Register OrbitHub.Data SP repositories + IUnitOfWork
-        services.AddRepositories();
 
         // 4. Register Typed HttpClients for SOAP & WSDL fetching
         services.AddHttpClient<WsdlParser>();

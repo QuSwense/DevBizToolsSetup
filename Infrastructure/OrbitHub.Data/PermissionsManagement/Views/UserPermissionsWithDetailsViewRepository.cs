@@ -5,8 +5,7 @@
 
 using LinqToDB;
 using LinqToDB.Data;
-using OrbitHub.Data.Repositories.Common;
-using OrbitHub.Data.Repositories.PermissionsManagement.Views;
+using OrbitHub.Data.Common;
 using OrbitHub.Data.PermissionsManagement;
 
 namespace OrbitHub.Data.PermissionsManagement.Views;

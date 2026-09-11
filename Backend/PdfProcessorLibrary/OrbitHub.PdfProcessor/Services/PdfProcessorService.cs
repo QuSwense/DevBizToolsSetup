@@ -1,3 +1,6 @@
+using OrbitHub.PdfProcessor.Core.Models.Common;
+using OrbitHub.PdfProcessor.Core.Models.Fields;
+
 namespace OrbitHub.PdfProcessor.Core.Services;
 
 public class PdfProcessorService(PdfContextFactory contextFactory)

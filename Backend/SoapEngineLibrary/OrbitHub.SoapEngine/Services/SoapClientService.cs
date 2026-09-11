@@ -4,7 +4,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using OrbitHub.GenericModels.Enums;
+using OrbitHub.SoapEngine.Core.Exceptions;
 using OrbitHub.SoapEngine.Core.Models.Inputs;
+using OrbitHub.SoapEngine.Core.Models.Outputs;
 
 namespace OrbitHub.SoapEngine.Core.Services;
 

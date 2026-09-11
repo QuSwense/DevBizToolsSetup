@@ -63,7 +63,7 @@ public class ServiceOperationRepository(
         if (!result.Success || result.Data is null)
             return [];
 
-        return result.Data.Select(MapFromOpsOutput).ToList();
+        return [.. result.Data.Select(MapFromOpsOutput)];
     }
 
     /// <summary>

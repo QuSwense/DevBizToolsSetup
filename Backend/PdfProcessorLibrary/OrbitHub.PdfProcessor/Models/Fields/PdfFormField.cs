@@ -1,3 +1,5 @@
+using OrbitHub.PdfProcessor.Core.Models.Common;
+
 namespace OrbitHub.PdfProcessor.Core.Models.Fields;
 
 /// <summary>
