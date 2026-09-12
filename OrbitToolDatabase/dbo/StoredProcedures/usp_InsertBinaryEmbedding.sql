@@ -4,11 +4,11 @@
     If the same FileHash already exists, returns the existing record.
 */
 CREATE PROCEDURE [dbo].[usp_InsertBinaryEmbedding]
-    @FileHash VARCHAR(64),
+    @ContentHash VARCHAR(64),
     @CompressedData VARBINARY(MAX),
     @UncompressedSizeBytes INT,
     @CompressionAlgorithmType VARCHAR(50),
-    @FileFormat VARCHAR(10) = NULL,
+    @ContentFormat VARCHAR(10),
     @UserId NVARCHAR(20) = NULL
 AS
 BEGIN
@@ -38,7 +38,7 @@ BEGIN
         -- Check if the hash already exists
         SELECT @ExistingId = [Id]
         FROM [dbo].[BinaryEmbeddingsStore]
-        WHERE [FileHash] = @FileHash;
+        WHERE [ContentHash] = @ContentHash;
 
         IF @ExistingId IS NOT NULL
         BEGIN
@@ -48,11 +48,12 @@ BEGIN
 
             SELECT 
                 [Id] AS EmbeddingId,
-                [FileHash],
+                [PublicId],
+                [ContentHash],
                 [CompressedData],
                 [UncompressedSizeBytes],
                 [CompressionAlgorithmType],
-                [FileFormat],
+                [ContentFormat],
                 [CreatedAt],
                 [CreatedBy],
                 [LastUpdatedAt],
@@ -66,22 +67,22 @@ BEGIN
 
         -- Insert new record
         INSERT INTO [dbo].[BinaryEmbeddingsStore] (
-            [FileHash],
+            [ContentHash],
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileFormat],
+            [ContentFormat],
             [CreatedAt],
             [CreatedBy],
             [LastUpdatedAt],
             [LastUpdatedBy]
         )
         VALUES (
-            @FileHash,
+            @ContentHash,
             @CompressedData,
             @UncompressedSizeBytes,
             @CompressionAlgorithmType,
-            @FileFormat,
+            @ContentFormat,
             GETDATE(),
             @ResolvedUser,
             NULL,  -- No updates yet
@@ -91,29 +92,29 @@ BEGIN
         SET @NewId = SCOPE_IDENTITY();
 
         -- Build notes
-        SET @Notes = CONCAT('Binary embedding stored: ', @FileHash, 
-                           ' (Size: ', @UncompressedSizeBytes, ' bytes, Format: ', 
-                           ISNULL(@FileFormat, 'Unknown'), ', Compression: ', 
-                           @CompressionAlgorithmType, ')');
+        SET @Notes = CONCAT('Binary embedding stored: ', @ContentHash, 
+                           ' (Size: ', @UncompressedSizeBytes,
+                           ' bytes, Format: ', @ContentFormat,
+                           ', Compression: ', @CompressionAlgorithmType, ')');
 
         -- Audit log
         DECLARE @FeatureJson NVARCHAR(MAX) = (
             SELECT 
-                'Create' AS ChangeType,
-                @FileHash AS FileHash,
+                'Insert' AS ChangeType,
+                @ContentHash AS ContentHash,
                 @UncompressedSizeBytes AS SizeBytes,
                 @CompressionAlgorithmType AS CompressionAlgorithm,
-                @FileFormat AS FileFormat
+                @ContentFormat AS ContentFormat
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
 
         EXEC [dbo].[usp_InsertUserActivity]
             @UserId = @ResolvedUser,
-            @ActivityType = 'BinaryEmbeddingCreate',
-            @ActionType = 'Create',
+            @ActivityType = 'BinaryStorage',
+            @ActionType = 'Insert',
             @FeatureActivitiesJson = @FeatureJson,
             @RelatedEntityType = 'BinaryEmbeddingsStore',
-            @RelatedEntityId = NULL,
+            @RelatedEntityId = @NewId,
             @Notes = @Notes,
             @ActivityId = @ActivityId OUTPUT;
 
@@ -123,11 +124,12 @@ BEGIN
         -- Return the new record
         SELECT 
             [Id] AS EmbeddingId,
-            [FileHash],
+            [PublicId],
+            [ContentHash],
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileFormat],
+            [ContentFormat],
             [CreatedAt],
             [CreatedBy],
             [LastUpdatedAt],

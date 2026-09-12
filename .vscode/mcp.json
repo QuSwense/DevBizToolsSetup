@@ -1,16 +1,33 @@
 {
-  "servers": {
-    "dotnet-source-mcp": {
-      "type": "stdio",
-      "command": "dotnet-source-mcp"
-    },
-    "sqlserver-schema": {
-      "type": "stdio",
-      "command": "sqlserverlocal-mcp",
-      "env": {
-        "SQL_SERVER_CONNECTION_STRING": "Data Source=localhost,1433;Initial Catalog=OrbitTool;User ID=sa;Password=root@1234;Encrypt=True;TrustServerCertificate=True;Command Timeout=30",
-        "SQL_SERVER_READONLY": "true"
-      }
-    }
-  }
+	"servers": {
+		"dotnet-source-mcp": {
+			"type": "stdio",
+			"command": "dotnet-source-mcp",
+			"env": {
+				"GITHUB_TOKEN": "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"
+			}
+		},
+		"sqlserver-schema": {
+			"type": "stdio",
+			"command": "sqlserverlocal-mcp",
+			"env": {
+				"SQL_SERVER_CONNECTION_STRING": "Data Source=localhost,1433;Initial Catalog=OrbitTool;User ID=sa;Password=root@1234;Encrypt=True;TrustServerCertificate=True;Command Timeout=30",
+				"SQL_SERVER_READONLY": "true"
+			}
+		},
+		"tokensaver": {
+			"type": "stdio",
+			"command": "dotnet",
+			"args": [
+				"tool",
+				"execute",
+				"TokenSaver.Mcp",
+				"--yes"
+			],
+			"env": {
+				"TOKENSAVER_API_URL": "https://tokensavermcp.com"
+			}
+		}
+	},
+	"inputs": []
 }
