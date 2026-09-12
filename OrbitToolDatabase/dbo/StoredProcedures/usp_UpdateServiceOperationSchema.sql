@@ -135,7 +135,6 @@ BEGIN
 
             SELECT 
                 [Id] AS SchemaId,
-                [ServiceDefinitionSyncId],
                 [ServiceOperationId],
                 [InputRootElementName],
                 [OutputRootElementName],
@@ -213,7 +212,6 @@ BEGIN
         -- Return the updated record
         SELECT 
             [Id] AS SchemaId,
-            [ServiceDefinitionSyncId],
             [ServiceOperationId],
             [InputRootElementName],
             [OutputRootElementName],

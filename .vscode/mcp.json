@@ -1,11 +1,15 @@
 {
   "servers": {
-    "tokensaver": {
+    "dotnet-source-mcp": {
       "type": "stdio",
-      "command": "dotnet",
-      "args": ["tool", "execute", "TokenSaver.Mcp", "--yes"],
+      "command": "dotnet-source-mcp"
+    },
+    "sqlserver-schema": {
+      "type": "stdio",
+      "command": "sqlserverlocal-mcp",
       "env": {
-        "TOKENSAVER_API_URL": "https://tokensavermcp.com"
+        "SQL_SERVER_CONNECTION_STRING": "Data Source=localhost,1433;Initial Catalog=OrbitTool;User ID=sa;Password=root@1234;Encrypt=True;TrustServerCertificate=True;Command Timeout=30",
+        "SQL_SERVER_READONLY": "true"
       }
     }
   }

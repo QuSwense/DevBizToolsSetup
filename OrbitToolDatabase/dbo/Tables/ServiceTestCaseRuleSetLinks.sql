@@ -4,6 +4,9 @@
 */
 CREATE TABLE [dbo].[ServiceTestCaseRuleSetLinks] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceTestCaseRuleSetLinks_PublicId DEFAULT NEWID(),
     [ServiceTestCaseId] INT NOT NULL,
     [RuleSetId] INT NOT NULL,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestCaseRuleSetLinks_IsActive DEFAULT 1,
@@ -12,6 +15,7 @@ CREATE TABLE [dbo].[ServiceTestCaseRuleSetLinks] (
 
     -- Primary Key
     CONSTRAINT PK_ServiceTestCaseRuleSetLinks PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceTestCaseRuleSetLinks_PublicId UNIQUE ([PublicId] ASC),
 
     -- Foreign Key
     CONSTRAINT FK_ServiceTestCaseRuleSetLinks_ServiceTestCases_ServiceTestCaseId

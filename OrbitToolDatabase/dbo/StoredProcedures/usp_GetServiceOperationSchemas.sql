@@ -28,7 +28,6 @@ BEGIN
     BEGIN
         SELECT 
             sos.[Id] AS SchemaId,
-            sos.[ServiceDefinitionSyncId],
             sos.[ServiceOperationId],
             so.[OperationName],
             sos.[InputRootElementName],
@@ -54,7 +53,6 @@ BEGIN
     BEGIN
         SELECT 
             sos.[Id] AS SchemaId,
-            sos.[ServiceDefinitionSyncId],
             sos.[ServiceOperationId],
             so.[OperationName],
             sos.[InputRootElementName],

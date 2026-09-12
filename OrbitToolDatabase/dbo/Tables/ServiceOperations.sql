@@ -38,7 +38,7 @@ CREATE TABLE [dbo].[ServiceOperations] (
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceOperations_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceOperations_ServiceApplicationId_OperationName_RecordVersion
-        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC, [ServiceDefinitionSyncId] ASC),
+        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC, [ServiceDefinitionSyncId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceOperations_HttpMethod
         CHECK ([HttpMethod] IS NULL OR [HttpMethod] IN ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')),
@@ -47,7 +47,7 @@ CREATE TABLE [dbo].[ServiceOperations] (
 
     -- Foreign keys
     CONSTRAINT FK_ServiceOperations_ServiceApplications_ServiceApplicationId
-        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]),
+        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_ServiceOperations_ServiceDefinitionSyncs_ServiceDefinitionSyncId
         FOREIGN KEY ([ServiceDefinitionSyncId]) REFERENCES [dbo].[ServiceDefinitionSyncs]([Id]),
     CONSTRAINT FK_ServiceOperations_Users_CreatedBy

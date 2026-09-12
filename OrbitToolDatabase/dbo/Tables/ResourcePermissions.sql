@@ -19,6 +19,8 @@ CREATE TABLE [dbo].[ResourcePermissions]
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ResourcePermissions PRIMARY KEY ([Id]),
+    CONSTRAINT UQ_ResourcePermissions_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ResourcePermissions_PermissionKey UNIQUE ([PermissionKey] ASC),
 
     CONSTRAINT FK_ResourcePermissions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ResourcePermissions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])

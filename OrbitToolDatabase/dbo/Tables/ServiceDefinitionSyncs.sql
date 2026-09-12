@@ -7,8 +7,12 @@
 CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceDefinitionSyncs_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceApplications table
     [ServiceApplicationId] INT NOT NULL,
+    -- URL of the definition file (WSDL, Swagger, OpenAPI)
+    [DefinitionUrl] NVARCHAR(500) NULL,
     -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
     [CompressedContent] VARBINARY(MAX) NOT NULL,
     -- uncompressed size of the definition file in bytes
@@ -29,6 +33,8 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [RecordVersion] ASC),
+    CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_ContentHash
+        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [ContentHash] ASC),
 
     CONSTRAINT CK_ServiceDefinitionSyncs_DefinitionUrl
         CHECK (LEFT([DefinitionUrl], 7) = 'http://' OR LEFT([DefinitionUrl], 8) = 'https://'),
@@ -45,8 +51,5 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     CONSTRAINT FK_ServiceDefinitionSyncs_Users_SyncedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceDefinitionSyncs_Users_LastUpdatedBy
-        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId]),
-
-    -- Index constraint
-    CONSTRAINT IX_ServiceDefinitionSyncs_ServiceApplicationId UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC)
+        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )

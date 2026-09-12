@@ -18,6 +18,10 @@ CREATE TABLE [dbo].[IndexingJsonFileElementMappings]
         PRIMARY KEY CLUSTERED ([Id] ASC) 
         WITH (DATA_COMPRESSION = PAGE),
 
+    CONSTRAINT [CK_IndexingJsonFileElementMappings_OneFile]
+        CHECK (([RequestFileId] IS NOT NULL AND [ResponseFileId] IS NULL)
+            OR ([RequestFileId] IS NULL AND [ResponseFileId] IS NOT NULL)),
+
     CONSTRAINT [FK_IndexingJsonFileElementMappings_IndexingJsonFileElementSearch] 
         FOREIGN KEY ([IndexingJsonFileElementSearchId]) REFERENCES [dbo].[IndexingJsonFileElementSearch]([Id]) ON DELETE CASCADE,
 

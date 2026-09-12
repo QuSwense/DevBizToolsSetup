@@ -9,6 +9,9 @@
 CREATE TABLE [dbo].[PermissionToUIPageMapping] (
     -- Primary Key
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_PermissionToUIPageMapping_PublicId DEFAULT NEWID(),
     -- Foreign Key to ResourcePermissions
     [ResourcePermissionId] BIGINT NOT NULL,
     -- Foreign Key to UIPages
@@ -24,7 +27,9 @@ CREATE TABLE [dbo].[PermissionToUIPageMapping] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_PermissionToUIPageMapping PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_PermissionToUIPageMapping_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_PermissionToUIPageMapping_Permission_Page UNIQUE ([ResourcePermissionId] ASC, [UIPageId] ASC),
+    CONSTRAINT CK_PermissionToUIPageMapping_AccessType CHECK ([AccessType] IN ('View', 'Edit', 'Full')),
 
     -- Foreign Keys
     CONSTRAINT FK_PermissionToUIPageMapping_ResourcePermissions FOREIGN KEY ([ResourcePermissionId]) 

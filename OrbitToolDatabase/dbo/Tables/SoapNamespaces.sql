@@ -5,6 +5,9 @@
 CREATE TABLE [dbo].[SoapNamespaces] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_SoapNamespaces_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceOperationSchemas table
     [ServiceOperationSchemaId] INT NOT NULL,
     -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
@@ -26,6 +29,7 @@ CREATE TABLE [dbo].[SoapNamespaces] (
 
     -- Primary Key
     CONSTRAINT [PK_SoapNamespaces] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [UQ_SoapNamespaces_PublicId] UNIQUE ([PublicId] ASC),
     CONSTRAINT CK_SoapNamespaces_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
     CONSTRAINT CK_SoapNamespaces_ContentHash

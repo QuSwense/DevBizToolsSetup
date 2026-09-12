@@ -4,6 +4,9 @@
 */
 CREATE TABLE [dbo].[ServiceTestSuiteTestCaseLinks] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceTestSuiteTestCaseLinks_PublicId DEFAULT NEWID(),
     [ServiceTestSuiteId] INT NOT NULL,
     [ServiceTestCaseId] INT NOT NULL,
     [ExecutionOrder] INT NOT NULL CONSTRAINT DF_ServiceTestSuiteTestCaseLinks_ExecutionOrder DEFAULT 1,
@@ -12,6 +15,7 @@ CREATE TABLE [dbo].[ServiceTestSuiteTestCaseLinks] (
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceTestSuiteTestCaseLinks PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceTestSuiteTestCaseLinks_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_ServiceTestSuites_ServiceTestSuiteId
         FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_ServiceTestCases_ServiceTestCaseId

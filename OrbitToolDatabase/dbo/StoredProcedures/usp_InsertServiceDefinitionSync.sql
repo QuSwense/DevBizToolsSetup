@@ -12,9 +12,10 @@
 CREATE PROCEDURE [dbo].[usp_InsertServiceDefinitionSync]
     @ServiceApplicationPublicId UNIQUEIDENTIFIER,
     @CompressedContent VARBINARY(MAX),
-    @UncompressedSizeBytes INT = NULL,
-    @CompressionAlgorithmType VARCHAR(50) = NULL,
+    @UncompressedSizeBytes INT,
+    @CompressionAlgorithmType VARCHAR(50),
     @UserId NVARCHAR(20) = NULL,
+    @DefinitionUrl NVARCHAR(500) = NULL, -- Optional: full URL to the definition file (will be constructed if not provided)
     @ContentHash VARCHAR(64) = NULL  -- Optional: if not provided, will be calculated
 AS
 BEGIN
@@ -31,10 +32,9 @@ BEGIN
         DECLARE @ResolvedUser NVARCHAR(20);
         DECLARE @ServiceAppId INT;
         DECLARE @ServiceAppName NVARCHAR(200);
-        DECLARE @BaseUrl NVARCHAR(500);
-        DECLARE @DefinitionRelativeUrl NVARCHAR(250);
-        DECLARE @DefinitionUrl NVARCHAR(500);
         DECLARE @NewRecordVersion VARCHAR(50);
+        DECLARE @BaseUrl NVARCHAR(500);
+        DECLARE @DefinitionRelativeUrl NVARCHAR(500);
         DECLARE @NewId INT;
         DECLARE @ActivityId BIGINT;
         DECLARE @Notes NVARCHAR(MAX);
@@ -53,8 +53,8 @@ BEGIN
         SELECT TOP 1
             @ServiceAppId = [Id],
             @ServiceAppName = [Name],
-            @BaseUrl = [BaseUrl],
-            @DefinitionRelativeUrl = [DefinitionRelativeUrl]
+            @DefinitionRelativeUrl = [DefinitionRelativeUrl],
+            @BaseUrl = [BaseUrl]
         FROM [dbo].[ServiceApplications]
         WHERE [PublicId] = @ServiceApplicationPublicId
           AND [IsActive] = 1
@@ -68,17 +68,11 @@ BEGIN
             RETURN;
         END
 
-        -- Check if DefinitionRelativeUrl is configured
-        IF @DefinitionRelativeUrl IS NULL
+        -- Construct the full definition URL if not provided
+        IF @DefinitionUrl IS NULL
         BEGIN
-            RAISERROR('Service application does not have a definition URL configured.', 16, 1);
-            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
-                ROLLBACK TRANSACTION;
-            RETURN;
+            SET @DefinitionUrl = @BaseUrl + @DefinitionRelativeUrl;
         END
-
-        -- Build the full Definition URL
-        SET @DefinitionUrl = @BaseUrl + @DefinitionRelativeUrl;
 
         -- Calculate file hash if not provided
         IF @ContentHash IS NULL AND @CompressedContent IS NOT NULL
@@ -118,7 +112,6 @@ BEGIN
                 SELECT 
                     [Id],
                     [ServiceApplicationId],
-                    [DefinitionUrl],
                     [CompressedContent],
                     [UncompressedSizeBytes],
                     [CompressionAlgorithmType],
@@ -153,7 +146,6 @@ BEGIN
         )
         VALUES (
             @ServiceAppId,
-            @DefinitionUrl,
             @CompressedContent,
             @UncompressedSizeBytes,
             @CompressionAlgorithmType,
@@ -169,7 +161,7 @@ BEGIN
 
         -- Build notes string
         SET @Notes = CONCAT('Definition synced for service: ', @ServiceAppName, 
-                           ' (Size: ', @UncompressedSizeBytes, ' bytes, Hash: ', @CalculatedContentHash, ')');
+                           ' (Size: ', @UncompressedSizeBytes, ' bytes, Version: ', @NewRecordVersion, ')');
 
         -- Audit log
         DECLARE @FeatureJson NVARCHAR(MAX) = (
@@ -190,8 +182,8 @@ BEGIN
             @ActivityType = 'ServiceDefinitionSync',
             @ActionType = 'Sync',
             @FeatureActivitiesJson = @FeatureJson,
-            @RelatedEntityType = 'ServiceApplication',
-            @RelatedEntityId = @ServiceApplicationPublicId,
+            @RelatedEntityType = 'ServiceDefinitionSyncs',
+            @RelatedEntityId = @NewId, -- Id of the new Definition Sync record
             @Notes = @Notes,
             @ActivityId = @ActivityId OUTPUT;
 
@@ -202,7 +194,6 @@ BEGIN
         SELECT 
             [Id],
             [ServiceApplicationId],
-            [DefinitionUrl],
             [CompressedContent],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],

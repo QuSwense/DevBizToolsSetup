@@ -4,6 +4,9 @@
 */
 CREATE TABLE [dbo].[ServiceTestSuiteExecutionAudits] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceTestSuiteExecutionAudits_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceTestSuites
     [ServiceTestSuiteId] INT NOT NULL,
     -- Execution started at
@@ -18,6 +21,7 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAudits] (
     [ExecutedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceTestSuiteExecutionAudits PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceTestSuiteExecutionAudits_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT FK_ServiceTestSuiteExecutionAudits_ServiceTestSuites_ServiceTestSuiteId
         FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_ServiceTestSuiteExecutionAudits_Users_ExecutedBy

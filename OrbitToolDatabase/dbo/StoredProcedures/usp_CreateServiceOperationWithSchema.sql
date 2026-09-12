@@ -96,13 +96,13 @@ BEGIN
             ORDER BY [Id] DESC;
 
             INSERT INTO [dbo].[ServiceOperationSchemas] (
-                [ServiceDefinitionSyncId], [ServiceOperationId],
+                [ServiceOperationId],
                 [InputRootElementName], [OutputRootElementName], [TargetNamespace],
                 [CompressedContent], [CompressionAlgorithmType],
                 [RecordVersion], [CreatedAt], [CreatedBy]
             )
             VALUES (
-                ISNULL(@SyncId, 0), @NewOpId,
+                @NewOpId,
                 @InputRootElementName, @OutputRootElementName, @TargetNamespace,
                 ISNULL(@CompressedSchemaContent, 0x), 'None',
                 [dbo].[fn_CalculateVersion](NULL), GETDATE(), @ResolvedUser

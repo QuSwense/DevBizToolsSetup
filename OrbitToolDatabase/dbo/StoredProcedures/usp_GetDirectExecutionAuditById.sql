@@ -16,7 +16,7 @@ BEGIN
         [ExecutionCompletedAt],
         [ExecutionDetails],
         [ExecutedBy]
-    FROM [dbo].[DirectExecutionAudits]
+    FROM [dbo].[DirectExecutionAudit]
     WHERE [Id] = @AuditId;
 END;
 GO

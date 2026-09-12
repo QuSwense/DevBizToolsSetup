@@ -30,7 +30,8 @@ BEGIN
         );
 
         -- Insert new audit record
-        INSERT INTO [dbo].[DirectExecutionAudits] (
+        -- Insert new audit record
+        INSERT INTO [dbo].[DirectExecutionAudit] (
             [Name],
             [ExecutedAt],
             [ExecutionStatus],

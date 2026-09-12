@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[IndexingPdfFileElements]
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
     -- Primary Key, auto-incrementing identity integer.
     [ElementName] NVARCHAR(400) NOT NULL,
-    -- Type of the PDF element, e.g., 'Text', 'Image', 'Table'
+    -- Type of the PDF element, e.g., 'Text', 'Image', 'Table', 'Field'
     [ElementType] NVARCHAR(100) NOT NULL,
     [PageNumber] INT NOT NULL,
     [BoundingRectangle] NVARCHAR(400) NOT NULL,

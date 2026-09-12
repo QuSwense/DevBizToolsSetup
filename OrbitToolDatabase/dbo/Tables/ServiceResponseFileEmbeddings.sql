@@ -5,6 +5,9 @@
 CREATE TABLE [dbo].[ServiceResponseFileEmbeddings] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceResponseFileEmbeddings_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceResponseFiles table
     [ServiceResponseFileId] INT NOT NULL,
     -- Foreign Key to BinaryEmbeddingsStore table
@@ -22,10 +25,11 @@ CREATE TABLE [dbo].[ServiceResponseFileEmbeddings] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT [PK_ServiceResponseFileEmbeddings] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceResponseFileEmbeddings_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceResponseFileEmbeddings_ServiceResponseFileId_BinaryEmbeddingsStoreId UNIQUE ([ServiceResponseFileId] ASC, [BinaryEmbeddingsStoreId] ASC),
 
     CONSTRAINT CK_ServiceResponseFileEmbeddings_FileHash
-        CHECK ([FileHash] IS NULL OR LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
+        CHECK (LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
 
     -- Foreign Key
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_ServiceResponseFiles_ServiceResponseFileId]

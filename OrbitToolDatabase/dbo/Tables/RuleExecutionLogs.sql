@@ -6,6 +6,9 @@
 CREATE TABLE [dbo].[RuleExecutionLogs] (
     -- Primary Key and Identity
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_RuleExecutionLogs_PublicId DEFAULT NEWID(),
     -- Foreign Key Reference to RuleSets
     [RuleSetId] INT NOT NULL,
     -- Input and Output Compressed Content
@@ -26,6 +29,7 @@ CREATE TABLE [dbo].[RuleExecutionLogs] (
     [ExecutedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_RuleExecutionLogs PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_RuleExecutionLogs_PublicId UNIQUE ([PublicId] ASC),
 
     CONSTRAINT CK_RuleExecutionLogs_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),

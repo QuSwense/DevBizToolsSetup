@@ -32,7 +32,7 @@ BEGIN
         );
 
         -- Validate audit exists
-        IF NOT EXISTS (SELECT 1 FROM [dbo].[DirectExecutionAudits] WHERE [Id] = @DirectExecutionAuditId)
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[DirectExecutionAudit] WHERE [Id] = @DirectExecutionAuditId)
         BEGIN
             RAISERROR('Direct execution audit with Id %d not found.', 16, 1, @DirectExecutionAuditId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

@@ -25,7 +25,7 @@ BEGIN
 
         -- Get current audit details
         SELECT @ExistingStatus = [ExecutionStatus], @AuditName = [Name]
-        FROM [dbo].[DirectExecutionAudits]
+        FROM [dbo].[DirectExecutionAudit]
         WHERE [Id] = @AuditId;
 
         IF @AuditName IS NULL
@@ -37,7 +37,7 @@ BEGIN
         END
 
         -- Update audit record
-        UPDATE [dbo].[DirectExecutionAudits]
+        UPDATE [dbo].[DirectExecutionAudit]
         SET
             [ExecutionStatus] = @ExecutionStatus,
             [ExecutionCompletedAt] = GETDATE(),

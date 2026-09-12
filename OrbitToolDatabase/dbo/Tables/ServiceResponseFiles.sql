@@ -5,6 +5,9 @@
 CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceResponseFiles_PublicId DEFAULT NEWID(),
     -- Foreign key to the ServiceRequestFiles table
     [ServiceRequestFileId] INT NOT NULL,
     -- File format, e.g., 'XML', 'JSON', 'PDF', 'BINARY'
@@ -39,6 +42,7 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceResponseFiles PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceResponseFiles_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceResponseFiles_Name UNIQUE ([Name] ASC, [RecordVersion] ASC),
     
     CONSTRAINT CK_ServiceResponseFiles_Format
@@ -50,11 +54,36 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     CONSTRAINT CK_ServiceResponseFiles_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
-    -- Foreign Key Constraint
+    -- Foreign Key Constraints
     CONSTRAINT FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId
-        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
+        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,
+    CONSTRAINT FK_ServiceResponseFiles_ParentBaseId
+        FOREIGN KEY ([ParentBaseId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
+    CONSTRAINT FK_ServiceResponseFiles_ParentDeltaId
+        FOREIGN KEY ([ParentDeltaId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
     CONSTRAINT FK_ServiceResponseFiles_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceResponseFiles_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ServiceRequestFileId
+    ON [dbo].[ServiceResponseFiles]([ServiceRequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_CreatedAt
+    ON [dbo].[ServiceResponseFiles]([CreatedAt] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_Name
+    ON [dbo].[ServiceResponseFiles]([Name] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_IsActive
+    ON [dbo].[ServiceResponseFiles]([IsActive] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_CreatedBy
+    ON [dbo].[ServiceResponseFiles]([CreatedBy] ASC)
+GO

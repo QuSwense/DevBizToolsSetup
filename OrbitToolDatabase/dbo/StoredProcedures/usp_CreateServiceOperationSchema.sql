@@ -28,7 +28,6 @@ BEGIN
         DECLARE @ResolvedUser NVARCHAR(20);
         DECLARE @ServiceAppId INT;
         DECLARE @ServiceAppName NVARCHAR(200);
-        DECLARE @ServiceDefinitionSyncId INT;
         DECLARE @ServiceOperationId INT;
         DECLARE @NewRecordVersion VARCHAR(50);
         DECLARE @NewId INT;
@@ -75,20 +74,6 @@ BEGIN
             RETURN;
         END
 
-        -- Get the latest definition sync ID for this service
-        SELECT TOP 1 @ServiceDefinitionSyncId = [Id]
-        FROM [dbo].[ServiceDefinitionSyncs]
-        WHERE [ServiceApplicationId] = @ServiceAppId
-        ORDER BY [Id] DESC;
-
-        IF @ServiceDefinitionSyncId IS NULL
-        BEGIN
-            RAISERROR('No definition sync found for this service. Please sync definitions first.', 16, 1);
-            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
-                ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
         -- Calculate hash if not provided
         IF @ContentHash IS NULL AND @CompressedContent IS NOT NULL
         BEGIN
@@ -117,7 +102,6 @@ BEGIN
 
         -- Insert new record
         INSERT INTO [dbo].[ServiceOperationSchemas] (
-            [ServiceDefinitionSyncId],
             [ServiceOperationId],
             [InputRootElementName],
             [OutputRootElementName],
@@ -133,7 +117,6 @@ BEGIN
             [LastUpdatedBy]
         )
         VALUES (
-            @ServiceDefinitionSyncId,
             @ServiceOperationId,
             @InputRootElementName,
             @OutputRootElementName,
@@ -189,7 +172,7 @@ BEGIN
         -- Return the new record
         SELECT 
             [Id] AS SchemaId,
-            [ServiceDefinitionSyncId],
+            [ServiceOperationId],
             [ServiceOperationId],
             [InputRootElementName],
             [OutputRootElementName],

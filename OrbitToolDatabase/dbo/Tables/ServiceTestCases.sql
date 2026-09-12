@@ -20,6 +20,7 @@ CREATE TABLE [dbo].[ServiceTestCases] (
     -- Primary Key
     CONSTRAINT PK_ServiceTestCases PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestCases_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceTestCases_Name UNIQUE ([Name] ASC),
     CONSTRAINT CK_ServiceTestCases_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 

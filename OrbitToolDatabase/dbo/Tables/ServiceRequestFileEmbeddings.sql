@@ -5,6 +5,9 @@
 CREATE TABLE [dbo].[ServiceRequestFileEmbeddings] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceRequestFileEmbeddings_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceRequestFiles table (optional)
     [ServiceRequestFileId] INT NOT NULL,
     -- Foreign Key to BinaryEmbeddingsStore table
@@ -22,10 +25,11 @@ CREATE TABLE [dbo].[ServiceRequestFileEmbeddings] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceRequestFileEmbeddings PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceRequestFileEmbeddings_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceRequestFileEmbeddings_ServiceRequestFileId_BinaryEmbeddingsStoreId UNIQUE ([ServiceRequestFileId] ASC, [BinaryEmbeddingsStoreId] ASC),
     
     CONSTRAINT CK_ServiceRequestFileEmbeddings_FileHash
-        CHECK ([FileHash] IS NULL OR LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
+        CHECK (LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
 
     CONSTRAINT FK_ServiceRequestFileEmbeddings_ServiceRequestFiles
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,

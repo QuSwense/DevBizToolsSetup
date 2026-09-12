@@ -2,7 +2,7 @@
 
 > **Purpose**: Comprehensive reference for AI models and developers to understand the OrbitTool database schema, foreign key dependencies, seed data, and execution scripts without re-scanning individual files.
 >
-> **Last updated**: 2026-09-08
+> **Last updated**: 2026-09-12
 > **Total tables**: 48
 
 ---
@@ -86,13 +86,13 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 |--------|------|-------------|
 | Id | BIGINT | **PK**, IDENTITY |
 | PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
-| PermissionKey | NVARCHAR(MAX) | NULL (format: `resource:action`) |
+| PermissionKey | NVARCHAR(MAX) | NULL, UNIQUE (format: `resource:action`) |
 | CreatedAt | DATETIME | DEFAULT GETDATE() |
 | CreatedBy | NVARCHAR(20) | NOT NULL, FK → Users(UserId) |
 | LastUpdatedAt | DATETIME | NULL |
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 
-**Permission key format**: `{resource}:{action}` — e.g., `serviceapplication:read`, `ruleset:write`, `settings:admin`.
+**Permission key format**: `{resource}:{action}` — e.g., `serviceapplication:read`, `ruleset:write`, `settings:admin`. UNIQUE constraint added to prevent duplicate permission keys.
 
 #### `RolePermissions`
 | Column | Type | Constraints |
@@ -167,6 +167,7 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | Column | Type | Constraints |
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
 | ResourcePermissionId | BIGINT | NOT NULL, FK → ResourcePermissions(Id) ON DELETE CASCADE |
 | UIPageId | INT | NOT NULL, FK → UIPages(Id) ON DELETE CASCADE |
 | AccessType | NVARCHAR(20) | DEFAULT 'View' (View/Edit/Full) |
@@ -209,7 +210,7 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 |--------|------|-------------|
 | Id | BIGINT | **PK**, IDENTITY |
 | PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
-| Name | NVARCHAR(200) | NOT NULL |
+| Name | NVARCHAR(200) | NOT NULL, UNIQUE |
 | AuthenticationType | VARCHAR(50) | NOT NULL, CHECK (Basic/NTLM/APIKey/OAuth2/Bearer/Custom) |
 | EncryptionAlgorithmType | VARCHAR(50) | NULL, CHECK (AES-GCM/RSA/None) |
 | EncryptedJson | NVARCHAR(MAX) | NOT NULL, CHECK (ISJSON) |
@@ -219,6 +220,8 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | CreatedBy | NVARCHAR(20) | NOT NULL, FK → Users(UserId) |
 | LastUpdatedAt | DATETIME | NULL |
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
+
+**Note**: UNIQUE constraint simplified from `(Name, PublicId)` to `(Name)` — `PublicId` is already independently unique.
 
 #### `ServiceAppPermissions`
 | Column | Type | Constraints |
@@ -243,7 +246,7 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
 | PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
-| ServiceApplicationId | INT | NOT NULL, FK → ServiceApplications(Id) |
+| ServiceApplicationId | INT | NOT NULL, FK → ServiceApplications(Id) ON DELETE CASCADE |
 | OperationName | NVARCHAR(200) | NOT NULL |
 | EndpointOrAction | NVARCHAR(500) | NULL |
 | HttpMethod | VARCHAR(10) | NULL, CHECK (GET/POST/PUT/DELETE/PATCH/HEAD/OPTIONS) |
@@ -259,8 +262,8 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | Column | Type | Constraints |
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
-| ServiceDefinitionSyncId | INT | NOT NULL, FK → ServiceDefinitionSyncs(Id) |
-| ServiceOperationId | INT | NOT NULL, FK → ServiceOperations(Id) |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
+| ServiceOperationId | INT | NOT NULL, FK → ServiceOperations(Id) ON DELETE CASCADE |
 | InputRootElementName | NVARCHAR(200) | NULL |
 | OutputRootElementName | NVARCHAR(200) | NULL |
 | TargetNamespace | NVARCHAR(500) | NULL |
@@ -278,6 +281,7 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | Column | Type | Constraints |
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
 | ServiceApplicationId | INT | NOT NULL, FK → ServiceApplications(Id) ON DELETE CASCADE |
 | DefinitionUrl | NVARCHAR(500) | NULL, CHECK (http:// or https://) |
 | CompressedContent | VARBINARY(MAX) | NOT NULL |
@@ -290,10 +294,13 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | LastUpdatedAt | DATETIME | NULL |
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 
+**Note**: `DefinitionUrl` column was added to align with the CHECK constraint. The redundant `IX_ServiceDefinitionSyncs_ServiceApplicationId` unique constraint was removed (subset of `UQ_ServiceDefinitionSyncs_ServiceApplicationId_RecordVersion`).
+
 #### `SoapNamespaces`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
 | ServiceOperationSchemaId | INT | NOT NULL, FK → ServiceOperationSchemas(Id) ON DELETE CASCADE |
 | CompressedContent | VARBINARY(MAX) | NOT NULL |
 | UncompressedSizeBytes | INT | NULL |
@@ -314,7 +321,7 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
 | PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
-| ServiceOperationId | INT | NOT NULL, FK → ServiceOperations(Id) |
+| ServiceOperationId | INT | NOT NULL, FK → ServiceOperations(Id) ON DELETE CASCADE |
 | FileFormat | VARCHAR(10) | NULL, CHECK (XML/JSON/PDF/BINARY) |
 | Name | NVARCHAR(250) | NOT NULL |
 | IsBaseSnapshot | BIT | DEFAULT 1 |
@@ -332,16 +339,38 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | LastUpdatedAt | DATETIME | NULL |
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 
-**Delta chain**: Self-referencing via `ParentBaseId` and `ParentDeltaId` for versioned file storage.
+**Delta chain**: Self-referencing via `ParentBaseId` and `ParentDeltaId` for versioned file storage. Self-referencing FK constraints added for delta chain integrity.
 
 #### `ServiceResponseFiles`
-Same structure as `ServiceRequestFiles` but FK to `ServiceRequestFiles(Id)` via `ServiceRequestFileId`.
+| Column | Type | Constraints |
+|--------|------|-------------|
+| Id | INT | **PK**, IDENTITY |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
+| ServiceRequestFileId | INT | NOT NULL, FK → ServiceRequestFiles(Id) ON DELETE CASCADE |
+| FileFormat | VARCHAR(10) | NULL, CHECK (XML/JSON/PDF/BINARY) |
+| Name | NVARCHAR(250) | NOT NULL |
+| IsBaseSnapshot | BIT | DEFAULT 1 |
+| ParentBaseId | INT | NULL, FK → ServiceResponseFiles(Id) |
+| ParentDeltaId | INT | NULL, FK → ServiceResponseFiles(Id) |
+| DeltaDepth | INT | DEFAULT 0 |
+| CompressedData | VARBINARY(MAX) | NOT NULL |
+| UncompressedSizeBytes | INT | NULL |
+| CompressionAlgorithmType | VARCHAR(50) | NULL, CHECK (Zstandard/Brotli/Gzip/none) |
+| ContentHash | VARCHAR(64) | NULL, CHECK (64 hex chars) |
+| RecordVersion | VARCHAR(50) | NOT NULL, DEFAULT fn_CalculateVersion(NULL), CHECK (YY.QQ.NN) |
+| IsActive | BIT | DEFAULT 1 |
+| CreatedAt | DATETIME | DEFAULT GETDATE() |
+| CreatedBy | NVARCHAR(20) | NOT NULL, FK → Users(UserId) |
+| LastUpdatedAt | DATETIME | NULL |
+| LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
+
+**Delta chain**: Same structure as `ServiceRequestFiles` with self-referencing FKs for delta chain integrity. FK to `ServiceRequestFiles(Id)` has `ON DELETE CASCADE`.
 
 #### `ServiceRequestFileEmbeddings` / `ServiceResponseFileEmbeddings`
-Link files to deduplicated binary content in `BinaryEmbeddingsStore`. Each has `FileHash` (SHA-256) and `BinaryEmbeddingsStoreId`.
+Link files to deduplicated binary content in `BinaryEmbeddingsStore`. Each has `PublicId` (UNIQUE, DEFAULT NEWID()), `FileHash` (SHA-256), and `BinaryEmbeddingsStoreId`.
 
 #### `BinaryEmbeddingsStore`
-Content-addressable binary storage keyed by SHA-256 hash. Single-instance deduplication.
+Content-addressable binary storage keyed by SHA-256 hash. Single-instance deduplication enforced via `UQ_BinaryEmbeddingsStore_FileHash`. Has `PublicId` (UNIQUE, DEFAULT NEWID()) for UI-safe external references.
 
 #### `ServiceRequestIndexingStatus` / `ServiceResponseIndexingStatus`
 One-to-one status tracking for background element indexing. Status values: `Pending`, `Processing`, `Completed`, `Failed`.
@@ -350,7 +379,7 @@ One-to-one status tracking for background element indexing. Status values: `Pend
 Same pattern as `ServiceAppPermissions` — grants permissions to users or roles for specific files.
 
 #### `DirectExecutionAudit`
-Logs direct (non-test-suite) executions. Links to response files via `DirectExecutionAuditResponseFileLinks`.
+Logs direct (non-test-suite) executions. Has `PublicId` (UNIQUE, DEFAULT NEWID()). Links to response files via `DirectExecutionAuditResponseFileLinks`.
 
 ---
 
@@ -387,13 +416,13 @@ Logs direct (non-test-suite) executions. Links to response files via `DirectExec
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 
 #### `RuleSetContextObjectLinks`
-Many-to-many link between `RuleSets` and `RuleContextObjects`.
+Many-to-many link between `RuleSets` and `RuleContextObjects`. Has `PublicId` (UNIQUE, DEFAULT NEWID()).
 
 #### `RuleSetsPermissions`
 Same pattern as `ServiceAppPermissions` — grants permissions to users or roles for specific rule sets.
 
 #### `RuleExecutionLogs`
-Logs rule execution with compressed input/output, success status, error messages, and timing.
+Logs rule execution with compressed input/output, success status, error messages, and timing. Has `PublicId` (UNIQUE, DEFAULT NEWID()).
 
 ---
 
@@ -418,7 +447,7 @@ Logs rule execution with compressed input/output, success status, error messages
 |--------|------|-------------|
 | Id | INT | **PK**, IDENTITY |
 | PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
-| Name | NVARCHAR(200) | NOT NULL |
+| Name | NVARCHAR(200) | NOT NULL, UNIQUE |
 | ServiceRequestFileId | INT | NULL, FK → ServiceRequestFiles(Id) |
 | IsActive | BIT | DEFAULT 1 |
 | RecordVersion | VARCHAR(50) | NOT NULL, DEFAULT fn_CalculateVersion(NULL), CHECK (YY.QQ.NN) |
@@ -431,13 +460,13 @@ Logs rule execution with compressed input/output, success status, error messages
 Same pattern as `ServiceAppPermissions`.
 
 #### `ServiceTestSuiteTestCaseLinks`
-Links test suites to test cases with `ExecutionOrder`.
+Links test suites to test cases with `ExecutionOrder`. Has `PublicId` (UNIQUE, DEFAULT NEWID()).
 
 #### `ServiceTestCaseRuleSetLinks`
-Many-to-many link between test cases and rule sets.
+Many-to-many link between test cases and rule sets. Has `PublicId` (UNIQUE, DEFAULT NEWID()).
 
 #### `ServiceTestSuiteExecutionAudits`
-Logs test suite executions. Links to individual test case results via `ServiceTestSuiteExecutionAuditTestCaseLinks`.
+Logs test suite executions. Has `PublicId` (UNIQUE, DEFAULT NEWID()). Links to individual test case results via `ServiceTestSuiteExecutionAuditTestCaseLinks`.
 
 ---
 
@@ -481,6 +510,7 @@ Per-user overrides of global settings. FK to `GlobalSettings(Id)` ON DELETE SET 
 | Column | Type | Constraints |
 |--------|------|-------------|
 | Id | BIGINT | **PK**, IDENTITY |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
 | UserId | NVARCHAR(20) | NOT NULL, FK → Users(UserId) ON DELETE CASCADE |
 | ActivityType | NVARCHAR(100) | NOT NULL (e.g., Login, FeatureUsage) |
 | ActionType | NVARCHAR(50) | NULL (e.g., Click, View, Edit) |
@@ -538,21 +568,22 @@ UIPages ──┐
 ServiceApplications
   ├── ServiceAppAuthentications (ServiceAppAuthenticationId)
   ├── ServiceAppPermissions (ServiceApplicationId)
-  ├── ServiceOperations (ServiceApplicationId)
-  │     ├── ServiceOperationSchemas (ServiceOperationId)
+  ├── ServiceOperations (ServiceApplicationId) [ON DELETE CASCADE]
+  │     ├── ServiceOperationSchemas (ServiceOperationId) [ON DELETE CASCADE]
   │     │     └── SoapNamespaces (ServiceOperationSchemaId)
-  │     └── ServiceRequestFiles (ServiceOperationId)
-  │           ├── ServiceResponseFiles (ServiceRequestFileId)
+  │     └── ServiceRequestFiles (ServiceOperationId) [ON DELETE CASCADE]
+  │           ├── ServiceResponseFiles (ServiceRequestFileId) [ON DELETE CASCADE]
+  │           │     └── self (ParentBaseId, ParentDeltaId)
   │           ├── ServiceRequestFileEmbeddings (ServiceRequestFileId)
   │           ├── ServiceRequestIndexingStatus (ServiceRequestFileId)
   │           ├── ServiceRequestFilesPermissions (ServiceRequestFileId)
   │           ├── DirectExecutionAuditResponseFileLinks (ServiceRequestFileId)
   │           └── ServiceTestCases (ServiceRequestFileId)
   ├── ServiceDefinitionSyncs (ServiceApplicationId)
-  │     └── ServiceOperationSchemas (ServiceDefinitionSyncId)
   └── ServiceOperations (ServiceApplicationId)
 
 ServiceResponseFiles
+  ├── self (ParentBaseId, ParentDeltaId)
   ├── ServiceResponseFileEmbeddings (ServiceResponseFileId)
   ├── ServiceResponseIndexingStatus (ServiceResponseFileId)
   ├── DirectExecutionAuditResponseFileLinks (ServiceResponseFileId)
@@ -591,10 +622,12 @@ DirectExecutionAudit
 IndexingXmlFileElements
   └── IndexingXmlFileElementSearch (IndexingXmlFileElementId)
         └── IndexingXmlFileElementMappings (IndexingXmlFileElementSearchId)
-              ├── ServiceRequestFiles (RequestFileId)
-              └── ServiceResponseFiles (ResponseFileId)
+              ├── ServiceRequestFiles (RequestFileId) — CHECK: exactly one of RequestFileId/ResponseFileId
+              └── ServiceResponseFiles (ResponseFileId) — CHECK: exactly one of RequestFileId/ResponseFileId
 
 [Same pattern for JSON and PDF]
+
+Note: `IndexingPdfFileElementMappings` uses `BinaryEmbeddingsStoreId` (NOT NULL) instead of RequestFileId/ResponseFileId.
 ```
 
 ---
@@ -826,3 +859,5 @@ Three parallel sets of tables for XML, JSON, and PDF:
 6. **Permission model**: Three-layer permission system — role-level (`RolePermissions`), user-level (`UserPermissions`), and resource-level (`ServiceAppPermissions` et al.) — with `IsGranted` allowing both grant and deny semantics.
 
 7. **Optimistic concurrency**: `RecordVersion` with `fn_CalculateVersion()` provides YY.QQ.NN formatted versioning for conflict detection without locking.
+
+8. **PublicId mandate**: Every table that is directly UI-exposed now has a `PublicId UNIQUEIDENTIFIER` column with a UNIQUE constraint. Exceptions: high-volume EAV indexing tables (9), 1:1 status tables (2), and `Users` (natural AD PK). See §C PublicId Audit for the full list.

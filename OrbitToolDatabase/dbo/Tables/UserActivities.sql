@@ -8,6 +8,9 @@
 CREATE TABLE [dbo].[UserActivities] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_UserActivities_PublicId DEFAULT NEWID(),
     -- Foreign Key to Users table
     [UserId] NVARCHAR(20) NOT NULL,
     -- Type of activity performed by the user, e.g., 'Login', 'FeatureUsage'
@@ -20,6 +23,7 @@ CREATE TABLE [dbo].[UserActivities] (
     [Timestamp] DATETIME NOT NULL CONSTRAINT DF_UserActivities_Timestamp DEFAULT GETDATE(),
 
     CONSTRAINT PK_UserActivities PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_UserActivities_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT CK_UserActivities_FeatureActivitiesJson CHECK ([FeatureActivitiesJson] IS NULL OR ISJSON([FeatureActivitiesJson]) = 1),
 
     CONSTRAINT FK_UserActivities_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]) ON DELETE CASCADE

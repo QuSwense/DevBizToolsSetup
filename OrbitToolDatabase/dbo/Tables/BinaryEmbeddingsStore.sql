@@ -15,8 +15,11 @@
 CREATE TABLE [dbo].[BinaryEmbeddingsStore] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT [DF_BinaryEmbeddingsStore_PublicId] DEFAULT NEWID(),
     -- Primary Key: SHA-256 hash calculated over the raw binary content for global single-instance deduplication.
-    [FileHash] VARCHAR(64) NOT NULL,
+    [ContentHash] VARCHAR(64) NOT NULL,
     -- Compressed physical byte stream of the binary attachment.
     [CompressedData] VARBINARY(MAX) NOT NULL,
     -- Original uncompressed byte size of the binary asset.
@@ -24,7 +27,7 @@ CREATE TABLE [dbo].[BinaryEmbeddingsStore] (
     -- Compression algorithm applied prior to storage (e.g., 'Zstandard', 'Brotli', 'Gzip', 'none').
     [CompressionAlgorithmType] VARCHAR(50) NOT NULL,
     -- File extension or format classification (e.g., 'PDF', 'BINARY').
-    [FileFormat] VARCHAR(10) NULL,
+    [ContentFormat] VARCHAR(10) NULL,
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_BinaryEmbeddingsStore_CreatedAt] DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
@@ -32,8 +35,10 @@ CREATE TABLE [dbo].[BinaryEmbeddingsStore] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT [PK_BinaryEmbeddingsStore] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [CK_BinaryEmbeddingsStore_Format] CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
-    CONSTRAINT [CK_BinaryEmbeddingsStore_FileHash] CHECK (LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
+    CONSTRAINT [UQ_BinaryEmbeddingsStore_PublicId] UNIQUE ([PublicId] ASC),
+    CONSTRAINT [UQ_BinaryEmbeddingsStore_ContentHash] UNIQUE ([ContentHash] ASC),
+    CONSTRAINT [CK_BinaryEmbeddingsStore_Format] CHECK ([ContentFormat] IS NULL OR [ContentFormat] IN ('XML','JSON','PDF','BINARY')),
+    CONSTRAINT [CK_BinaryEmbeddingsStore_ContentHash] CHECK (LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT [CK_BinaryEmbeddingsStore_Compression] CHECK ([CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
 
     CONSTRAINT [FK_BinaryEmbeddingsStore_Users_CreatedBy]

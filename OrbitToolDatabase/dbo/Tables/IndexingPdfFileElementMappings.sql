@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
     -- Primary key.
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
     -- Foreign Key target for BinaryEmbeddingsStore
-    [BinaryEmbeddingsStoreId] INT NULL,
+    [BinaryEmbeddingsStoreId] INT NOT NULL,
     -- Foreign Key referencing the unique entry in IndexingPdfFileElementSearch.
     [IndexingPdfFileElementSearchId] BIGINT NOT NULL,
 

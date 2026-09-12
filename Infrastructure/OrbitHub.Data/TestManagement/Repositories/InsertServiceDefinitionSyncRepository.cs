@@ -28,6 +28,7 @@ public class InsertServiceDefinitionSyncRepository
                 new DataParameter("@UncompressedSizeBytes", input.UncompressedSizeBytes),
                 new DataParameter("@CompressionAlgorithmType", input.CompressionAlgorithmType),
                 new DataParameter("@UserId", input.UserId),
+                new DataParameter("@DefinitionUrl", input.DefinitionUrl),
                 new DataParameter("@ContentHash", input.ContentHash)
                 )).ToList();
                 return RepositoryResult<InsertServiceDefinitionSyncOutput>.Ok(result.FirstOrDefault()!);

@@ -1,8 +1,22 @@
+/*
+    This table is designed to store links between direct execution audit records and their associated request and response files. Each record captures the execution details, HTTP response information, and the user who performed the execution.
+
+    Key Features:
+    - Execution Tracking: Records the start and completion times of each execution.
+    - HTTP Response Details: Stores HTTP status code, headers, content type, and content length.
+    - Auditing: Tracks the user who executed the operation and maintains timestamps for auditing purposes. There is no updation of existing records; each execution is logged as a new entry.
+
+*/
 CREATE TABLE [dbo].[DirectExecutionAuditResponseFileLinks] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_DirectExecutionAuditResponseFileLinks_PublicId DEFAULT NEWID(),
     [DirectExecutionAuditId] INT NOT NULL,
     [ServiceRequestFileId] INT NOT NULL,
     [ServiceResponseFileId] INT NOT NULL,
+    -- Execution order within the audit
+    [ExecutionOrder] INT NOT NULL CONSTRAINT DF_DirectExecutionAuditResponseFileLinks_ExecutionOrder DEFAULT 0,
     [ExecutedAt] DATETIME NOT NULL CONSTRAINT DF_DirectExecutionAuditResponseFileLinks_ExecutedAt DEFAULT GETDATE(),
     [ExecutionCompletedAt] DATETIME NULL,
     [HttpStatusCode] INT NULL, -- Response status code (200, 404, 500, etc.)
@@ -17,10 +31,14 @@ CREATE TABLE [dbo].[DirectExecutionAuditResponseFileLinks] (
     [ExecutedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_DirectExecutionAuditResponseFileLinks PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_DirectExecutionAuditResponseFileLinks_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT CK_DirectExecutionAuditResponseFileLinks_ExecutionStatus CHECK ([ExecutionStatus] IN ('Pending', 'InProgress', 'Completed', 'Failed')),
+
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_DirectExecutionAudit_DirectExecutionAuditId
         FOREIGN KEY ([DirectExecutionAuditId]) REFERENCES [dbo].[DirectExecutionAudit]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_ServiceRequestFiles_ServiceRequestFileId
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_ServiceResponseFiles_ServiceResponseFileId
         FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE
-)
+);
+GO

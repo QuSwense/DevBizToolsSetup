@@ -7,7 +7,7 @@
 */
 CREATE TABLE [dbo].[ServiceAppAuthentications] (
     -- Primary Key, Identity Column and Unique identifier
-    [Id] BIGINT IDENTITY(1,1) NOT NULL,
+    [Id] INT IDENTITY(1,1) NOT NULL,
     -- Public Identifier for UI/Secure Operations (GUID)
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_ServiceAppAuthentications_PublicId DEFAULT NEWID(),
@@ -31,7 +31,7 @@ CREATE TABLE [dbo].[ServiceAppAuthentications] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceAppAuthentications PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceAppAuthentications_Name UNIQUE ([Name] ASC, [PublicId] ASC),
+    CONSTRAINT UQ_ServiceAppAuthentications_Name UNIQUE ([Name] ASC),
 
     -- Check constraints
     CONSTRAINT CK_ServiceAppAuthentications_Type

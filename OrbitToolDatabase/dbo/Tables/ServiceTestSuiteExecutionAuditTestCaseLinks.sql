@@ -4,6 +4,9 @@
 */
 CREATE TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks] (
     [Id] INT IDENTITY(1,1) NOT NULL,
+    -- Public Identifier for UI/Secure Operations (GUID)
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceTestSuiteExecutionAuditTestCaseLinks_PublicId DEFAULT NEWID(),
     [ServiceTestSuiteExecutionAuditId] INT NOT NULL,
     [ServiceTestCaseId] INT NOT NULL,
     [ServiceResponseFileId] INT NOT NULL,
@@ -21,6 +24,7 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks] (
     [ExecutedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceTestSuiteExecutionAuditTestCaseLinks PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceTestSuiteExecutionAuditTestCaseLinks_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestSuiteExecutionAuditId_ServiceTestCaseId UNIQUE ([ServiceTestSuiteExecutionAuditId], [ServiceTestCaseId]),
     CONSTRAINT CK_ServiceTestSuiteExecutionAuditTestCaseLinks_HttpStatusCode CHECK ([HttpStatusCode] IS NULL OR ([HttpStatusCode] >= 100 AND [HttpStatusCode] <= 599)),
     CONSTRAINT CK_ServiceTestSuiteExecutionAuditTestCaseLinks_HttpVersion CHECK ([HttpVersion] IS NULL OR [HttpVersion] IN ('HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/3')),

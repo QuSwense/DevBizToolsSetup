@@ -11,8 +11,8 @@
 CREATE TABLE [dbo].[ServiceOperationSchemas] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
-    -- Foreign Key to ServiceDefinitionSyncs table
-    [ServiceDefinitionSyncId] INT NOT NULL,
+    [PublicId] UNIQUEIDENTIFIER NOT NULL 
+        CONSTRAINT DF_ServiceOperationSchemas_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceOperations table (optional)
     [ServiceOperationId] INT NOT NULL,
     -- Root element name for the input message of the operation, e.g., 'GetUserRequest', 'CreateOrderRequest'
@@ -41,28 +41,19 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
 
     -- Primary Key
     CONSTRAINT [PK_ServiceOperationSchemas] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceOperationSchemas_ServiceDefinitionSyncId_ServiceOperationId_RecordVersion
-        UNIQUE NONCLUSTERED ([ServiceDefinitionSyncId] ASC, [ServiceOperationId] ASC, [RecordVersion] ASC),
+    CONSTRAINT UQ_ServiceOperationSchemas_ServiceOperationId_RecordVersion
+        UNIQUE NONCLUSTERED ([ServiceOperationId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceOperationSchemas_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
     CONSTRAINT CK_ServiceOperationSchemas_ContentHash
         CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
-    CONSTRAINT CK_ServiceOperationSchemas_SchemaContent
-        CHECK (TRY_CAST([CompressedContent] AS XML) IS NOT NULL),
 
     -- Foreign Keys
-    CONSTRAINT [FK_ServiceOperationSchemas_ServiceDefinitionSyncs_ServiceDefinitionSyncId]
-        FOREIGN KEY ([ServiceDefinitionSyncId])
-        REFERENCES [dbo].[ServiceDefinitionSyncs]([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_ServiceOperationSchemas_ServiceOperations_ServiceOperationId]
         FOREIGN KEY ([ServiceOperationId])
-        REFERENCES [dbo].[ServiceOperations]([Id])
+        REFERENCES [dbo].[ServiceOperations]([Id]) ON DELETE CASCADE
 )
-GO
-
-CREATE NONCLUSTERED INDEX [IX_ServiceOperationSchemas_ServiceDefinitionSyncId]
-    ON [dbo].[ServiceOperationSchemas]([ServiceDefinitionSyncId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX [IX_ServiceOperationSchemas_ServiceOperationId]

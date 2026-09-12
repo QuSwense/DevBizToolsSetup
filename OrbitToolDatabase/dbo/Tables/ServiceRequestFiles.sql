@@ -57,6 +57,10 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
     -- Foreign keys
     CONSTRAINT FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId
         FOREIGN KEY ([ServiceOperationId]) REFERENCES [dbo].[ServiceOperations]([Id]) ON DELETE CASCADE,
+    CONSTRAINT FK_ServiceRequestFiles_ParentBaseId
+        FOREIGN KEY ([ParentBaseId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
+    CONSTRAINT FK_ServiceRequestFiles_ParentDeltaId
+        FOREIGN KEY ([ParentDeltaId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
     CONSTRAINT FK_ServiceRequestFiles_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceRequestFiles_Users_LastUpdatedBy

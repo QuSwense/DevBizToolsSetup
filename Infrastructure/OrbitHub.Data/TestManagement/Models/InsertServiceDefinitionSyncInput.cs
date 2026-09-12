@@ -8,9 +8,10 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class InsertServiceDefinitionSyncInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
-    public byte[]? CompressedContent { get; set; } = default!;
-    public int? UncompressedSizeBytes { get; set; } = default!;
-    public string? CompressionAlgorithmType { get; set; } = default!;
+    public byte[] CompressedContent { get; set; } = default!;
+    public int UncompressedSizeBytes { get; set; } = default!;
+    public string CompressionAlgorithmType { get; set; } = default!;
     public string? UserId { get; set; } = default!;
+    public string? DefinitionUrl { get; set; } = default!;
     public string? ContentHash { get; set; } = default!;
 }
