@@ -32,8 +32,6 @@ CREATE TABLE [dbo].[ServiceTestSuitesPermissions] (
     -- Primary Key
     CONSTRAINT PK_ServiceTestSuitesPermissions PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestSuitesPermissions_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceTestSuitesPermissions_SuiteId_UserId_RoleId_ResourcePermissionId 
-        UNIQUE ([ServiceTestSuiteId] ASC, [UserId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC),
 
     -- Check constraints
     CONSTRAINT CK_ServiceTestSuitesPermissions_UserOrRole 
@@ -58,6 +56,18 @@ CREATE TABLE [dbo].[ServiceTestSuitesPermissions] (
 GO
 
 -- Performance Indexes
+-- Filtered unique indexes: a plain UNIQUE over nullable UserId/RoleId does not enforce
+-- uniqueness (NULLs compare as distinct), so split into one index per grantee kind.
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceTestSuitesPermissions_Suite_User_Resource
+    ON [dbo].[ServiceTestSuitesPermissions]([ServiceTestSuiteId] ASC, [UserId] ASC, [ResourcePermissionId] ASC)
+    WHERE [UserId] IS NOT NULL
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceTestSuitesPermissions_Suite_Role_Resource
+    ON [dbo].[ServiceTestSuitesPermissions]([ServiceTestSuiteId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC)
+    WHERE [RoleId] IS NOT NULL
+GO
+
 CREATE NONCLUSTERED INDEX IX_ServiceTestSuitesPermissions_SuiteId
     ON [dbo].[ServiceTestSuitesPermissions]([ServiceTestSuiteId] ASC)
 GO

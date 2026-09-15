@@ -2,8 +2,8 @@
 
 > **Purpose**: Comprehensive reference for AI models and developers to understand the OrbitTool database schema, foreign key dependencies, seed data, and execution scripts without re-scanning individual files.
 >
-> **Last updated**: 2026-09-12
-> **Total tables**: 48
+> **Last updated**: 2026-09-15
+> **Total tables**: 49
 
 ---
 
@@ -12,7 +12,7 @@
 1. [Schema Overview](#1-schema-overview)
 2. [Table Inventory (A–Z)](#2-table-inventory-a-z)
 3. [Foreign Key Dependency Graph](#3-foreign-key-dependency-graph)
-4. [Circular FK Dependency: Users ↔ Roles](#4-circular-fk-dependency-users--roles)
+4. [User ↔ Role Assignment (UserRoles)](#4-user--role-assignment-userroles)
 5. [Seed Data](#5-seed-data)
    - [5.1 Seed Execution Order](#51-seed-execution-order)
    - [5.2 Seed Scripts Detail](#52-seed-scripts-detail)
@@ -29,11 +29,11 @@
 
 ## 1. Schema Overview
 
-The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sqlproj`) with 48 tables organized into these functional domains:
+The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sqlproj`) with 49 tables organized into these functional domains:
 
 | Domain | Tables | Description |
 |--------|--------|-------------|
-| **Identity & Access** | 8 | Users, Roles, ResourcePermissions, RolePermissions, UserPermissions, PermissionToUIPageMapping, UIPages, UIActions |
+| **Identity & Access** | 9 | Users, Roles, UserRoles, ResourcePermissions, RolePermissions, UserPermissions, PermissionToUIPageMapping, UIPages, UIActions |
 | **Service Applications** | 8 | ServiceApplications, ServiceAppAuthentications, ServiceAppPermissions, ServiceOperations, ServiceOperationSchemas, ServiceDefinitionSyncs, SoapNamespaces |
 | **Request/Response Files** | 10 | ServiceRequestFiles, ServiceResponseFiles, ServiceRequestFileEmbeddings, ServiceResponseFileEmbeddings, ServiceRequestIndexingStatus, ServiceResponseIndexingStatus, BinaryEmbeddingsStore, ServiceRequestFilesPermissions, DirectExecutionAudit, DirectExecutionAuditResponseFileLinks |
 | **Rule Engine** | 5 | RuleSets, RuleContextObjects, RuleSetContextObjectLinks, RuleSetsPermissions, RuleExecutionLogs |
@@ -56,14 +56,13 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | Department | NVARCHAR(100) | NULL |
 | FirstName | NVARCHAR(100) | NULL |
 | LastName | NVARCHAR(100) | NULL |
-| RoleId | INT | NULL, FK → Roles(Id) ON DELETE SET NULL |
 | IsActive | BIT | DEFAULT 1 |
 | CreatedAt | DATETIME | DEFAULT GETDATE() |
 | CreatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 | LastUpdatedAt | DATETIME | NULL |
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 
-**Notes**: PK is a natural key (AD User ID). Circular FK with Roles (see §4).
+**Notes**: PK is a natural key (AD User ID). Role assignment is modelled by the `UserRoles` junction table (see §4); `Users` no longer has a `RoleId` column.
 
 #### `Roles`
 | Column | Type | Constraints |
@@ -80,6 +79,18 @@ The OrbitTool database is an SSDT (SQL Server Data Tools) project (`OrbitTool.sq
 | LastUpdatedBy | NVARCHAR(20) | NULL, FK → Users(UserId) |
 
 **Seeded roles**: `Developer`, `Admin`, `Viewer` (all `IsSystemRole = 1`).
+
+#### `UserRoles`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| Id | INT | **PK**, IDENTITY |
+| PublicId | UNIQUEIDENTIFIER | UNIQUE, DEFAULT NEWID() |
+| UserId | NVARCHAR(20) | NOT NULL, FK → Users(UserId) |
+| RoleId | INT | NOT NULL, FK → Roles(Id) |
+| CreatedBy | NVARCHAR(20) | NOT NULL, FK → Users(UserId) |
+| CreatedAt | DATETIME | DEFAULT GETDATE() |
+
+**Unique**: `(UserId, RoleId)`. Junction table that replaced the former `Users.RoleId` column, removing the circular FK between `Users` and `Roles`.
 
 #### `ResourcePermissions`
 | Column | Type | Constraints |
@@ -537,6 +548,7 @@ Users ──┐
          └── UserActivities (UserId)
 
 Roles ──┐
+        ├── UserRoles (RoleId)
         ├── RolePermissions (RoleId)
         ├── ServiceAppPermissions (RoleId)
         ├── ServiceRequestFilesPermissions (RoleId)
@@ -632,26 +644,20 @@ Note: `IndexingPdfFileElementMappings` uses `BinaryEmbeddingsStoreId` (NOT NULL)
 
 ---
 
-## 4. Circular FK Dependency: Users ↔ Roles
+## 4. User ↔ Role Assignment (UserRoles)
 
-There is a **circular foreign key dependency** between `Users` and `Roles`:
+Role assignment is modelled by the `UserRoles` junction table:
 
 ```
-Users.RoleId    → Roles(Id)     [ON DELETE SET NULL]
-Roles.CreatedBy → Users(UserId)
+UserRoles.UserId    → Users(UserId)
+UserRoles.RoleId    → Roles(Id)
+UserRoles.CreatedBy → Users(UserId)
 ```
 
-This means neither table can be created with both FKs active before the other exists. The SSDT project handles this by:
+This replaced the former `Users.RoleId` column, which created a **circular foreign key dependency** (`Users.RoleId → Roles(Id)` while `Roles.CreatedBy → Users(UserId)`). With the junction table there is no cycle, so:
 
-1. Creating `Users` **without** `FK_Users_Roles_RoleId`
-2. Creating `Roles` with `FK_Roles_Users_CreatedBy`
-3. Adding `FK_Users_Roles_RoleId` via `ALTER TABLE` after both exist
-
-For seed data, the `RunSeeds.sql` script handles it by:
-
-1. Inserting the `SYSTEM` user with `RoleId = NULL` and `CreatedBy = NULL`
-2. Inserting the three system roles (`Developer`, `Admin`, `Viewer`) referencing `SYSTEM` as `CreatedBy`
-3. Updating the `SYSTEM` user's `RoleId` to point to the `Developer` role
+- Every table is created directly from its `dbo/Tables/*.sql` source file — no deferred `ALTER TABLE` and no inline DDL in `OrbitTool_ResetAndRecreate.sql`.
+- Seed data needs no post-insert `UPDATE`: `UsersSeed.sql` inserts users, `RolesSeed.sql` inserts roles, then `UserRolesSeed.sql` links them.
 
 ---
 
@@ -663,9 +669,9 @@ The `RunSeeds.sql` script executes seeds in this exact order (9 steps):
 
 | Step | Seed Script | Tables Populated | FK Dependencies Satisfied |
 |------|-------------|-----------------|---------------------------|
-| 1 | `UsersSeed.sql` | Users | None (SYSTEM inserted with NULL refs) |
+| 1 | `UsersSeed.sql` | Users | None (SYSTEM inserted with `CreatedBy = NULL`) |
 | 2 | `RolesSeed.sql` | Roles | Users (CreatedBy → SYSTEM) |
-| 3 | *(inline UPDATE)* | Users.RoleId | Roles (Developer role exists) |
+| 3 | `UserRolesSeed.sql` | UserRoles | Users, Roles |
 | 4 | `ResourcePermissionsSeed.sql` | ResourcePermissions | Users (CreatedBy → SYSTEM) |
 | 5 | `UIPagesSeed.sql` | UIPages | ResourcePermissions, Users |
 | 6 | `UIActionsSeed.sql` | UIActions | UIPages, ResourcePermissions, Users |
@@ -677,14 +683,19 @@ The `RunSeeds.sql` script executes seeds in this exact order (9 steps):
 
 #### `UsersSeed.sql`
 Inserts 2 users idempotently:
-- `SYSTEM` — system account, `RoleId = NULL` (updated in step 3), `CreatedBy = NULL`
-- `test_soap_user1` — test user, `RoleId = Admin`, `CreatedBy = SYSTEM`
+- `SYSTEM` — system account, `CreatedBy = NULL`
+- `test_soap_user1` — test user, `CreatedBy = SYSTEM`
 
 #### `RolesSeed.sql`
 Inserts 3 system roles idempotently:
 - `Developer` — full access including settings
 - `Admin` — full access to main resources (excludes settings/system)
 - `Viewer` — read-only access
+
+#### `UserRolesSeed.sql`
+Links the seeded users to their roles idempotently:
+- `SYSTEM` → `Developer`
+- `test_soap_user1` → `Admin`
 
 #### `ResourcePermissionsSeed.sql`
 Inserts 55 permission keys across these resource groups:
@@ -764,11 +775,11 @@ A bash script providing an interactive menu with 6 options:
 
 ### 6.2 `RunSeeds.sql` — Insert Seed Data
 
-Uses `:r` (sqlcmd include) directives to execute seed scripts in FK-safe order (see §5.1). Handles the circular FK dependency between Users and Roles.
+Uses `:r` (sqlcmd include) directives to execute seed scripts in FK-safe order (see §5.1). Role assignments are seeded through `UserRolesSeed.sql` after Users and Roles exist.
 
 ### 6.3 `ClearSeeds.sql` — Clear All Data
 
-Deletes all rows from all 48 tables in reverse FK dependency order (most-dependent first). The deletion order is:
+Deletes all rows from all 49 tables in reverse FK dependency order (most-dependent first). The deletion order is:
 
 1. Indexing tables (9): XmlFileElementSearch/Mappings/Elements, JsonFileElementSearch/Mappings/Elements, PdfFileElementSearch/Mappings/Elements
 2. DirectExecutionAuditResponseFileLinks, DirectExecutionAudit
@@ -791,12 +802,13 @@ Deletes all rows from all 48 tables in reverse FK dependency order (most-depende
 19. ResourcePermissions
 20. GlobalSettings
 21. RuleContextObjects
-22. Roles
-23. Users
+22. UserRoles
+23. Roles
+24. Users
 
 ### 6.4 `OrbitTool_ResetAndRecreate.sql` — Full Reset
 
-Drops all FK constraints, views, stored procedures, tables (most-dependent first), full-text catalog, and `fn_CalculateVersion` function, then recreates everything from the SSDT project source files using `:r` include directives.
+Drops all FK constraints, views, stored procedures, tables (most-dependent first), full-text catalog, and `fn_CalculateVersion` function, then recreates everything from the SSDT project source files using `:r` include directives. Every table — including `Users`, `Roles`, and `UserRoles` — is created directly from its `dbo/Tables/*.sql` source; there is no inline DDL or deferred `ALTER TABLE`.
 
 ### 6.5 `ApplyColumnDescriptions.sql` — Column Metadata
 
@@ -848,7 +860,7 @@ Three parallel sets of tables for XML, JSON, and PDF:
 
 1. **Natural PK for Users**: `UserId` is NVARCHAR(20) — the AD user ID — rather than an identity column, ensuring uniqueness across the organization.
 
-2. **Circular FK resolution**: The Users ↔ Roles circular dependency is resolved at the SSDT project level by deferring the `Users.RoleId` FK creation, and at the seed level by inserting SYSTEM with NULL references then updating.
+2. **User ↔ Role junction table**: Role assignment lives in `UserRoles` rather than a `Users.RoleId` column. This removes the former Users ↔ Roles circular FK, so all tables are created directly from their source files and seeds need no post-insert `UPDATE`.
 
 3. **Delta chain for files**: `ServiceRequestFiles` and `ServiceResponseFiles` support versioned storage via `IsBaseSnapshot`, `ParentBaseId`, `ParentDeltaId`, and `DeltaDepth` — enabling differential storage of file changes.
 

@@ -23,11 +23,11 @@ CREATE TABLE [dbo].[BinaryEmbeddingsStore] (
     -- Compressed physical byte stream of the binary attachment.
     [CompressedData] VARBINARY(MAX) NOT NULL,
     -- Original uncompressed byte size of the binary asset.
-    [UncompressedSizeBytes] INT NOT NULL,
+    [UncompressedSizeBytes] BIGINT NOT NULL,
     -- Compression algorithm applied prior to storage (e.g., 'Zstandard', 'Brotli', 'Gzip', 'none').
-    [CompressionAlgorithmType] VARCHAR(50) NOT NULL,
+    [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- File extension or format classification (e.g., 'PDF', 'BINARY').
-    [ContentFormat] VARCHAR(10) NOT NULL,
+    [ContentFormat] VARCHAR(10) NULL,
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_BinaryEmbeddingsStore_CreatedAt] DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
@@ -37,9 +37,9 @@ CREATE TABLE [dbo].[BinaryEmbeddingsStore] (
     CONSTRAINT [PK_BinaryEmbeddingsStore] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [UQ_BinaryEmbeddingsStore_PublicId] UNIQUE ([PublicId] ASC),
     CONSTRAINT [UQ_BinaryEmbeddingsStore_ContentHash] UNIQUE ([ContentHash] ASC),
-    CONSTRAINT [CK_BinaryEmbeddingsStore_Format] CHECK ([ContentFormat] IN ('XML','JSON','PDF','BINARY')),
+    CONSTRAINT [CK_BinaryEmbeddingsStore_Format] CHECK ([ContentFormat] IS NULL OR [ContentFormat] IN ('XML','JSON','PDF','BINARY')),
     CONSTRAINT [CK_BinaryEmbeddingsStore_ContentHash] CHECK (LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
-    CONSTRAINT [CK_BinaryEmbeddingsStore_Compression] CHECK ([CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
+    CONSTRAINT [CK_BinaryEmbeddingsStore_Compression] CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
 
     CONSTRAINT [FK_BinaryEmbeddingsStore_Users_CreatedBy]
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),

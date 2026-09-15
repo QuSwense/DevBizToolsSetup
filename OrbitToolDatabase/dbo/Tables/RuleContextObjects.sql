@@ -10,17 +10,17 @@ CREATE TABLE [dbo].[RuleContextObjects] (
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_RuleContextObjects_PublicId DEFAULT NEWID(),
     -- Context Name, must be unique
-    [ContextName] NVARCHAR(100) NOT NULL UNIQUE,  -- e.g., "Customer", "Order", "Product"
+    [ContextName] NVARCHAR(100) NOT NULL,  -- e.g., "Customer", "Order", "Product"
     -- Rule Type Identifier, linking to the specific rule type in .NET
     [RuleTypeId] NVARCHAR(255) NOT NULL,         -- Full assembly-qualified type name
     -- Optional Description of the Context Object
     [Description] NVARCHAR(500) NULL,
     -- Active Status of the Context Object
-    [IsActive] BIT DEFAULT 1,
+    [IsActive] BIT NOT NULL CONSTRAINT DF_RuleContextObjects_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedDate] DATETIME DEFAULT GETDATE(),
+    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_RuleContextObjects_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedDate] DATETIME NULL,
+    [LastUpdatedAt] DATETIME NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_RuleContextObjects PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -32,3 +32,8 @@ CREATE TABLE [dbo].[RuleContextObjects] (
     CONSTRAINT FK_RuleContextObjects_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_RuleContextObjects_IsActive
+    ON [dbo].[RuleContextObjects]([IsActive] ASC)
+GO

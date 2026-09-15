@@ -25,7 +25,7 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Compressed file data
     [CompressedData] VARBINARY(MAX) NOT NULL,
     -- Uncompressed size of the file in bytes
-    [UncompressedSizeBytes] INT NULL,
+    [UncompressedSizeBytes] BIGINT NULL,
     -- Compression algorithm used for the file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the file data for integrity verification
@@ -53,6 +53,8 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
         CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceResponseFiles_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
+    CONSTRAINT CK_ServiceResponseFiles_DeltaDepth
+        CHECK ([DeltaDepth] >= 0),
 
     -- Foreign Key Constraints
     CONSTRAINT FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId
@@ -70,6 +72,14 @@ GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ServiceRequestFileId
     ON [dbo].[ServiceResponseFiles]([ServiceRequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ParentBaseId
+    ON [dbo].[ServiceResponseFiles]([ParentBaseId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ParentDeltaId
+    ON [dbo].[ServiceResponseFiles]([ParentDeltaId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_CreatedAt

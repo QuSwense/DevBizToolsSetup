@@ -32,13 +32,26 @@ CREATE TABLE [dbo].[DirectExecutionAuditResponseFileLinks] (
 
     CONSTRAINT PK_DirectExecutionAuditResponseFileLinks PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_DirectExecutionAuditResponseFileLinks_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_DirectExecutionAuditResponseFileLinks_Audit_Request_Response
+        UNIQUE ([DirectExecutionAuditId] ASC, [ServiceRequestFileId] ASC, [ServiceResponseFileId] ASC),
     CONSTRAINT CK_DirectExecutionAuditResponseFileLinks_ExecutionStatus CHECK ([ExecutionStatus] IN ('Pending', 'InProgress', 'Completed', 'Failed')),
 
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_DirectExecutionAudit_DirectExecutionAuditId
         FOREIGN KEY ([DirectExecutionAuditId]) REFERENCES [dbo].[DirectExecutionAudit]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_ServiceRequestFiles_ServiceRequestFileId
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,
+    -- NO ACTION: ServiceRequestFiles is already reachable via ServiceResponseFiles (which cascades
+    -- from ServiceRequestFiles), so CASCADE here would create a multiple-cascade-path error (Msg 1785).
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_ServiceResponseFiles_ServiceResponseFileId
-        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE
+        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE NO ACTION
 );
+GO
+
+-- Performance Indexes
+CREATE NONCLUSTERED INDEX IX_DirectExecutionAuditResponseFileLinks_ServiceRequestFileId
+    ON [dbo].[DirectExecutionAuditResponseFileLinks]([ServiceRequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_DirectExecutionAuditResponseFileLinks_ServiceResponseFileId
+    ON [dbo].[DirectExecutionAuditResponseFileLinks]([ServiceResponseFileId] ASC)
 GO

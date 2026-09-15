@@ -25,7 +25,7 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
     -- Compressed file data
     [CompressedData] VARBINARY(MAX) NOT NULL,
     -- Uncompressed size of the file in bytes
-    [UncompressedSizeBytes] INT NULL,
+    [UncompressedSizeBytes] BIGINT NULL,
     -- Compression algorithm used for the file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the file data for integrity verification
@@ -43,7 +43,6 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
 
     CONSTRAINT PK_ServiceRequestFiles PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceRequestFiles_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceRequestFiles_Name UNIQUE ([ParentBaseId] ASC, [ParentDeltaId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceRequestFiles_Format
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
@@ -53,6 +52,8 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
         CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceRequestFiles_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
+    CONSTRAINT CK_ServiceRequestFiles_DeltaDepth
+        CHECK ([DeltaDepth] >= 0),
 
     -- Foreign keys
     CONSTRAINT FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId
@@ -68,8 +69,22 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
 )
 GO
 
+-- Uniqueness: name+version is unique per parent operation (the previous constraint keyed
+-- on the nullable ParentBaseId/ParentDeltaId, which never enforced anything for base rows).
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceRequestFiles_Operation_Name_Version
+    ON [dbo].[ServiceRequestFiles]([ServiceOperationId] ASC, [Name] ASC, [RecordVersion] ASC)
+GO
+
 CREATE NONCLUSTERED INDEX IX_ServiceRequestFiles_ServiceOperationId
     ON [dbo].[ServiceRequestFiles]([ServiceOperationId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceRequestFiles_ParentBaseId
+    ON [dbo].[ServiceRequestFiles]([ParentBaseId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceRequestFiles_ParentDeltaId
+    ON [dbo].[ServiceRequestFiles]([ParentDeltaId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceRequestFiles_CreatedAt

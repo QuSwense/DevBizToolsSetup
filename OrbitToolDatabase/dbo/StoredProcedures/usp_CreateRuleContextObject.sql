@@ -50,9 +50,9 @@ BEGIN
             [RuleTypeId],
             [Description],
             [IsActive],
-            [CreatedDate],
+            [CreatedAt],
             [CreatedBy],
-            [LastUpdatedDate],
+            [LastUpdatedAt],
             [LastUpdatedBy]
         )
         VALUES (
@@ -102,9 +102,9 @@ BEGIN
             [RuleTypeId],
             [Description],
             [IsActive],
-            [CreatedDate],
+            [CreatedAt],
             [CreatedBy],
-            [LastUpdatedDate],
+            [LastUpdatedAt],
             [LastUpdatedBy],
             @ActivityId AS AuditActivityId
         FROM [dbo].[RuleContextObjects]

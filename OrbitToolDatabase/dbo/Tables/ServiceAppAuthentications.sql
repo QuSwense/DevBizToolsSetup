@@ -31,6 +31,7 @@ CREATE TABLE [dbo].[ServiceAppAuthentications] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceAppAuthentications PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceAppAuthentications_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceAppAuthentications_Name UNIQUE ([Name] ASC),
 
     -- Check constraints

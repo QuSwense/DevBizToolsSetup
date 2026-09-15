@@ -14,8 +14,13 @@ CREATE TABLE [dbo].[IndexingXmlFileElementSearch]
     [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
     
     CONSTRAINT [PK_IndexingXmlFileElementSearch] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
+    CONSTRAINT [UQ_IndexingXmlFileElementSearch_Element_Value] UNIQUE ([IndexingXmlFileElementId] ASC, [ElementValue] ASC),
 
     CONSTRAINT [FK_IndexingXmlFileElementSearch_IndexingXmlFileElements] 
         FOREIGN KEY ([IndexingXmlFileElementId]) REFERENCES [dbo].[IndexingXmlFileElements]([Id]) ON DELETE CASCADE
 );
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElementSearch_ElementId]
+    ON [dbo].[IndexingXmlFileElementSearch]([IndexingXmlFileElementId] ASC)
 GO

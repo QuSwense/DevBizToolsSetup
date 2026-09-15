@@ -15,8 +15,8 @@ CREATE TABLE [dbo].[RuleExecutionLogs] (
     [InputCompressedContent] VARBINARY(MAX) NOT NULL,
     [OutputCompressedContent] VARBINARY(MAX) NULL,
     -- Input and Output Uncompressed Size in bytes
-    [InputUncompressedSizeBytes] INT NULL,
-    [OutputUncompressedSizeBytes] INT NULL,
+    [InputUncompressedSizeBytes] BIGINT NULL,
+    [OutputUncompressedSizeBytes] BIGINT NULL,
     -- compression algorithm used for the input content, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the input content for integrity verification
@@ -43,3 +43,12 @@ CREATE TABLE [dbo].[RuleExecutionLogs] (
     CONSTRAINT FK_RuleExecutionLogs_Users_ExecutedBy
         FOREIGN KEY ([ExecutedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_RuleExecutionLogs_RuleSetId
+    ON [dbo].[RuleExecutionLogs]([RuleSetId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_RuleExecutionLogs_ExecutedAt
+    ON [dbo].[RuleExecutionLogs]([ExecutedAt] ASC)
+GO

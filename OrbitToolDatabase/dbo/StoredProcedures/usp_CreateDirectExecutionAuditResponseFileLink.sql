@@ -90,7 +90,7 @@ BEGIN
             [ActivityType],
             [ActionType],
             [FeatureActivitiesJson],
-            [Timestamp]
+            [CreatedAt]
         )
         VALUES (
             @ResolvedUser,

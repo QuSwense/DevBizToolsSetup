@@ -4,7 +4,7 @@
     Uses subqueries to resolve permission keys to ResourcePermissions.Id.
 */
 INSERT INTO [dbo].[UIPages] 
-    ([ParentId], [Name], [ResourcePermissionsId], [FeatureFlag], [IsVisibleInNav], [CreatedBy])
+    ([ParentId], [Name], [ResourcePermissionId], [FeatureFlag], [IsVisibleInNav], [CreatedBy])
 VALUES 
     -- ============================================
     -- Root Level Pages (Level 0)

@@ -17,8 +17,6 @@ CREATE TABLE [dbo].[Users] (
     [FirstName] NVARCHAR(100) NULL,
     -- User's last name, optional field
     [LastName] NVARCHAR(100) NULL,
-    -- Foreign Key to Roles table (removed Role string column)
-    [RoleId] INT NULL,
     -- Indicates if the user is currently active, default is true
     [IsActive] BIT NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT 1,
     -- Timestamps for auditing
@@ -31,11 +29,8 @@ CREATE TABLE [dbo].[Users] (
     CONSTRAINT UQ_Users_Email UNIQUE ([Email] ASC),
 
     -- Foreign Keys
-    CONSTRAINT FK_Users_Roles_RoleId FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE SET NULL,
-    CONSTRAINT FK_Users_CreatedBy_Users FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_Users_LastUpdatedBy_Users FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+    CONSTRAINT FK_Users_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
+    CONSTRAINT FK_Users_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
+);
 GO
 
-CREATE NONCLUSTERED INDEX IX_Users_RoleId ON [dbo].[Users]([RoleId] ASC)
-GO

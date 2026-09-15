@@ -28,14 +28,14 @@ PRINT '';
 -- Delete from most-dependent tables first (reverse FK order)
 
 PRINT 'Clearing Indexing tables...';
-DELETE FROM [dbo].[IndexingPdfFileElementSearch];
 DELETE FROM [dbo].[IndexingPdfFileElementMappings];
+DELETE FROM [dbo].[IndexingPdfFileElementSearch];
 DELETE FROM [dbo].[IndexingPdfFileElements];
-DELETE FROM [dbo].[IndexingJsonFileElementSearch];
 DELETE FROM [dbo].[IndexingJsonFileElementMappings];
+DELETE FROM [dbo].[IndexingJsonFileElementSearch];
 DELETE FROM [dbo].[IndexingJsonFileElements];
-DELETE FROM [dbo].[IndexingXmlFileElementSearch];
 DELETE FROM [dbo].[IndexingXmlFileElementMappings];
+DELETE FROM [dbo].[IndexingXmlFileElementSearch];
 DELETE FROM [dbo].[IndexingXmlFileElements];
 PRINT '  Indexing tables cleared.';
 GO
@@ -157,6 +157,11 @@ GO
 PRINT 'Clearing RuleContextObjects...';
 DELETE FROM [dbo].[RuleContextObjects];
 PRINT '  RuleContextObjects cleared.';
+GO
+
+PRINT 'Clearing UserRoles...';
+DELETE FROM [dbo].[UserRoles];
+PRINT '  UserRoles cleared.';
 GO
 
 PRINT 'Clearing Roles...';

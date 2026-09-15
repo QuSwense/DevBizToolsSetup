@@ -4,7 +4,7 @@
     Uses subqueries to resolve permission keys to ResourcePermissions.Id.
 */
 INSERT INTO [dbo].[UIActions] 
-    ([PageId], [ActionName], [DisplayName], [ResourcePermissionsId], [ActionType], [UiElementId], [CreatedBy])
+    ([PageId], [ActionName], [DisplayName], [ResourcePermissionId], [ActionType], [UiElementId], [CreatedBy])
 VALUES 
     -- ============================================
     -- Service Application Actions

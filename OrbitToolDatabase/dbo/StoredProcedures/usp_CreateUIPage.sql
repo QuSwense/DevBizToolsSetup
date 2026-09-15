@@ -6,7 +6,7 @@
 CREATE PROCEDURE [dbo].[usp_CreateUIPage]
     @ParentPublicId       UNIQUEIDENTIFIER = NULL,
     @Name                 NVARCHAR(100),
-    @ResourcePermissionsId BIGINT,
+    @ResourcePermissionId BIGINT,
     @FeatureFlag          NVARCHAR(100) = NULL,
     @IsActive             BIT = 1,
     @IsVisibleInNav       BIT = 1,
@@ -49,8 +49,8 @@ BEGIN
         END
     END
 
-    -- Validation: ResourcePermissionsId must exist
-    IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionsId)
+    -- Validation: ResourcePermissionId must exist
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
     BEGIN
         RAISERROR('Resource permission not found for the specified Id.', 16, 1);
         RETURN;
@@ -64,10 +64,10 @@ BEGIN
         END
 
         INSERT INTO [dbo].[UIPages]
-            ([PublicId], [ParentId], [Name], [ResourcePermissionsId], [FeatureFlag],
+            ([PublicId], [ParentId], [Name], [ResourcePermissionId], [FeatureFlag],
              [IsActive], [IsVisibleInNav], [CreatedBy])
         VALUES
-            (@NewPublicId, @ParentId, @Name, @ResourcePermissionsId, @FeatureFlag,
+            (@NewPublicId, @ParentId, @Name, @ResourcePermissionId, @FeatureFlag,
              @IsActive, @IsVisibleInNav, @ResolvedUserId);
 
         -- Audit logging
@@ -88,7 +88,7 @@ BEGIN
             [PublicId],
             [ParentId],
             [Name],
-            [ResourcePermissionsId],
+            [ResourcePermissionId],
             [FeatureFlag],
             [IsActive],
             [IsVisibleInNav],

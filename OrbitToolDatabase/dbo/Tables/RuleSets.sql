@@ -10,13 +10,13 @@ CREATE TABLE [dbo].[RuleSets] (
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_RuleSets_PublicId DEFAULT NEWID(),
     -- Workflow and Rule Definition Name
-    [WorkflowName] NVARCHAR(255) NOT NULL UNIQUE,
+    [WorkflowName] NVARCHAR(255) NOT NULL,
     -- JSON Rule Definition, only one rule set per workflow is allowed
     [RuleContent] NVARCHAR(MAX) NOT NULL,
     -- Output Type Reference, linking to RuleContextObjects
     [OutputTypeId] INT NOT NULL,
     -- Active Status of the Rule Set
-    [IsActive] BIT DEFAULT 1,
+    [IsActive] BIT NOT NULL CONSTRAINT DF_RuleSets_IsActive DEFAULT 1,
     -- Optional Description of the Rule Set
     [Description] NVARCHAR(500) NULL,
     -- Versioning and Audit Fields
@@ -43,3 +43,12 @@ CREATE TABLE [dbo].[RuleSets] (
     CONSTRAINT FK_RuleSets_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_RuleSets_OutputTypeId
+    ON [dbo].[RuleSets]([OutputTypeId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_RuleSets_IsActive
+    ON [dbo].[RuleSets]([IsActive] ASC)
+GO

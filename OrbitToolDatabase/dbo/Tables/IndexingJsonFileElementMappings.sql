@@ -25,9 +25,24 @@ CREATE TABLE [dbo].[IndexingJsonFileElementMappings]
     CONSTRAINT [FK_IndexingJsonFileElementMappings_IndexingJsonFileElementSearch] 
         FOREIGN KEY ([IndexingJsonFileElementSearchId]) REFERENCES [dbo].[IndexingJsonFileElementSearch]([Id]) ON DELETE CASCADE,
 
+    -- NO ACTION: ServiceRequestFiles already reaches this table through ServiceResponseFiles
+    -- (which cascades from ServiceRequestFiles), so CASCADE here would be a second
+    -- cascade path to the same table (Msg 1785).
     CONSTRAINT [FK_IndexingJsonFileElementMappings_ServiceRequestFiles] 
-        FOREIGN KEY ([RequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
+        FOREIGN KEY ([RequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_IndexingJsonFileElementMappings_ServiceResponseFiles] 
-        FOREIGN KEY ([ResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id])
+        FOREIGN KEY ([ResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE NO ACTION
 );
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingJsonFileElementMappings_RequestFileId]
+    ON [dbo].[IndexingJsonFileElementMappings]([RequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingJsonFileElementMappings_ResponseFileId]
+    ON [dbo].[IndexingJsonFileElementMappings]([ResponseFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingJsonFileElementMappings_SearchId]
+    ON [dbo].[IndexingJsonFileElementMappings]([IndexingJsonFileElementSearchId] ASC)
 GO

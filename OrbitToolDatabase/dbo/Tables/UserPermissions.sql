@@ -31,4 +31,9 @@ CREATE TABLE [dbo].[UserPermissions] (
     CONSTRAINT FK_UserPermissions_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UserPermissions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UserPermissions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-);
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_UserPermissions_ResourcePermissionId
+    ON [dbo].[UserPermissions]([ResourcePermissionId] ASC)
+GO

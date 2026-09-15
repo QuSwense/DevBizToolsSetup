@@ -2,8 +2,9 @@
     Seed Roles - System roles (Developer, Admin, Viewer)
 
     Idempotent: each role is inserted only if a role with that name does not exist.
-    NOTE: The SYSTEM user must exist before running this script (Users.sql inserts
-    SYSTEM with RoleId=NULL to break the circular FK dependency).
+    NOTE: The SYSTEM user must exist before running this script (UsersSeed.sql inserts
+    SYSTEM with CreatedBy = NULL). Role assignments are seeded afterwards by
+    UserRolesSeed.sql.
 */
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE [Name] = N'Developer')
     INSERT INTO [dbo].[Roles] ([Name], [Description], [IsSystemRole], [CreatedBy])

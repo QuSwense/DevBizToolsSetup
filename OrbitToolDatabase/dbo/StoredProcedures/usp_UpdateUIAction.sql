@@ -7,7 +7,7 @@ CREATE PROCEDURE [dbo].[usp_UpdateUIAction]
     @PublicId              UNIQUEIDENTIFIER,
     @ActionName            NVARCHAR(50) = NULL,
     @DisplayName           NVARCHAR(100) = NULL,
-    @ResourcePermissionsId BIGINT = NULL,
+    @ResourcePermissionId BIGINT = NULL,
     @ActionType            NVARCHAR(20) = NULL,
     @UiElementId           NVARCHAR(100) = NULL,
     @IsActive              BIT = NULL,
@@ -58,10 +58,10 @@ BEGIN
         RETURN;
     END
 
-    -- Validation: ResourcePermissionsId must exist if provided
-    IF @ResourcePermissionsId IS NOT NULL
+    -- Validation: ResourcePermissionId must exist if provided
+    IF @ResourcePermissionId IS NOT NULL
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionsId)
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
         BEGIN
             RAISERROR('Resource permission not found for the specified Id.', 16, 1);
             RETURN;
@@ -86,7 +86,7 @@ BEGIN
         SET
             [ActionName]            = ISNULL(@ActionName, [ActionName]),
             [DisplayName]           = ISNULL(@DisplayName, [DisplayName]),
-            [ResourcePermissionsId] = ISNULL(@ResourcePermissionsId, [ResourcePermissionsId]),
+            [ResourcePermissionId] = ISNULL(@ResourcePermissionId, [ResourcePermissionId]),
             [ActionType]            = ISNULL(@ActionType, [ActionType]),
             [UiElementId]           = ISNULL(@UiElementId, [UiElementId]),
             [IsActive]              = ISNULL(@IsActive, [IsActive]),
@@ -113,7 +113,7 @@ BEGIN
             [PageId],
             [ActionName],
             [DisplayName],
-            [ResourcePermissionsId],
+            [ResourcePermissionId],
             [ActionType],
             [UiElementId],
             [IsActive],

@@ -22,8 +22,19 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAudits] (
 
     CONSTRAINT PK_ServiceTestSuiteExecutionAudits PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestSuiteExecutionAudits_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT CK_ServiceTestSuiteExecutionAudits_ExecutionStatus
+        CHECK ([ExecutionStatus] IN ('Pending', 'InProgress', 'Completed', 'Failed')),
     CONSTRAINT FK_ServiceTestSuiteExecutionAudits_ServiceTestSuites_ServiceTestSuiteId
         FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_ServiceTestSuiteExecutionAudits_Users_ExecutedBy
         FOREIGN KEY ([ExecutedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAudits_ServiceTestSuiteId
+    ON [dbo].[ServiceTestSuiteExecutionAudits]([ServiceTestSuiteId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAudits_ExecutedBy
+    ON [dbo].[ServiceTestSuiteExecutionAudits]([ExecutedBy] ASC)
+GO

@@ -32,8 +32,6 @@ CREATE TABLE [dbo].[ServiceRequestFilesPermissions] (
     -- Primary Key
     CONSTRAINT PK_ServiceRequestFilesPermissions PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceRequestFilesPermissions_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceRequestFilesPermissions_FileId_UserId_RoleId_ResourcePermissionId 
-        UNIQUE ([ServiceRequestFileId] ASC, [UserId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC),
 
     -- Check constraints
     CONSTRAINT CK_ServiceRequestFilesPermissions_UserOrRole 
@@ -58,6 +56,18 @@ CREATE TABLE [dbo].[ServiceRequestFilesPermissions] (
 GO
 
 -- Performance Indexes
+-- Filtered unique indexes: a plain UNIQUE over nullable UserId/RoleId does not enforce
+-- uniqueness (NULLs compare as distinct), so split into one index per grantee kind.
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceRequestFilesPermissions_File_User_Resource
+    ON [dbo].[ServiceRequestFilesPermissions]([ServiceRequestFileId] ASC, [UserId] ASC, [ResourcePermissionId] ASC)
+    WHERE [UserId] IS NOT NULL
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceRequestFilesPermissions_File_Role_Resource
+    ON [dbo].[ServiceRequestFilesPermissions]([ServiceRequestFileId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC)
+    WHERE [RoleId] IS NOT NULL
+GO
+
 CREATE NONCLUSTERED INDEX IX_ServiceRequestFilesPermissions_FileId
     ON [dbo].[ServiceRequestFilesPermissions]([ServiceRequestFileId] ASC)
 GO

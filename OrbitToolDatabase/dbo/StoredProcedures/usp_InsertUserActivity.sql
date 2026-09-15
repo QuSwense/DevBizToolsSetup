@@ -61,7 +61,7 @@ BEGIN
             [ActivityType],
             [ActionType],
             [FeatureActivitiesJson],
-            [Timestamp]
+            [CreatedAt]
         )
         VALUES (
             @UserId,

@@ -13,15 +13,16 @@ CREATE TABLE [dbo].[IndexingXmlFileElements]
     -- XML value type: 'String', 'Number', 'Boolean', 'Array', 'Object'
     [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
     [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
-    [UpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME NULL,
 
     CONSTRAINT [PK_IndexingXmlFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
+    CONSTRAINT [UQ_IndexingXmlFileElements_ElementName_XmlPath] UNIQUE ([ElementName] ASC, [XmlPath] ASC),
     CONSTRAINT [CK_IndexingXmlFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object'))
 );
 GO
 
 -- Index supporting wildcard and exact-value searches across XML values.
-CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElements_Value_KeyPath] 
+CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElements_ElementName_XmlPath] 
 ON [dbo].[IndexingXmlFileElements] ([ElementName] ASC, [XmlPath] ASC) 
 INCLUDE ([Id]);
 GO

@@ -32,3 +32,12 @@ CREATE TABLE [dbo].[ServiceTestCases] (
     CONSTRAINT FK_ServiceTestCases_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestCases_ServiceRequestFileId
+    ON [dbo].[ServiceTestCases]([ServiceRequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestCases_IsActive
+    ON [dbo].[ServiceTestCases]([IsActive] ASC)
+GO

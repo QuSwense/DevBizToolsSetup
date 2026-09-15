@@ -168,6 +168,7 @@ IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UIPages'))
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ResourcePermissions')) DROP TABLE [dbo].[ResourcePermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.GlobalSettings')) DROP TABLE [dbo].[GlobalSettings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleContextObjects')) DROP TABLE [dbo].[RuleContextObjects];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserRoles')) DROP TABLE [dbo].[UserRoles];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Roles')) DROP TABLE [dbo].[Roles];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Users')) DROP TABLE [dbo].[Users];
 GO
@@ -190,44 +191,22 @@ GO
 :r ../dbo/Functions/fn_CalculateVersion.sql
 GO
 
-/* Recreate tables from project source, honoring foreign-key dependencies. */
-/* Users and Roles have a circular foreign-key relationship:
-     Users.RoleId    -> Roles(Id)
-     Roles.CreatedBy -> Users(UserId)
-   SQL Server cannot create either table with both FKs before the other exists,
-   so Users is created below WITHOUT FK_Users_Roles_RoleId, then Roles is
-   created, then the FK is added via ALTER to complete the cycle.
-   The inline Users DDL mirrors ../dbo/Tables/Users.sql (minus FK_Users_Roles_RoleId). */
-CREATE TABLE [dbo].[Users] (
-    [UserId] NVARCHAR(20) NOT NULL,
-    [Email] NVARCHAR(250) NOT NULL,
-    [Department] NVARCHAR(100) NULL,
-    [FirstName] NVARCHAR(100) NULL,
-    [LastName] NVARCHAR(100) NULL,
-    [RoleId] INT NULL,
-    [IsActive] BIT NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT 1,
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT GETDATE(),
-    [CreatedBy] NVARCHAR(20) NULL,
-    [LastUpdatedAt] DATETIME NULL,
-    [LastUpdatedBy] NVARCHAR(20) NULL,
-
-    CONSTRAINT PK_Users PRIMARY KEY CLUSTERED ([UserId] ASC),
-    CONSTRAINT UQ_Users_Email UNIQUE ([Email] ASC),
-
-    -- Foreign Keys
-    CONSTRAINT FK_Users_CreatedBy_Users FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_Users_LastUpdatedBy_Users FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
-GO
-
-CREATE NONCLUSTERED INDEX IX_Users_RoleId ON [dbo].[Users]([RoleId] ASC)
+/* Recreate tables from project source, honoring foreign-key dependencies.
+   Users and Roles no longer have a circular foreign-key relationship: the
+   Users.RoleId column and its FK were removed and replaced by the UserRoles
+   junction table (dbo/Tables/UserRoles.sql), so every table can be created
+   directly from its project source file with no inline DDL or deferred ALTER. */
+:r ../dbo/Tables/Users.sql
 GO
 
 /* Seed the SYSTEM user so the Roles seed (and other seeds) that set
    CreatedBy = N'SYSTEM' satisfy the FK_*_Users_CreatedBy constraints. */
+/* Matches Seeds/UsersSeed.sql (SYSTEM bootstrap row; CreatedBy = NULL there,
+   N'SYSTEM' here because the FK_Users_Users_CreatedBy constraint needs the row
+   itself to exist before other rows can reference it). */
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [UserId] = N'SYSTEM')
-    INSERT INTO [dbo].[Users] ([UserId], [Email], [FirstName], [LastName], [CreatedBy])
-    VALUES (N'SYSTEM', N'system@orbit.local', N'System', N'User', N'SYSTEM');
+    INSERT INTO [dbo].[Users] ([UserId], [Email], [Department], [FirstName], [LastName], [CreatedBy])
+    VALUES (N'SYSTEM', N'system@example.com', N'IT', N'System', N'User', N'SYSTEM');
 GO
 
 :r ../dbo/Tables/Roles.sql
@@ -241,9 +220,8 @@ VALUES
     (N'Viewer', N'Read-only access to all resources', 1, N'SYSTEM');
 GO
 
-/* Complete the Users <-> Roles foreign-key cycle. */
-ALTER TABLE [dbo].[Users] ADD CONSTRAINT FK_Users_Roles_RoleId
-    FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE SET NULL;
+/* UserRoles junction table (depends on Users and Roles created above). */
+:r ../dbo/Tables/UserRoles.sql
 GO
 :r ../dbo/Tables/RuleContextObjects.sql
 GO
@@ -367,6 +345,8 @@ GO
 GO
 :r ../dbo/Views/v_BinaryEmbeddingsStoreWithUsage.sql
 GO
+:r ../dbo/Views/v_GlobalSettingsWithDetails.sql
+GO
 :r ../dbo/Views/v_IndexingElementUsageStats.sql
 GO
 :r ../dbo/Views/v_IndexingFileElementSearch.sql
@@ -379,9 +359,13 @@ GO
 GO
 :r ../dbo/Views/v_LatestServiceApplicationsWithAuth.sql
 GO
+:r ../dbo/Views/v_ResourcePermissionsWithDetails.sql
+GO
 :r ../dbo/Views/v_RolePermissionSummary.sql
 GO
 :r ../dbo/Views/v_RolePermissionsWithDetails.sql
+GO
+:r ../dbo/Views/v_RolesWithDetails.sql
 GO
 :r ../dbo/Views/v_RuleContextObjectsWithUsage.sql
 GO
@@ -429,11 +413,17 @@ GO
 GO
 :r ../dbo/Views/v_SoapNamespacesWithDetails.sql
 GO
+:r ../dbo/Views/v_UIActionsWithDetails.sql
+GO
+:r ../dbo/Views/v_UIPagesWithDetails.sql
+GO
 :r ../dbo/Views/v_UserPermissionsSummary.sql
 GO
 :r ../dbo/Views/v_UserPermissionSummary.sql
 GO
 :r ../dbo/Views/v_UserPermissionsWithDetails.sql
+GO
+:r ../dbo/Views/v_UserSettingsWithDetails.sql
 GO
 
 /* usp_InsertUserActivity is created first because many other procedures depend on it. */
@@ -442,6 +432,18 @@ GO
 :r ../dbo/StoredProcedures/usp_ActivateServiceOperation.sql
 GO
 :r ../dbo/StoredProcedures/usp_BinaryEmbeddingExists.sql
+GO
+:r ../dbo/StoredProcedures/usp_CompleteDirectExecutionAudit.sql
+GO
+:r ../dbo/StoredProcedures/usp_CreateDirectExecutionAudit.sql
+GO
+:r ../dbo/StoredProcedures/usp_CreateDirectExecutionAuditResponseFileLink.sql
+GO
+:r ../dbo/StoredProcedures/usp_CreateGlobalSetting.sql
+GO
+:r ../dbo/StoredProcedures/usp_CreateResourcePermission.sql
+GO
+:r ../dbo/StoredProcedures/usp_CreateRole.sql
 GO
 :r ../dbo/StoredProcedures/usp_CreateRolePermission.sql
 GO
@@ -455,6 +457,8 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_CreateServiceOperationSchema.sql
 GO
+:r ../dbo/StoredProcedures/usp_CreateServiceOperationWithSchema.sql
+GO
 :r ../dbo/StoredProcedures/usp_CreateServiceTestCase.sql
 GO
 :r ../dbo/StoredProcedures/usp_CreateServiceTestSuite.sql
@@ -463,41 +467,43 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_CreateTestSuiteExecutionAudit.sql
 GO
+:r ../dbo/StoredProcedures/usp_CreateUIAction.sql
+GO
+:r ../dbo/StoredProcedures/usp_CreateUIPage.sql
+GO
 :r ../dbo/StoredProcedures/usp_CreateUserPermission.sql
 GO
 :r ../dbo/StoredProcedures/usp_DeleteUserPermission.sql
 GO
+:r ../dbo/StoredProcedures/usp_FindBinaryEmbeddingByContent.sql
+GO
 :r ../dbo/StoredProcedures/usp_GetAvailablePermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetBinaryEmbeddingByHash.sql
-GO
 :r ../dbo/StoredProcedures/usp_GetBinaryEmbeddingById.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetBinaryEmbeddingUsage.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetElementFrequency.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetFilesByElement.sql
 GO
+:r ../dbo/StoredProcedures/usp_GetGlobalSettings.sql
+GO
 :r ../dbo/StoredProcedures/usp_GetIndexingStatistics.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetRolePermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetRuleExecutionStatistics.sql
+:r ../dbo/StoredProcedures/usp_GetRoles.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetRuleSetsByContext.sql
+:r ../dbo/StoredProcedures/usp_GetRuleExecutionStatistics.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceAppPermissions.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceApplicationHistory.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceDefinitionSync.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetServiceOperationSchemas.sql
-GO
 :r ../dbo/StoredProcedures/usp_GetServiceOperations.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceRequestFileChain.sql
+GO
+:r ../dbo/StoredProcedures/usp_GetServiceRequestFileConsecutiveDeltaCount.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceRequestFilesByOperation.sql
 GO
@@ -507,13 +513,13 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_GetSoapNamespaces.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetSoapNamespacesByService.sql
-GO
 :r ../dbo/StoredProcedures/usp_GetTestSuiteExecutionSummary.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetUserPermissions.sql
 GO
 :r ../dbo/StoredProcedures/usp_InsertBinaryEmbedding.sql
+GO
+:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAudit.sql
 GO
 :r ../dbo/StoredProcedures/usp_InsertServiceDefinitionSync.sql
 GO
@@ -555,6 +561,8 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_RemoveServiceAppPermissions.sql
 GO
+:r ../dbo/StoredProcedures/usp_SaveServiceDefinitionSyncWithOperations.sql
+GO
 /* usp_SearchElements is recreated below using LIKE-based search via the
    v_IndexingFileElementSearch view (no longer uses FREETEXTTABLE). */
 :r ../dbo/StoredProcedures/usp_SearchElements.sql
@@ -566,6 +574,18 @@ GO
 :r ../dbo/StoredProcedures/usp_UnlinkRuleSetFromTestCase.sql
 GO
 :r ../dbo/StoredProcedures/usp_UnlinkTestCaseFromSuite.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateBinaryEmbedding.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAudit.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAuditResponseFileLinkStatus.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateGlobalSetting.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateResourcePermission.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateRole.sql
 GO
 :r ../dbo/StoredProcedures/usp_UpdateRolePermission.sql
 GO
@@ -585,6 +605,8 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_UpdateServiceRequestFileEmbedding.sql
 GO
+:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFileWithDeltaChain.sql
+GO
 :r ../dbo/StoredProcedures/usp_UpdateServiceResponseFile.sql
 GO
 :r ../dbo/StoredProcedures/usp_UpdateServiceResponseFileEmbedding.sql
@@ -597,7 +619,13 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_UpdateTestCaseExecution.sql
 GO
+:r ../dbo/StoredProcedures/usp_UpdateUIAction.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateUIPage.sql
+GO
 :r ../dbo/StoredProcedures/usp_UpdateUserPermission.sql
+GO
+:r ../dbo/StoredProcedures/usp_UpdateUserSetting.sql
 GO
 :r ../dbo/StoredProcedures/usp_UpsertServiceAppPermissions.sql
 GO

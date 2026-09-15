@@ -42,3 +42,7 @@ CREATE TABLE [dbo].[PermissionToUIPageMapping] (
         REFERENCES [dbo].[Users]([UserId])
 )
 GO
+
+CREATE NONCLUSTERED INDEX IX_PermissionToUIPageMapping_UIPageId
+    ON [dbo].[PermissionToUIPageMapping]([UIPageId] ASC)
+GO

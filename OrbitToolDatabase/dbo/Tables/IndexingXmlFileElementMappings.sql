@@ -25,9 +25,24 @@ CREATE TABLE [dbo].[IndexingXmlFileElementMappings]
     CONSTRAINT [FK_IndexingXmlFileElementMappings_IndexingXmlFileElementSearch] 
         FOREIGN KEY ([IndexingXmlFileElementSearchId]) REFERENCES [dbo].[IndexingXmlFileElementSearch]([Id]) ON DELETE CASCADE,
 
+    -- NO ACTION: ServiceRequestFiles already reaches this table through ServiceResponseFiles
+    -- (which cascades from ServiceRequestFiles), so CASCADE here would be a second
+    -- cascade path to the same table (Msg 1785).
     CONSTRAINT [FK_IndexingXmlFileElementMappings_ServiceRequestFiles] 
-        FOREIGN KEY ([RequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
+        FOREIGN KEY ([RequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_IndexingXmlFileElementMappings_ServiceResponseFiles] 
-        FOREIGN KEY ([ResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id])
+        FOREIGN KEY ([ResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE NO ACTION
 );
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElementMappings_RequestFileId]
+    ON [dbo].[IndexingXmlFileElementMappings]([RequestFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElementMappings_ResponseFileId]
+    ON [dbo].[IndexingXmlFileElementMappings]([ResponseFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingXmlFileElementMappings_SearchId]
+    ON [dbo].[IndexingXmlFileElementMappings]([IndexingXmlFileElementSearchId] ASC)
 GO

@@ -11,9 +11,9 @@ SELECT
     rco.[RuleTypeId],
     rco.[Description],
     rco.[IsActive],
-    rco.[CreatedDate],
+    rco.[CreatedAt],
     rco.[CreatedBy],
-    rco.[LastUpdatedDate],
+    rco.[LastUpdatedAt],
     rco.[LastUpdatedBy],
     
     -- Usage as Output Type
@@ -59,7 +59,7 @@ SELECT
     ) AS LinkedRuleSets,
     
     -- Age
-    DATEDIFF(DAY, rco.[CreatedDate], GETDATE()) AS AgeDays
+    DATEDIFF(DAY, rco.[CreatedAt], GETDATE()) AS AgeDays
 
 FROM [dbo].[RuleContextObjects] rco;
 GO

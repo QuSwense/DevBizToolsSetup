@@ -31,3 +31,8 @@ CREATE TABLE [dbo].[RuleSetContextObjectLinks] (
     CONSTRAINT FK_RuleSetContextObjectLinks_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_RuleSetContextObjectLinks_RuleContextObjectId
+    ON [dbo].[RuleSetContextObjectLinks]([RuleContextObjectId] ASC)
+GO

@@ -13,7 +13,7 @@ SELECT
     ro.LastUpdatedAt,
     ro.LastUpdatedBy,
     -- User and permission counts
-    (SELECT COUNT(*) FROM [dbo].[Users] u WHERE u.RoleId = ro.Id) AS UserCount,
+    (SELECT COUNT(*) FROM [dbo].[UserRoles] ur WHERE ur.RoleId = ro.Id) AS UserCount,
     (SELECT COUNT(*) FROM [dbo].[RolePermissions] rp WHERE rp.RoleId = ro.Id) AS PermissionCount,
     (SELECT COUNT(*) FROM [dbo].[RolePermissions] rp WHERE rp.RoleId = ro.Id AND rp.IsGranted = 1) AS GrantedPermissionCount,
     -- Role classification

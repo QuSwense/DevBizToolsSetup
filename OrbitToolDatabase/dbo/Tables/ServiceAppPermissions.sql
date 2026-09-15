@@ -32,8 +32,6 @@ CREATE TABLE [dbo].[ServiceAppPermissions] (
     -- Primary Key
     CONSTRAINT PK_ServiceAppPermissions PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceAppPermissions_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceAppPermissions_AppId_UserId_RoleId_ResourcePermissionId 
-        UNIQUE ([ServiceApplicationId] ASC, [UserId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC),
 
     -- Check constraints
     CONSTRAINT CK_ServiceAppPermissions_UserOrRole 
@@ -58,6 +56,18 @@ CREATE TABLE [dbo].[ServiceAppPermissions] (
 GO
 
 -- Performance Indexes
+-- Filtered unique indexes: a plain UNIQUE over nullable UserId/RoleId does not enforce
+-- uniqueness (NULLs compare as distinct), so split into one index per grantee kind.
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceAppPermissions_App_User_Resource
+    ON [dbo].[ServiceAppPermissions]([ServiceApplicationId] ASC, [UserId] ASC, [ResourcePermissionId] ASC)
+    WHERE [UserId] IS NOT NULL
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceAppPermissions_App_Role_Resource
+    ON [dbo].[ServiceAppPermissions]([ServiceApplicationId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC)
+    WHERE [RoleId] IS NOT NULL
+GO
+
 CREATE NONCLUSTERED INDEX IX_ServiceAppPermissions_ServiceApplicationId
     ON [dbo].[ServiceAppPermissions]([ServiceApplicationId] ASC)
 GO

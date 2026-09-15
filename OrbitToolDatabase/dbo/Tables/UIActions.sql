@@ -18,9 +18,9 @@ CREATE TABLE [dbo].[UIActions] (
     -- Display name for the action (e.g., 'Create New', 'Edit', 'Delete')
     [DisplayName] NVARCHAR(100) NOT NULL,
     -- Required permission for this action
-    [ResourcePermissionsId] BIGINT NOT NULL,
+    [ResourcePermissionId] BIGINT NOT NULL,
     -- Action type (e.g., 'Button', 'MenuItem', 'Tab', 'Link')
-    [ActionType] NVARCHAR(20) NOT NULL DEFAULT 'Button',
+    [ActionType] NVARCHAR(20) NOT NULL CONSTRAINT DF_UIActions_ActionType DEFAULT 'Button',
     -- CSS/UI identifier for the element
     [UiElementId] NVARCHAR(100) NULL,
     -- Indicates if action is active
@@ -37,8 +37,16 @@ CREATE TABLE [dbo].[UIActions] (
 
     -- Foreign Keys
     CONSTRAINT FK_UIActions_UIPages_PageId FOREIGN KEY ([PageId]) REFERENCES [dbo].[UIPages]([Id]) ON DELETE CASCADE,
-    CONSTRAINT FK_UIActions_ResourcePermissions FOREIGN KEY ([ResourcePermissionsId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
+    CONSTRAINT FK_UIActions_ResourcePermissions FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_UIActions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UIActions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_UIActions_ResourcePermissionId
+    ON [dbo].[UIActions]([ResourcePermissionId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_UIActions_IsActive
+    ON [dbo].[UIActions]([IsActive] ASC)
 GO

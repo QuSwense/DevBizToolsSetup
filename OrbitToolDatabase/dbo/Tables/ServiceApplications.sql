@@ -60,3 +60,12 @@ CREATE TABLE [dbo].[ServiceApplications] (
     CONSTRAINT FK_ServiceApplications_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceApplications_ServiceAppAuthenticationId
+    ON [dbo].[ServiceApplications]([ServiceAppAuthenticationId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceApplications_IsActive
+    ON [dbo].[ServiceApplications]([IsActive] ASC)
+GO

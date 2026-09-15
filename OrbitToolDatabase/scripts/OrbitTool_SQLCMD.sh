@@ -103,7 +103,7 @@ reset_and_recreate_with_descriptions() {
     echo "This will DROP and RECREATE all tables, views, and stored procedures,"
     echo "then apply MS_Description extended properties to all columns."
     echo "WARNING: All existing data will be LOST!"
-    read -r -p "Are you sure? (y/N): confirm"
+    read -r -p "Are you sure? (y/N): " confirm
     if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
         echo "Cancelled."
         return

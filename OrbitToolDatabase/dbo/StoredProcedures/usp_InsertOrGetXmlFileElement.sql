@@ -41,7 +41,7 @@ BEGIN
             -- Update the existing record
             UPDATE [dbo].[IndexingXmlFileElements]
             SET [ValueType] = @ValueType,
-                [UpdatedAt] = GETDATE()
+                [LastUpdatedAt] = GETDATE()
             WHERE [Id] = @ExistingId;
 
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -53,7 +53,7 @@ BEGIN
                 [XmlPath],
                 [ValueType],
                 [CreatedAt],
-                [UpdatedAt],
+                [LastUpdatedAt],
                 0 AS IsNew
             FROM [dbo].[IndexingXmlFileElements]
             WHERE [Id] = @ExistingId;
@@ -67,7 +67,7 @@ BEGIN
             [XmlPath],
             [ValueType],
             [CreatedAt],
-            [UpdatedAt]
+            [LastUpdatedAt]
         )
         VALUES (
             @ElementName,
@@ -88,7 +88,7 @@ BEGIN
             [XmlPath],
             [ValueType],
             [CreatedAt],
-            [UpdatedAt],
+            [LastUpdatedAt],
             1 AS IsNew
         FROM [dbo].[IndexingXmlFileElements]
         WHERE [Id] = @ExistingId;

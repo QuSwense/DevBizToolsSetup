@@ -16,6 +16,7 @@ CREATE TABLE [dbo].[ServiceTestCaseRuleSetLinks] (
     -- Primary Key
     CONSTRAINT PK_ServiceTestCaseRuleSetLinks PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestCaseRuleSetLinks_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceTestCaseRuleSetLinks_Case_Set UNIQUE ([ServiceTestCaseId] ASC, [RuleSetId] ASC),
 
     -- Foreign Key
     CONSTRAINT FK_ServiceTestCaseRuleSetLinks_ServiceTestCases_ServiceTestCaseId
@@ -25,3 +26,8 @@ CREATE TABLE [dbo].[ServiceTestCaseRuleSetLinks] (
     CONSTRAINT FK_ServiceTestCaseRuleSetLinks_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestCaseRuleSetLinks_RuleSetId
+    ON [dbo].[ServiceTestCaseRuleSetLinks]([RuleSetId] ASC)
+GO

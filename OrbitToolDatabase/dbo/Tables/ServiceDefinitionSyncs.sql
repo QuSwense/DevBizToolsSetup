@@ -16,7 +16,7 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
     [CompressedContent] VARBINARY(MAX) NOT NULL,
     -- uncompressed size of the definition file in bytes
-    [UncompressedSizeBytes] INT NULL,
+    [UncompressedSizeBytes] BIGINT NULL,
     -- compression algorithm used for the definition file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the definition file content for integrity verification
@@ -31,13 +31,16 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceDefinitionSyncs_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [RecordVersion] ASC),
     CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_ContentHash
         UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [ContentHash] ASC),
 
     CONSTRAINT CK_ServiceDefinitionSyncs_DefinitionUrl
-        CHECK (LEFT([DefinitionUrl], 7) = 'http://' OR LEFT([DefinitionUrl], 8) = 'https://'),
+        CHECK ([DefinitionUrl] IS NULL
+            OR LEFT([DefinitionUrl], 7) = 'http://'
+            OR LEFT([DefinitionUrl], 8) = 'https://'),
     CONSTRAINT CK_ServiceDefinitionSyncs_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
     CONSTRAINT CK_ServiceDefinitionSyncs_ContentHash
@@ -48,7 +51,7 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     -- Foreign keys
     CONSTRAINT FK_ServiceDefinitionSyncs_ServiceApplications_ServiceApplicationId
         FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]) ON DELETE CASCADE,
-    CONSTRAINT FK_ServiceDefinitionSyncs_Users_SyncedBy
+    CONSTRAINT FK_ServiceDefinitionSyncs_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceDefinitionSyncs_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])

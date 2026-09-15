@@ -46,6 +46,10 @@ CREATE NONCLUSTERED INDEX [IX_ServiceRequestFileEmbeddings_ServiceRequestFileId]
     ON [dbo].[ServiceRequestFileEmbeddings]([ServiceRequestFileId] ASC)
 GO
 
+CREATE NONCLUSTERED INDEX [IX_ServiceRequestFileEmbeddings_BinaryEmbeddingsStoreId]
+    ON [dbo].[ServiceRequestFileEmbeddings]([BinaryEmbeddingsStoreId] ASC)
+GO
+
 CREATE NONCLUSTERED INDEX [IX_ServiceRequestFileEmbeddings_Name]
     ON [dbo].[ServiceRequestFileEmbeddings]([Name] ASC)
 GO

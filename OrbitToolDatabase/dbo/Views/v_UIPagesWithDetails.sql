@@ -6,7 +6,7 @@ SELECT
     up.PublicId,
     up.ParentId,
     up.Name,
-    up.ResourcePermissionsId,
+    up.ResourcePermissionId,
     up.FeatureFlag,
     up.IsActive,
     up.IsVisibleInNav,
@@ -28,5 +28,5 @@ SELECT
     CASE WHEN up.ParentId IS NULL THEN up.Name ELSE parent.Name + ' > ' + up.Name END AS FullPath
 FROM [dbo].[UIPages] up
 LEFT JOIN [dbo].[UIPages] parent ON up.ParentId = parent.Id
-INNER JOIN [dbo].[ResourcePermissions] rp ON up.ResourcePermissionsId = rp.Id;
+INNER JOIN [dbo].[ResourcePermissions] rp ON up.ResourcePermissionId = rp.Id;
 GO

@@ -17,7 +17,7 @@ BEGIN
         r.[CreatedBy],
         r.[LastUpdatedAt],
         r.[LastUpdatedBy],
-        (SELECT COUNT(1) FROM [dbo].[Users] u WHERE u.[RoleId] = r.[Id]) AS [UserCount],
+        (SELECT COUNT(1) FROM [dbo].[UserRoles] ur WHERE ur.[RoleId] = r.[Id]) AS [UserCount],
         (SELECT COUNT(1) FROM [dbo].[RolePermissions] rp WHERE rp.[RoleId] = r.[Id]) AS [PermissionCount]
     FROM [dbo].[Roles] r
     WHERE

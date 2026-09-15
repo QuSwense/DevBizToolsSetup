@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_ServiceTestSuites_PublicId DEFAULT NEWID(),
     [Name] NVARCHAR(200) NOT NULL,
-    [Description] NVARCHAR(MAX) NULL,
+    [Description] NVARCHAR(500) NULL,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestSuites_IsActive DEFAULT 1,
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceTestSuites_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),

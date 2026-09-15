@@ -15,15 +15,16 @@ CREATE TABLE [dbo].[IndexingPdfFileElements]
     -- PDF value type: 'String', 'Number', 'Boolean', 'Array', 'Object'
     [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
     [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
-    [UpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME NULL,
 
     CONSTRAINT [PK_IndexingPdfFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
-    CONSTRAINT [CK_IndexingPdfFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object'))
+    CONSTRAINT [CK_IndexingPdfFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object')),
+    CONSTRAINT [CK_IndexingPdfFileElements_PageNumber] CHECK ([PageNumber] >= 1)
 );
 GO
 
 -- Index supporting wildcard and exact-value searches across PDF values.
-CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElements_Value_KeyPath] 
+CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElements_ElementName_ElementType] 
 ON [dbo].[IndexingPdfFileElements] ([ElementName] ASC, [ElementType] ASC) 
 INCLUDE ([Id]);
 GO

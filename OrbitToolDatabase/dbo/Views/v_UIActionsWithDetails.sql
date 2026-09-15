@@ -7,7 +7,7 @@ SELECT
     ua.PageId,
     ua.ActionName,
     ua.DisplayName,
-    ua.ResourcePermissionsId,
+    ua.ResourcePermissionId,
     ua.ActionType,
     ua.UiElementId,
     ua.IsActive,
@@ -36,5 +36,5 @@ SELECT
     CASE WHEN ua.IsActive = 1 THEN 'Active' ELSE 'Inactive' END AS StatusDescription
 FROM [dbo].[UIActions] ua
 INNER JOIN [dbo].[UIPages] up ON ua.PageId = up.Id
-INNER JOIN [dbo].[ResourcePermissions] rp ON ua.ResourcePermissionsId = rp.Id;
+INNER JOIN [dbo].[ResourcePermissions] rp ON ua.ResourcePermissionId = rp.Id;
 GO

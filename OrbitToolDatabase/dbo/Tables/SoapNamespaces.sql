@@ -13,7 +13,7 @@ CREATE TABLE [dbo].[SoapNamespaces] (
     -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
     [CompressedContent] VARBINARY(MAX) NOT NULL,
     -- uncompressed size of the definition file in bytes
-    [UncompressedSizeBytes] INT NULL,
+    [UncompressedSizeBytes] BIGINT NULL,
     -- compression algorithm used for the definition file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
     -- SHA256 hash of the definition file content for integrity verification
@@ -30,6 +30,7 @@ CREATE TABLE [dbo].[SoapNamespaces] (
     -- Primary Key
     CONSTRAINT [PK_SoapNamespaces] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [UQ_SoapNamespaces_PublicId] UNIQUE ([PublicId] ASC),
+    CONSTRAINT [UQ_SoapNamespaces_Schema_RecordVersion] UNIQUE ([ServiceOperationSchemaId] ASC, [RecordVersion] ASC),
     CONSTRAINT CK_SoapNamespaces_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
     CONSTRAINT CK_SoapNamespaces_ContentHash

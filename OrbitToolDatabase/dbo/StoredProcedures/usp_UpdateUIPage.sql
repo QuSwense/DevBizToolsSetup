@@ -7,7 +7,7 @@ CREATE PROCEDURE [dbo].[usp_UpdateUIPage]
     @PublicId             UNIQUEIDENTIFIER,
     @ParentPublicId       UNIQUEIDENTIFIER = NULL,
     @Name                 NVARCHAR(100) = NULL,
-    @ResourcePermissionsId BIGINT = NULL,
+    @ResourcePermissionId BIGINT = NULL,
     @FeatureFlag          NVARCHAR(100) = NULL,
     @IsActive             BIT = NULL,
     @IsVisibleInNav       BIT = NULL,
@@ -93,10 +93,10 @@ BEGIN
         END
     END
 
-    -- Validation: ResourcePermissionsId must exist if provided
-    IF @ResourcePermissionsId IS NOT NULL
+    -- Validation: ResourcePermissionId must exist if provided
+    IF @ResourcePermissionId IS NOT NULL
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionsId)
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
         BEGIN
             RAISERROR('Resource permission not found for the specified Id.', 16, 1);
             RETURN;
@@ -114,7 +114,7 @@ BEGIN
         SET
             [ParentId]             = ISNULL(@ParentId, [ParentId]),
             [Name]                 = ISNULL(@Name, [Name]),
-            [ResourcePermissionsId] = ISNULL(@ResourcePermissionsId, [ResourcePermissionsId]),
+            [ResourcePermissionId] = ISNULL(@ResourcePermissionId, [ResourcePermissionId]),
             [FeatureFlag]          = ISNULL(@FeatureFlag, [FeatureFlag]),
             [IsActive]             = ISNULL(@IsActive, [IsActive]),
             [IsVisibleInNav]       = ISNULL(@IsVisibleInNav, [IsVisibleInNav]),
@@ -140,7 +140,7 @@ BEGIN
             [PublicId],
             [ParentId],
             [Name],
-            [ResourcePermissionsId],
+            [ResourcePermissionId],
             [FeatureFlag],
             [IsActive],
             [IsVisibleInNav],

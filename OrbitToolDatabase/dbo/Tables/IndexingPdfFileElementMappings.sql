@@ -23,3 +23,11 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
         FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id])
 );
 GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementMappings_BinaryEmbeddingsStoreId]
+    ON [dbo].[IndexingPdfFileElementMappings]([BinaryEmbeddingsStoreId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementMappings_SearchId]
+    ON [dbo].[IndexingPdfFileElementMappings]([IndexingPdfFileElementSearchId] ASC)
+GO

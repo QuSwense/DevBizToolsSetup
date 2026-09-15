@@ -11,7 +11,7 @@ CREATE TABLE [dbo].[ResourcePermissions]
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_ResourcePermissions_PublicId DEFAULT NEWID(),
     -- string representing the permission key e.g., 'soapapplication:add', 'restapi:delete', etc.
-    [PermissionKey] NVARCHAR(MAX) NULL,
+    [PermissionKey] NVARCHAR(512) NOT NULL,
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ResourcePermissions_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,

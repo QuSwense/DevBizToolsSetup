@@ -37,8 +37,6 @@ CREATE TABLE [dbo].[ServiceOperations] (
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceOperations_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceOperations_ServiceApplicationId_OperationName_RecordVersion
-        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [OperationName] ASC, [ServiceDefinitionSyncId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceOperations_HttpMethod
         CHECK ([HttpMethod] IS NULL OR [HttpMethod] IN ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')),
@@ -57,8 +55,24 @@ CREATE TABLE [dbo].[ServiceOperations] (
 )
 GO
 
+-- Uniqueness: ServiceDefinitionSyncId is nullable, so a plain UNIQUE over it does not
+-- enforce uniqueness (NULLs compare as distinct). Split into two filtered indexes.
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceOperations_App_Op_Version_NoSync
+    ON [dbo].[ServiceOperations]([ServiceApplicationId] ASC, [OperationName] ASC, [RecordVersion] ASC)
+    WHERE [ServiceDefinitionSyncId] IS NULL
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceOperations_App_Op_Sync_Version
+    ON [dbo].[ServiceOperations]([ServiceApplicationId] ASC, [OperationName] ASC, [ServiceDefinitionSyncId] ASC, [RecordVersion] ASC)
+    WHERE [ServiceDefinitionSyncId] IS NOT NULL
+GO
+
 CREATE NONCLUSTERED INDEX IX_ServiceOperations_ServiceApplicationId
     ON [dbo].[ServiceOperations]([ServiceApplicationId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceOperations_ServiceDefinitionSyncId
+    ON [dbo].[ServiceOperations]([ServiceDefinitionSyncId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceOperations_IsActive

@@ -32,8 +32,6 @@ CREATE TABLE [dbo].[RuleSetsPermissions] (
     -- Primary Key
     CONSTRAINT PK_RuleSetsPermissions PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_RuleSetsPermissions_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_RuleSetsPermissions_RuleSetId_UserId_RoleId_ResourcePermissionId 
-        UNIQUE ([RuleSetId] ASC, [UserId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC),
 
     -- Check constraints
     CONSTRAINT CK_RuleSetsPermissions_UserOrRole 
@@ -58,6 +56,18 @@ CREATE TABLE [dbo].[RuleSetsPermissions] (
 GO
 
 -- Performance Indexes
+-- Filtered unique indexes: a plain UNIQUE over nullable UserId/RoleId does not enforce
+-- uniqueness (NULLs compare as distinct), so split into one index per grantee kind.
+CREATE UNIQUE NONCLUSTERED INDEX UX_RuleSetsPermissions_Set_User_Resource
+    ON [dbo].[RuleSetsPermissions]([RuleSetId] ASC, [UserId] ASC, [ResourcePermissionId] ASC)
+    WHERE [UserId] IS NOT NULL
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_RuleSetsPermissions_Set_Role_Resource
+    ON [dbo].[RuleSetsPermissions]([RuleSetId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC)
+    WHERE [RoleId] IS NOT NULL
+GO
+
 CREATE NONCLUSTERED INDEX IX_RuleSetsPermissions_RuleSetId
     ON [dbo].[RuleSetsPermissions]([RuleSetId] ASC)
 GO

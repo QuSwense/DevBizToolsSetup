@@ -16,6 +16,7 @@ CREATE TABLE [dbo].[ServiceTestSuiteTestCaseLinks] (
 
     CONSTRAINT PK_ServiceTestSuiteTestCaseLinks PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestSuiteTestCaseLinks_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceTestSuiteTestCaseLinks_Suite_Case UNIQUE ([ServiceTestSuiteId] ASC, [ServiceTestCaseId] ASC),
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_ServiceTestSuites_ServiceTestSuiteId
         FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]) ON DELETE CASCADE,
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_ServiceTestCases_ServiceTestCaseId
@@ -23,3 +24,8 @@ CREATE TABLE [dbo].[ServiceTestSuiteTestCaseLinks] (
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteTestCaseLinks_ServiceTestCaseId
+    ON [dbo].[ServiceTestSuiteTestCaseLinks]([ServiceTestCaseId] ASC)
+GO

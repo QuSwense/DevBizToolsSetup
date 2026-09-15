@@ -13,15 +13,16 @@ CREATE TABLE [dbo].[IndexingJsonFileElements]
     -- JSON value type: 'String', 'Number', 'Boolean', 'Null', 'Array', 'Object'
     [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
     [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
-    [UpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME NULL,
 
     CONSTRAINT [PK_IndexingJsonFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
+    CONSTRAINT [UQ_IndexingJsonFileElements_ElementName_JsonPath] UNIQUE ([ElementName] ASC, [JsonPath] ASC),
     CONSTRAINT [CK_IndexingJsonFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object'))
 );
 GO
 
 -- Index supporting wildcard and exact-value searches across JSON values.
-CREATE NONCLUSTERED INDEX [IX_IndexingJsonFileElements_Value_KeyPath] 
+CREATE NONCLUSTERED INDEX [IX_IndexingJsonFileElements_ElementName_JsonPath] 
 ON [dbo].[IndexingJsonFileElements] ([ElementName] ASC, [JsonPath] ASC) 
 INCLUDE ([Id]);
 GO

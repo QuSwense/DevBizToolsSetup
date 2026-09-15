@@ -12,7 +12,7 @@ SELECT TOP (100) PERCENT
     ua.[ActivityType],
     ua.[ActionType],
     ua.[FeatureActivitiesJson],
-    ua.[Timestamp],
+    ua.[CreatedAt],
     JSON_VALUE(ua.[FeatureActivitiesJson], '$.ServiceId') AS ServicePublicId,
     JSON_VALUE(ua.[FeatureActivitiesJson], '$.ServiceName') AS ServiceName,
     JSON_VALUE(ua.[FeatureActivitiesJson], '$.ChangeType') AS ChangeType,
@@ -27,10 +27,10 @@ SELECT TOP (100) PERCENT
         WHEN ua.[ActionType] = 'StatusToggle' THEN 'Status Toggled'
         ELSE 'Unknown'
     END AS ActionDescription,
-    DATEDIFF(HOUR, ua.[Timestamp], GETDATE()) AS HoursAgo,
-    FORMAT(ua.[Timestamp], 'yyyy-MM-dd HH:mm:ss') AS FormattedTimestamp
+    DATEDIFF(HOUR, ua.[CreatedAt], GETDATE()) AS HoursAgo,
+    FORMAT(ua.[CreatedAt], 'yyyy-MM-dd HH:mm:ss') AS FormattedCreatedAt
 FROM [dbo].[UserActivities] ua
 LEFT JOIN [dbo].[Users] u ON ua.[UserId] = u.[UserId]
 WHERE ua.[ActivityType] LIKE 'ServiceApplication%'
-ORDER BY ua.[Timestamp] DESC;
+ORDER BY ua.[CreatedAt] DESC;
 GO

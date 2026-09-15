@@ -95,7 +95,7 @@ BEGIN
         );
 
         INSERT INTO [dbo].[UserActivities] (
-            [UserId], [ActivityType], [ActionType], [FeatureActivitiesJson], [Timestamp]
+            [UserId], [ActivityType], [ActionType], [FeatureActivitiesJson], [CreatedAt]
         )
         VALUES (
             @ResolvedUser, 'ServiceDefinitionSync', 'Create', @FeatureJson, GETDATE()

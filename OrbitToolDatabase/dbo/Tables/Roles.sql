@@ -36,9 +36,6 @@ CREATE TABLE [dbo].[Roles] (
 )
 GO
 
-CREATE NONCLUSTERED INDEX IX_Roles_Name ON [dbo].[Roles]([Name] ASC)
-GO
-
 CREATE NONCLUSTERED INDEX IX_Roles_IsActive ON [dbo].[Roles]([IsActive] ASC)
 GO
 

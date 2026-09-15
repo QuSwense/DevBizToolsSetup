@@ -45,7 +45,7 @@ BEGIN
             UPDATE [dbo].[IndexingPdfFileElements]
             SET [BoundingRectangle] = @BoundingRectangle,
                 [ValueType] = @ValueType,
-                [UpdatedAt] = GETDATE()
+                [LastUpdatedAt] = GETDATE()
             WHERE [Id] = @ExistingId;
 
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -59,7 +59,7 @@ BEGIN
                 [BoundingRectangle],
                 [ValueType],
                 [CreatedAt],
-                [UpdatedAt],
+                [LastUpdatedAt],
                 0 AS IsNew
             FROM [dbo].[IndexingPdfFileElements]
             WHERE [Id] = @ExistingId;
@@ -75,7 +75,7 @@ BEGIN
             [BoundingRectangle],
             [ValueType],
             [CreatedAt],
-            [UpdatedAt]
+            [LastUpdatedAt]
         )
         VALUES (
             @ElementName,
@@ -100,7 +100,7 @@ BEGIN
             [BoundingRectangle],
             [ValueType],
             [CreatedAt],
-            [UpdatedAt],
+            [LastUpdatedAt],
             1 AS IsNew
         FROM [dbo].[IndexingPdfFileElements]
         WHERE [Id] = @ExistingId;

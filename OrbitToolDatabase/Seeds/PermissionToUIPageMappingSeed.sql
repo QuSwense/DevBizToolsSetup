@@ -1,8 +1,8 @@
 /*
     Seed PermissionToUIPageMapping - Link permissions to UI pages
     NOTE: ResourcePermissions and UIPages must be seeded BEFORE this script.
-    Maps permissions to pages by joining on ResourcePermissionsId (the FK column).
-    Every UIPage has a non-null ResourcePermissionsId, so a single JOIN covers all.
+    Maps permissions to pages by joining on ResourcePermissionId (the FK column).
+    Every UIPage has a non-null ResourcePermissionId, so a single JOIN covers all.
 */
 INSERT INTO [dbo].[PermissionToUIPageMapping] 
     ([ResourcePermissionId], [UIPageId], [AccessType], [CreatedBy])
@@ -18,6 +18,6 @@ SELECT
     'SYSTEM'
 FROM [dbo].[ResourcePermissions] rp
 JOIN [dbo].[UIPages] up 
-    ON up.[ResourcePermissionsId] = rp.[Id]
+    ON up.[ResourcePermissionId] = rp.[Id]
 WHERE rp.[PermissionKey] IS NOT NULL
 GO

@@ -16,6 +16,9 @@ CREATE TABLE [dbo].[ServiceResponseIndexingStatus] (
     [LastIndexedAt] DATETIME NULL,
     -- Timestamp when the status tracking entry was created.
     [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_ServiceResponseIndexingStatus_CreatedAt] DEFAULT GETDATE(),
+    -- Timestamp when the status was last updated by the background worker.
+    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT [PK_ServiceResponseIndexingStatus] PRIMARY KEY CLUSTERED ([ServiceResponseFileId] ASC),
     CONSTRAINT [CK_ServiceResponseIndexingStatus_Status] CHECK ([IndexingStatus] IN ('Pending', 'Processing', 'Completed', 'Failed')),

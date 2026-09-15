@@ -7,7 +7,7 @@ CREATE PROCEDURE [dbo].[usp_CreateUIAction]
     @PagePublicId          UNIQUEIDENTIFIER,
     @ActionName            NVARCHAR(50),
     @DisplayName           NVARCHAR(100),
-    @ResourcePermissionsId BIGINT,
+    @ResourcePermissionId BIGINT,
     @ActionType            NVARCHAR(20) = 'Button',
     @UiElementId           NVARCHAR(100) = NULL,
     @IsActive              BIT = 1,
@@ -54,8 +54,8 @@ BEGIN
         RETURN;
     END
 
-    -- Validation: ResourcePermissionsId must exist
-    IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionsId)
+    -- Validation: ResourcePermissionId must exist
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
     BEGIN
         RAISERROR('Resource permission not found for the specified Id.', 16, 1);
         RETURN;
@@ -76,10 +76,10 @@ BEGIN
         END
 
         INSERT INTO [dbo].[UIActions]
-            ([PublicId], [PageId], [ActionName], [DisplayName], [ResourcePermissionsId],
+            ([PublicId], [PageId], [ActionName], [DisplayName], [ResourcePermissionId],
              [ActionType], [UiElementId], [IsActive], [CreatedBy])
         VALUES
-            (@NewPublicId, @PageId, @ActionName, @DisplayName, @ResourcePermissionsId,
+            (@NewPublicId, @PageId, @ActionName, @DisplayName, @ResourcePermissionId,
              @ActionType, @UiElementId, @IsActive, @ResolvedUserId);
 
         -- Audit logging
@@ -101,7 +101,7 @@ BEGIN
             [PageId],
             [ActionName],
             [DisplayName],
-            [ResourcePermissionsId],
+            [ResourcePermissionId],
             [ActionType],
             [UiElementId],
             [IsActive],

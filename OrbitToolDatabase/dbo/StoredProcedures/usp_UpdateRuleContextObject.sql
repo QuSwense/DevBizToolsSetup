@@ -77,7 +77,7 @@ BEGIN
             [RuleTypeId] = ISNULL(@RuleTypeId, [RuleTypeId]),
             [Description] = ISNULL(@Description, [Description]),
             [IsActive] = ISNULL(@IsActive, [IsActive]),
-            [LastUpdatedDate] = GETDATE(),
+            [LastUpdatedAt] = GETDATE(),
             [LastUpdatedBy] = @ResolvedUser
         WHERE [Id] = @ContextObjectId;
 
@@ -117,9 +117,9 @@ BEGIN
             [RuleTypeId],
             [Description],
             [IsActive],
-            [CreatedDate],
+            [CreatedAt],
             [CreatedBy],
-            [LastUpdatedDate],
+            [LastUpdatedAt],
             [LastUpdatedBy],
             @ActivityId AS AuditActivityId
         FROM [dbo].[RuleContextObjects]

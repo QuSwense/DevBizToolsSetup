@@ -39,3 +39,16 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks] (
     CONSTRAINT FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceResponseFiles_ServiceResponseFileId
         FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestCaseId
+    ON [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks]([ServiceTestCaseId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceResponseFileId
+    ON [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks]([ServiceResponseFileId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAuditTestCaseLinks_ExecutedBy
+    ON [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks]([ExecutedBy] ASC)
+GO

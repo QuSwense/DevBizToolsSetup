@@ -33,6 +33,7 @@
     <None Include="Seeds\RolePermissionsSeed.sql" />
     <None Include="Seeds\UIPagesSeed.sql" />
     <None Include="Seeds\UIActionsSeed.sql" />
+    <None Include="Seeds\UserRolesSeed.sql" />
   </ItemGroup>
   <Target Name="BeforeBuild">
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />

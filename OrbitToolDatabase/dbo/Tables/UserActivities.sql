@@ -20,11 +20,21 @@ CREATE TABLE [dbo].[UserActivities] (
     -- JSON string representing the activities performed by the user, including feature names and actions
     [FeatureActivitiesJson] NVARCHAR(MAX) NULL,
     -- Timestamp of when the activity was logged, defaulting to the current date and time
-    [Timestamp] DATETIME NOT NULL CONSTRAINT DF_UserActivities_Timestamp DEFAULT GETDATE(),
+    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_UserActivities_CreatedAt DEFAULT GETDATE(),
 
     CONSTRAINT PK_UserActivities PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_UserActivities_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT CK_UserActivities_FeatureActivitiesJson CHECK ([FeatureActivitiesJson] IS NULL OR ISJSON([FeatureActivitiesJson]) = 1),
 
-    CONSTRAINT FK_UserActivities_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]) ON DELETE CASCADE
+    -- NO ACTION: audit history must survive deletion of the user it refers to.
+    CONSTRAINT FK_UserActivities_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]) ON DELETE NO ACTION
 )
+GO
+
+CREATE NONCLUSTERED INDEX IX_UserActivities_UserId_CreatedAt
+    ON [dbo].[UserActivities]([UserId] ASC, [CreatedAt] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX IX_UserActivities_ActivityType
+    ON [dbo].[UserActivities]([ActivityType] ASC)
+GO

@@ -2,9 +2,8 @@
     RunSeeds.sql - Execute all seed scripts in the correct FK-dependent order
 
     This script inserts seed data into all reference/lookup tables in the proper
-    order to respect foreign key constraints. It handles the circular FK dependency
-    between Users and Roles by inserting the SYSTEM user with NULL references first,
-    then updating after Roles are seeded.
+    order to respect foreign key constraints. Role assignments are seeded through
+    the UserRoles junction table after both Users and Roles exist.
 
     Usage:
         SQLCMDPASSWORD='...' sqlcmd -S localhost,1433 -U sa -C -d OrbitTool -b -i RunSeeds.sql
@@ -27,7 +26,7 @@ PRINT '========================================';
 PRINT '';
 
 -- ============================================
--- Step 1: Seed Users (SYSTEM user with NULL RoleId/CreatedBy to break circular FK)
+-- Step 1: Seed Users (SYSTEM user with CreatedBy = NULL)
 -- ============================================
 PRINT 'Step 1/9: Seeding Users...';
 :r ../Seeds/UsersSeed.sql
@@ -43,15 +42,11 @@ PRINT '  Roles seed completed.';
 PRINT '';
 
 -- ============================================
--- Step 3: Update SYSTEM user's RoleId to Developer
---          (circular FK resolved after Roles exist)
+-- Step 3: Seed UserRoles (links seeded users to seeded roles)
 -- ============================================
-PRINT 'Step 3/9: Updating SYSTEM user RoleId...';
-UPDATE [dbo].[Users]
-SET [RoleId] = (SELECT [Id] FROM [dbo].[Roles] WHERE [Name] = N'Developer')
-WHERE [UserId] = 'SYSTEM'
-  AND [RoleId] IS NULL;
-PRINT '  SYSTEM user RoleId updated.';
+PRINT 'Step 3/9: Seeding UserRoles...';
+:r ../Seeds/UserRolesSeed.sql
+PRINT '  UserRoles seed completed.';
 PRINT '';
 
 -- ============================================

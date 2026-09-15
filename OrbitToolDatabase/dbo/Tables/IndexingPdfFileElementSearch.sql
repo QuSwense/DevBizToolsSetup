@@ -14,8 +14,13 @@ CREATE TABLE [dbo].[IndexingPdfFileElementSearch]
     [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
     
     CONSTRAINT [PK_IndexingPdfFileElementSearch] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
+    CONSTRAINT [UQ_IndexingPdfFileElementSearch_Element_Value] UNIQUE ([IndexingPdfFileElementId] ASC, [ElementValue] ASC),
 
     CONSTRAINT [FK_IndexingPdfFileElementSearch_IndexingPdfFileElements] 
         FOREIGN KEY ([IndexingPdfFileElementId]) REFERENCES [dbo].[IndexingPdfFileElements]([Id]) ON DELETE CASCADE
 );
+GO
+
+CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementSearch_ElementId]
+    ON [dbo].[IndexingPdfFileElementSearch]([IndexingPdfFileElementId] ASC)
 GO
