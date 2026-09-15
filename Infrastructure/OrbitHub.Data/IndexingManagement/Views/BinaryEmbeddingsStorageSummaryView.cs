@@ -8,15 +8,26 @@ namespace OrbitHub.Data.IndexingManagement.Views;
 public class BinaryEmbeddingsStorageSummaryView
 {
     public int TotalEmbeddings { get; set; }
+
     public long? TotalUncompressedSize { get; set; }
+
     public long? TotalCompressedSize { get; set; }
+
     public long? TotalCompressionSavings { get; set; }
+
     public decimal? CompressionSavingsPercent { get; set; }
+
     public int CompressionTypesUsed { get; set; }
+
     public int FileFormatsUsed { get; set; }
+
     public long? MinSize { get; set; }
+
     public long? MaxSize { get; set; }
+
     public long? AvgSize { get; set; }
+
     public string TotalUncompressedSizeHuman { get; set; } = string.Empty;
+
     public string TotalCompressedSizeHuman { get; set; } = string.Empty;
 }

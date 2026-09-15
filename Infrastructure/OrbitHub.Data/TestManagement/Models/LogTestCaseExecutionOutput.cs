@@ -8,5 +8,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class LogTestCaseExecutionOutput
 {
     public int? ExecutionLinkId { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

@@ -6,10 +6,16 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record GetDirectExecutionAuditByIdOutput
 {
     public required int Id { get; init; }
+
     public required string Name { get; init; }
+
     public required DateTime ExecutedAt { get; init; }
+
     public required string ExecutionStatus { get; init; }
+
     public DateTime? ExecutionCompletedAt { get; init; }
+
     public string? ExecutionDetails { get; init; }
+
     public required string ExecutedBy { get; init; }
 }

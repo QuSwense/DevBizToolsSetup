@@ -8,11 +8,18 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceTestSuiteOutput
 {
     public int? TestSuiteId { get; set; }
+
     public string? Name { get; set; }
+
     public string? Description { get; set; }
+
     public bool? IsActive { get; set; }
+
     public string? RecordVersion { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

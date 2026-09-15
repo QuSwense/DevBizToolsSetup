@@ -8,5 +8,6 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class GetServiceAppPermissionsInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

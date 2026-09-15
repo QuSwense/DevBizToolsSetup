@@ -23,6 +23,12 @@ public partial class RuleExecutionLog
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related RuleSets record.
 	/// </summary>
 	[Column("RuleSetId")]
@@ -44,13 +50,13 @@ public partial class RuleExecutionLog
 	/// Size of the rule input content before compression, in bytes.
 	/// </summary>
 	[Column("InputUncompressedSizeBytes")]
-	public int? InputUncompressedSizeBytes { get; set; } // int
+	public long? InputUncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
 	/// Size of the rule output content before compression, in bytes.
 	/// </summary>
 	[Column("OutputUncompressedSizeBytes")]
-	public int? OutputUncompressedSizeBytes { get; set; } // int
+	public long? OutputUncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
 	/// Algorithm used to compress the stored content.

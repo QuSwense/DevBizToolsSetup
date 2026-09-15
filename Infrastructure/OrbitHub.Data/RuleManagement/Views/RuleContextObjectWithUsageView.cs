@@ -8,18 +8,32 @@ namespace OrbitHub.Data.RuleManagement.Views;
 public class RuleContextObjectWithUsageView
 {
     public long ContextObjectId { get; set; }
+
     public string ContextName { get; set; } = string.Empty;
+
     public int? RuleTypeId { get; set; }
+
     public string? Description { get; set; }
+
     public bool? IsActive { get; set; }
+
     public DateTime? CreatedDate { get; set; }
+
     public string? CreatedBy { get; set; }
+
     public DateTime? LastUpdatedDate { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public int UsedAsOutputCount { get; set; }
+
     public int UsedAsContextCount { get; set; }
+
     public int TotalUsage { get; set; }
+
     public string? OutputRuleSets { get; set; }
+
     public string? LinkedRuleSets { get; set; }
+
     public int AgeDays { get; set; }
 }

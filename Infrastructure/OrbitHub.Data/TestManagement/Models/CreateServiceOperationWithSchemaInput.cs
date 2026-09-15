@@ -6,13 +6,22 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record CreateServiceOperationWithSchemaInput
 {
     public required int ServiceApplicationId { get; init; }
+
     public required string OperationName { get; init; }
+
     public string? EndpointOrAction { get; init; }
+
     public string? HttpMethod { get; init; }
+
     public string? Description { get; init; }
+
     public string? InputRootElementName { get; init; }
+
     public string? OutputRootElementName { get; init; }
+
     public string? TargetNamespace { get; init; }
+
     public byte[]? CompressedSchemaContent { get; init; }
+
     public string? UserId { get; init; }
 }

@@ -8,6 +8,8 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class UnlinkRuleSetFromContextObjectOutput
 {
     public int? LinkId { get; set; }
+
     public string? Message { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

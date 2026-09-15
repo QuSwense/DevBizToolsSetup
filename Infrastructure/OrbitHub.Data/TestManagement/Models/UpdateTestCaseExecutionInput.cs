@@ -8,12 +8,20 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateTestCaseExecutionInput
 {
     public int ExecutionLinkId { get; set; } = default!;
+
     public int? HttpStatusCode { get; set; } = default!;
+
     public int? HttpRequestDurationMs { get; set; } = default!;
+
     public string? HttpResponseHeaders { get; set; } = default!;
+
     public string? HttpContentType { get; set; } = default!;
+
     public long? HttpContentLength { get; set; } = default!;
+
     public string? ExecutionStatus { get; set; } = default!;
+
     public string? ExecutionDetails { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

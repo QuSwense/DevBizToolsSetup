@@ -8,12 +8,20 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class CreateServiceApplicationInput
 {
     public string ServiceType { get; set; } = default!;
+
     public Guid? ServiceAppAuthenticationId { get; set; } = default!;
+
     public string Name { get; set; } = default!;
+
     public string BaseUrl { get; set; } = default!;
+
     public string? DefinitionType { get; set; } = default!;
+
     public string? DefinitionRelativeUrl { get; set; } = default!;
+
     public string? HealthcheckRelativeUrl { get; set; } = default!;
+
     public string? Description { get; set; } = default!;
+
     public string UserId { get; set; } = default!;
 }

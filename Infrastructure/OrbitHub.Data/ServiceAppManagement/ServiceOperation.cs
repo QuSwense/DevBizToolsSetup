@@ -24,10 +24,22 @@ public partial class ServiceOperation
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related ServiceApplications record.
 	/// </summary>
 	[Column("ServiceApplicationId")]
 	public int ServiceApplicationId { get; set; } // int
+
+	/// <summary>
+	/// Identifier of the related ServiceDefinitionSyncs record.
+	/// </summary>
+	[Column("ServiceDefinitionSyncId")]
+	public int? ServiceDefinitionSyncId { get; set; } // int
 
 	/// <summary>
 	/// SOAP operation name or REST endpoint name.
@@ -101,6 +113,12 @@ public partial class ServiceOperation
 	/// </summary>
 	[Association(CanBeNull = false, ThisKey = nameof(ServiceApplicationId), OtherKey = nameof(ServiceAppManagement.ServiceApplication.Id))]
 	public ServiceApplication ServiceApplication { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceOperations_ServiceDefinitionSyncs_ServiceDefinitionSyncId
+	/// </summary>
+	[Association(ThisKey = nameof(ServiceDefinitionSyncId), OtherKey = nameof(ServiceAppManagement.ServiceDefinitionSync.Id))]
+	public ServiceDefinitionSync? ServiceDefinitionSync { get; set; }
 
 	/// <summary>
 	/// FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId backreference

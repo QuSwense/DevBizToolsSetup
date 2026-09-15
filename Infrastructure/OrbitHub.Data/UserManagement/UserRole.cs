@@ -11,13 +11,13 @@ using System;
 #pragma warning disable 1573, 1591
 #nullable enable
 
-namespace OrbitHub.Data.TestManagement;
+namespace OrbitHub.Data.UserManagement;
 
-[Table("ServiceTestCaseRuleSetLinks")]
-public partial class ServiceTestCaseRuleSetLink
+[Table("UserRoles")]
+public partial class UserRole
 {
 	/// <summary>
-	/// Unique identifier for this ServiceTestCaseRuleSetLinks record.
+	/// Unique identifier for this UserRoles record.
 	/// </summary>
 	[Column("Id", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
 	public int Id { get; set; } // int
@@ -29,28 +29,16 @@ public partial class ServiceTestCaseRuleSetLink
 	public Guid PublicId { get; set; } // uniqueidentifier
 
 	/// <summary>
-	/// Identifier of the related ServiceTestCases record.
+	/// Identifier of the related Users record.
 	/// </summary>
-	[Column("ServiceTestCaseId")]
-	public int ServiceTestCaseId { get; set; } // int
+	[Column("UserId", CanBeNull = false)]
+	public string UserId { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// Identifier of the related RuleSets record.
+	/// Identifier of the related Roles record.
 	/// </summary>
-	[Column("RuleSetId")]
-	public int RuleSetId { get; set; } // int
-
-	/// <summary>
-	/// Indicates whether this record is active and available for use.
-	/// </summary>
-	[Column("IsActive")]
-	public bool IsActive { get; set; } // bit
-
-	/// <summary>
-	/// Date and time at which this record was created.
-	/// </summary>
-	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	[Column("RoleId")]
+	public int RoleId { get; set; } // int
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -58,11 +46,23 @@ public partial class ServiceTestCaseRuleSetLink
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
+	/// <summary>
+	/// Date and time at which this record was created.
+	/// </summary>
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
+
 	#region Associations
 	/// <summary>
-	/// FK_ServiceTestCaseRuleSetLinks_ServiceTestCases_ServiceTestCaseId
+	/// FK_UserRoles_Users_CreatedBy
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(ServiceTestCaseId), OtherKey = nameof(TestManagement.ServiceTestCase.Id))]
-	public ServiceTestCase ServiceTestCase { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(CreatedBy), OtherKey = nameof(UserManagement.User.UserId))]
+	public User UsersCreatedBy { get; set; } = null!;
+
+	/// <summary>
+	/// FK_UserRoles_Users_UserId
+	/// </summary>
+	[Association(CanBeNull = false, ThisKey = nameof(UserId), OtherKey = nameof(UserManagement.User.UserId))]
+	public User User { get; set; } = null!;
 	#endregion
 }

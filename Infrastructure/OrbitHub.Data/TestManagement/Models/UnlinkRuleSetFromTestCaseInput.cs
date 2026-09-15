@@ -8,5 +8,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UnlinkRuleSetFromTestCaseInput
 {
     public int LinkId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

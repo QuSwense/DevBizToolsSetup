@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetSoapNamespacesInput
 {
     public int? ServiceOperationSchemaId { get; set; } = default!;
+
     public int? NamespaceId { get; set; } = default!;
+
     public bool? IncludeContent { get; set; } = default!;
 }

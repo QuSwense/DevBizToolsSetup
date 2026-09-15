@@ -19,15 +19,24 @@ namespace OrbitHub.Data.ServiceAppManagement;
 
 public partial class ServiceAppDbContext : DataConnection
 {
-    public ServiceAppDbContext() => InitDataContext();
+	public ServiceAppDbContext()
+	{
+		InitDataContext();
+	}
 
-    public ServiceAppDbContext(string configuration)
-        : base(configuration) => InitDataContext();
+	public ServiceAppDbContext(string configuration)
+		: base(configuration)
+	{
+		InitDataContext();
+	}
 
-    public ServiceAppDbContext(DataOptions<ServiceAppDbContext> options)
-        : base(options.Options) => InitDataContext();
+	public ServiceAppDbContext(DataOptions<ServiceAppDbContext> options)
+		: base(options.Options)
+	{
+		InitDataContext();
+	}
 
-    partial void InitDataContext();
+	partial void InitDataContext();
 
 	public ITable<DirectExecutionAudit>                 DirectExecutionAudits                 => this.GetTable<DirectExecutionAudit>();
 
@@ -77,12 +86,12 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static ServiceAppAuthentication? Find(this ITable<ServiceAppAuthentication> table, long id)
+	public static ServiceAppAuthentication? Find(this ITable<ServiceAppAuthentication> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<ServiceAppAuthentication?> FindAsync(this ITable<ServiceAppAuthentication> table, long id, CancellationToken cancellationToken = default)
+	public static Task<ServiceAppAuthentication?> FindAsync(this ITable<ServiceAppAuthentication> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}

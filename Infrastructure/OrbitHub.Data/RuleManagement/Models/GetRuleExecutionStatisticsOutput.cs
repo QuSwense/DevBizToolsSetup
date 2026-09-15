@@ -8,16 +8,28 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class GetRuleExecutionStatisticsOutput
 {
     public int? RuleSetId { get; set; }
+
     public string? WorkflowName { get; set; }
+
     public int? TotalExecutions { get; set; }
+
     public int? SuccessfulExecutions { get; set; }
+
     public int? FailedExecutions { get; set; }
+
     public decimal? AvgExecutionTimeMs { get; set; }
+
     public int? MinExecutionTimeMs { get; set; }
+
     public int? MaxExecutionTimeMs { get; set; }
+
     public decimal? AvgInputSize { get; set; }
+
     public decimal? AvgOutputSize { get; set; }
+
     public decimal? SuccessRate { get; set; }
+
     public string? DailyBreakdown { get; set; }
+
     public string? RecentExecutions { get; set; }
 }

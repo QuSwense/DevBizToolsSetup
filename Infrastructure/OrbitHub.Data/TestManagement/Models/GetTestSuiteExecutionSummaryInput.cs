@@ -8,5 +8,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetTestSuiteExecutionSummaryInput
 {
     public int ServiceTestSuiteId { get; set; } = default!;
+
     public int? DaysBack { get; set; } = default!;
 }

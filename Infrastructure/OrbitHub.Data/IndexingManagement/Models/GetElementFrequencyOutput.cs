@@ -8,10 +8,16 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetElementFrequencyOutput
 {
     public string? ElementType { get; set; }
+
     public string? KeyPath { get; set; }
+
     public string? ElementValue { get; set; }
+
     public int? RequestFileCount { get; set; }
+
     public int? ResponseFileCount { get; set; }
+
     public int? TotalMappings { get; set; }
+
     public int? TotalFileCount { get; set; }
 }

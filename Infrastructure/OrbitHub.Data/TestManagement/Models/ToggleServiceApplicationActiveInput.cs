@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class ToggleServiceApplicationActiveInput
 {
     public Guid PublicId { get; set; } = default!;
+
     public string UserId { get; set; } = default!;
+
     public bool IsActive { get; set; } = default!;
 }

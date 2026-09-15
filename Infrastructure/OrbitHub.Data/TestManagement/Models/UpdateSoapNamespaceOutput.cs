@@ -8,12 +8,20 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateSoapNamespaceOutput
 {
     public int? NamespaceId { get; set; }
+
     public byte[]? CompressedContent { get; set; }
+
     public int? UncompressedSizeBytes { get; set; }
+
     public string? CompressionAlgorithmType { get; set; }
+
     public string? ContentHash { get; set; }
+
     public string? RecordVersion { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

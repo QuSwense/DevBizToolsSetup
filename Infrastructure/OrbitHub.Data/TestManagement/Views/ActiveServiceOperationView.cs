@@ -8,12 +8,20 @@ namespace OrbitHub.Data.TestManagement.Views;
 public class ActiveServiceOperationView
 {
     public long OperationId { get; set; }
+
     public string OperationName { get; set; } = string.Empty;
+
     public string? EndpointOrAction { get; set; }
+
     public string? HttpMethod { get; set; }
+
     public string? Description { get; set; }
+
     public string ServicePublicId { get; set; } = string.Empty;
+
     public string ServiceName { get; set; } = string.Empty;
+
     public string ServiceType { get; set; } = string.Empty;
+
     public string DisplayName { get; set; } = string.Empty;
 }

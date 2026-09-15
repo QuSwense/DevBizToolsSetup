@@ -19,15 +19,24 @@ namespace OrbitHub.Data.PermissionsManagement;
 
 public partial class PermissionsDbContext : DataConnection
 {
-    public PermissionsDbContext() => InitDataContext();
+	public PermissionsDbContext()
+	{
+		InitDataContext();
+	}
 
-    public PermissionsDbContext(string configuration)
-        : base(configuration) => InitDataContext();
+	public PermissionsDbContext(string configuration)
+		: base(configuration)
+	{
+		InitDataContext();
+	}
 
-    public PermissionsDbContext(DataOptions<PermissionsDbContext> options)
-        : base(options.Options) => InitDataContext();
+	public PermissionsDbContext(DataOptions<PermissionsDbContext> options)
+		: base(options.Options)
+	{
+		InitDataContext();
+	}
 
-    partial void InitDataContext();
+	partial void InitDataContext();
 
 	public ITable<ResourcePermission>            ResourcePermissions            => this.GetTable<ResourcePermission>();
 

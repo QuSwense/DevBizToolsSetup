@@ -39,7 +39,7 @@ public partial class ServiceApplication
 	/// Identifier of the related ServiceAppAuthentications record.
 	/// </summary>
 	[Column("ServiceAppAuthenticationId")]
-	public long? ServiceAppAuthenticationId { get; set; } // bigint
+	public int? ServiceAppAuthenticationId { get; set; } // int
 
 	/// <summary>
 	/// Human-readable name of this record.

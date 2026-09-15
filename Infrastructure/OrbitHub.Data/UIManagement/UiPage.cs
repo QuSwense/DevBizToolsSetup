@@ -42,10 +42,10 @@ public partial class UiPage
 	public string Name { get; set; } = null!; // nvarchar(100)
 
 	/// <summary>
-	/// Permission key required to view this page or perform this action.
+	/// Identifier of the related ResourcePermissions record.
 	/// </summary>
-	[Column("RequiredPermissionKey")]
-	public string? RequiredPermissionKey { get; set; } // nvarchar(100)
+	[Column("ResourcePermissionId")]
+	public long ResourcePermissionId { get; set; } // bigint
 
 	/// <summary>
 	/// Name of the feature flag that controls whether this page is visible.

@@ -48,12 +48,6 @@ public partial class User
 	public string? LastName { get; set; } // nvarchar(100)
 
 	/// <summary>
-	/// Identifier of the related Roles record.
-	/// </summary>
-	[Column("RoleId")]
-	public int? RoleId { get; set; } // int
-
-	/// <summary>
 	/// Indicates whether this record is active and available for use.
 	/// </summary>
 	[Column("IsActive")]
@@ -91,25 +85,37 @@ public partial class User
 	public IEnumerable<UserActivity> UserActivities { get; set; } = null!;
 
 	/// <summary>
-	/// FK_Users_CreatedBy_Users
+	/// FK_UserRoles_Users_CreatedBy backreference
+	/// </summary>
+	[Association(ThisKey = nameof(UserId), OtherKey = nameof(UserRole.CreatedBy))]
+	public IEnumerable<UserRole> UserRoles { get; set; } = null!;
+
+	/// <summary>
+	/// FK_UserRoles_Users_UserId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(UserId), OtherKey = nameof(UserRole.UserId))]
+	public IEnumerable<UserRole> UserRoles1 { get; set; } = null!;
+
+	/// <summary>
+	/// FK_Users_Users_CreatedBy
 	/// </summary>
 	[Association(ThisKey = nameof(CreatedBy), OtherKey = nameof(UserId))]
 	public User? CreatedBy1 { get; set; }
 
 	/// <summary>
-	/// FK_Users_CreatedBy_Users backreference
+	/// FK_Users_Users_CreatedBy backreference
 	/// </summary>
 	[Association(ThisKey = nameof(UserId), OtherKey = nameof(CreatedBy))]
 	public IEnumerable<User> Users { get; set; } = null!;
 
 	/// <summary>
-	/// FK_Users_LastUpdatedBy_Users
+	/// FK_Users_Users_LastUpdatedBy
 	/// </summary>
 	[Association(ThisKey = nameof(LastUpdatedBy), OtherKey = nameof(UserId))]
 	public User? LastUpdatedBy1 { get; set; }
 
 	/// <summary>
-	/// FK_Users_LastUpdatedBy_Users backreference
+	/// FK_Users_Users_LastUpdatedBy backreference
 	/// </summary>
 	[Association(ThisKey = nameof(UserId), OtherKey = nameof(LastUpdatedBy))]
 	public IEnumerable<User> Users1 { get; set; } = null!;

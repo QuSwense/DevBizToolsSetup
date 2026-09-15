@@ -8,19 +8,34 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceOperationSchemasOutput
 {
     public int? SchemaId { get; set; }
+
     public int? ServiceDefinitionSyncId { get; set; }
+
     public int? ServiceOperationId { get; set; }
+
     public string? OperationName { get; set; }
+
     public string? InputRootElementName { get; set; }
+
     public string? OutputRootElementName { get; set; }
+
     public string? TargetNamespace { get; set; }
+
     public byte[]? CompressedContent { get; set; }
+
     public int? UncompressedSizeBytes { get; set; }
+
     public string? CompressionAlgorithmType { get; set; }
+
     public string? ContentHash { get; set; }
+
     public string? RecordVersion { get; set; }
+
     public DateTime? CreatedAt { get; set; }
+
     public string? CreatedBy { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
 }

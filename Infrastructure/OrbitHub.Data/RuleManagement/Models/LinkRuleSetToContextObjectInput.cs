@@ -8,6 +8,8 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class LinkRuleSetToContextObjectInput
 {
     public int RuleSetId { get; set; } = default!;
+
     public int RuleContextObjectId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

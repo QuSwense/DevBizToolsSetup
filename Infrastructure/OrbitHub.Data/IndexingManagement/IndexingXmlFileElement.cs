@@ -50,8 +50,8 @@ public partial class IndexingXmlFileElement
 	/// <summary>
 	/// Date and time at which this record was last updated.
 	/// </summary>
-	[Column("UpdatedAt")]
-	public DateTime? UpdatedAt { get; set; } // datetime
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
 
 	#region Associations
 	/// <summary>

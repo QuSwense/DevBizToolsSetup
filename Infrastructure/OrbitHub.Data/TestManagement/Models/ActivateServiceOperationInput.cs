@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class ActivateServiceOperationInput
 {
     public int OperationId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
+
     public string RecordVersion { get; set; } = default!;
 }

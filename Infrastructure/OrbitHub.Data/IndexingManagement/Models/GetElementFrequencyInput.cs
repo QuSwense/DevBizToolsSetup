@@ -8,5 +8,6 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetElementFrequencyInput
 {
     public string? ElementType { get; set; } = default!;
+
     public int? MinFrequency { get; set; } = default!;
 }

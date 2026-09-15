@@ -8,8 +8,12 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class UpsertServiceAppPermissionsInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
+
     public string UserId { get; set; } = default!;
+
     public string PermissionKeys { get; set; } = default!;
+
     public bool? IsGranted { get; set; } = default!;
+
     public string? CreatedBy { get; set; } = default!;
 }

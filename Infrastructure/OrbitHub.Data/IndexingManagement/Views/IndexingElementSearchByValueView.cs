@@ -8,14 +8,24 @@ namespace OrbitHub.Data.IndexingManagement.Views;
 public class IndexingElementSearchByValueView
 {
     public string ElementType { get; set; } = string.Empty;
+
     public long ElementId { get; set; }
+
     public string? KeyPath { get; set; }
+
     public string? ElementValue { get; set; }
+
     public string? ValueType { get; set; }
+
     public long? RequestFileId { get; set; }
+
     public long? ResponseFileId { get; set; }
+
     public string? RequestFileName { get; set; }
+
     public string? ResponseFileName { get; set; }
+
     public string SourceFileType { get; set; } = string.Empty;
+
     public string FileDisplayName { get; set; } = string.Empty;
 }

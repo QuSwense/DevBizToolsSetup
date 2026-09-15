@@ -24,6 +24,12 @@ public partial class RuleContextObject
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Unique name of the rule context object.
 	/// </summary>
 	[Column("ContextName", CanBeNull = false)]
@@ -45,13 +51,13 @@ public partial class RuleContextObject
 	/// Indicates whether this record is active and available for use.
 	/// </summary>
 	[Column("IsActive")]
-	public bool? IsActive { get; set; } // bit
+	public bool IsActive { get; set; } // bit
 
 	/// <summary>
 	/// Date and time at which this record was created.
 	/// </summary>
-	[Column("CreatedDate")]
-	public DateTime? CreatedDate { get; set; } // datetime
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -62,8 +68,8 @@ public partial class RuleContextObject
 	/// <summary>
 	/// Date and time at which this record was last updated.
 	/// </summary>
-	[Column("LastUpdatedDate")]
-	public DateTime? LastUpdatedDate { get; set; } // datetime
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
 
 	/// <summary>
 	/// Identifier of the related Users record.

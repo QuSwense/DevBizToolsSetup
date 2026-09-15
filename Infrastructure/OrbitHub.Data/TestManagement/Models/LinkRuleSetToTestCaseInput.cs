@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class LinkRuleSetToTestCaseInput
 {
     public int ServiceTestCaseId { get; set; } = default!;
+
     public int RuleSetId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

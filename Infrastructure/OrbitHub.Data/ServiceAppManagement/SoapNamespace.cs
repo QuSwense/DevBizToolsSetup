@@ -23,6 +23,12 @@ public partial class SoapNamespace
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related ServiceOperationSchemas record.
 	/// </summary>
 	[Column("ServiceOperationSchemaId")]
@@ -38,7 +44,7 @@ public partial class SoapNamespace
 	/// Size of the file content before compression, in bytes.
 	/// </summary>
 	[Column("UncompressedSizeBytes")]
-	public int? UncompressedSizeBytes { get; set; } // int
+	public long? UncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
 	/// Algorithm used to compress the stored content.

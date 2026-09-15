@@ -8,20 +8,36 @@ namespace OrbitHub.Data.TestManagement.Views;
 public class ServiceTestSuiteExecutionAuditWithDetailsView
 {
     public long AuditId { get; set; }
+
     public long ServiceTestSuiteId { get; set; }
+
     public DateTime ExecutedAt { get; set; }
+
     public DateTime? ExecutionCompletedAt { get; set; }
+
     public string? SuiteExecutionStatus { get; set; }
+
     public string? SuiteExecutionDetails { get; set; }
+
     public string? SuiteExecutedBy { get; set; }
+
     public string SuiteName { get; set; } = string.Empty;
+
     public string? SuiteDescription { get; set; }
+
     public string ExecutedByFullName { get; set; } = string.Empty;
+
     public string ExecutedByEmail { get; set; } = string.Empty;
+
     public string? TestCaseExecutions { get; set; }
+
     public int TotalTestCases { get; set; }
+
     public int SuccessfulTestCases { get; set; }
+
     public int FailedTestCases { get; set; }
+
     public int DurationSeconds { get; set; }
+
     public decimal? AvgResponseTimeMs { get; set; }
 }

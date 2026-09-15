@@ -8,21 +8,38 @@ namespace OrbitHub.Data.TestManagement.Views;
 public class LatestServiceAppAuthenticationView
 {
     public string AuthenticationId { get; set; } = string.Empty;
+
     public long InternalId { get; set; }
+
     public string? AuthenticationName { get; set; }
+
     public string? AuthenticationType { get; set; }
+
     public string? EncryptionAlgorithmType { get; set; }
+
     public string? EncryptedJson { get; set; }
+
     public bool? IsActive { get; set; }
+
     public int? AuthenticationVersion { get; set; }
+
     public DateTime? AuthCreatedAt { get; set; }
+
     public string? AuthCreatedBy { get; set; }
+
     public DateTime? AuthLastUpdatedAt { get; set; }
+
     public string? AuthLastUpdatedBy { get; set; }
+
     public int TotalVersions { get; set; }
+
     public string StatusDescription { get; set; } = string.Empty;
+
     public string DisplayName { get; set; } = string.Empty;
+
     public int ActiveServiceCount { get; set; }
+
     public int TotalServiceCount { get; set; }
+
     public bool IsInUse { get; set; }
 }

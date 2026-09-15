@@ -8,5 +8,6 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class GetUserPermissionsInput
 {
     public string? UserId { get; set; } = default!;
+
     public bool? IncludeInactive { get; set; } = default!;
 }

@@ -32,8 +32,8 @@ public partial class ResourcePermission
 	/// <summary>
 	/// Unique permission key in the form resource:action, such as soapapplication:read.
 	/// </summary>
-	[Column("PermissionKey")]
-	public string? PermissionKey { get; set; } // nvarchar(max)
+	[Column("PermissionKey", CanBeNull = false)]
+	public string PermissionKey { get; set; } = null!; // nvarchar(512)
 
 	/// <summary>
 	/// Date and time at which this record was created.

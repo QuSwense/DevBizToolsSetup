@@ -8,5 +8,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceResponseFilesByRequestInput
 {
     public int RequestFileId { get; set; } = default!;
+
     public bool? IncludeInactive { get; set; } = default!;
 }

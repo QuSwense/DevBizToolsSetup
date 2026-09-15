@@ -8,16 +8,28 @@ namespace OrbitHub.Data.TestManagement.Views;
 public class ServiceTestSuiteWithDetailsView
 {
     public long TestSuiteId { get; set; }
+
     public string SuiteName { get; set; } = string.Empty;
+
     public string? SuiteDescription { get; set; }
+
     public bool? SuiteIsActive { get; set; }
+
     public int? SuiteVersion { get; set; }
+
     public DateTime? SuiteCreatedAt { get; set; }
+
     public string? SuiteCreatedBy { get; set; }
+
     public DateTime? SuiteLastUpdatedAt { get; set; }
+
     public string? SuiteLastUpdatedBy { get; set; }
+
     public string? TestCases { get; set; }
+
     public int TestCaseCount { get; set; }
+
     public string? LastExecution { get; set; }
+
     public int TotalExecutions { get; set; }
 }

@@ -8,7 +8,10 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class RemoveServiceAppPermissionsInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
+
     public string UserId { get; set; } = default!;
+
     public string? PermissionKeys { get; set; } = default!;
+
     public string? CreatedBy { get; set; } = default!;
 }

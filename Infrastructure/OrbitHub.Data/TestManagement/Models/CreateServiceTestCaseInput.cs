@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class CreateServiceTestCaseInput
 {
     public string Name { get; set; } = default!;
+
     public int? ServiceRequestFileId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

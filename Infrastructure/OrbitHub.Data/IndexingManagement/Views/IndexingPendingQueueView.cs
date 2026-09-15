@@ -8,11 +8,18 @@ namespace OrbitHub.Data.IndexingManagement.Views;
 public class IndexingPendingQueueView
 {
     public string FileType { get; set; } = string.Empty;
+
     public long FileId { get; set; }
+
     public string FileName { get; set; } = string.Empty;
+
     public string? FileFormat { get; set; }
+
     public string IndexingStatus { get; set; } = string.Empty;
+
     public DateTime? LastIndexedAt { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
     public string? IndexingFailureReason { get; set; }
 }

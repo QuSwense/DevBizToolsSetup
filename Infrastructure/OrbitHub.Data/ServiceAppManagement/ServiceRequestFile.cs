@@ -24,6 +24,12 @@ public partial class ServiceRequestFile
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related ServiceOperations record.
 	/// </summary>
 	[Column("ServiceOperationId")]
@@ -48,13 +54,13 @@ public partial class ServiceRequestFile
 	public bool IsBaseSnapshot { get; set; } // bit
 
 	/// <summary>
-	/// Identifier of the base snapshot record in the delta chain.
+	/// Identifier of the related ServiceRequestFiles record.
 	/// </summary>
 	[Column("ParentBaseId")]
 	public int? ParentBaseId { get; set; } // int
 
 	/// <summary>
-	/// Identifier of the immediate predecessor record in the delta chain.
+	/// Identifier of the related ServiceRequestFiles record.
 	/// </summary>
 	[Column("ParentDeltaId")]
 	public int? ParentDeltaId { get; set; } // int
@@ -75,7 +81,7 @@ public partial class ServiceRequestFile
 	/// Size of the file content before compression, in bytes.
 	/// </summary>
 	[Column("UncompressedSizeBytes")]
-	public int? UncompressedSizeBytes { get; set; } // int
+	public long? UncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
 	/// Algorithm used to compress the stored content.
@@ -137,6 +143,30 @@ public partial class ServiceRequestFile
 	/// </summary>
 	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceRequestFileEmbedding.ServiceRequestFileId))]
 	public IEnumerable<ServiceRequestFileEmbedding> ServiceRequestFileEmbeddings { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceRequestFiles_ParentBaseId
+	/// </summary>
+	[Association(ThisKey = nameof(ParentBaseId), OtherKey = nameof(Id))]
+	public ServiceRequestFile? ParentBase { get; set; }
+
+	/// <summary>
+	/// FK_ServiceRequestFiles_ParentBaseId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ParentBaseId))]
+	public IEnumerable<ServiceRequestFile> ServiceRequestFiles { get; set; } = null!;
+
+	/// <summary>
+	/// FK_ServiceRequestFiles_ParentDeltaId
+	/// </summary>
+	[Association(ThisKey = nameof(ParentDeltaId), OtherKey = nameof(Id))]
+	public ServiceRequestFile? ParentDelta { get; set; }
+
+	/// <summary>
+	/// FK_ServiceRequestFiles_ParentDeltaId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ParentDeltaId))]
+	public IEnumerable<ServiceRequestFile> ServiceRequestFiles1 { get; set; } = null!;
 
 	/// <summary>
 	/// FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId

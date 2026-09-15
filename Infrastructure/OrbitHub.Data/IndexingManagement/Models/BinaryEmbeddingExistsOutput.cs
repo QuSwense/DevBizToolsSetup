@@ -8,5 +8,6 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class BinaryEmbeddingExistsOutput
 {
     public bool? Exists { get; set; }
+
     public int? EmbeddingId { get; set; }
 }

@@ -8,13 +8,22 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceResponseFileInput
 {
     public int ResponseFileId { get; set; } = default!;
+
     public string? Name { get; set; } = default!;
+
     public string? FileFormat { get; set; } = default!;
+
     public byte[]? CompressedData { get; set; } = default!;
+
     public int? UncompressedSizeBytes { get; set; } = default!;
+
     public string? CompressionAlgorithmType { get; set; } = default!;
+
     public string? FileHash { get; set; } = default!;
+
     public bool? IsActive { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
+
     public string RecordVersion { get; set; } = default!;
 }

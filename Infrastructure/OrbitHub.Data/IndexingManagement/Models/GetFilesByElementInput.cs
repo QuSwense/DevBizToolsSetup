@@ -8,7 +8,10 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetFilesByElementInput
 {
     public string ElementType { get; set; } = default!;
+
     public string KeyPath { get; set; } = default!;
+
     public string? ElementValue { get; set; } = default!;
+
     public bool? IncludeContent { get; set; } = default!;
 }

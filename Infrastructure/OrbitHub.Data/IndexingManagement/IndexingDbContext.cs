@@ -19,15 +19,24 @@ namespace OrbitHub.Data.IndexingManagement;
 
 public partial class IndexingDbContext : DataConnection
 {
-    public IndexingDbContext() => InitDataContext();
+	public IndexingDbContext()
+	{
+		InitDataContext();
+	}
 
-    public IndexingDbContext(string configuration)
-        : base(configuration) => InitDataContext();
+	public IndexingDbContext(string configuration)
+		: base(configuration)
+	{
+		InitDataContext();
+	}
 
-    public IndexingDbContext(DataOptions<IndexingDbContext> options)
-        : base(options.Options) => InitDataContext();
+	public IndexingDbContext(DataOptions<IndexingDbContext> options)
+		: base(options.Options)
+	{
+		InitDataContext();
+	}
 
-    partial void InitDataContext();
+	partial void InitDataContext();
 
 	public ITable<BinaryEmbeddingsStore>          BinaryEmbeddingsStores          => this.GetTable<BinaryEmbeddingsStore>();
 

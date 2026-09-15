@@ -25,7 +25,7 @@ public partial class IndexingPdfFileElementMapping
 	/// Identifier of the related BinaryEmbeddingsStore record.
 	/// </summary>
 	[Column("BinaryEmbeddingsStoreId")]
-	public int? BinaryEmbeddingsStoreId { get; set; } // int
+	public int BinaryEmbeddingsStoreId { get; set; } // int
 
 	/// <summary>
 	/// Identifier of the related IndexingPdfFileElementSearch record.
@@ -37,8 +37,8 @@ public partial class IndexingPdfFileElementMapping
 	/// <summary>
 	/// FK_IndexingPdfFileElementMappings_BinaryEmbeddingsStore
 	/// </summary>
-	[Association(ThisKey = nameof(BinaryEmbeddingsStoreId), OtherKey = nameof(IndexingManagement.BinaryEmbeddingsStore.Id))]
-	public BinaryEmbeddingsStore? BinaryEmbeddingsStore { get; set; }
+	[Association(CanBeNull = false, ThisKey = nameof(BinaryEmbeddingsStoreId), OtherKey = nameof(IndexingManagement.BinaryEmbeddingsStore.Id))]
+	public BinaryEmbeddingsStore BinaryEmbeddingsStore { get; set; } = null!;
 
 	/// <summary>
 	/// FK_IndexingPdfFileElementMappings_IndexingPdfFileElementSearch

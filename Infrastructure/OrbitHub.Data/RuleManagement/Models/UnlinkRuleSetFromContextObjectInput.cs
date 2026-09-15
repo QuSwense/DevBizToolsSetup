@@ -8,5 +8,6 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class UnlinkRuleSetFromContextObjectInput
 {
     public int LinkId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

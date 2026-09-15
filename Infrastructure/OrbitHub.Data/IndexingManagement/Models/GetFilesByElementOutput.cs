@@ -8,11 +8,18 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetFilesByElementOutput
 {
     public int? RequestFileId { get; set; }
+
     public int? ResponseFileId { get; set; }
+
     public string? RequestFileName { get; set; }
+
     public string? ResponseFileName { get; set; }
+
     public string? KeyPath { get; set; }
+
     public string? ElementValue { get; set; }
+
     public byte[]? FileContent { get; set; }
+
     public string? ValueType { get; set; }
 }

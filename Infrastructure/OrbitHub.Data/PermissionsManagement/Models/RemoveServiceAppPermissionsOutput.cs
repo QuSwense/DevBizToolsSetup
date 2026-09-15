@@ -8,18 +8,32 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class RemoveServiceAppPermissionsOutput
 {
     public long? PermissionId { get; set; }
+
     public Guid? PermissionPublicId { get; set; }
+
     public string? UserId { get; set; }
+
     public string? UserFullName { get; set; }
+
     public string? UserEmail { get; set; }
+
     public bool? IsGranted { get; set; }
+
     public string? PermissionKey { get; set; }
+
     public long? ResourcePermissionId { get; set; }
+
     public DateTime? PermissionCreatedAt { get; set; }
+
     public string? PermissionCreatedBy { get; set; }
+
     public DateTime? PermissionLastUpdatedAt { get; set; }
+
     public string? PermissionLastUpdatedBy { get; set; }
+
     public Guid? ServicePublicId { get; set; }
+
     public string? ServiceName { get; set; }
+
     public string? ServiceVersion { get; set; }
 }

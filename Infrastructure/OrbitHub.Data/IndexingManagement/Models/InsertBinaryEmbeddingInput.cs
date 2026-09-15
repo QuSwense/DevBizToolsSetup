@@ -8,9 +8,14 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class InsertBinaryEmbeddingInput
 {
     public string FileHash { get; set; } = default!;
+
     public byte[]? CompressedData { get; set; } = default!;
+
     public int UncompressedSizeBytes { get; set; } = default!;
+
     public string CompressionAlgorithmType { get; set; } = default!;
+
     public string? FileFormat { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

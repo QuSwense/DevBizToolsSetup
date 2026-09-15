@@ -8,13 +8,22 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class InsertServiceRequestFileEmbeddingOutput
 {
     public int? EmbeddingId { get; set; }
+
     public int? ServiceRequestFileId { get; set; }
+
     public int? BinaryEmbeddingsStoreId { get; set; }
+
     public string? Name { get; set; }
+
     public string? FileHash { get; set; }
+
     public bool? IsActive { get; set; }
+
     public DateTime? CreatedAt { get; set; }
+
     public string? CreatedBy { get; set; }
+
     public bool? IsExisting { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

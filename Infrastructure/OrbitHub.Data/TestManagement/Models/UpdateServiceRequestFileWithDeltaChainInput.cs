@@ -6,10 +6,16 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record UpdateServiceRequestFileWithDeltaChainInput
 {
     public required int FileId { get; init; }
+
     public required byte[] CompressedData { get; init; }
+
     public int? UncompressedSizeBytes { get; init; }
+
     public string? CompressionAlgorithmType { get; init; }
+
     public string? ContentHash { get; init; }
+
     public byte[]? BackwardDiffData { get; init; }
+
     public string? UserId { get; init; }
 }

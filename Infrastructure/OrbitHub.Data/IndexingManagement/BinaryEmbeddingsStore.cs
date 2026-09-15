@@ -24,10 +24,16 @@ public partial class BinaryEmbeddingsStore
 	public int Id { get; set; } // int
 
 	/// <summary>
-	/// SHA-256 hash of the stored file content.
+	/// Public identifier used by the UI and external systems (GUID).
 	/// </summary>
-	[Column("FileHash", CanBeNull = false)]
-	public string FileHash { get; set; } = null!; // varchar(64)
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
+	/// SHA-256 hash of the stored content for integrity verification.
+	/// </summary>
+	[Column("ContentHash", CanBeNull = false)]
+	public string ContentHash { get; set; } = null!; // varchar(64)
 
 	/// <summary>
 	/// Compressed binary content stored for this record.
@@ -39,19 +45,19 @@ public partial class BinaryEmbeddingsStore
 	/// Size of the file content before compression, in bytes.
 	/// </summary>
 	[Column("UncompressedSizeBytes")]
-	public int UncompressedSizeBytes { get; set; } // int
+	public long UncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
 	/// Algorithm used to compress the stored content.
 	/// </summary>
-	[Column("CompressionAlgorithmType", CanBeNull = false)]
-	public string CompressionAlgorithmType { get; set; } = null!; // varchar(50)
+	[Column("CompressionAlgorithmType")]
+	public string? CompressionAlgorithmType { get; set; } // varchar(50)
 
 	/// <summary>
-	/// Format of the stored file payload, such as XML, JSON, PDF, or BINARY.
+	/// Format of the stored binary content, such as XML, JSON, PDF, or BINARY.
 	/// </summary>
-	[Column("FileFormat")]
-	public string? FileFormat { get; set; } // varchar(10)
+	[Column("ContentFormat")]
+	public string? ContentFormat { get; set; } // varchar(10)
 
 	/// <summary>
 	/// Date and time at which this record was created.

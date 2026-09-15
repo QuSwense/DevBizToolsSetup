@@ -8,5 +8,6 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class GetRuleExecutionStatisticsInput
 {
     public int RuleSetId { get; set; } = default!;
+
     public int? DaysBack { get; set; } = default!;
 }

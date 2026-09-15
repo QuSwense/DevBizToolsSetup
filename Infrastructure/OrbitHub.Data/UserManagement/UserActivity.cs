@@ -23,6 +23,12 @@ public partial class UserActivity
 	public long Id { get; set; } // bigint
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("UserId", CanBeNull = false)]
@@ -47,10 +53,10 @@ public partial class UserActivity
 	public string? FeatureActivitiesJson { get; set; } // nvarchar(max)
 
 	/// <summary>
-	/// Date and time at which the user activity was recorded.
+	/// Date and time at which this record was created.
 	/// </summary>
-	[Column("Timestamp")]
-	public DateTime Timestamp { get; set; } // datetime
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime
 
 	#region Associations
 	/// <summary>

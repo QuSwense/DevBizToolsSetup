@@ -8,5 +8,6 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetBinaryEmbeddingByIdInput
 {
     public int EmbeddingId { get; set; } = default!;
+
     public bool? IncludeData { get; set; } = default!;
 }

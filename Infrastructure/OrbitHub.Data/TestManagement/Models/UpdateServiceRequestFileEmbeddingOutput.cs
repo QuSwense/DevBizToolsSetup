@@ -8,10 +8,16 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceRequestFileEmbeddingOutput
 {
     public int? EmbeddingId { get; set; }
+
     public string? Name { get; set; }
+
     public string? FileHash { get; set; }
+
     public bool? IsActive { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

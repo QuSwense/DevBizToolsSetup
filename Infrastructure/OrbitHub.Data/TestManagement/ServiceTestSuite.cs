@@ -24,6 +24,12 @@ public partial class ServiceTestSuite
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Human-readable name of this record.
 	/// </summary>
 	[Column("Name", CanBeNull = false)]
@@ -33,7 +39,7 @@ public partial class ServiceTestSuite
 	/// Optional human-readable description of this record.
 	/// </summary>
 	[Column("Description")]
-	public string? Description { get; set; } // nvarchar(max)
+	public string? Description { get; set; } // nvarchar(500)
 
 	/// <summary>
 	/// Indicates whether this record is active and available for use.

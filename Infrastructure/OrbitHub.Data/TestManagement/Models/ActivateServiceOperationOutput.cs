@@ -8,7 +8,10 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class ActivateServiceOperationOutput
 {
     public int? OperationId { get; set; }
+
     public string? OperationName { get; set; }
+
     public string? Message { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

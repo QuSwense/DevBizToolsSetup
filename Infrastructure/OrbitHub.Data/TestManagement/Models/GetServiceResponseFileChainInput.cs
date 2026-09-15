@@ -8,5 +8,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceResponseFileChainInput
 {
     public int ResponseFileId { get; set; } = default!;
+
     public bool? IncludeData { get; set; } = default!;
 }

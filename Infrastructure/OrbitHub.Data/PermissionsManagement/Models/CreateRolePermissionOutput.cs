@@ -8,15 +8,26 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class CreateRolePermissionOutput
 {
     public long? RolePermissionId { get; set; }
+
     public int? RoleId { get; set; }
+
     public long? ResourcePermissionId { get; set; }
+
     public bool? IsGranted { get; set; }
+
     public bool? IsActive { get; set; }
+
     public DateTime? CreatedAt { get; set; }
+
     public string? CreatedBy { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public string? PermissionKey { get; set; }
+
     public string? RoleName { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

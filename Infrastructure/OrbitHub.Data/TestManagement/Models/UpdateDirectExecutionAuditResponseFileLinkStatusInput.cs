@@ -6,10 +6,16 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record UpdateDirectExecutionAuditResponseFileLinkStatusInput
 {
     public required int LinkId { get; init; }
+
     public required string ExecutionStatus { get; init; }
+
     public int? HttpStatusCode { get; init; }
+
     public int? HttpRequestDurationMs { get; init; }
+
     public string? HttpContentType { get; init; }
+
     public string? HttpRequestHeaders { get; init; }
+
     public string? HttpResponseHeaders { get; init; }
 }

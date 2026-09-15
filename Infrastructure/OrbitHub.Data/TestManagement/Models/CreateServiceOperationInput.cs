@@ -8,9 +8,14 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class CreateServiceOperationInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
+
     public string OperationName { get; set; } = default!;
+
     public string? EndpointOrAction { get; set; } = default!;
+
     public string? HttpMethod { get; set; } = default!;
+
     public string? Description { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

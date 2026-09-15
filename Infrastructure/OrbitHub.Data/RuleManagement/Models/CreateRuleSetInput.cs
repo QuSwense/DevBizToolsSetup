@@ -8,9 +8,14 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class CreateRuleSetInput
 {
     public string WorkflowName { get; set; } = default!;
+
     public string RuleContent { get; set; } = default!;
+
     public int OutputTypeId { get; set; } = default!;
+
     public string? Description { get; set; } = default!;
+
     public bool? IsActive { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

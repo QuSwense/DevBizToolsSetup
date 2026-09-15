@@ -19,15 +19,24 @@ namespace OrbitHub.Data.RuleManagement;
 
 public partial class RuleDbContext : DataConnection
 {
-    public RuleDbContext() => InitDataContext();
+	public RuleDbContext()
+	{
+		InitDataContext();
+	}
 
-    public RuleDbContext(string configuration)
-        : base(configuration) => InitDataContext();
+	public RuleDbContext(string configuration)
+		: base(configuration)
+	{
+		InitDataContext();
+	}
 
-    public RuleDbContext(DataOptions<RuleDbContext> options)
-        : base(options.Options) => InitDataContext();
+	public RuleDbContext(DataOptions<RuleDbContext> options)
+		: base(options.Options)
+	{
+		InitDataContext();
+	}
 
-    partial void InitDataContext();
+	partial void InitDataContext();
 
 	public ITable<RuleContextObject>        RuleContextObjects        => this.GetTable<RuleContextObject>();
 

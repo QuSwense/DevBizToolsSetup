@@ -8,20 +8,36 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceResponseFileChainOutput
 {
     public int? ResponseFileId { get; set; }
+
     public int? ServiceRequestFileId { get; set; }
+
     public bool? IsBaseSnapshot { get; set; }
+
     public int? ParentBaseId { get; set; }
+
     public int? ParentDeltaId { get; set; }
+
     public int? DeltaDepth { get; set; }
+
     public string? Name { get; set; }
+
     public string? FileFormat { get; set; }
+
     public byte[]? CompressedData { get; set; }
+
     public int? UncompressedSizeBytes { get; set; }
+
     public string? CompressionAlgorithmType { get; set; }
+
     public string? FileHash { get; set; }
+
     public DateTime? CreatedAt { get; set; }
+
     public string? CreatedBy { get; set; }
+
     public int? ChainPosition { get; set; }
+
     public string? ChainPositionDescription { get; set; }
+
     public int? TotalChainLength { get; set; }
 }

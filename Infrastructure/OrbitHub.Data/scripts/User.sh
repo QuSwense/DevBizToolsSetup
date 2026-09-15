@@ -23,7 +23,7 @@ dotnet linq2db scaffold \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables Users,UserActivities \
+  --include-tables Users,UserActivities,UserRoles \
   --namespace OrbitHub.Data.UserManagement \
   --context-name UserDbContext \
   --add-typed-options-ctor \

@@ -8,18 +8,32 @@ namespace OrbitHub.Data.PermissionsManagement.Views;
 public class ServiceAppPermissionsSummaryView
 {
     public string ServicePublicId { get; set; } = string.Empty;
+
     public long ServiceInternalId { get; set; }
+
     public string ServiceName { get; set; } = string.Empty;
+
     public string ServiceType { get; set; } = string.Empty;
+
     public string? BaseUrl { get; set; }
+
     public bool? ServiceIsActive { get; set; }
+
     public int? ServiceVersion { get; set; }
+
     public int TotalUsersWithAccess { get; set; }
+
     public int UsersWithGrantedAccess { get; set; }
+
     public int UsersWithDeniedAccess { get; set; }
+
     public int TotalPermissionTypes { get; set; }
+
     public string GrantedPermissions { get; set; } = string.Empty;
+
     public string UsersWithAccess { get; set; } = string.Empty;
+
     public DateTime? LastPermissionUpdate { get; set; }
+
     public string? LastPermissionUpdater { get; set; }
 }

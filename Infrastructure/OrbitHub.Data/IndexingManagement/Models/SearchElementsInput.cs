@@ -8,6 +8,8 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class SearchElementsInput
 {
     public string SearchTerm { get; set; } = default!;
+
     public string? ElementType { get; set; } = default!;
+
     public int? MaxResults { get; set; } = default!;
 }

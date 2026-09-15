@@ -8,12 +8,20 @@ namespace OrbitHub.Data.IndexingManagement.Views;
 public class IndexingElementUsageStatsView
 {
     public string ElementType { get; set; } = string.Empty;
+
     public long ElementId { get; set; }
+
     public string? KeyPath { get; set; }
+
     public string? ElementValue { get; set; }
+
     public int RequestFileCount { get; set; }
+
     public int ResponseFileCount { get; set; }
+
     public int TotalMappings { get; set; }
+
     public int DuplicateCount { get; set; }
+
     public long UsageRank { get; set; }
 }

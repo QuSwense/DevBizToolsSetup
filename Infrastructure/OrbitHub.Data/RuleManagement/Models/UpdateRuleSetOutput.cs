@@ -8,13 +8,22 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class UpdateRuleSetOutput
 {
     public int? RuleSetId { get; set; }
+
     public string? WorkflowName { get; set; }
+
     public string? RuleContent { get; set; }
+
     public int? OutputTypeId { get; set; }
+
     public bool? IsActive { get; set; }
+
     public string? Description { get; set; }
+
     public string? RecordVersion { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

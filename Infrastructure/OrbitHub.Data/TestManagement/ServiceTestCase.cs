@@ -24,6 +24,12 @@ public partial class ServiceTestCase
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Human-readable name of this record.
 	/// </summary>
 	[Column("Name", CanBeNull = false)]

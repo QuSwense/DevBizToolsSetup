@@ -24,6 +24,12 @@ public partial class RuleSet
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Unique name of the rule workflow.
 	/// </summary>
 	[Column("WorkflowName", CanBeNull = false)]
@@ -45,7 +51,7 @@ public partial class RuleSet
 	/// Indicates whether this record is active and available for use.
 	/// </summary>
 	[Column("IsActive")]
-	public bool? IsActive { get; set; } // bit
+	public bool IsActive { get; set; } // bit
 
 	/// <summary>
 	/// Optional human-readable description of this record.

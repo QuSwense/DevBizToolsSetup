@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceApplicationHistoryInput
 {
     public Guid PublicId { get; set; } = default!;
+
     public bool? IncludeAuthDetails { get; set; } = default!;
+
     public bool? IncludeServiceUsage { get; set; } = default!;
 }

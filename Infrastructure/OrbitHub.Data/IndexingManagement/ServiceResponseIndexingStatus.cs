@@ -45,4 +45,16 @@ public partial class ServiceResponseIndexingStatus
 	/// </summary>
 	[Column("CreatedAt")]
 	public DateTime CreatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Date and time at which this record was last updated.
+	/// </summary>
+	[Column("LastUpdatedAt")]
+	public DateTime? LastUpdatedAt { get; set; } // datetime
+
+	/// <summary>
+	/// Identifier of the user who last updated this record.
+	/// </summary>
+	[Column("LastUpdatedBy")]
+	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 }

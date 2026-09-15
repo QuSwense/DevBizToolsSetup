@@ -47,10 +47,10 @@ public partial class UiAction
 	public string DisplayName { get; set; } = null!; // nvarchar(100)
 
 	/// <summary>
-	/// Permission key required to view this page or perform this action.
+	/// Identifier of the related ResourcePermissions record.
 	/// </summary>
-	[Column("RequiredPermissionKey", CanBeNull = false)]
-	public string RequiredPermissionKey { get; set; } = null!; // nvarchar(100)
+	[Column("ResourcePermissionId")]
+	public long ResourcePermissionId { get; set; } // bigint
 
 	/// <summary>
 	/// Granular action type of the activity, such as Click, View, or Edit.

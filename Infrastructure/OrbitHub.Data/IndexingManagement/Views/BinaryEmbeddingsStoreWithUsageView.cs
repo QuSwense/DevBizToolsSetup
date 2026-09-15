@@ -8,20 +8,36 @@ namespace OrbitHub.Data.IndexingManagement.Views;
 public class BinaryEmbeddingsStoreWithUsageView
 {
     public long EmbeddingId { get; set; }
+
     public string? FileHash { get; set; }
+
     public long? UncompressedSizeBytes { get; set; }
+
     public string? CompressionAlgorithmType { get; set; }
+
     public string? FileFormat { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
     public string CreatedBy { get; set; } = string.Empty;
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public string HumanReadableSize { get; set; } = string.Empty;
+
     public int RequestFileEmbeddingCount { get; set; }
+
     public int ResponseFileEmbeddingCount { get; set; }
+
     public int UniqueRequestFiles { get; set; }
+
     public int UniqueResponseFiles { get; set; }
+
     public int TotalEmbeddingCount { get; set; }
+
     public string HashShort { get; set; } = string.Empty;
+
     public int AgeDays { get; set; }
 }

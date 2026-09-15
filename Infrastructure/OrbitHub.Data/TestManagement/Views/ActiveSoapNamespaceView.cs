@@ -8,13 +8,22 @@ namespace OrbitHub.Data.TestManagement.Views;
 public class ActiveSoapNamespaceView
 {
     public long NamespaceId { get; set; }
+
     public string OperationName { get; set; } = string.Empty;
+
     public string ServiceName { get; set; } = string.Empty;
+
     public string ServicePublicId { get; set; } = string.Empty;
+
     public string? ContentHash { get; set; }
+
     public long? UncompressedSizeBytes { get; set; }
+
     public string? CompressionAlgorithmType { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
     public string DisplayName { get; set; } = string.Empty;
+
     public string HashShort { get; set; } = string.Empty;
 }

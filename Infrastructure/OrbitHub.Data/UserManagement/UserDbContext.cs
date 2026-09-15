@@ -19,17 +19,28 @@ namespace OrbitHub.Data.UserManagement;
 
 public partial class UserDbContext : DataConnection
 {
-    public UserDbContext() => InitDataContext();
+	public UserDbContext()
+	{
+		InitDataContext();
+	}
 
-    public UserDbContext(string configuration)
-        : base(configuration) => InitDataContext();
+	public UserDbContext(string configuration)
+		: base(configuration)
+	{
+		InitDataContext();
+	}
 
-    public UserDbContext(DataOptions<UserDbContext> options)
-        : base(options.Options) => InitDataContext();
+	public UserDbContext(DataOptions<UserDbContext> options)
+		: base(options.Options)
+	{
+		InitDataContext();
+	}
 
-    partial void InitDataContext();
+	partial void InitDataContext();
 
 	public ITable<UserActivity> UserActivities => this.GetTable<UserActivity>();
+
+	public ITable<UserRole>     UserRoles      => this.GetTable<UserRole>();
 
 	public ITable<User>         Users          => this.GetTable<User>();
 }
@@ -43,6 +54,16 @@ public static partial class ExtensionMethods
 	}
 
 	public static Task<UserActivity?> FindAsync(this ITable<UserActivity> table, long id, CancellationToken cancellationToken = default)
+	{
+		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+	}
+
+	public static UserRole? Find(this ITable<UserRole> table, int id)
+	{
+		return table.FirstOrDefault(e => e.Id == id);
+	}
+
+	public static Task<UserRole?> FindAsync(this ITable<UserRole> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}

@@ -8,8 +8,12 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class CreateUserPermissionInput
 {
     public string UserId { get; set; } = default!;
+
     public long ResourcePermissionId { get; set; } = default!;
+
     public bool? IsGranted { get; set; } = default!;
+
     public bool? IsActive { get; set; } = default!;
+
     public string? CreatedBy { get; set; } = default!;
 }

@@ -23,6 +23,12 @@ public partial class RuleSetContextObjectLink
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related RuleSets record.
 	/// </summary>
 	[Column("RuleSetId")]
@@ -45,18 +51,6 @@ public partial class RuleSetContextObjectLink
 	/// </summary>
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the related Users record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>

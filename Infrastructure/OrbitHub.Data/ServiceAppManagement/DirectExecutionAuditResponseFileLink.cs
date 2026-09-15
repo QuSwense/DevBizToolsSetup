@@ -23,6 +23,12 @@ public partial class DirectExecutionAuditResponseFileLink
 	public int Id { get; set; } // int
 
 	/// <summary>
+	/// Public identifier used by the UI and external systems (GUID).
+	/// </summary>
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
+
+	/// <summary>
 	/// Identifier of the related DirectExecutionAudit record.
 	/// </summary>
 	[Column("DirectExecutionAuditId")]
@@ -39,6 +45,12 @@ public partial class DirectExecutionAuditResponseFileLink
 	/// </summary>
 	[Column("ServiceResponseFileId")]
 	public int ServiceResponseFileId { get; set; } // int
+
+	/// <summary>
+	/// Order in which the test case runs within its test suite.
+	/// </summary>
+	[Column("ExecutionOrder")]
+	public int ExecutionOrder { get; set; } // int
 
 	/// <summary>
 	/// Date and time at which execution started.

@@ -8,7 +8,10 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class CreateTestSuiteExecutionAuditInput
 {
     public int ServiceTestSuiteId { get; set; } = default!;
+
     public string? ExecutionStatus { get; set; } = default!;
+
     public string? ExecutionDetails { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

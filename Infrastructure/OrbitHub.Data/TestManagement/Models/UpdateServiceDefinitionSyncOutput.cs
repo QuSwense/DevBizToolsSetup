@@ -8,14 +8,24 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceDefinitionSyncOutput
 {
     public int? SyncId { get; set; }
+
     public int? ServiceApplicationId { get; set; }
+
     public string? DefinitionUrl { get; set; }
+
     public byte[]? CompressedContent { get; set; }
+
     public int? UncompressedSizeBytes { get; set; }
+
     public string? CompressionAlgorithmType { get; set; }
+
     public string? ContentHash { get; set; }
+
     public string? RecordVersion { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

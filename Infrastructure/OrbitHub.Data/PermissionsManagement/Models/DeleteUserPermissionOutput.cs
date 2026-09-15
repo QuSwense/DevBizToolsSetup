@@ -8,6 +8,8 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class DeleteUserPermissionOutput
 {
     public long? UserPermissionId { get; set; }
+
     public string? Message { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

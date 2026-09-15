@@ -6,7 +6,10 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record CreateDirectExecutionAuditResponseFileLinkInput
 {
     public required int DirectExecutionAuditId { get; init; }
+
     public required int ServiceRequestFileId { get; init; }
+
     public required int ExecutionOrder { get; init; }
+
     public string? ExecutedBy { get; init; }
 }

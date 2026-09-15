@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class LinkRuleSetToTestCaseOutput
 {
     public int? LinkId { get; set; }
+
     public string? Message { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

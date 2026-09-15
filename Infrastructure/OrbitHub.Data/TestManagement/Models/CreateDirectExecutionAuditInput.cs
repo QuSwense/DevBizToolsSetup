@@ -6,5 +6,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record CreateDirectExecutionAuditInput
 {
     public required string Name { get; init; }
+
     public string? ExecutedBy { get; init; }
 }

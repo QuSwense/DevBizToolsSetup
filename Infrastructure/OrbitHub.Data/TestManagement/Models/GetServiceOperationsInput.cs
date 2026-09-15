@@ -8,6 +8,8 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceOperationsInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
+
     public bool? IncludeInactive { get; set; } = default!;
+
     public string? OperationName { get; set; } = default!;
 }

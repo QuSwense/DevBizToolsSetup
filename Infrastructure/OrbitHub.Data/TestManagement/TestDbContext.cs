@@ -19,15 +19,24 @@ namespace OrbitHub.Data.TestManagement;
 
 public partial class TestDbContext : DataConnection
 {
-    public TestDbContext() => InitDataContext();
+	public TestDbContext()
+	{
+		InitDataContext();
+	}
 
-    public TestDbContext(string configuration)
-        : base(configuration) => InitDataContext();
+	public TestDbContext(string configuration)
+		: base(configuration)
+	{
+		InitDataContext();
+	}
 
-    public TestDbContext(DataOptions<TestDbContext> options)
-        : base(options.Options) => InitDataContext();
+	public TestDbContext(DataOptions<TestDbContext> options)
+		: base(options.Options)
+	{
+		InitDataContext();
+	}
 
-    partial void InitDataContext();
+	partial void InitDataContext();
 
 	public ITable<ServiceTestCaseRuleSetLink>                 ServiceTestCaseRuleSetLinks                 => this.GetTable<ServiceTestCaseRuleSetLink>();
 

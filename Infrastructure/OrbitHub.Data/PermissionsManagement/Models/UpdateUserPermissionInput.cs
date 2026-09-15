@@ -8,7 +8,10 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class UpdateUserPermissionInput
 {
     public long UserPermissionId { get; set; } = default!;
+
     public bool? IsGranted { get; set; } = default!;
+
     public bool? IsActive { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

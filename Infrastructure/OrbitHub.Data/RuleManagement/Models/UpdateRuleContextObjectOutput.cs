@@ -8,11 +8,18 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class UpdateRuleContextObjectOutput
 {
     public int? ContextObjectId { get; set; }
+
     public string? ContextName { get; set; }
+
     public string? RuleTypeId { get; set; }
+
     public string? Description { get; set; }
+
     public bool? IsActive { get; set; }
+
     public DateTime? LastUpdatedDate { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

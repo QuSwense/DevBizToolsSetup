@@ -6,10 +6,16 @@ namespace OrbitHub.Data.TestManagement.Models;
 public sealed record SaveServiceDefinitionSyncWithOperationsInput
 {
     public required int ServiceApplicationId { get; init; }
+
     public string? DefinitionUrl { get; init; }
+
     public required byte[] CompressedContent { get; init; }
+
     public int? UncompressedSizeBytes { get; init; }
+
     public string? CompressionAlgorithmType { get; init; }
+
     public string? ContentHash { get; init; }
+
     public string? UserId { get; init; }
 }

@@ -8,15 +8,26 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class SearchElementsOutput
 {
     public string? ElementType { get; set; }
+
     public int? ElementId { get; set; }
+
     public string? KeyPath { get; set; }
+
     public string? ElementValue { get; set; }
+
     public string? ValueType { get; set; }
+
     public int? RequestFileId { get; set; }
+
     public int? ResponseFileId { get; set; }
+
     public string? RequestFileName { get; set; }
+
     public string? ResponseFileName { get; set; }
+
     public string? SourceFileType { get; set; }
+
     public string? FileDisplayName { get; set; }
+
     public int? RelevanceScore { get; set; }
 }

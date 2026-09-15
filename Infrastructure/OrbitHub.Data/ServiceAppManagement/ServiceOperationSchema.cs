@@ -24,10 +24,10 @@ public partial class ServiceOperationSchema
 	public int Id { get; set; } // int
 
 	/// <summary>
-	/// Identifier of the related ServiceDefinitionSyncs record.
+	/// Public identifier used by the UI and external systems (GUID).
 	/// </summary>
-	[Column("ServiceDefinitionSyncId")]
-	public int ServiceDefinitionSyncId { get; set; } // int
+	[Column("PublicId")]
+	public Guid PublicId { get; set; } // uniqueidentifier
 
 	/// <summary>
 	/// Identifier of the related ServiceOperations record.
@@ -63,7 +63,7 @@ public partial class ServiceOperationSchema
 	/// Size of the file content before compression, in bytes.
 	/// </summary>
 	[Column("UncompressedSizeBytes")]
-	public int? UncompressedSizeBytes { get; set; } // int
+	public long? UncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
 	/// Algorithm used to compress the stored content.
@@ -108,12 +108,6 @@ public partial class ServiceOperationSchema
 	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
-	/// <summary>
-	/// FK_ServiceOperationSchemas_ServiceDefinitionSyncs_ServiceDefinitionSyncId
-	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(ServiceDefinitionSyncId), OtherKey = nameof(ServiceAppManagement.ServiceDefinitionSync.Id))]
-	public ServiceDefinitionSync ServiceDefinitionSync { get; set; } = null!;
-
 	/// <summary>
 	/// FK_ServiceOperationSchemas_ServiceOperations_ServiceOperationId
 	/// </summary>

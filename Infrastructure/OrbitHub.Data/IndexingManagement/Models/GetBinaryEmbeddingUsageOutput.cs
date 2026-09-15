@@ -8,9 +8,14 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetBinaryEmbeddingUsageOutput
 {
     public string? FileHash { get; set; }
+
     public bool? IsUsed { get; set; }
+
     public int? RequestFileCount { get; set; }
+
     public int? ResponseFileCount { get; set; }
+
     public int? RequestEmbeddingCount { get; set; }
+
     public int? ResponseEmbeddingCount { get; set; }
 }

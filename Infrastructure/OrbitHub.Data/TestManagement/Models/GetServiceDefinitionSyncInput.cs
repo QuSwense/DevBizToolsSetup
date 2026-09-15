@@ -8,5 +8,6 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class GetServiceDefinitionSyncInput
 {
     public Guid ServiceApplicationPublicId { get; set; } = default!;
+
     public bool? IncludeContent { get; set; } = default!;
 }

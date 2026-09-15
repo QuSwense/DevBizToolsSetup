@@ -8,9 +8,14 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class UpdateRuleContextObjectInput
 {
     public int ContextObjectId { get; set; } = default!;
+
     public string? ContextName { get; set; } = default!;
+
     public string? RuleTypeId { get; set; } = default!;
+
     public string? Description { get; set; } = default!;
+
     public bool? IsActive { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

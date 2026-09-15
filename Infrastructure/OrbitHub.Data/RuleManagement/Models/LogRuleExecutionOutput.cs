@@ -8,5 +8,6 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class LogRuleExecutionOutput
 {
     public int? ExecutionLogId { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

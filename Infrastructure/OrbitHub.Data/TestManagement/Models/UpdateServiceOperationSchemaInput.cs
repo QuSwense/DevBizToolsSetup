@@ -8,13 +8,22 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceOperationSchemaInput
 {
     public int SchemaId { get; set; } = default!;
+
     public string? InputRootElementName { get; set; } = default!;
+
     public string? OutputRootElementName { get; set; } = default!;
+
     public string? TargetNamespace { get; set; } = default!;
+
     public byte[]? CompressedContent { get; set; } = default!;
+
     public int? UncompressedSizeBytes { get; set; } = default!;
+
     public string? CompressionAlgorithmType { get; set; } = default!;
+
     public string? ContentHash { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
+
     public string RecordVersion { get; set; } = default!;
 }

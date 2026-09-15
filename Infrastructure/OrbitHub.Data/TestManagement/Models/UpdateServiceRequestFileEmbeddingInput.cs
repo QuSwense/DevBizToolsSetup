@@ -8,8 +8,12 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceRequestFileEmbeddingInput
 {
     public int EmbeddingId { get; set; } = default!;
+
     public string? Name { get; set; } = default!;
+
     public string? FileHash { get; set; } = default!;
+
     public bool? IsActive { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

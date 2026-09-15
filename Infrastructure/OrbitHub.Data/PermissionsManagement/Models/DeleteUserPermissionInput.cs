@@ -8,5 +8,6 @@ namespace OrbitHub.Data.PermissionsManagement.Models;
 public class DeleteUserPermissionInput
 {
     public long UserPermissionId { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

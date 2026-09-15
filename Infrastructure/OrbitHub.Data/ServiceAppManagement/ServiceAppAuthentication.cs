@@ -21,7 +21,7 @@ public partial class ServiceAppAuthentication
 	/// Unique identifier for this ServiceAppAuthentications record.
 	/// </summary>
 	[Column("Id", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
-	public long Id { get; set; } // bigint
+	public int Id { get; set; } // int
 
 	/// <summary>
 	/// Public identifier used by the UI and external systems (GUID).

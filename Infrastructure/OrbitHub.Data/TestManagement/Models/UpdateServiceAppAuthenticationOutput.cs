@@ -8,13 +8,22 @@ namespace OrbitHub.Data.TestManagement.Models;
 public class UpdateServiceAppAuthenticationOutput
 {
     public int? Id { get; set; }
+
     public Guid? PublicId { get; set; }
+
     public string? Name { get; set; }
+
     public string? AuthenticationType { get; set; }
+
     public string? EncryptionAlgorithmType { get; set; }
+
     public bool? IsActive { get; set; }
+
     public string? RecordVersion { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
+
     public string? LastUpdatedBy { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

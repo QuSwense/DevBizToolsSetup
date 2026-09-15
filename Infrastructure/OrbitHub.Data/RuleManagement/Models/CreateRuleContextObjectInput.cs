@@ -8,7 +8,10 @@ namespace OrbitHub.Data.RuleManagement.Models;
 public class CreateRuleContextObjectInput
 {
     public string ContextName { get; set; } = default!;
+
     public string RuleTypeId { get; set; } = default!;
+
     public string? Description { get; set; } = default!;
+
     public string? UserId { get; set; } = default!;
 }

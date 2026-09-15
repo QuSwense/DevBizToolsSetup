@@ -8,5 +8,6 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 public class GetBinaryEmbeddingByHashInput
 {
     public string FileHash { get; set; } = default!;
+
     public bool? IncludeData { get; set; } = default!;
 }

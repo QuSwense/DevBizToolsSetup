@@ -8,16 +8,28 @@ namespace OrbitHub.Data.PermissionsManagement.Views;
 public class UserPermissionSummaryView
 {
     public string UserId { get; set; } = string.Empty;
+
     public string UserFullName { get; set; } = string.Empty;
+
     public string UserEmail { get; set; } = string.Empty;
+
     public string? UserDepartment { get; set; }
+
     public int TotalPermissions { get; set; }
+
     public int GrantedPermissions { get; set; }
+
     public int DeniedPermissions { get; set; }
+
     public int ActivePermissions { get; set; }
+
     public int InactivePermissions { get; set; }
+
     public int UniquePermissionCategories { get; set; }
+
     public string GrantedPermissionKeys { get; set; } = string.Empty;
+
     public DateTime? LastPermissionGranted { get; set; }
+
     public DateTime? LastPermissionUpdated { get; set; }
 }
