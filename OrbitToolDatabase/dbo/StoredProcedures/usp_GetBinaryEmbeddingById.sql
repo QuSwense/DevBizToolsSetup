@@ -13,11 +13,11 @@ BEGIN
     BEGIN
         SELECT 
             [Id] AS EmbeddingId,
-            [FileHash],
+            [ContentHash],
             [CompressedData],
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileFormat],
+            [ContentFormat],
             [CreatedAt],
             [CreatedBy],
             [LastUpdatedAt],
@@ -37,11 +37,11 @@ BEGIN
     BEGIN
         SELECT 
             [Id] AS EmbeddingId,
-            [FileHash],
+            [ContentHash],
             CAST(0x AS VARBINARY(1)) AS CompressedData,  -- Placeholder
             [UncompressedSizeBytes],
             [CompressionAlgorithmType],
-            [FileFormat],
+            [ContentFormat],
             [CreatedAt],
             [CreatedBy],
             [LastUpdatedAt],

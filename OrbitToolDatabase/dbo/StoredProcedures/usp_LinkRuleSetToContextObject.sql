@@ -79,17 +79,13 @@ BEGIN
             [RuleSetId],
             [RuleContextObjectId],
             [CreatedAt],
-            [CreatedBy],
-            [LastUpdatedAt],
-            [LastUpdatedBy]
+            [CreatedBy]
         )
         VALUES (
             @RuleSetId,
             @RuleContextObjectId,
             GETDATE(),
-            @ResolvedUser,
-            NULL,
-            NULL
+            @ResolvedUser
         );
 
         SET @NewId = SCOPE_IDENTITY();
@@ -129,8 +125,6 @@ BEGIN
             [RuleContextObjectId],
             [CreatedAt],
             [CreatedBy],
-            [LastUpdatedAt],
-            [LastUpdatedBy],
             @WorkflowName AS WorkflowName,
             @ContextName AS ContextName,
             @ActivityId AS AuditActivityId

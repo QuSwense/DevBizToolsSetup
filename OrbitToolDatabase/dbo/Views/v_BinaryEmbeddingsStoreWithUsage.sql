@@ -6,10 +6,10 @@ CREATE VIEW [dbo].[v_BinaryEmbeddingsStoreWithUsage]
 AS
 SELECT 
     bes.[Id] AS EmbeddingId,
-    bes.[FileHash],
+    bes.[ContentHash],
     bes.[UncompressedSizeBytes],
     bes.[CompressionAlgorithmType],
-    bes.[FileFormat],
+    bes.[ContentFormat],
     bes.[CreatedAt],
     bes.[CreatedBy],
     bes.[LastUpdatedAt],
@@ -65,7 +65,7 @@ SELECT
     ) AS TotalEmbeddingCount,
     
     -- Hash short
-    LEFT(bes.[FileHash], 16) + '...' AS HashShort,
+    LEFT(bes.[ContentHash], 16) + '...' AS HashShort,
     
     -- Age
     DATEDIFF(DAY, bes.[CreatedAt], GETDATE()) AS AgeDays

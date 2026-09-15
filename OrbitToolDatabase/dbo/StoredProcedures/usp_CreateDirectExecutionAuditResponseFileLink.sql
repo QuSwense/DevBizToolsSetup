@@ -5,6 +5,7 @@
 CREATE PROCEDURE [dbo].[usp_CreateDirectExecutionAuditResponseFileLink]
     @DirectExecutionAuditId INT,
     @ServiceRequestFileId INT,
+    @ServiceResponseFileId INT,
     @ExecutionOrder INT = 0,
     @ExecutedBy NVARCHAR(20) = NULL
 AS
@@ -53,16 +54,20 @@ BEGIN
         INSERT INTO [dbo].[DirectExecutionAuditResponseFileLinks] (
             [DirectExecutionAuditId],
             [ServiceRequestFileId],
+            [ServiceResponseFileId],
             [ExecutionOrder],
             [ExecutionStatus],
-            [ExecutedAt]
+            [ExecutedAt],
+            [ExecutedBy]
         )
         VALUES (
             @DirectExecutionAuditId,
             @ServiceRequestFileId,
+            @ServiceResponseFileId,
             @ExecutionOrder,
             'Pending',
-            GETDATE()
+            GETDATE(),
+            @ResolvedUser
         );
 
         SET @NewId = SCOPE_IDENTITY();
@@ -95,7 +100,7 @@ BEGIN
             GETDATE()
         );
 
-        SELECT @NewId AS Id, @DirectExecutionAuditId AS DirectExecutionAuditId, @ServiceRequestFileId AS ServiceRequestFileId, @ExecutionOrder AS ExecutionOrder, 'Pending' AS ExecutionStatus, GETDATE() AS ExecutedAt;
+        SELECT @NewId AS Id, @DirectExecutionAuditId AS DirectExecutionAuditId, @ServiceRequestFileId AS ServiceRequestFileId, @ServiceResponseFileId AS ServiceResponseFileId, @ExecutionOrder AS ExecutionOrder, 'Pending' AS ExecutionStatus, GETDATE() AS ExecutedAt;
 
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             COMMIT TRANSACTION;

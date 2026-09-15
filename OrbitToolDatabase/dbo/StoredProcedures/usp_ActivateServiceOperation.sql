@@ -1,11 +1,17 @@
 /*
     Stored Procedure: usp_ActivateServiceOperation
-    Description: Reactivates a previously deactivated service operation with audit logging.
+    Description: Activates or deactivates a service operation with audit logging.
+    Parameters:
+        @OperationId INT - Internal Id of the service operation.
+        @UserId NVARCHAR(20) - Optional audit user; falls back to SYSTEM_USER.
+        @RecordVersion VARCHAR(50) - Current RecordVersion for optimistic concurrency control.
+        @IsActive BIT = 1 - 1 to activate (default), 0 to deactivate.
 */
 CREATE PROCEDURE [dbo].[usp_ActivateServiceOperation]
     @OperationId INT,
     @UserId NVARCHAR(20) = NULL,
-    @RecordVersion VARCHAR(50)  -- For optimistic concurrency control
+    @RecordVersion VARCHAR(50),  -- For optimistic concurrency control
+    @IsActive BIT = 1            -- 1 = activate, 0 = deactivate
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -27,6 +33,11 @@ BEGIN
         DECLARE @Notes NVARCHAR(MAX);
         DECLARE @ExistingRecordVersion VARCHAR(50);
         DECLARE @ExistingIsActive BIT;
+        DECLARE @RequestedStateText NVARCHAR(20);
+        DECLARE @ChangeType NVARCHAR(20);
+        DECLARE @ActionVerb NVARCHAR(20);
+        DECLARE @ActivityTypeName NVARCHAR(100);
+        DECLARE @ResultMessage NVARCHAR(100);
 
         -- Resolve audit user
         SET @ResolvedUser = COALESCE(
@@ -34,6 +45,16 @@ BEGIN
             SYSTEM_USER,
             'SYSTEM'
         );
+
+        -- Derive state-dependent values once (CASE is not allowed in RAISERROR/EXEC argument lists)
+        SET @RequestedStateText = CASE WHEN @IsActive = 1 THEN 'active' ELSE 'inactive' END;
+        SET @ChangeType = CASE WHEN @IsActive = 1 THEN 'Activate' ELSE 'Deactivate' END;
+        SET @ActionVerb = CASE WHEN @IsActive = 1 THEN 'Reactivated' ELSE 'Deactivated' END;
+        SET @ActivityTypeName = CASE WHEN @IsActive = 1 THEN 'ServiceOperationActivate' ELSE 'ServiceOperationDeactivate' END;
+        SET @ResultMessage = CASE WHEN @IsActive = 1
+            THEN 'Operation reactivated successfully'
+            ELSE 'Operation deactivated successfully'
+        END;
 
         -- Get the current operation details with lock
         SELECT TOP 1
@@ -46,7 +67,7 @@ BEGIN
         INNER JOIN [dbo].[ServiceApplications] sa ON so.[ServiceApplicationId] = sa.[Id]
         WHERE so.[Id] = @OperationId;
 
-        IF @OperationId IS NULL
+        IF @ExistingRecordVersion IS NULL
         BEGIN
             RAISERROR('Service operation with Id %d not found.', 16, 1, @OperationId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -63,10 +84,10 @@ BEGIN
             RETURN;
         END
 
-        -- Check if already active
-        IF @ExistingIsActive = 1
+        -- Check if already in the requested state
+        IF @ExistingIsActive = @IsActive
         BEGIN
-            RAISERROR('Operation "%s" is already active.', 16, 1, @OperationName);
+            RAISERROR('Operation "%s" is already %s.', 16, 1, @OperationName, @RequestedStateText);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -75,34 +96,38 @@ BEGIN
         -- Calculate new version
         SET @NewRecordVersion = [dbo].[fn_CalculateVersion](@ExistingRecordVersion);
 
-        -- Reactivate by setting IsActive = 1
+        -- Apply the requested active state
         UPDATE [dbo].[ServiceOperations]
         SET
-            [IsActive] = 1,
+            [IsActive] = @IsActive,
             [RecordVersion] = @NewRecordVersion,
             [LastUpdatedAt] = GETDATE(),
             [LastUpdatedBy] = @ResolvedUser
         WHERE [Id] = @OperationId;
 
         -- Build notes
-        SET @Notes = CONCAT('Service operation reactivated: ', @OperationName, ' (Service: ', @ServiceAppName, ')');
+        SET @Notes = CONCAT('Service operation ',
+            CASE WHEN @IsActive = 1 THEN 'reactivated: ' ELSE 'deactivated: ' END,
+            @OperationName, ' (Service: ', @ServiceAppName, ')');
 
         -- Audit log
         DECLARE @FeatureJson NVARCHAR(MAX) = (
             SELECT 
-                'Activate' AS ChangeType,
+                @ChangeType AS ChangeType,
                 @OperationId AS OperationId,
                 @OperationName AS OperationName,
                 @ExistingRecordVersion AS OldVersion,
                 @NewRecordVersion AS NewVersion,
-                'Reactivated' AS Action
+                @ExistingIsActive AS OldIsActive,
+                @IsActive AS NewIsActive,
+                @ActionVerb AS Action
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
 
         EXEC [dbo].[usp_InsertUserActivity]
             @UserId = @ResolvedUser,
-            @ActivityType = 'ServiceOperationActivate',
-            @ActionType = 'Activate',
+            @ActivityType = @ActivityTypeName,
+            @ActionType = @ChangeType,
             @FeatureActivitiesJson = @FeatureJson,
             @RelatedEntityType = 'ServiceApplication',
             @RelatedEntityId = @ServiceAppPublicId,
@@ -116,7 +141,7 @@ BEGIN
         SELECT 
             @OperationId AS OperationId,
             @OperationName AS OperationName,
-            'Operation reactivated successfully' AS Message,
+            @ResultMessage AS Message,
             @ActivityId AS AuditActivityId;
 
     END TRY
@@ -128,7 +153,7 @@ BEGIN
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
         DECLARE @ErrorState INT = ERROR_STATE();
         
-        RAISERROR('Error reactivating service operation: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
+        RAISERROR('Error changing service operation active state: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

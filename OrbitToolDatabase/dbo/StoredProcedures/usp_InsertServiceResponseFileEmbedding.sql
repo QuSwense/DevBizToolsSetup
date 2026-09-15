@@ -1,4 +1,4 @@
-/*
+﻿/*
     Stored Procedure: usp_InsertServiceResponseFileEmbedding
     Description: Inserts a new service response file embedding record with deduplication.
     Uses BinaryEmbeddingsStore for deduplicated binary storage.
@@ -71,11 +71,12 @@ BEGIN
         -- Insert into BinaryEmbeddingsStore (handles deduplication)
         DECLARE @EmbeddingResult TABLE (
             EmbeddingId INT,
-            FileHash VARCHAR(64),
+            PublicId UNIQUEIDENTIFIER,
+            ContentHash VARCHAR(64),
             CompressedData VARBINARY(MAX),
             UncompressedSizeBytes INT,
             CompressionAlgorithmType VARCHAR(50),
-            FileFormat VARCHAR(10),
+            ContentFormat VARCHAR(10),
             CreatedAt DATETIME,
             CreatedBy NVARCHAR(20),
             LastUpdatedAt DATETIME,
@@ -85,11 +86,11 @@ BEGIN
 
         INSERT INTO @EmbeddingResult
         EXEC [dbo].[usp_InsertBinaryEmbedding]
-            @FileHash = @FileHash,
+            @ContentHash = @FileHash,
             @CompressedData = @CompressedData,
             @UncompressedSizeBytes = @UncompressedSizeBytes,
             @CompressionAlgorithmType = @CompressionAlgorithmType,
-            @FileFormat = @FileFormat,
+            @ContentFormat = @FileFormat,
             @UserId = @ResolvedUser;
 
         SELECT 

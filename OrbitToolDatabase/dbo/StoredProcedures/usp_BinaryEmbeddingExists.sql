@@ -3,7 +3,7 @@
     Description: Checks if a binary embedding exists by hash.
 */
 CREATE PROCEDURE [dbo].[usp_BinaryEmbeddingExists]
-    @FileHash VARCHAR(64)
+    @ContentHash VARCHAR(64)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -13,12 +13,12 @@ BEGIN
             WHEN EXISTS (
                 SELECT 1 
                 FROM [dbo].[BinaryEmbeddingsStore] 
-                WHERE [FileHash] = @FileHash
+                WHERE [ContentHash] = @ContentHash
             ) THEN 1
             ELSE 0
         END AS [Exists],
         [Id] AS EmbeddingId
     FROM [dbo].[BinaryEmbeddingsStore]
-    WHERE [FileHash] = @FileHash;
+    WHERE [ContentHash] = @ContentHash;
 END;
 GO

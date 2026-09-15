@@ -25,7 +25,7 @@ SELECT
     COUNT(DISTINCT [CompressionAlgorithmType]) AS CompressionTypesUsed,
     
     -- By file format
-    COUNT(DISTINCT [FileFormat]) AS FileFormatsUsed,
+    COUNT(DISTINCT [ContentFormat]) AS FileFormatsUsed,
     
     -- Min/Max/Avg sizes
     MIN([UncompressedSizeBytes]) AS MinSize,

@@ -7,7 +7,7 @@ CREATE PROCEDURE [dbo].[usp_UpdateDirectExecutionAuditResponseFileLinkStatus]
     @ExecutionStatus NVARCHAR(50),
     @HttpStatusCode INT = NULL,
     @HttpRequestDurationMs INT = NULL,
-    @HttpContentType NVARCHAR(100) = NULL,
+    @HttpContentType NVARCHAR(255) = NULL,
     @HttpRequestHeaders NVARCHAR(MAX) = NULL,
     @HttpResponseHeaders NVARCHAR(MAX) = NULL
 AS

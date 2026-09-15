@@ -37,7 +37,7 @@ SELECT
     sa.[ServiceType],
     
     -- Binary Embeddings Store details (if the table exists)
-    bes.[FileHash] AS BinaryFileHash,
+    bes.[ContentHash] AS BinaryFileHash,
     bes.[CompressionAlgorithmType] AS BinaryCompression,
     
     -- Status

@@ -5,7 +5,7 @@
 CREATE VIEW [dbo].[v_BinaryEmbeddingsByFormat]
 AS
 SELECT TOP (100) PERCENT 
-    [FileFormat],
+    [ContentFormat],
     COUNT(*) AS EmbeddingCount,
     SUM([UncompressedSizeBytes]) AS TotalSize,
     AVG([UncompressedSizeBytes]) AS AvgSize,
@@ -16,7 +16,7 @@ SELECT TOP (100) PERCENT
     (
         SELECT TOP 1 [CompressionAlgorithmType]
         FROM [dbo].[BinaryEmbeddingsStore] bes2
-        WHERE bes2.[FileFormat] = bes.[FileFormat]
+        WHERE bes2.[ContentFormat] = bes.[ContentFormat]
         GROUP BY [CompressionAlgorithmType]
         ORDER BY COUNT(*) DESC
     ) AS MostUsedCompression,
@@ -32,7 +32,7 @@ SELECT TOP (100) PERCENT
     END AS TotalSizeHuman
 
 FROM [dbo].[BinaryEmbeddingsStore] bes
-WHERE [FileFormat] IS NOT NULL
-GROUP BY [FileFormat]
+WHERE [ContentFormat] IS NOT NULL
+GROUP BY [ContentFormat]
 ORDER BY EmbeddingCount DESC;
 GO

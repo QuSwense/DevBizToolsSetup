@@ -34,7 +34,7 @@ BEGIN
         DECLARE @ServiceAppName NVARCHAR(200);
         DECLARE @NewRecordVersion VARCHAR(50);
         DECLARE @BaseUrl NVARCHAR(500);
-        DECLARE @DefinitionRelativeUrl NVARCHAR(500);
+        DECLARE @DefinitionRelativeUrl NVARCHAR(250);
         DECLARE @NewId INT;
         DECLARE @ActivityId BIGINT;
         DECLARE @Notes NVARCHAR(MAX);
