@@ -9,7 +9,7 @@ public class UserPermissionsWithDetailsView
 {
     public long UserPermissionId { get; set; }
 
-    public string? PublicId { get; set; }
+    public Guid? PublicId { get; set; }
 
     public string UserId { get; set; } = string.Empty;
 
@@ -37,7 +37,7 @@ public class UserPermissionsWithDetailsView
 
     public long ResourcePermissionKeyId { get; set; }
 
-    public string ResourcePermissionPublicId { get; set; } = string.Empty;
+    public Guid ResourcePermissionPublicId { get; set; }
 
     public string PermissionStatus { get; set; } = string.Empty;
 

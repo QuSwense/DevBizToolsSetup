@@ -21,9 +21,15 @@ public class UpdateRuleSetOutput
 
     public string? RecordVersion { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public string? CreatedBy { get; set; }
+
     public DateTime? LastUpdatedAt { get; set; }
 
     public string? LastUpdatedBy { get; set; }
+
+    public string? OutputContextName { get; set; }
 
     public long? AuditActivityId { get; set; }
 }

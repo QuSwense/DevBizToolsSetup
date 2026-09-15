@@ -9,7 +9,9 @@ public class InsertBinaryEmbeddingOutput
 {
     public int? EmbeddingId { get; set; }
 
-    public string? FileHash { get; set; }
+    public Guid? PublicId { get; set; }
+
+    public string? ContentHash { get; set; }
 
     public byte[]? CompressedData { get; set; }
 
@@ -17,7 +19,7 @@ public class InsertBinaryEmbeddingOutput
 
     public string? CompressionAlgorithmType { get; set; }
 
-    public string? FileFormat { get; set; }
+    public string? ContentFormat { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

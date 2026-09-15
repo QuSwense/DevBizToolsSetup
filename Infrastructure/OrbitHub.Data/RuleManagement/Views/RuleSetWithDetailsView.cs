@@ -7,19 +7,21 @@ namespace OrbitHub.Data.RuleManagement.Views;
 
 public class RuleSetWithDetailsView
 {
-    public long RuleSetId { get; set; }
+    public int RuleSetId { get; set; }
+
+    public Guid RuleSetPublicId { get; set; }
 
     public string WorkflowName { get; set; } = string.Empty;
 
     public string? RuleContent { get; set; }
 
-    public long? OutputTypeId { get; set; }
+    public int? OutputTypeId { get; set; }
 
     public bool? IsActive { get; set; }
 
     public string? Description { get; set; }
 
-    public int? RecordVersion { get; set; }
+    public string? RecordVersion { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -31,7 +33,7 @@ public class RuleSetWithDetailsView
 
     public string? OutputContextName { get; set; }
 
-    public int? OutputRuleTypeId { get; set; }
+    public string? OutputRuleTypeId { get; set; }
 
     public string? OutputContextDescription { get; set; }
 

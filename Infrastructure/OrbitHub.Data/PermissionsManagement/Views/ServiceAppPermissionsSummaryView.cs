@@ -7,7 +7,7 @@ namespace OrbitHub.Data.PermissionsManagement.Views;
 
 public class ServiceAppPermissionsSummaryView
 {
-    public string ServicePublicId { get; set; } = string.Empty;
+    public Guid ServicePublicId { get; set; }
 
     public long ServiceInternalId { get; set; }
 
@@ -19,7 +19,7 @@ public class ServiceAppPermissionsSummaryView
 
     public bool? ServiceIsActive { get; set; }
 
-    public int? ServiceVersion { get; set; }
+    public string? ServiceVersion { get; set; }
 
     public int TotalUsersWithAccess { get; set; }
 

@@ -7,5 +7,5 @@ namespace OrbitHub.Data.IndexingManagement.Models;
 
 public class BinaryEmbeddingExistsInput
 {
-    public string FileHash { get; set; } = default!;
+    public string ContentHash { get; set; } = default!;
 }

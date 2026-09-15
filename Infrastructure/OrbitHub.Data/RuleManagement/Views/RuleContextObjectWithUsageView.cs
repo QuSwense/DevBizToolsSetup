@@ -7,21 +7,23 @@ namespace OrbitHub.Data.RuleManagement.Views;
 
 public class RuleContextObjectWithUsageView
 {
-    public long ContextObjectId { get; set; }
+    public int ContextObjectId { get; set; }
+
+    public Guid ContextObjectPublicId { get; set; }
 
     public string ContextName { get; set; } = string.Empty;
 
-    public int? RuleTypeId { get; set; }
+    public string? RuleTypeId { get; set; }
 
     public string? Description { get; set; }
 
     public bool? IsActive { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public string? CreatedBy { get; set; }
 
-    public DateTime? LastUpdatedDate { get; set; }
+    public DateTime? LastUpdatedAt { get; set; }
 
     public string? LastUpdatedBy { get; set; }
 

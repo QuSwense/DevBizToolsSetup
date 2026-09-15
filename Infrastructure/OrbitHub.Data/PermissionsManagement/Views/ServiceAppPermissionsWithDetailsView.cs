@@ -9,7 +9,7 @@ public class ServiceAppPermissionsWithDetailsView
 {
     public long PermissionId { get; set; }
 
-    public string PermissionPublicId { get; set; } = string.Empty;
+    public Guid PermissionPublicId { get; set; }
 
     public bool IsGranted { get; set; }
 
@@ -21,7 +21,7 @@ public class ServiceAppPermissionsWithDetailsView
 
     public string? PermissionLastUpdatedBy { get; set; }
 
-    public string ServicePublicId { get; set; } = string.Empty;
+    public Guid ServicePublicId { get; set; }
 
     public long ServiceInternalId { get; set; }
 
@@ -31,7 +31,7 @@ public class ServiceAppPermissionsWithDetailsView
 
     public string? BaseUrl { get; set; }
 
-    public int? ServiceVersion { get; set; }
+    public string? ServiceVersion { get; set; }
 
     public bool? ServiceIsActive { get; set; }
 
@@ -47,7 +47,7 @@ public class ServiceAppPermissionsWithDetailsView
 
     public long ResourcePermissionId { get; set; }
 
-    public string ResourcePermissionPublicId { get; set; } = string.Empty;
+    public Guid ResourcePermissionPublicId { get; set; }
 
     public string PermissionStatus { get; set; } = string.Empty;
 

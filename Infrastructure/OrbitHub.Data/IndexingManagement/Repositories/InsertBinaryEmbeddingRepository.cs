@@ -23,11 +23,11 @@ public class InsertBinaryEmbeddingRepository
         {
                 var result = (await _ctx.QueryProcAsync<InsertBinaryEmbeddingOutput>(
                     "[dbo].[usp_InsertBinaryEmbedding]",
-                new DataParameter("@FileHash", input.FileHash),
+                new DataParameter("@ContentHash", input.ContentHash),
                 new DataParameter("@CompressedData", input.CompressedData),
                 new DataParameter("@UncompressedSizeBytes", input.UncompressedSizeBytes),
                 new DataParameter("@CompressionAlgorithmType", input.CompressionAlgorithmType),
-                new DataParameter("@FileFormat", input.FileFormat),
+                new DataParameter("@ContentFormat", input.ContentFormat),
                 new DataParameter("@UserId", input.UserId)
                 )).ToList();
                 return RepositoryResult<InsertBinaryEmbeddingOutput>.Ok(result.FirstOrDefault()!);

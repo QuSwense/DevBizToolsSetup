@@ -9,6 +9,8 @@ public class RolePermissionSummaryView
 {
     public int RoleId { get; set; }
 
+    public Guid RolePublicId { get; set; }
+
     public string Role { get; set; } = string.Empty;
 
     public int TotalPermissions { get; set; }

@@ -9,13 +9,13 @@ public class BinaryEmbeddingsStoreWithUsageView
 {
     public long EmbeddingId { get; set; }
 
-    public string? FileHash { get; set; }
+    public string? ContentHash { get; set; }
 
     public long? UncompressedSizeBytes { get; set; }
 
     public string? CompressionAlgorithmType { get; set; }
 
-    public string? FileFormat { get; set; }
+    public string? ContentFormat { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

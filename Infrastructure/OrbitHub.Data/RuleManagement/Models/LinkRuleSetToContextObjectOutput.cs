@@ -9,7 +9,17 @@ public class LinkRuleSetToContextObjectOutput
 {
     public int? LinkId { get; set; }
 
-    public string? Message { get; set; }
+    public int? RuleSetId { get; set; }
+
+    public int? RuleContextObjectId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? WorkflowName { get; set; }
+
+    public string? ContextName { get; set; }
 
     public long? AuditActivityId { get; set; }
 }

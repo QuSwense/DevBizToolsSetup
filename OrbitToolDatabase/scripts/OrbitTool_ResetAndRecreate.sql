@@ -325,7 +325,7 @@ GO
    The old IndexingFileElementSearch denormalized table has been replaced
    by per-type element search tables (IndexingXmlFileElementSearch,
    IndexingJsonFileElementSearch, IndexingPdfFileElementSearch).
-   The usp_SearchElements procedure now uses LIKE-based search via the
+   The usp_SearchIndexingElements procedure now uses LIKE-based search via the
    v_IndexingFileElementSearch view instead of FREETEXTTABLE. */
 GO
 
@@ -426,84 +426,83 @@ GO
 :r ../dbo/Views/v_UserSettingsWithDetails.sql
 GO
 
-/* usp_InsertUserActivity is created first because many other procedures depend on it. */
-:r ../dbo/StoredProcedures/usp_InsertUserActivity.sql
+/* usp_InsertUserActivities is created first because many other procedures depend on it. */
+:r ../dbo/StoredProcedures/usp_InsertUserActivities.sql
 GO
-:r ../dbo/StoredProcedures/usp_ActivateServiceOperation.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceOperationsActivate.sql
 GO
-:r ../dbo/StoredProcedures/usp_BinaryEmbeddingExists.sql
+:r ../dbo/StoredProcedures/usp_FindBinaryEmbeddingsStore.sql
 GO
-:r ../dbo/StoredProcedures/usp_CompleteDirectExecutionAudit.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateDirectExecutionAudit.sql
+:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAuditWithActivity.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateDirectExecutionAuditResponseFileLink.sql
+:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAuditResponseFileLink.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateGlobalSetting.sql
+:r ../dbo/StoredProcedures/usp_InsertGlobalSettings.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateResourcePermission.sql
+:r ../dbo/StoredProcedures/usp_InsertResourcePermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateRole.sql
+:r ../dbo/StoredProcedures/usp_InsertRoles.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateRolePermission.sql
+:r ../dbo/StoredProcedures/usp_InsertRolePermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateRuleContextObject.sql
+:r ../dbo/StoredProcedures/usp_InsertRuleContextObjects.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateRuleSet.sql
+:r ../dbo/StoredProcedures/usp_InsertRuleSets.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateServiceApplication.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceApplications.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateServiceOperation.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceOperations.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateServiceOperationSchema.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceOperationSchemas.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateServiceOperationWithSchema.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceOperationWithSchema.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateServiceTestCase.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceTestCases.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateServiceTestSuite.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceTestSuites.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateSoapNamespace.sql
+:r ../dbo/StoredProcedures/usp_InsertSoapNamespaces.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateTestSuiteExecutionAudit.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceTestSuiteExecutionAudits.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateUIAction.sql
+:r ../dbo/StoredProcedures/usp_InsertUIActions.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateUIPage.sql
+:r ../dbo/StoredProcedures/usp_InsertUIPages.sql
 GO
-:r ../dbo/StoredProcedures/usp_CreateUserPermission.sql
+:r ../dbo/StoredProcedures/usp_InsertUserPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_DeleteUserPermission.sql
+:r ../dbo/StoredProcedures/usp_DeleteUserPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_FindBinaryEmbeddingByContent.sql
+:r ../dbo/StoredProcedures/usp_FindBinaryEmbeddingsStoreByContentHash.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetAvailablePermissions.sql
+:r ../dbo/StoredProcedures/usp_GetResourcePermissionsAvailable.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetBinaryEmbeddingById.sql
+:r ../dbo/StoredProcedures/usp_GetBinaryEmbeddingsStore.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetElementFrequency.sql
+:r ../dbo/StoredProcedures/usp_GetIndexingFileElementsFrequency.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetFilesByElement.sql
+:r ../dbo/StoredProcedures/usp_GetIndexingFileElementsFiles.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetGlobalSettings.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetIndexingStatistics.sql
+:r ../dbo/StoredProcedures/usp_GetIndexingFileElementsStatistics.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetRolePermissions.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetRoles.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetRuleExecutionStatistics.sql
+:r ../dbo/StoredProcedures/usp_GetRuleExecutionLogsStatistics.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceAppPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceApplicationHistory.sql
+:r ../dbo/StoredProcedures/usp_GetServiceApplicationsHistory.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceOperations.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceRequestFileChain.sql
+:r ../dbo/StoredProcedures/usp_GetServiceRequestFilesChain.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceRequestFileConsecutiveDeltaCount.sql
+:r ../dbo/StoredProcedures/usp_GetServiceRequestFilesConsecutiveDeltaCount.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceRequestFilesByOperation.sql
 GO
@@ -513,123 +512,123 @@ GO
 GO
 :r ../dbo/StoredProcedures/usp_GetSoapNamespaces.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetTestSuiteExecutionSummary.sql
+:r ../dbo/StoredProcedures/usp_GetServiceTestSuiteExecutionAuditsSummary.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetUserPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertBinaryEmbedding.sql
+:r ../dbo/StoredProcedures/usp_InsertBinaryEmbeddingsStore.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAudit.sql
+:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAuditSimple.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertServiceDefinitionSync.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceDefinitionSyncs.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertServiceRequestFile.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceRequestFiles.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertServiceRequestFileEmbedding.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceRequestFileEmbeddings.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertServiceResponseFile.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceResponseFiles.sql
 GO
 :r ../dbo/StoredProcedures/usp_InsertServiceResponseFileEmbedding.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetXmlFileElement.sql
+:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingXmlFileElements.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetXmlFileElementSearch.sql
+:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingXmlFileElementSearch.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertXmlFileElementMapping.sql
+:r ../dbo/StoredProcedures/usp_InsertIndexingXmlFileElementMappingsSingle.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetJsonFileElement.sql
+:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingJsonFileElements.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetJsonFileElementSearch.sql
+:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingJsonFileElementSearch.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertJsonFileElementMapping.sql
+:r ../dbo/StoredProcedures/usp_InsertIndexingJsonFileElementMappings.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetPdfFileElement.sql
+:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingPdfFileElements.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetPdfFileElementSearch.sql
+:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingPdfFileElementSearch.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertPdfFileElementMapping.sql
+:r ../dbo/StoredProcedures/usp_InsertIndexingPdfFileElementMappings.sql
 GO
-:r ../dbo/StoredProcedures/usp_LinkRuleSetToContextObject.sql
+:r ../dbo/StoredProcedures/usp_InsertRuleSetContextObjectLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_LinkRuleSetToTestCase.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceTestCaseRuleSetLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_LinkTestCaseToSuite.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceTestSuiteTestCaseLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_LogRuleExecution.sql
+:r ../dbo/StoredProcedures/usp_InsertRuleExecutionLogs.sql
 GO
-:r ../dbo/StoredProcedures/usp_LogTestCaseExecution.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceTestSuiteExecutionAuditTestCaseLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_RemoveServiceAppPermissions.sql
+:r ../dbo/StoredProcedures/usp_DeleteServiceAppPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_SaveServiceDefinitionSyncWithOperations.sql
+:r ../dbo/StoredProcedures/usp_InsertServiceDefinitionSyncsWithOperations.sql
 GO
-/* usp_SearchElements is recreated below using LIKE-based search via the
+/* usp_SearchIndexingElements is recreated below using LIKE-based search via the
    v_IndexingFileElementSearch view (no longer uses FREETEXTTABLE). */
-:r ../dbo/StoredProcedures/usp_SearchElements.sql
+:r ../dbo/StoredProcedures/usp_SearchIndexingElements.sql
 GO
-:r ../dbo/StoredProcedures/usp_ToggleServiceApplicationActive.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceApplicationsActive.sql
 GO
-:r ../dbo/StoredProcedures/usp_UnlinkRuleSetFromContextObject.sql
+:r ../dbo/StoredProcedures/usp_DeleteRuleSetContextObjectLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_UnlinkRuleSetFromTestCase.sql
+:r ../dbo/StoredProcedures/usp_DeleteServiceTestCaseRuleSetLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_UnlinkTestCaseFromSuite.sql
+:r ../dbo/StoredProcedures/usp_DeleteServiceTestSuiteTestCaseLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateBinaryEmbedding.sql
+:r ../dbo/StoredProcedures/usp_UpdateBinaryEmbeddingsStore.sql
 GO
 :r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAudit.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAuditResponseFileLinkStatus.sql
+:r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAuditResponseFileLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateGlobalSetting.sql
+:r ../dbo/StoredProcedures/usp_UpdateGlobalSettings.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateResourcePermission.sql
+:r ../dbo/StoredProcedures/usp_UpdateResourcePermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateRole.sql
+:r ../dbo/StoredProcedures/usp_UpdateRoles.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateRolePermission.sql
+:r ../dbo/StoredProcedures/usp_UpdateRolePermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateRuleContextObject.sql
+:r ../dbo/StoredProcedures/usp_UpdateRuleContextObjects.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateRuleSet.sql
+:r ../dbo/StoredProcedures/usp_UpdateRuleSets.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceAppAuthentication.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceAppAuthentications.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceDefinitionSync.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceDefinitionSyncs.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceOperation.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceOperations.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceOperationSchema.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceOperationSchemas.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFile.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFiles.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFileEmbedding.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFileEmbeddings.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFileWithDeltaChain.sql
+:r ../dbo/StoredProcedures/usp_InsertAndUpdateServiceRequestFiles.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceResponseFile.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceResponseFiles.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceResponseFileEmbedding.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceResponseFileEmbeddings.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceTestCase.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceTestCases.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceTestSuite.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceTestSuites.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateSoapNamespace.sql
+:r ../dbo/StoredProcedures/usp_UpdateSoapNamespaces.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateTestCaseExecution.sql
+:r ../dbo/StoredProcedures/usp_UpdateServiceTestSuiteExecutionAuditTestCaseLinks.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateUIAction.sql
+:r ../dbo/StoredProcedures/usp_UpdateUIActions.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateUIPage.sql
+:r ../dbo/StoredProcedures/usp_UpdateUIPages.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateUserPermission.sql
+:r ../dbo/StoredProcedures/usp_UpdateUserPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpdateUserSetting.sql
+:r ../dbo/StoredProcedures/usp_UpdateUserSettings.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpsertServiceAppPermissions.sql
+:r ../dbo/StoredProcedures/usp_InsertAndUpdateServiceAppPermissions.sql
 GO
-:r ../dbo/StoredProcedures/usp_UpsertServiceApplication.sql
+:r ../dbo/StoredProcedures/usp_InsertAndUpdateServiceApplications.sql
 GO
 
 /* Apply documentation after all tables, views, and stored procedures are available. */

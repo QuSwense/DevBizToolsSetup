@@ -30,4 +30,6 @@ public class UserPermissionsSummaryView
     public DateTime? LastPermissionUpdate { get; set; }
 
     public string? LastPermissionUpdater { get; set; }
+
+    public Guid? LastServicePublicId { get; set; }
 }

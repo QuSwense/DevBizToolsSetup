@@ -174,7 +174,7 @@ BEGIN
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
 
-        EXEC [dbo].[usp_InsertUserActivity]
+        EXEC [dbo].[usp_InsertUserActivities]
             @UserId = @ResolvedUser,
             @ActivityType = 'ServiceResponseFileEmbeddingCreate',
             @ActionType = 'Create',

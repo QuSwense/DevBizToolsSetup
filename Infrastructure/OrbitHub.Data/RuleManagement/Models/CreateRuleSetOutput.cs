@@ -29,5 +29,7 @@ public class CreateRuleSetOutput
 
     public string? LastUpdatedBy { get; set; }
 
+    public string? OutputContextName { get; set; }
+
     public long? AuditActivityId { get; set; }
 }

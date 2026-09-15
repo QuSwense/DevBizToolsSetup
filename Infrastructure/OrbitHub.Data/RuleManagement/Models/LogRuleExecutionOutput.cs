@@ -7,7 +7,35 @@ namespace OrbitHub.Data.RuleManagement.Models;
 
 public class LogRuleExecutionOutput
 {
-    public int? ExecutionLogId { get; set; }
+    public int? LogId { get; set; }
+
+    public int? RuleSetId { get; set; }
+
+    public byte[]? InputCompressedContent { get; set; }
+
+    public int? InputUncompressedSizeBytes { get; set; }
+
+    public string? InputContentHash { get; set; }
+
+    public byte[]? OutputCompressedContent { get; set; }
+
+    public int? OutputUncompressedSizeBytes { get; set; }
+
+    public string? OutputContentHash { get; set; }
+
+    public string? CompressionAlgorithmType { get; set; }
+
+    public bool? IsSuccess { get; set; }
+
+    public string? ErrorMessage { get; set; }
+
+    public int? ExecutionTimeMs { get; set; }
+
+    public DateTime? ExecutedAt { get; set; }
+
+    public string? ExecutedBy { get; set; }
 
     public long? AuditActivityId { get; set; }
+
+    public string? WorkflowName { get; set; }
 }

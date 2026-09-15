@@ -12,7 +12,7 @@ public class InsertOrGetXmlFileElementOutput
 
     public DateTime CreatedAt { get; set; }
 
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? LastUpdatedAt { get; set; }
 
     public bool IsNew { get; set; }
 }

@@ -30,4 +30,6 @@ public class UpdateUserPermissionOutput
     public string? PermissionKey { get; set; }
 
     public string? UserFullName { get; set; }
+
+    public long? AuditActivityId { get; set; }
 }

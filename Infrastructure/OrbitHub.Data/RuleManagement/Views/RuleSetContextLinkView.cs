@@ -7,19 +7,17 @@ namespace OrbitHub.Data.RuleManagement.Views;
 
 public class RuleSetContextLinkView
 {
-    public long LinkId { get; set; }
+    public int LinkId { get; set; }
 
-    public long RuleSetId { get; set; }
+    public int RuleSetId { get; set; }
 
-    public long RuleContextObjectId { get; set; }
+    public int RuleContextObjectId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
-    public string CreatedBy { get; set; } = string.Empty;
+    public string? CreatedBy { get; set; }
 
-    public DateTime? LastUpdatedAt { get; set; }
-
-    public string? LastUpdatedBy { get; set; }
+    public Guid RuleSetPublicId { get; set; }
 
     public string WorkflowName { get; set; } = string.Empty;
 
@@ -27,15 +25,15 @@ public class RuleSetContextLinkView
 
     public string? RuleSetDescription { get; set; }
 
+    public Guid ContextObjectPublicId { get; set; }
+
     public string ContextName { get; set; } = string.Empty;
 
-    public int? ContextRuleTypeId { get; set; }
+    public string? ContextRuleTypeId { get; set; }
 
     public string? ContextDescription { get; set; }
 
     public bool? ContextIsActive { get; set; }
 
-    public string CreatedByFullName { get; set; } = string.Empty;
-
-    public string LastUpdatedByFullName { get; set; } = string.Empty;
+    public string? CreatedByFullName { get; set; }
 }

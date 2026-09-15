@@ -34,9 +34,7 @@ public static class RepositoryRegistration
 
         // IndexingManagement
         services.AddScoped<BinaryEmbeddingExistsRepository>();
-        services.AddScoped<GetBinaryEmbeddingByHashRepository>();
         services.AddScoped<GetBinaryEmbeddingByIdRepository>();
-        services.AddScoped<GetBinaryEmbeddingUsageRepository>();
         services.AddScoped<GetElementFrequencyRepository>();
         services.AddScoped<GetFilesByElementRepository>();
         services.AddScoped<GetIndexingStatisticsRepository>();

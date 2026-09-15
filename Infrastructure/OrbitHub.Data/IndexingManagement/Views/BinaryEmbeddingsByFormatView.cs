@@ -7,7 +7,7 @@ namespace OrbitHub.Data.IndexingManagement.Views;
 
 public class BinaryEmbeddingsByFormatView
 {
-    public string? FileFormat { get; set; }
+    public string? ContentFormat { get; set; }
 
     public int EmbeddingCount { get; set; }
 

@@ -27,7 +27,7 @@ public class CreateRolePermissionOutput
 
     public string? PermissionKey { get; set; }
 
-    public string? RoleName { get; set; }
+    public string? Role { get; set; }
 
     public long? AuditActivityId { get; set; }
 }

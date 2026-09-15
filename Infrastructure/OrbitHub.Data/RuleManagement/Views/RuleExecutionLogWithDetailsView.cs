@@ -7,19 +7,19 @@ namespace OrbitHub.Data.RuleManagement.Views;
 
 public class RuleExecutionLogWithDetailsView
 {
-    public long LogId { get; set; }
+    public int LogId { get; set; }
 
-    public long RuleSetId { get; set; }
+    public int RuleSetId { get; set; }
 
-    public string? InputCompressedContent { get; set; }
+    public byte[]? InputCompressedContent { get; set; }
 
-    public long? InputUncompressedSizeBytes { get; set; }
+    public int? InputUncompressedSizeBytes { get; set; }
 
     public string? InputContentHash { get; set; }
 
-    public string? OutputCompressedContent { get; set; }
+    public byte[]? OutputCompressedContent { get; set; }
 
-    public long? OutputUncompressedSizeBytes { get; set; }
+    public int? OutputUncompressedSizeBytes { get; set; }
 
     public string? OutputContentHash { get; set; }
 
@@ -29,7 +29,7 @@ public class RuleExecutionLogWithDetailsView
 
     public string? ErrorMessage { get; set; }
 
-    public long? ExecutionTimeMs { get; set; }
+    public int? ExecutionTimeMs { get; set; }
 
     public DateTime ExecutedAt { get; set; }
 
@@ -37,9 +37,9 @@ public class RuleExecutionLogWithDetailsView
 
     public string WorkflowName { get; set; } = string.Empty;
 
-    public long? OutputTypeId { get; set; }
+    public int? OutputTypeId { get; set; }
 
-    public int? RuleSetVersion { get; set; }
+    public string? RuleSetVersion { get; set; }
 
     public string? RuleSetDescription { get; set; }
 

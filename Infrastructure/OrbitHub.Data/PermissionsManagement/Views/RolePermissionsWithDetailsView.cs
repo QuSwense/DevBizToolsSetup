@@ -31,7 +31,7 @@ public class RolePermissionsWithDetailsView
 
     public long ResourcePermissionKeyId { get; set; }
 
-    public string ResourcePermissionPublicId { get; set; } = string.Empty;
+    public Guid ResourcePermissionPublicId { get; set; }
 
     public string PermissionStatus { get; set; } = string.Empty;
 

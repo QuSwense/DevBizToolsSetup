@@ -28,4 +28,6 @@ public class UpdateRolePermissionOutput
     public string? LastUpdatedBy { get; set; }
 
     public string? PermissionKey { get; set; }
+
+    public long? AuditActivityId { get; set; }
 }

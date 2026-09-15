@@ -23,7 +23,7 @@ public class BinaryEmbeddingExistsRepository
         {
                 var result = (await _ctx.QueryProcAsync<BinaryEmbeddingExistsOutput>(
                     "[dbo].[usp_BinaryEmbeddingExists]",
-                new DataParameter("@FileHash", input.FileHash)
+                new DataParameter("@ContentHash", input.ContentHash)
                 )).ToList();
                 return RepositoryResult<BinaryEmbeddingExistsOutput>.Ok(result.FirstOrDefault()!);
         }
