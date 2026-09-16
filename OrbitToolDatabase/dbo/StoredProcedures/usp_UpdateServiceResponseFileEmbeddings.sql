@@ -46,7 +46,7 @@ BEGIN
         FROM [dbo].[ServiceResponseFileEmbeddings] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @EmbeddingId;
 
-        IF @ServiceRequestFileId IS NULL
+        IF @EmbeddingId IS NULL
         BEGIN
             RAISERROR('Response file embedding with Id %d not found.', 16, 1, @EmbeddingId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

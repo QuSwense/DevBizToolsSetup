@@ -15,13 +15,14 @@ DECLARE ColumnDescriptionCursor CURSOR LOCAL FAST_FORWARD FOR
         CAST(
             CASE
                 WHEN column_object.name = N'Id' THEN N'Unique identifier for this ' + table_object.name + N' record.'
+                WHEN column_object.name = N'ParentId' THEN N'Identifier of the parent ' + table_object.name + N' record in the hierarchy.'
+                WHEN column_object.name = N'RoleId' THEN N'Identifier of the role assigned to the user or permission mapping.'
                 WHEN foreign_key.referenced_table IS NOT NULL THEN N'Identifier of the related ' + foreign_key.referenced_table + N' record.'
                 WHEN column_object.name = N'UserId' THEN N'Unique identifier of the user associated with this record.'
                 WHEN column_object.name = N'Email' THEN N'Email address of the user.'
                 WHEN column_object.name = N'Department' THEN N'Organizational department of the user.'
                 WHEN column_object.name = N'FirstName' THEN N'Given name of the user.'
                 WHEN column_object.name = N'LastName' THEN N'Family name of the user.'
-                WHEN column_object.name = N'RoleId' THEN N'Identifier of the role assigned to the user.'
                 WHEN column_object.name = N'PublicId' THEN N'Public identifier used by the UI and external systems (GUID).'
                 WHEN column_object.name = N'ServiceType' THEN N'Service protocol category, such as SOAP or REST.'
                 WHEN column_object.name = N'Name' THEN N'Human-readable name of this record.'
@@ -120,10 +121,8 @@ DECLARE ColumnDescriptionCursor CURSOR LOCAL FAST_FORWARD FOR
                 WHEN column_object.name = N'AccessType' THEN N'Access level granted by the mapping, such as View, Edit, or Full.'
                 WHEN column_object.name = N'CreatedAt' THEN N'Date and time at which this record was created.'
                 WHEN column_object.name = N'CreatedBy' THEN N'Identifier of the user who created this record.'
-                WHEN column_object.name = N'LastUpdatedAt' THEN N'Date and time at which this record was last updated.'
+                WHEN column_object.name = N'LastUpdatedAt' OR column_object.name = N'UpdatedAt' THEN N'Date and time at which this record was last updated.'
                 WHEN column_object.name = N'LastUpdatedBy' THEN N'Identifier of the user who last updated this record.'
-                WHEN column_object.name = N'LastUpdatedAt' THEN N'Date and time at which this record was last updated.'
-                WHEN column_object.name = N'UpdatedAt' THEN N'Date and time at which this record was last updated.'
                 WHEN column_object.name = N'Timestamp' THEN N'Date and time at which the user activity was recorded.'
                 ELSE N'Value of the ' + column_object.name + N' field for this ' + table_object.name + N' record.'
             END AS nvarchar(4000))
