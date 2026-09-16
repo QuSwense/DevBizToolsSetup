@@ -68,7 +68,7 @@ BEGIN
 
         IF @ServiceOperationId IS NULL
         BEGIN
-            RAISERROR('Service operation "%s" not found or inactive.', 16, 1, CONVERT(VARCHAR(200), @OperationName));
+            RAISERROR('Service operation "%s" not found or inactive.', 16, 1, @OperationName);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -91,7 +91,7 @@ BEGIN
             WHERE [ServiceOperationId] = @ServiceOperationId
         )
         BEGIN
-            RAISERROR('A schema already exists for operation "%s". Use update procedure to modify.', 16, 1, CONVERT(VARCHAR(200), @OperationName));
+            RAISERROR('A schema already exists for operation "%s". Use update procedure to modify.', 16, 1, @OperationName);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

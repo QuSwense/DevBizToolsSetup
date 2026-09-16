@@ -69,7 +69,7 @@ BEGIN
               AND [IsActive] = 1
         )
         BEGIN
-            RAISERROR('Permission "%s" already exists for role "%s".', 16, 1, CONVERT(VARCHAR(512), @PermissionKey), CONVERT(VARCHAR(50), @RoleName));
+            RAISERROR('Permission "%s" already exists for role "%s".', 16, 1, @PermissionKey, @RoleName);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

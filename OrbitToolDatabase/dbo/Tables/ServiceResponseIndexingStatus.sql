@@ -13,16 +13,16 @@ CREATE TABLE [dbo].[ServiceResponseIndexingStatus] (
     -- Error message and stack trace detailing failure if IndexingStatus = 'Failed'.
     [IndexingFailureReason] NVARCHAR(MAX) NULL,
     -- Timestamp when background parsing successfully completed.
-    [LastIndexedAt] DATETIME NULL,
+    [LastIndexedAt] DATETIME2(3) NULL,
     -- Timestamp when the status tracking entry was created.
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_ServiceResponseIndexingStatus_CreatedAt] DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT [DF_ServiceResponseIndexingStatus_CreatedAt] DEFAULT GETDATE(),
     -- Timestamp when the status was last updated by the background worker.
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT [PK_ServiceResponseIndexingStatus] PRIMARY KEY CLUSTERED ([ServiceResponseFileId] ASC),
     CONSTRAINT [CK_ServiceResponseIndexingStatus_Status] CHECK ([IndexingStatus] IN ('Pending', 'Processing', 'Completed', 'Failed')),
-    CONSTRAINT [FK_ServiceResponseIndexingStatus_ServiceResponseFiles] FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE
+    CONSTRAINT [FK_ServiceResponseIndexingStatus_ServiceResponseFiles] FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id])
 );
 GO
 

@@ -18,20 +18,20 @@ CREATE TABLE [dbo].[RuleContextObjects] (
     -- Active Status of the Context Object
     [IsActive] BIT NOT NULL CONSTRAINT DF_RuleContextObjects_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_RuleContextObjects_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleContextObjects_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_RuleContextObjects PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_RuleContextObjects_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UIX_RuleContextObjects_ContextName UNIQUE ([ContextName] ASC),
+    CONSTRAINT UQ_RuleContextObjects_ContextName UNIQUE ([ContextName] ASC),
     
     CONSTRAINT FK_RuleContextObjects_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_RuleContextObjects_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_RuleContextObjects_IsActive

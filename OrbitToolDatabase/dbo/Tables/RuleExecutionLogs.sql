@@ -25,7 +25,7 @@ CREATE TABLE [dbo].[RuleExecutionLogs] (
     [IsSuccess] BIT NOT NULL,
     [ErrorMessage] NVARCHAR(MAX) NULL,
     [ExecutionTimeMs] INT NULL,
-    [ExecutedAt] DATETIME NOT NULL CONSTRAINT DF_RuleExecutionLogs_ExecutedAt DEFAULT GETDATE(),
+    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleExecutionLogs_ExecutedAt DEFAULT GETDATE(),
     [ExecutedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_RuleExecutionLogs PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -39,10 +39,10 @@ CREATE TABLE [dbo].[RuleExecutionLogs] (
         CHECK ([OutputContentHash] IS NULL OR LEN([OutputContentHash]) = 64 AND [OutputContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
 
     CONSTRAINT FK_RuleExecutionLogs_RuleSets FOREIGN KEY ([RuleSetId])
-        REFERENCES [dbo].[RuleSets]([Id]) ON DELETE CASCADE,
+        REFERENCES [dbo].[RuleSets]([Id]),
     CONSTRAINT FK_RuleExecutionLogs_Users_ExecutedBy
         FOREIGN KEY ([ExecutedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_RuleExecutionLogs_RuleSetId

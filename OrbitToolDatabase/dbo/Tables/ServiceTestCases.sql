@@ -12,9 +12,9 @@ CREATE TABLE [dbo].[ServiceTestCases] (
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestCases_IsActive DEFAULT 1,
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceTestCases_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceTestCases_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceTestCases_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     -- Primary Key
@@ -31,7 +31,7 @@ CREATE TABLE [dbo].[ServiceTestCases] (
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceTestCases_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceTestCases_ServiceRequestFileId

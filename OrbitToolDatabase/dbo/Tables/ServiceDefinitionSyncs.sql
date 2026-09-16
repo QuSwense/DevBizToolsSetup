@@ -25,9 +25,9 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceDefinitionSyncs_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceDefinitionSyncs_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceDefinitionSyncs_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -50,9 +50,10 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
 
     -- Foreign keys
     CONSTRAINT FK_ServiceDefinitionSyncs_ServiceApplications_ServiceApplicationId
-        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]),
     CONSTRAINT FK_ServiceDefinitionSyncs_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceDefinitionSyncs_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
+GO

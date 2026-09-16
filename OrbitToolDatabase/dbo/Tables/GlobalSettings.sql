@@ -24,9 +24,9 @@ CREATE TABLE [dbo].[GlobalSettings] (
     -- Indicates if the setting is currently active
     [IsActive] BIT NOT NULL CONSTRAINT DF_GlobalSettings_IsActive DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_GlobalSettings_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_GlobalSettings_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_GlobalSettings PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -39,4 +39,5 @@ CREATE TABLE [dbo].[GlobalSettings] (
     -- Foreign Key Constraints for auditing
     CONSTRAINT FK_GlobalSettings_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_GlobalSettings_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
+GO

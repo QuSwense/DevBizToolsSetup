@@ -127,4 +127,5 @@ BEGIN
         -- Re-throw error
         THROW;
     END CATCH
-END
+END;
+GO

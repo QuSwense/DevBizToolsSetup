@@ -94,7 +94,7 @@ BEGIN
                   AND [Id] != @OperationId
             )
             BEGIN
-                RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, CONVERT(VARCHAR(200), @OperationName));
+                RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, @OperationName);
                 IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                     ROLLBACK TRANSACTION;
                 RETURN;

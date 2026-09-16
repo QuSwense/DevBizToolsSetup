@@ -17,8 +17,8 @@ CREATE TABLE [dbo].[DirectExecutionAuditResponseFileLinks] (
     [ServiceResponseFileId] INT NOT NULL,
     -- Execution order within the audit
     [ExecutionOrder] INT NOT NULL CONSTRAINT DF_DirectExecutionAuditResponseFileLinks_ExecutionOrder DEFAULT 0,
-    [ExecutedAt] DATETIME NOT NULL CONSTRAINT DF_DirectExecutionAuditResponseFileLinks_ExecutedAt DEFAULT GETDATE(),
-    [ExecutionCompletedAt] DATETIME NULL,
+    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_DirectExecutionAuditResponseFileLinks_ExecutedAt DEFAULT GETDATE(),
+    [ExecutionCompletedAt] DATETIME2(3) NULL,
     [HttpStatusCode] INT NULL, -- Response status code (200, 404, 500, etc.)
     [HttpVersion] NVARCHAR(10) NULL, -- HTTP/1.1, HTTP/2, HTTP/3
     [HttpRequestDurationMs] INT NULL, -- Total request duration in milliseconds
@@ -37,9 +37,9 @@ CREATE TABLE [dbo].[DirectExecutionAuditResponseFileLinks] (
     CONSTRAINT CK_DirectExecutionAuditResponseFileLinks_ExecutionStatus CHECK ([ExecutionStatus] IN ('Pending', 'InProgress', 'Completed', 'Failed')),
 
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_DirectExecutionAudit_DirectExecutionAuditId
-        FOREIGN KEY ([DirectExecutionAuditId]) REFERENCES [dbo].[DirectExecutionAudit]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([DirectExecutionAuditId]) REFERENCES [dbo].[DirectExecutionAudit]([Id]),
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_ServiceRequestFiles_ServiceRequestFileId
-        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
     -- NO ACTION: ServiceRequestFiles is already reachable via ServiceResponseFiles (which cascades
     -- from ServiceRequestFiles), so CASCADE here would create a multiple-cascade-path error (Msg 1785).
     CONSTRAINT FK_DirectExecutionAuditResponseFileLinks_ServiceResponseFiles_ServiceResponseFileId

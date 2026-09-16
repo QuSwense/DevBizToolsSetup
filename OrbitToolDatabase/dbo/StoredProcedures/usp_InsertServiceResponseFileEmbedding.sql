@@ -77,9 +77,9 @@ BEGIN
             UncompressedSizeBytes INT,
             CompressionAlgorithmType VARCHAR(50),
             ContentFormat VARCHAR(10),
-            CreatedAt DATETIME,
+            CreatedAt DATETIME2(3),
             CreatedBy NVARCHAR(20),
-            LastUpdatedAt DATETIME,
+            LastUpdatedAt DATETIME2(3),
             LastUpdatedBy NVARCHAR(20),
             IsNew BIT
         );

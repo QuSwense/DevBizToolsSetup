@@ -12,8 +12,8 @@ CREATE TABLE [dbo].[IndexingJsonFileElements]
     [JsonPath] NVARCHAR(400) NOT NULL,
     -- JSON value type: 'String', 'Number', 'Boolean', 'Null', 'Array', 'Object'
     [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
-    [LastUpdatedAt] DATETIME NULL,
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
+    [LastUpdatedAt] DATETIME2(3) NULL,
 
     CONSTRAINT [PK_IndexingJsonFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
     CONSTRAINT [UQ_IndexingJsonFileElements_ElementName_JsonPath] UNIQUE ([ElementName] ASC, [JsonPath] ASC),

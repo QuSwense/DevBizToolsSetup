@@ -11,19 +11,19 @@ CREATE TABLE [dbo].[ServiceTestSuiteTestCaseLinks] (
     [ServiceTestCaseId] INT NOT NULL,
     [ExecutionOrder] INT NOT NULL CONSTRAINT DF_ServiceTestSuiteTestCaseLinks_ExecutionOrder DEFAULT 1,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestSuiteTestCaseLinks_IsActive DEFAULT 1,
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceTestSuiteTestCaseLinks_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceTestSuiteTestCaseLinks_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceTestSuiteTestCaseLinks PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestSuiteTestCaseLinks_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_ServiceTestSuiteTestCaseLinks_Suite_Case UNIQUE ([ServiceTestSuiteId] ASC, [ServiceTestCaseId] ASC),
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_ServiceTestSuites_ServiceTestSuiteId
-        FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]),
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_ServiceTestCases_ServiceTestCaseId
-        FOREIGN KEY ([ServiceTestCaseId]) REFERENCES [dbo].[ServiceTestCases]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceTestCaseId]) REFERENCES [dbo].[ServiceTestCases]([Id]),
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinks_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteTestCaseLinks_ServiceTestCaseId

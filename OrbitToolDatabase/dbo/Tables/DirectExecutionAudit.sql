@@ -13,8 +13,8 @@ CREATE TABLE [dbo].[DirectExecutionAudit] (
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_DirectExecutionAudit_PublicId DEFAULT NEWID(),
     [Name] NVARCHAR(200) NOT NULL,
-    [ExecutedAt] DATETIME NOT NULL CONSTRAINT DF_DirectExecutionAudit_ExecutedAt DEFAULT GETDATE(),
-    [ExecutionCompletedAt] DATETIME NULL,
+    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_DirectExecutionAudit_ExecutedAt DEFAULT GETDATE(),
+    [ExecutionCompletedAt] DATETIME2(3) NULL,
     [ExecutionStatus] NVARCHAR(50) NOT NULL,
     [ExecutionDetails] NVARCHAR(MAX) NULL, -- JSON or text details about the execution
     [ExecutedBy] NVARCHAR(20) NOT NULL,

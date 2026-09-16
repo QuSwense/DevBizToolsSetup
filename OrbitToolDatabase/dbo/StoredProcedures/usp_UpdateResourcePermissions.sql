@@ -88,14 +88,14 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        -- Rollback if we started the transaction
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        -- Re-throw with preserved error metadata (standard family pattern)
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
         DECLARE @ErrorState INT = ERROR_STATE();
-        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
+
+        RAISERROR('Error updating resource permission: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
-END
+END;
+GO

@@ -12,9 +12,9 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestSuites_IsActive DEFAULT 1,
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceTestSuites_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceTestSuites_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceTestSuites_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceTestSuites PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -27,4 +27,5 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceTestSuites_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
+GO

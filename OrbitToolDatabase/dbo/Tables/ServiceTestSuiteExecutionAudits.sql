@@ -10,9 +10,9 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAudits] (
     -- Foreign Key to ServiceTestSuites
     [ServiceTestSuiteId] INT NOT NULL,
     -- Execution started at
-    [ExecutedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceTestSuiteExecutionAudits_ExecutedAt DEFAULT GETDATE(),
+    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceTestSuiteExecutionAudits_ExecutedAt DEFAULT GETDATE(),
     -- Execution completed at
-    [ExecutionCompletedAt] DATETIME NULL,
+    [ExecutionCompletedAt] DATETIME2(3) NULL,
     -- Execution status (e.g., 'Pending', 'In Progress', 'Completed', 'Failed')
     [ExecutionStatus] NVARCHAR(50) NOT NULL,
     -- Execution details in JSON or text format, providing additional information about the execution process, such as logs, error messages, or any other relevant data.
@@ -25,10 +25,10 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAudits] (
     CONSTRAINT CK_ServiceTestSuiteExecutionAudits_ExecutionStatus
         CHECK ([ExecutionStatus] IN ('Pending', 'InProgress', 'Completed', 'Failed')),
     CONSTRAINT FK_ServiceTestSuiteExecutionAudits_ServiceTestSuites_ServiceTestSuiteId
-        FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceTestSuiteId]) REFERENCES [dbo].[ServiceTestSuites]([Id]),
     CONSTRAINT FK_ServiceTestSuiteExecutionAudits_Users_ExecutedBy
         FOREIGN KEY ([ExecutedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAudits_ServiceTestSuiteId

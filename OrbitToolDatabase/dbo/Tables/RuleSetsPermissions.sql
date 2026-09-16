@@ -24,9 +24,9 @@ CREATE TABLE [dbo].[RuleSetsPermissions] (
     -- Indicates if the permission is active, default is true
     [IsActive] BIT NOT NULL CONSTRAINT DF_RuleSetsPermissions_IsActive DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_RuleSetsPermissions_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleSetsPermissions_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     -- Primary Key
@@ -41,29 +41,29 @@ CREATE TABLE [dbo].[RuleSetsPermissions] (
 
     -- Foreign Keys
     CONSTRAINT FK_RuleSetsPermissions_RuleSets_RuleSetId
-        FOREIGN KEY ([RuleSetId]) REFERENCES [dbo].[RuleSets]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([RuleSetId]) REFERENCES [dbo].[RuleSets]([Id]),
     CONSTRAINT FK_RuleSetsPermissions_Users_UserId
-        FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]) ON DELETE CASCADE,
+        FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_RuleSetsPermissions_Roles_RoleId
-        FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]),
     CONSTRAINT FK_RuleSetsPermissions_ResourcePermissions_ResourcePermissionId
-        FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_RuleSetsPermissions_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_RuleSetsPermissions_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 -- Performance Indexes
 -- Filtered unique indexes: a plain UNIQUE over nullable UserId/RoleId does not enforce
 -- uniqueness (NULLs compare as distinct), so split into one index per grantee kind.
-CREATE UNIQUE NONCLUSTERED INDEX UX_RuleSetsPermissions_Set_User_Resource
+CREATE UNIQUE NONCLUSTERED INDEX IX_RuleSetsPermissions_Set_User_Resource
     ON [dbo].[RuleSetsPermissions]([RuleSetId] ASC, [UserId] ASC, [ResourcePermissionId] ASC)
     WHERE [UserId] IS NOT NULL
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX UX_RuleSetsPermissions_Set_Role_Resource
+CREATE UNIQUE NONCLUSTERED INDEX IX_RuleSetsPermissions_Set_Role_Resource
     ON [dbo].[RuleSetsPermissions]([RuleSetId] ASC, [RoleId] ASC, [ResourcePermissionId] ASC)
     WHERE [RoleId] IS NOT NULL
 GO

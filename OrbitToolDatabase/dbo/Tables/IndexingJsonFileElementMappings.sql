@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[IndexingJsonFileElementMappings]
             OR ([RequestFileId] IS NULL AND [ResponseFileId] IS NOT NULL)),
 
     CONSTRAINT [FK_IndexingJsonFileElementMappings_IndexingJsonFileElementSearch] 
-        FOREIGN KEY ([IndexingJsonFileElementSearchId]) REFERENCES [dbo].[IndexingJsonFileElementSearch]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([IndexingJsonFileElementSearchId]) REFERENCES [dbo].[IndexingJsonFileElementSearch]([Id]),
 
     -- NO ACTION: ServiceRequestFiles already reaches this table through ServiceResponseFiles
     -- (which cascades from ServiceRequestFiles), so CASCADE here would be a second

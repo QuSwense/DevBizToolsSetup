@@ -22,9 +22,9 @@ CREATE TABLE [dbo].[SoapNamespaces] (
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_SoapNamespaces_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_SoapNamespaces_CreatedAt] DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT [DF_SoapNamespaces_CreatedAt] DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     -- Primary Key
@@ -40,8 +40,8 @@ CREATE TABLE [dbo].[SoapNamespaces] (
 
     -- Foreign Keys
     CONSTRAINT [FK_SoapNamespaces_ServiceOperationSchemas_ServiceOperationSchemaId]
-        FOREIGN KEY ([ServiceOperationSchemaId]) REFERENCES [dbo].[ServiceOperationSchemas]([Id]) ON DELETE CASCADE
-)
+        FOREIGN KEY ([ServiceOperationSchemaId]) REFERENCES [dbo].[ServiceOperationSchemas]([Id])
+);
 GO
 
 CREATE NONCLUSTERED INDEX [IX_SoapNamespaces_ServiceOperationSchemaId]

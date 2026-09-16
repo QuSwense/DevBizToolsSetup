@@ -21,9 +21,9 @@ CREATE TABLE [dbo].[Roles] (
     -- Indicates if the role is active
     [IsActive] BIT NOT NULL CONSTRAINT DF_Roles_IsActive DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_Roles_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_Roles_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_Roles PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -33,7 +33,7 @@ CREATE TABLE [dbo].[Roles] (
     -- Foreign Keys
     CONSTRAINT FK_Roles_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_Roles_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_Roles_IsActive ON [dbo].[Roles]([IsActive] ASC)

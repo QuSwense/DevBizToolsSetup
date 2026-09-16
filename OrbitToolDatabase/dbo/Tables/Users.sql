@@ -20,9 +20,9 @@ CREATE TABLE [dbo].[Users] (
     -- Indicates if the user is currently active, default is true
     [IsActive] BIT NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_Users PRIMARY KEY CLUSTERED ([UserId] ASC),

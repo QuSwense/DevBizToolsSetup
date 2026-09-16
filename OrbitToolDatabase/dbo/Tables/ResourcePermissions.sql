@@ -13,9 +13,9 @@ CREATE TABLE [dbo].[ResourcePermissions]
     -- string representing the permission key e.g., 'soapapplication:add', 'restapi:delete', etc.
     [PermissionKey] NVARCHAR(512) NOT NULL,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ResourcePermissions_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ResourcePermissions_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ResourcePermissions PRIMARY KEY ([Id]),
@@ -25,3 +25,4 @@ CREATE TABLE [dbo].[ResourcePermissions]
     CONSTRAINT FK_ResourcePermissions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ResourcePermissions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
+GO

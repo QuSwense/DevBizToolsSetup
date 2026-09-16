@@ -26,9 +26,9 @@ CREATE TABLE [dbo].[UIActions] (
     -- Indicates if action is active
     [IsActive] BIT NOT NULL CONSTRAINT DF_UIActions_IsActive DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_UIActions_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_UIActions_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_UIActions PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -36,11 +36,11 @@ CREATE TABLE [dbo].[UIActions] (
     CONSTRAINT UQ_UIActions_PageId_ActionName UNIQUE ([PageId] ASC, [ActionName] ASC),
 
     -- Foreign Keys
-    CONSTRAINT FK_UIActions_UIPages_PageId FOREIGN KEY ([PageId]) REFERENCES [dbo].[UIPages]([Id]) ON DELETE CASCADE,
+    CONSTRAINT FK_UIActions_UIPages_PageId FOREIGN KEY ([PageId]) REFERENCES [dbo].[UIPages]([Id]),
     CONSTRAINT FK_UIActions_ResourcePermissions FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_UIActions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UIActions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_UIActions_ResourcePermissionId

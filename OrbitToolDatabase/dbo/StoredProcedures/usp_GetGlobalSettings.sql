@@ -39,4 +39,5 @@ BEGIN
     ORDER BY
         gs.[Category],
         gs.[SettingKey];
-END
+END;
+GO

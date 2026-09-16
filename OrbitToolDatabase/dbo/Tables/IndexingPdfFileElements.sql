@@ -14,8 +14,8 @@ CREATE TABLE [dbo].[IndexingPdfFileElements]
     [BoundingRectangle] NVARCHAR(400) NOT NULL,
     -- PDF value type: 'String', 'Number', 'Boolean', 'Array', 'Object'
     [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
-    [LastUpdatedAt] DATETIME NULL,
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
+    [LastUpdatedAt] DATETIME2(3) NULL,
 
     CONSTRAINT [PK_IndexingPdfFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
     CONSTRAINT [CK_IndexingPdfFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object')),

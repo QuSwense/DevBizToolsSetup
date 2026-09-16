@@ -9,7 +9,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @StartDate DATETIME = DATEADD(DAY, -@DaysBack, GETDATE());
+    DECLARE @StartDate DATETIME2(3) = DATEADD(DAY, -@DaysBack, SYSDATETIME());
 
     SELECT 
         @ServiceTestSuiteId AS TestSuiteId,

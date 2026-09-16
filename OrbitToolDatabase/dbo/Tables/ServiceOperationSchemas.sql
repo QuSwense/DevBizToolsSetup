@@ -33,10 +33,10 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceOperationSchemas_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL
+    [CreatedAt] DATETIME2(3) NOT NULL
         CONSTRAINT [DF_ServiceOperationSchemas_CreatedAt] DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     -- Primary Key
@@ -55,9 +55,10 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
     -- Foreign Keys
     CONSTRAINT [FK_ServiceOperationSchemas_ServiceOperations_ServiceOperationId]
         FOREIGN KEY ([ServiceOperationId])
-        REFERENCES [dbo].[ServiceOperations]([Id]) ON DELETE CASCADE
-)
+        REFERENCES [dbo].[ServiceOperations]([Id])
+);
 GO
 
 CREATE NONCLUSTERED INDEX [IX_ServiceOperationSchemas_ServiceOperationId]
     ON [dbo].[ServiceOperationSchemas]([ServiceOperationId] ASC)
+GO

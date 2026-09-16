@@ -53,7 +53,7 @@ BEGIN
         -- Verify user exists
         IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [UserId] = @UserId)
         BEGIN
-            RAISERROR('User %s not found.', 16, 1, CONVERT(VARCHAR(20), @UserId));
+            RAISERROR('User %s not found.', 16, 1, @UserId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

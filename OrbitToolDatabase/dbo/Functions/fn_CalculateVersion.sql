@@ -55,4 +55,5 @@ BEGIN
     END
 
     RETURN @Result;
-END
+END;
+GO

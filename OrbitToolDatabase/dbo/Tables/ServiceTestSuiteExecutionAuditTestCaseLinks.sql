@@ -10,8 +10,8 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks] (
     [ServiceTestSuiteExecutionAuditId] INT NOT NULL,
     [ServiceTestCaseId] INT NOT NULL,
     [ServiceResponseFileId] INT NOT NULL,
-    [ExecutedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceTestSuiteExecutionAuditTestCaseLinks_ExecutedAt DEFAULT GETDATE(),
-    [ExecutionCompletedAt] DATETIME NULL,
+    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceTestSuiteExecutionAuditTestCaseLinks_ExecutedAt DEFAULT GETDATE(),
+    [ExecutionCompletedAt] DATETIME2(3) NULL,
     [HttpStatusCode] INT NULL, -- Response status code (200, 404, 500, etc.)
     [HttpVersion] NVARCHAR(10) NULL, -- HTTP/1.1, HTTP/2, HTTP/3
     [HttpRequestDurationMs] INT NULL, -- Total request duration in milliseconds
@@ -33,12 +33,12 @@ CREATE TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks] (
         FOREIGN KEY ([ExecutedBy]) REFERENCES [dbo].[Users]([UserId]),
 
     CONSTRAINT FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestSuiteExecutionAudits_ServiceTestSuiteExecutionAuditId
-        FOREIGN KEY ([ServiceTestSuiteExecutionAuditId]) REFERENCES [dbo].[ServiceTestSuiteExecutionAudits]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceTestSuiteExecutionAuditId]) REFERENCES [dbo].[ServiceTestSuiteExecutionAudits]([Id]),
     CONSTRAINT FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestCases_ServiceTestCaseId
-        FOREIGN KEY ([ServiceTestCaseId]) REFERENCES [dbo].[ServiceTestCases]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceTestCaseId]) REFERENCES [dbo].[ServiceTestCases]([Id]),
     CONSTRAINT FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceResponseFiles_ServiceResponseFileId
-        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE
-)
+        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id])
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestCaseId

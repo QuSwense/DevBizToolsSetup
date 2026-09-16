@@ -19,9 +19,9 @@ CREATE TABLE [dbo].[ServiceRequestFileEmbeddings] (
     -- Indicates if the service request file embedding record is currently active
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceRequestFileEmbeddings_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceRequestFileEmbeddings_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceRequestFileEmbeddings_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceRequestFileEmbeddings PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -32,7 +32,7 @@ CREATE TABLE [dbo].[ServiceRequestFileEmbeddings] (
         CHECK (LEN([FileHash]) = 64 AND [FileHash] NOT LIKE '%[^0-9a-fA-F]%'),
 
     CONSTRAINT FK_ServiceRequestFileEmbeddings_ServiceRequestFiles
-        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
     CONSTRAINT FK_ServiceRequestFileEmbeddings_BinaryEmbeddingsStore
         FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id]),
     CONSTRAINT FK_ServiceRequestFileEmbeddings_Users_CreatedBy

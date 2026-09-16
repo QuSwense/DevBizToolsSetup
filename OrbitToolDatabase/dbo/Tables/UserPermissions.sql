@@ -17,9 +17,9 @@ CREATE TABLE [dbo].[UserPermissions] (
     -- Indicates if the user permission is currently active, default is true
     [IsActive] BIT NOT NULL CONSTRAINT DF_UserPermissions_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_UserPermissions_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_UserPermissions_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_UserPermissions PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -31,7 +31,7 @@ CREATE TABLE [dbo].[UserPermissions] (
     CONSTRAINT FK_UserPermissions_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UserPermissions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UserPermissions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_UserPermissions_ResourcePermissionId

@@ -25,9 +25,9 @@ CREATE TABLE [dbo].[UIPages] (
     -- Indicates if page is visible in navigation
     [IsVisibleInNav] BIT NOT NULL CONSTRAINT DF_UIPages_IsVisibleInNav DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_UIPages_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_UIPages_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_UIPages PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -39,7 +39,7 @@ CREATE TABLE [dbo].[UIPages] (
     CONSTRAINT FK_UIPages_ResourcePermissions FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_UIPages_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UIPages_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_UIPages_ParentId

@@ -48,7 +48,7 @@ BEGIN
         DECLARE @ExistingIsActive BIT;
         DECLARE @ExistingRecordVersion VARCHAR(50);
         DECLARE @ExistingAuthId INT;
-        DECLARE @ExistingCreatedAt DATETIME;
+        DECLARE @ExistingCreatedAt DATETIME2(3);
         DECLARE @ExistingCreatedBy NVARCHAR(20);
         DECLARE @ExistingLastUpdatedBy NVARCHAR(20);
         DECLARE @NewAuthId INT = NULL;
@@ -157,7 +157,7 @@ BEGIN
                   AND [IsActive] = 1
             )
             BEGIN
-                RAISERROR('An active service application with the name "%s" already exists.', 16, 1, CONVERT(VARCHAR(200), @Name));
+                RAISERROR('An active service application with the name "%s" already exists.', 16, 1, @Name);
                 IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                     ROLLBACK TRANSACTION;
                 RETURN;

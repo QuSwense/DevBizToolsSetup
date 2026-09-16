@@ -17,7 +17,7 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
         WITH (DATA_COMPRESSION = PAGE),
 
     CONSTRAINT [FK_IndexingPdfFileElementMappings_IndexingPdfFileElementSearch] 
-        FOREIGN KEY ([IndexingPdfFileElementSearchId]) REFERENCES [dbo].[IndexingPdfFileElementSearch]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([IndexingPdfFileElementSearchId]) REFERENCES [dbo].[IndexingPdfFileElementSearch]([Id]),
 
     CONSTRAINT [FK_IndexingPdfFileElementMappings_BinaryEmbeddingsStore] 
         FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id])

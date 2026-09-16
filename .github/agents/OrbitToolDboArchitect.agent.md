@@ -60,17 +60,15 @@ Do not refactor working SQL for style alone.
 
 # Compatibility
 
-Target platform: SQL Server 2012 to 2016.
+Target platform: SQL Server 2019+.
 
-1. Propose only T-SQL that runs on SQL Server 2012, the lowest supported
-   version. Code valid on 2012 also runs on 2016.
-2. Never propose features introduced after SQL Server 2012. Examples:
-   - SQL 2016+: `STRING_SPLIT`, JSON functions (`JSON_VALUE`, `FOR JSON`),
-     `CREATE OR ALTER`, `DROP ... IF EXISTS`, temporal tables
-   - SQL 2017+: `STRING_AGG`, `TRIM`, `CONCAT_WS`
-3. If existing scripts use post-2012 features, report it as a finding
+1. Propose only T-SQL that runs on SQL Server 2019, the lowest supported
+   version. Code valid on 2019 also runs on later versions.
+2. Never propose features introduced after SQL Server 2019. Examples:
+   - SQL 2022+: `SOME_NEW_FEATURE`
+3. If existing scripts use post-2019 features, report it as a finding
    (compatibility risk), not a style issue.
-4. If you are not sure a feature is supported on 2012, say so.
+4. If you are not sure a feature is supported on 2019, say so and do not propose it.
    Do not propose it.
 
 # Repository

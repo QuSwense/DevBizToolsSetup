@@ -14,16 +14,16 @@ CREATE TABLE [dbo].[UserRoles]
     -- The Role ID is used to associate the user with a specific role.
     [RoleId] INT NOT NULL,
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT PK_UserRoles PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_UserRoles_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_UserRoles_UserId_RoleId UNIQUE ([UserId] ASC, [RoleId] ASC),
 
-    CONSTRAINT FK_UserRoles_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]) ON DELETE CASCADE,
+    CONSTRAINT FK_UserRoles_Users_UserId FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_UserRoles_Roles_RoleId FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]),
     CONSTRAINT FK_UserRoles_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_UserRoles_RoleId

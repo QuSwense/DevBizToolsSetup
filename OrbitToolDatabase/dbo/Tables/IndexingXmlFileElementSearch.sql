@@ -11,13 +11,12 @@ CREATE TABLE [dbo].[IndexingXmlFileElementSearch]
     [IndexingXmlFileElementId] BIGINT NOT NULL,
     -- Path and value
     [ElementValue] NVARCHAR(800) NOT NULL,
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
     
     CONSTRAINT [PK_IndexingXmlFileElementSearch] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
-    CONSTRAINT [UQ_IndexingXmlFileElementSearch_Element_Value] UNIQUE ([IndexingXmlFileElementId] ASC, [ElementValue] ASC),
 
     CONSTRAINT [FK_IndexingXmlFileElementSearch_IndexingXmlFileElements] 
-        FOREIGN KEY ([IndexingXmlFileElementId]) REFERENCES [dbo].[IndexingXmlFileElements]([Id]) ON DELETE CASCADE
+        FOREIGN KEY ([IndexingXmlFileElementId]) REFERENCES [dbo].[IndexingXmlFileElements]([Id])
 );
 GO
 

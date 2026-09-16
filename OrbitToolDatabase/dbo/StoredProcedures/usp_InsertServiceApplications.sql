@@ -64,7 +64,7 @@ BEGIN
               AND [IsActive] = 1
         )
         BEGIN
-            RAISERROR('An active service application with the name "%s" already exists.', 16, 1, CONVERT(VARCHAR(200), @Name));
+            RAISERROR('An active service application with the name "%s" already exists.', 16, 1, @Name);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

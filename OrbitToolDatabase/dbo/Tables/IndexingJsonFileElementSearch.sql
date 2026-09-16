@@ -10,14 +10,13 @@ CREATE TABLE [dbo].[IndexingJsonFileElementSearch]
     -- Element reference
     [IndexingJsonFileElementId] BIGINT NOT NULL,
     -- Path and value
-    [ElementValue] NVARCHAR(800) NOT NULL,
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [ElementValue] NVARCHAR(1024) NOT NULL,
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
     
     CONSTRAINT [PK_IndexingJsonFileElementSearch] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
-    CONSTRAINT [UQ_IndexingJsonFileElementSearch_Element_Value] UNIQUE ([IndexingJsonFileElementId] ASC, [ElementValue] ASC),
 
     CONSTRAINT [FK_IndexingJsonFileElementSearch_IndexingJsonFileElements] 
-        FOREIGN KEY ([IndexingJsonFileElementId]) REFERENCES [dbo].[IndexingJsonFileElements]([Id]) ON DELETE CASCADE
+        FOREIGN KEY ([IndexingJsonFileElementId]) REFERENCES [dbo].[IndexingJsonFileElements]([Id])
 );
 GO
 

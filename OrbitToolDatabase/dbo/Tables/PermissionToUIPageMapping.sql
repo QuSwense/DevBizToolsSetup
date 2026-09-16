@@ -21,9 +21,9 @@ CREATE TABLE [dbo].[PermissionToUIPageMapping] (
     -- Indicates if mapping is active
     [IsActive] BIT NOT NULL CONSTRAINT DF_PermissionToUIPageMapping_IsActive DEFAULT 1,
     -- Timestamps
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_PermissionToUIPageMapping_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_PermissionToUIPageMapping_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_PermissionToUIPageMapping PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -33,14 +33,14 @@ CREATE TABLE [dbo].[PermissionToUIPageMapping] (
 
     -- Foreign Keys
     CONSTRAINT FK_PermissionToUIPageMapping_ResourcePermissions FOREIGN KEY ([ResourcePermissionId]) 
-        REFERENCES [dbo].[ResourcePermissions]([Id]) ON DELETE CASCADE,
+        REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_PermissionToUIPageMapping_UIPages FOREIGN KEY ([UIPageId]) 
-        REFERENCES [dbo].[UIPages]([Id]) ON DELETE CASCADE,
+        REFERENCES [dbo].[UIPages]([Id]),
     CONSTRAINT FK_PermissionToUIPageMapping_Users_CreatedBy FOREIGN KEY ([CreatedBy]) 
         REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_PermissionToUIPageMapping_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) 
         REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_PermissionToUIPageMapping_UIPageId

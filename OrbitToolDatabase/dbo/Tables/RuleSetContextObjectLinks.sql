@@ -17,20 +17,20 @@ CREATE TABLE [dbo].[RuleSetContextObjectLinks] (
     -- Foreign Key References
     [RuleContextObjectId] INT NOT NULL,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_RuleSetContextObjectLinks_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleSetContextObjectLinks_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_RuleSetContextObjectLinks PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_RuleSetContextObjectLinks_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UIX_RuleSetContextObjectLinks_RuleSetId_RuleContextObjectId UNIQUE ([RuleSetId] ASC, [RuleContextObjectId] ASC),
+    CONSTRAINT UQ_RuleSetContextObjectLinks_RuleSetId_RuleContextObjectId UNIQUE ([RuleSetId] ASC, [RuleContextObjectId] ASC),
 
     CONSTRAINT FK_RuleSetContextObjectLinks_RuleSets FOREIGN KEY ([RuleSetId])
-        REFERENCES [dbo].[RuleSets]([Id]) ON DELETE CASCADE,
+        REFERENCES [dbo].[RuleSets]([Id]),
     CONSTRAINT FK_RuleSetContextObjectLinks_RuleContextObjects FOREIGN KEY ([RuleContextObjectId])
-        REFERENCES [dbo].[RuleContextObjects]([Id]) ON DELETE CASCADE,
+        REFERENCES [dbo].[RuleContextObjects]([Id]),
     CONSTRAINT FK_RuleSetContextObjectLinks_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_RuleSetContextObjectLinks_RuleContextObjectId

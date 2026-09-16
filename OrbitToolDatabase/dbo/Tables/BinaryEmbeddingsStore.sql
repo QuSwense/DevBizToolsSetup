@@ -29,9 +29,9 @@ CREATE TABLE [dbo].[BinaryEmbeddingsStore] (
     -- File extension or format classification (e.g., 'PDF', 'BINARY').
     [ContentFormat] VARCHAR(10) NULL,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_BinaryEmbeddingsStore_CreatedAt] DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT [DF_BinaryEmbeddingsStore_CreatedAt] DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT [PK_BinaryEmbeddingsStore] PRIMARY KEY CLUSTERED ([Id] ASC),

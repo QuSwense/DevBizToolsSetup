@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[IndexingXmlFileElementMappings]
             OR ([RequestFileId] IS NULL AND [ResponseFileId] IS NOT NULL)),
 
     CONSTRAINT [FK_IndexingXmlFileElementMappings_IndexingXmlFileElementSearch] 
-        FOREIGN KEY ([IndexingXmlFileElementSearchId]) REFERENCES [dbo].[IndexingXmlFileElementSearch]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([IndexingXmlFileElementSearchId]) REFERENCES [dbo].[IndexingXmlFileElementSearch]([Id]),
 
     -- NO ACTION: ServiceRequestFiles already reaches this table through ServiceResponseFiles
     -- (which cascades from ServiceRequestFiles), so CASCADE here would be a second

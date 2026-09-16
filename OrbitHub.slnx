@@ -17,6 +17,9 @@
   <Folder Name="/Infrastructure/OrbitHub.Data/scripts/linq2db-doccomments/">
     <Project Path="Infrastructure/linq2db-doccomments/DocIntercept.csproj" />
   </Folder>
+  <Folder Name="/ToolHelpers/">
+    <Project Path="ToolHelpers/CodeMerger/CodeMerger.csproj" />
+  </Folder>
   <Folder Name="/WebApp/">
     <Project Path="WebApp/OrbitHub.Web/OrbitHub.Web.csproj" />
   </Folder>

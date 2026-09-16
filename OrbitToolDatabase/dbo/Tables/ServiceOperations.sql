@@ -30,9 +30,9 @@ CREATE TABLE [dbo].[ServiceOperations] (
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceOperations_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceOperations_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceOperations_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -45,24 +45,24 @@ CREATE TABLE [dbo].[ServiceOperations] (
 
     -- Foreign keys
     CONSTRAINT FK_ServiceOperations_ServiceApplications_ServiceApplicationId
-        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceApplicationId]) REFERENCES [dbo].[ServiceApplications]([Id]),
     CONSTRAINT FK_ServiceOperations_ServiceDefinitionSyncs_ServiceDefinitionSyncId
         FOREIGN KEY ([ServiceDefinitionSyncId]) REFERENCES [dbo].[ServiceDefinitionSyncs]([Id]),
     CONSTRAINT FK_ServiceOperations_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceOperations_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 -- Uniqueness: ServiceDefinitionSyncId is nullable, so a plain UNIQUE over it does not
 -- enforce uniqueness (NULLs compare as distinct). Split into two filtered indexes.
-CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceOperations_App_Op_Version_NoSync
+CREATE UNIQUE NONCLUSTERED INDEX IX_ServiceOperations_App_Op_Version_NoSync
     ON [dbo].[ServiceOperations]([ServiceApplicationId] ASC, [OperationName] ASC, [RecordVersion] ASC)
     WHERE [ServiceDefinitionSyncId] IS NULL
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceOperations_App_Op_Sync_Version
+CREATE UNIQUE NONCLUSTERED INDEX IX_ServiceOperations_App_Op_Sync_Version
     ON [dbo].[ServiceOperations]([ServiceApplicationId] ASC, [OperationName] ASC, [ServiceDefinitionSyncId] ASC, [RecordVersion] ASC)
     WHERE [ServiceDefinitionSyncId] IS NOT NULL
 GO
@@ -77,3 +77,4 @@ GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceOperations_IsActive
     ON [dbo].[ServiceOperations]([IsActive] ASC)
+GO

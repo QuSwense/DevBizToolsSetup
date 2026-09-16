@@ -62,7 +62,7 @@ BEGIN
               AND [OperationName] = @OperationName
         )
         BEGIN
-            RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, CONVERT(VARCHAR(200), @OperationName));
+            RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, @OperationName);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -165,11 +165,12 @@ BEGIN
     BEGIN CATCH
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-DECLARE @ErrorState INT = ERROR_STATE();
-        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState
+
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
-        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        DECLARE @ErrorState INT = ERROR_STATE();
+        
+        RAISERROR('Error creating service operation schema: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

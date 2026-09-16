@@ -36,9 +36,9 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
     -- Indicates if the service request file record is currently active
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceRequestFiles_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceRequestFiles_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceRequestFiles_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceRequestFiles PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -57,7 +57,7 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
 
     -- Foreign keys
     CONSTRAINT FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId
-        FOREIGN KEY ([ServiceOperationId]) REFERENCES [dbo].[ServiceOperations]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceOperationId]) REFERENCES [dbo].[ServiceOperations]([Id]),
     CONSTRAINT FK_ServiceRequestFiles_ParentBaseId
         FOREIGN KEY ([ParentBaseId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
     CONSTRAINT FK_ServiceRequestFiles_ParentDeltaId
@@ -66,12 +66,12 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceRequestFiles_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 -- Uniqueness: name+version is unique per parent operation (the previous constraint keyed
 -- on the nullable ParentBaseId/ParentDeltaId, which never enforced anything for base rows).
-CREATE UNIQUE NONCLUSTERED INDEX UX_ServiceRequestFiles_Operation_Name_Version
+CREATE UNIQUE NONCLUSTERED INDEX IX_ServiceRequestFiles_Operation_Name_Version
     ON [dbo].[ServiceRequestFiles]([ServiceOperationId] ASC, [Name] ASC, [RecordVersion] ASC)
 GO
 

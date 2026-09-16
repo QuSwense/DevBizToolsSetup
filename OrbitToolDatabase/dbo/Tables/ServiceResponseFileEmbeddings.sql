@@ -19,9 +19,9 @@ CREATE TABLE [dbo].[ServiceResponseFileEmbeddings] (
     -- Indicates if the service response file embedding record is currently active
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceResponseFileEmbeddings_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceResponseFileEmbeddings_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceResponseFileEmbeddings_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT [PK_ServiceResponseFileEmbeddings] PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -33,14 +33,14 @@ CREATE TABLE [dbo].[ServiceResponseFileEmbeddings] (
 
     -- Foreign Key
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_ServiceResponseFiles_ServiceResponseFileId]
-        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_BinaryEmbeddingsStore]
         FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id]),
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_Users_CreatedBy]
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT [FK_ServiceResponseFileEmbeddings_Users_LastUpdatedBy]
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX [IX_ServiceResponseFileEmbeddings_ServiceResponseFileId]

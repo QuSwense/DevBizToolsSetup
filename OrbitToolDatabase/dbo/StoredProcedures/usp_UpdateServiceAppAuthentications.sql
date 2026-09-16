@@ -42,7 +42,7 @@ BEGIN
         DECLARE @ExistingAuthenticationType VARCHAR(50);
         DECLARE @ExistingEncryptionAlgorithmType VARCHAR(50);
         DECLARE @ExistingEncryptedJson NVARCHAR(MAX);
-        DECLARE @ExistingCreatedAt DATETIME;
+        DECLARE @ExistingCreatedAt DATETIME2(3);
         DECLARE @ExistingCreatedBy NVARCHAR(20);
         DECLARE @ExistingLastUpdatedBy NVARCHAR(20);
         DECLARE @NewRecordVersion VARCHAR(50);
@@ -120,7 +120,7 @@ BEGIN
                   AND [IsActive] = 1
             )
             BEGIN
-                RAISERROR('An active authentication configuration with the name "%s" already exists.', 16, 1, CONVERT(VARCHAR(200), @Name));
+                RAISERROR('An active authentication configuration with the name "%s" already exists.', 16, 1, @Name);
                 IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                     ROLLBACK TRANSACTION;
                 RETURN;

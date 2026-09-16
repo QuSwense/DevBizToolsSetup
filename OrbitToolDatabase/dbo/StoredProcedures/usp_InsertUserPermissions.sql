@@ -41,7 +41,7 @@ BEGIN
 
         IF @UserName IS NULL
         BEGIN
-            RAISERROR('User "%s" not found.', 16, 1, CONVERT(VARCHAR(20), @UserId));
+            RAISERROR('User "%s" not found.', 16, 1, @UserId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -69,7 +69,7 @@ BEGIN
               AND [IsActive] = 1
         )
         BEGIN
-            RAISERROR('Permission "%s" already exists for user "%s".', 16, 1, CONVERT(VARCHAR(512), @PermissionKey), CONVERT(VARCHAR(20), @UserId));
+            RAISERROR('Permission "%s" already exists for user "%s".', 16, 1, @PermissionKey, @UserId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

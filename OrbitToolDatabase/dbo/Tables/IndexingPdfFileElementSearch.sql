@@ -11,13 +11,12 @@ CREATE TABLE [dbo].[IndexingPdfFileElementSearch]
     [IndexingPdfFileElementId] BIGINT NOT NULL,
     -- Path and value
     [ElementValue] NVARCHAR(800) NOT NULL,
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
     
     CONSTRAINT [PK_IndexingPdfFileElementSearch] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
-    CONSTRAINT [UQ_IndexingPdfFileElementSearch_Element_Value] UNIQUE ([IndexingPdfFileElementId] ASC, [ElementValue] ASC),
 
     CONSTRAINT [FK_IndexingPdfFileElementSearch_IndexingPdfFileElements] 
-        FOREIGN KEY ([IndexingPdfFileElementId]) REFERENCES [dbo].[IndexingPdfFileElements]([Id]) ON DELETE CASCADE
+        FOREIGN KEY ([IndexingPdfFileElementId]) REFERENCES [dbo].[IndexingPdfFileElements]([Id])
 );
 GO
 

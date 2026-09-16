@@ -21,9 +21,9 @@ CREATE TABLE [dbo].[RolePermissions] (
     -- Indicates if the role permission is currently active, default is true
     [IsActive] BIT NOT NULL CONSTRAINT DF_RolePermissions_IsActive DEFAULT 1,
     -- Timestamps for auditing
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_RolePermissions_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RolePermissions_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_RolePermissions PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -31,11 +31,11 @@ CREATE TABLE [dbo].[RolePermissions] (
     CONSTRAINT UQ_RolePermissions_RoleId_ResourcePermissionId UNIQUE ([RoleId] ASC, [ResourcePermissionId] ASC),
 
     -- Foreign Keys
-    CONSTRAINT FK_RolePermissions_Roles_RoleId FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]) ON DELETE CASCADE,
-    CONSTRAINT FK_RolePermissions_ResourcePermissions_ResourcePermissionId FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]) ON DELETE CASCADE,
+    CONSTRAINT FK_RolePermissions_Roles_RoleId FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles]([Id]),
+    CONSTRAINT FK_RolePermissions_ResourcePermissions_ResourcePermissionId FOREIGN KEY ([ResourcePermissionId]) REFERENCES [dbo].[ResourcePermissions]([Id]),
     CONSTRAINT FK_RolePermissions_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_RolePermissions_Users_LastUpdatedBy FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_RolePermissions_RoleId ON [dbo].[RolePermissions]([RoleId] ASC)

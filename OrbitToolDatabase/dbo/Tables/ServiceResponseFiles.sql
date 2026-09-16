@@ -36,14 +36,13 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Indicates if the service response file record is currently active
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceResponseFiles_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceResponseFiles_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceResponseFiles_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceResponseFiles PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceResponseFiles_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceResponseFiles_Name UNIQUE ([Name] ASC, [RecordVersion] ASC),
     
     CONSTRAINT CK_ServiceResponseFiles_Format
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
@@ -58,7 +57,7 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
 
     -- Foreign Key Constraints
     CONSTRAINT FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId
-        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]) ON DELETE CASCADE,
+        FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
     CONSTRAINT FK_ServiceResponseFiles_ParentBaseId
         FOREIGN KEY ([ParentBaseId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
     CONSTRAINT FK_ServiceResponseFiles_ParentDeltaId
@@ -67,7 +66,7 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceResponseFiles_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
 GO
 
 CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ServiceRequestFileId

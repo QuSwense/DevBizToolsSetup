@@ -25,9 +25,9 @@ CREATE TABLE [dbo].[ServiceAppAuthentications] (
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceAppAuthentications_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME NOT NULL CONSTRAINT DF_ServiceAppAuthentications_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceAppAuthentications_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME NULL,
+    [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceAppAuthentications PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -49,4 +49,5 @@ CREATE TABLE [dbo].[ServiceAppAuthentications] (
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_ServiceAppAuthentications_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
-)
+);
+GO

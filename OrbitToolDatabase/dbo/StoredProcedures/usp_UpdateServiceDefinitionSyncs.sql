@@ -129,6 +129,8 @@ BEGIN
         ELSE
         BEGIN
             SET @CalculatedContentHash = @ExistingContentHash;
+        END
+        
         -- NULL-safe comparison: avoids UNKNOWN result when either side is NULL
         IF ISNULL(@DefinitionUrl, '') != ISNULL(@ExistingDefinitionUrl, '')
 
