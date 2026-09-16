@@ -65,7 +65,7 @@ BEGIN
         -- Check if link already exists
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[ServiceTestSuiteTestCaseLinks]
+            FROM [dbo].[ServiceTestSuiteTestCaseLinks] WITH (UPDLOCK, HOLDLOCK)
             WHERE [ServiceTestSuiteId] = @ServiceTestSuiteId
               AND [ServiceTestCaseId] = @ServiceTestCaseId
         )

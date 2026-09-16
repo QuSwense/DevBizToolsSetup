@@ -55,33 +55,21 @@ SELECT
         FOR JSON AUTO
     ) AS LastExecution,
     
-    -- Total execution count
-    (
-        SELECT COUNT(*)
-        FROM [dbo].[RuleExecutionLogs] rel
-        WHERE rel.[RuleSetId] = rs.[Id]
-    ) AS TotalExecutions,
-    
-    -- Success rate
-    CASE 
-        WHEN (
-            SELECT COUNT(*)
-            FROM [dbo].[RuleExecutionLogs] rel
-            WHERE rel.[RuleSetId] = rs.[Id]
-        ) > 0 THEN
-            CAST(
-                (SELECT COUNT(*) * 100.0
-                 FROM [dbo].[RuleExecutionLogs] rel
-                 WHERE rel.[RuleSetId] = rs.[Id]
-                   AND rel.[IsSuccess] = 1) / 
-                (SELECT COUNT(*)
-                 FROM [dbo].[RuleExecutionLogs] rel
-                 WHERE rel.[RuleSetId] = rs.[Id])
-                AS DECIMAL(10,2)
-            )
-        ELSE NULL
-    END AS SuccessRate
+    -- Total execution count and success rate (single aggregation via APPLY)
+    execStats.[TotalExecutions],
+    execStats.[SuccessRate]
 
 FROM [dbo].[RuleSets] rs
-LEFT JOIN [dbo].[RuleContextObjects] rco ON rs.[OutputTypeId] = rco.[Id];
+LEFT JOIN [dbo].[RuleContextObjects] rco ON rs.[OutputTypeId] = rco.[Id]
+CROSS APPLY (
+    SELECT 
+        COUNT(*) AS TotalExecutions,
+        CASE 
+            WHEN COUNT(*) > 0 THEN
+                CAST(SUM(CASE WHEN rel.[IsSuccess] = 1 THEN 100.0 ELSE 0 END) / COUNT(*) AS DECIMAL(10,2))
+            ELSE NULL
+        END AS SuccessRate
+    FROM [dbo].[RuleExecutionLogs] rel
+    WHERE rel.[RuleSetId] = rs.[Id]
+) execStats;
 GO

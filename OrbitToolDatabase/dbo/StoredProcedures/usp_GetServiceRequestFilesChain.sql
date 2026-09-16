@@ -10,13 +10,10 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @BaseId INT;
-    DECLARE @CurrentId INT = @FileId;
-    DECLARE @Depth INT;
 
     -- Get the base ID for this file
     SELECT 
-        @BaseId = CASE WHEN [IsBaseSnapshot] = 1 THEN [Id] ELSE [ParentBaseId] END,
-        @Depth = [DeltaDepth]
+        @BaseId = CASE WHEN [IsBaseSnapshot] = 1 THEN [Id] ELSE [ParentBaseId] END
     FROM [dbo].[ServiceRequestFiles]
     WHERE [Id] = @FileId
       AND [IsActive] = 1;

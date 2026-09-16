@@ -44,7 +44,7 @@ BEGIN
     -- Validation: ActionName must be unique per page if changed
     IF @ActionName IS NOT NULL AND @ActionName <> @CurrentActionName
     BEGIN
-        IF EXISTS (SELECT 1 FROM [dbo].[UIActions] WHERE [PageId] = @CurrentPageId AND [ActionName] = @ActionName AND [Id] <> @ActionId)
+        IF EXISTS (SELECT 1 FROM [dbo].[UIActions] WITH (UPDLOCK, HOLDLOCK) WHERE [PageId] = @CurrentPageId AND [ActionName] = @ActionName AND [Id] <> @ActionId)
         BEGIN
             RAISERROR('An action with the name ''%s'' already exists for this page.', 16, 1, @ActionName);
             RETURN;

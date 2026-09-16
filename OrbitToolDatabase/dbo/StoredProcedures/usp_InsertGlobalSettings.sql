@@ -25,17 +25,28 @@ BEGIN
         -- Resolve user context
         SET @ResolvedUserId = COALESCE(@UserId, SYSTEM_USER, 'SYSTEM');
 
+        -- Start transaction if not already in one
+        IF @@TRANCOUNT = 0
+        BEGIN
+            BEGIN TRANSACTION;
+            SET @LocalTranStarted = 1;
+        END
+
         -- Validation: SettingKey not empty
         IF @SettingKey IS NULL OR LTRIM(RTRIM(@SettingKey)) = ''
         BEGIN
             RAISERROR('SettingKey cannot be empty.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
             RETURN;
         END
 
         -- Validation: SettingKey unique
-        IF EXISTS (SELECT 1 FROM [dbo].[GlobalSettings] WHERE [SettingKey] = @SettingKey)
+        IF EXISTS (SELECT 1 FROM [dbo].[GlobalSettings] WITH (UPDLOCK, HOLDLOCK) WHERE [SettingKey] = @SettingKey)
         BEGIN
             RAISERROR('SettingKey already exists. Must be unique.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
             RETURN;
         END
 
@@ -43,14 +54,9 @@ BEGIN
         IF @DataType NOT IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'Xml', 'DateTime')
         BEGIN
             RAISERROR('Invalid DataType. Must be one of: String, Integer, Decimal, Boolean, Json, Xml, DateTime.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
             RETURN;
-        END
-
-        -- Start transaction if not already in one
-        IF @@TRANCOUNT = 0
-        BEGIN
-            BEGIN TRANSACTION;
-            SET @LocalTranStarted = 1;
         END
 
         -- Generate new PublicId

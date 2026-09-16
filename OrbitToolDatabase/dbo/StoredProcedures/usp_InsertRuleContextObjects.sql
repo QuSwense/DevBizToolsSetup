@@ -34,7 +34,7 @@ BEGIN
         -- Check for duplicate context name
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[RuleContextObjects]
+            FROM [dbo].[RuleContextObjects] WITH (UPDLOCK, HOLDLOCK)
             WHERE [ContextName] = @ContextName
         )
         BEGIN

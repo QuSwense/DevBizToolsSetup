@@ -16,14 +16,14 @@ BEGIN
         sts.[Name] AS SuiteName,
         
         -- Execution counts
-        COUNT(*) AS TotalExecutions,
-        SUM(CASE WHEN [ExecutionStatus] = 'Completed' THEN 1 ELSE 0 END) AS SuccessfulExecutions,
-        SUM(CASE WHEN [ExecutionStatus] = 'Failed' THEN 1 ELSE 0 END) AS FailedExecutions,
+        COUNT(a.[Id]) AS TotalExecutions,
+        ISNULL(SUM(CASE WHEN [ExecutionStatus] = 'Completed' THEN 1 ELSE 0 END), 0) AS SuccessfulExecutions,
+        ISNULL(SUM(CASE WHEN [ExecutionStatus] = 'Failed' THEN 1 ELSE 0 END), 0) AS FailedExecutions,
         
         -- Success rate
         CASE 
-            WHEN COUNT(*) > 0 THEN
-                CAST((SUM(CASE WHEN [ExecutionStatus] = 'Completed' THEN 1 ELSE 0 END) * 100.0) / COUNT(*) AS DECIMAL(10,2))
+            WHEN COUNT(a.[Id]) > 0 THEN
+                CAST((SUM(CASE WHEN [ExecutionStatus] = 'Completed' THEN 1 ELSE 0 END) * 100.0) / COUNT(a.[Id]) AS DECIMAL(10,2))
             ELSE 0
         END AS SuccessRate,
         
@@ -75,10 +75,11 @@ BEGIN
             FOR JSON AUTO
         ) AS RecentExecutions
 
-    FROM [dbo].[ServiceTestSuiteExecutionAudits] a
-    INNER JOIN [dbo].[ServiceTestSuites] sts ON a.[ServiceTestSuiteId] = sts.[Id]
-    WHERE a.[ServiceTestSuiteId] = @ServiceTestSuiteId
-      AND a.[ExecutedAt] >= @StartDate
+    FROM [dbo].[ServiceTestSuites] sts
+    LEFT JOIN [dbo].[ServiceTestSuiteExecutionAudits] a 
+        ON a.[ServiceTestSuiteId] = sts.[Id]
+       AND a.[ExecutedAt] >= @StartDate
+    WHERE sts.[Id] = @ServiceTestSuiteId
     GROUP BY sts.[Name];
 END;
 GO

@@ -23,9 +23,9 @@ BEGIN
         DECLARE @ActivityId BIGINT;
         DECLARE @Notes NVARCHAR(MAX);
 
-        -- Get current audit details
+        -- Get current audit details with lock
         SELECT @ExistingStatus = [ExecutionStatus], @AuditName = [Name]
-        FROM [dbo].[DirectExecutionAudit]
+        FROM [dbo].[DirectExecutionAudit] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @AuditId;
 
         IF @AuditName IS NULL
@@ -41,7 +41,7 @@ BEGIN
         SET
             [ExecutionStatus] = @ExecutionStatus,
             [ExecutionCompletedAt] = GETDATE(),
-            [ExecutionDetails] = @ExecutionDetails
+            [ExecutionDetails] = ISNULL(@ExecutionDetails, [ExecutionDetails])
         WHERE [Id] = @AuditId;
 
         -- Build notes
@@ -82,7 +82,8 @@ BEGIN
 
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
-        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        DECLARE @ErrorState INT = ERROR_STATE();
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
     END CATCH
 END;
 GO

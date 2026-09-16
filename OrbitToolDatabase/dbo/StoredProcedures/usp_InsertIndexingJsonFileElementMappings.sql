@@ -71,7 +71,7 @@ BEGIN
 
         -- Check for duplicate mapping
         IF EXISTS (
-            SELECT 1 FROM [dbo].[IndexingJsonFileElementMappings]
+            SELECT 1 FROM [dbo].[IndexingJsonFileElementMappings] WITH (UPDLOCK, HOLDLOCK)
             WHERE [IndexingJsonFileElementSearchId] = @IndexingJsonFileElementSearchId
               AND ((@RequestFileId IS NOT NULL AND [RequestFileId] = @RequestFileId)
                    OR (@ResponseFileId IS NOT NULL AND [ResponseFileId] = @ResponseFileId))
@@ -126,7 +126,11 @@ BEGIN
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        THROW;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR('Error inserting JSON file element mapping: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

@@ -57,7 +57,7 @@ BEGIN
         FROM [dbo].[SoapNamespaces] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @NamespaceId;
 
-        IF @NamespaceId IS NULL
+        IF @ExistingRecordVersion IS NULL
         BEGIN
             RAISERROR('SOAP namespace with Id %d not found.', 16, 1, @NamespaceId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

@@ -52,7 +52,7 @@ BEGIN
         -- Check for duplicate workflow name
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[RuleSets]
+            FROM [dbo].[RuleSets] WITH (UPDLOCK, HOLDLOCK)
             WHERE [WorkflowName] = @WorkflowName
         )
         BEGIN

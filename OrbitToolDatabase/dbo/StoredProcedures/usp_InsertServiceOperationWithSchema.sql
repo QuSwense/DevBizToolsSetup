@@ -57,12 +57,12 @@ BEGIN
 
         -- Check for duplicate operation name
         IF EXISTS (
-            SELECT 1 FROM [dbo].[ServiceOperations]
+            SELECT 1 FROM [dbo].[ServiceOperations] WITH (UPDLOCK, HOLDLOCK)
             WHERE [ServiceApplicationId] = @ServiceApplicationId
               AND [OperationName] = @OperationName
         )
         BEGIN
-            RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, @OperationName);
+            RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, CONVERT(VARCHAR(200), @OperationName));
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -141,12 +141,15 @@ BEGIN
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
 
-        INSERT INTO [dbo].[UserActivities] (
-            [UserId], [ActivityType], [ActionType], [FeatureActivitiesJson], [CreatedAt]
-        )
-        VALUES (
-            @ResolvedUser, 'ServiceOperation', 'Create', @FeatureJson, GETDATE()
-        );
+        EXEC [dbo].[usp_InsertUserActivities]
+            @UserId = @ResolvedUser,
+            @ActivityType = 'ServiceOperation',
+            @ActionType = 'Create',
+            @FeatureActivitiesJson = @FeatureJson,
+            @RelatedEntityType = 'ServiceOperation',
+            @RelatedEntityId = @ServiceAppPublicId,
+            @Notes = @Notes,
+            @ActivityId = @ActivityId OUTPUT;
 
         -- Return the created operation
         SELECT
@@ -162,7 +165,8 @@ BEGIN
     BEGIN CATCH
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-
+DECLARE @ErrorState INT = ERROR_STATE();
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
         RAISERROR(@ErrorMessage, @ErrorSeverity, 1);

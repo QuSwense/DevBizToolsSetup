@@ -19,6 +19,14 @@ BEGIN
         -- Resolve user context
         SET @ResolvedUserId = COALESCE(@UserId, SYSTEM_USER, 'SYSTEM');
 
+        -- Start transaction if not already in one
+        -- (validations run inside the guard so RAISERROR rolls back cleanly)
+        IF @@TRANCOUNT = 0
+        BEGIN
+            BEGIN TRANSACTION;
+            SET @LocalTranStarted = 1;
+        END
+
         -- Validation: PermissionKey not empty
         IF @PermissionKey IS NULL OR LTRIM(RTRIM(@PermissionKey)) = ''
         BEGIN
@@ -27,17 +35,10 @@ BEGIN
         END
 
         -- Validation: PermissionKey unique
-        IF EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [PermissionKey] = @PermissionKey)
+        IF EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WITH (UPDLOCK, HOLDLOCK) WHERE [PermissionKey] = @PermissionKey)
         BEGIN
             RAISERROR('PermissionKey already exists. Must be unique.', 16, 1);
             RETURN;
-        END
-
-        -- Start transaction if not already in one
-        IF @@TRANCOUNT = 0
-        BEGIN
-            BEGIN TRANSACTION;
-            SET @LocalTranStarted = 1;
         END
 
         -- Generate new PublicId

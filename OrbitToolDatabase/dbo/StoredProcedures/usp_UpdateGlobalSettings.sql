@@ -69,7 +69,7 @@ BEGIN
         BEGIN
             IF EXISTS (
                 SELECT 1
-                FROM [dbo].[GlobalSettings]
+                FROM [dbo].[GlobalSettings] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [SettingKey] = @SettingKey
                   AND [Id] != @GlobalSettingId
             )

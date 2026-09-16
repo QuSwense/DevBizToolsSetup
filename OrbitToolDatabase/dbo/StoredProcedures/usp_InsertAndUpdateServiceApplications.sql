@@ -157,7 +157,7 @@ BEGIN
                   AND [IsActive] = 1
             )
             BEGIN
-                RAISERROR('An active service application with the name "%s" already exists.', 16, 1, @Name);
+                RAISERROR('An active service application with the name "%s" already exists.', 16, 1, CONVERT(VARCHAR(200), @Name));
                 IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                     ROLLBACK TRANSACTION;
                 RETURN;
@@ -320,7 +320,7 @@ BEGIN
             UPDATE [dbo].[ServiceApplications]
             SET 
                 [ServiceType] = ISNULL(@ServiceType, [ServiceType]),
-                [ServiceAppAuthenticationId] = @NewAuthId,
+                [ServiceAppAuthenticationId] = ISNULL(@NewAuthId, [ServiceAppAuthenticationId]),
                 [Name] = ISNULL(@Name, [Name]),
                 [Description] = ISNULL(@Description, [Description]),
                 [IsActive] = ISNULL(@IsActive, [IsActive]),

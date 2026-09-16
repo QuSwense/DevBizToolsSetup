@@ -82,7 +82,7 @@ BEGIN
         );
 
         INSERT INTO @EmbeddingResult
-        EXEC [dbo].[usp_InsertBinaryEmbedding]
+        EXEC [dbo].[usp_InsertBinaryEmbeddingsStore]
             @ContentHash = @FileHash,
             @CompressedData = @CompressedData,
             @UncompressedSizeBytes = @UncompressedSizeBytes,

@@ -63,7 +63,7 @@ BEGIN
         -- Check if link already exists
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[RuleSetContextObjectLinks]
+            FROM [dbo].[RuleSetContextObjectLinks] WITH (UPDLOCK, HOLDLOCK)
             WHERE [RuleSetId] = @RuleSetId
               AND [RuleContextObjectId] = @RuleContextObjectId
         )

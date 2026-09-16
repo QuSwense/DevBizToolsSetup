@@ -45,7 +45,7 @@ BEGIN
         FROM [dbo].[RuleContextObjects] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @ContextObjectId;
 
-        IF @ContextObjectId IS NULL
+        IF @ExistingContextName IS NULL
         BEGIN
             RAISERROR('Rule context object with Id %d not found.', 16, 1, @ContextObjectId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -58,7 +58,7 @@ BEGIN
         BEGIN
             IF EXISTS (
                 SELECT 1 
-                FROM [dbo].[RuleContextObjects]
+                FROM [dbo].[RuleContextObjects] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [ContextName] = @ContextName
                   AND [Id] != @ContextObjectId
             )

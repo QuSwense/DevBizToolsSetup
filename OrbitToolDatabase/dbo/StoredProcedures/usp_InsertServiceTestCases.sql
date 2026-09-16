@@ -52,7 +52,7 @@ BEGIN
         -- Check for duplicate name
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[ServiceTestCases]
+            FROM [dbo].[ServiceTestCases] WITH (UPDLOCK, HOLDLOCK)
             WHERE [Name] = @Name
               AND [IsActive] = 1
         )

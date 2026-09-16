@@ -1,6 +1,9 @@
 /*
     View: v_UserPermissionsSummary
-    Description: Summary of permissions per user across all service applications.
+    Description: Summary of permissions per user granted via ServiceAppPermissions
+    across all service applications.
+    Note: Do not confuse with v_UserPermissionSummary (singular), which summarizes
+    direct user permissions from dbo.UserPermissions.
 */
 CREATE VIEW [dbo].[v_UserPermissionsSummary]
 AS

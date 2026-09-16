@@ -21,7 +21,6 @@ BEGIN
     BEGIN TRY
         DECLARE @ResolvedUser NVARCHAR(20);
         DECLARE @ExistingId BIGINT;
-        DECLARE @ElementExists BIT = 0;
 
         -- Resolve audit user
         SET @ResolvedUser = COALESCE(
@@ -41,7 +40,7 @@ BEGIN
 
         -- Check if search entry already exists
         SELECT @ExistingId = [Id]
-        FROM [dbo].[IndexingXmlFileElementSearch]
+        FROM [dbo].[IndexingXmlFileElementSearch] WITH (UPDLOCK, HOLDLOCK)
         WHERE [IndexingXmlFileElementId] = @IndexingXmlFileElementId
           AND [ElementValue] = @ElementValue;
 
@@ -93,7 +92,11 @@ BEGIN
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        THROW;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR('Error inserting or getting XML file element search entry: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

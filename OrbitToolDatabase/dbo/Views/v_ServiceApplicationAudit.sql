@@ -4,7 +4,7 @@
 */
 CREATE VIEW [dbo].[v_ServiceApplicationAudit]
 AS
-SELECT TOP (100) PERCENT 
+SELECT 
     ua.[Id] AS AuditId,
     ua.[UserId],
     CONCAT(u.[FirstName], ' ', u.[LastName]) AS UserFullName,
@@ -31,6 +31,5 @@ SELECT TOP (100) PERCENT
     FORMAT(ua.[CreatedAt], 'yyyy-MM-dd HH:mm:ss') AS FormattedCreatedAt
 FROM [dbo].[UserActivities] ua
 LEFT JOIN [dbo].[Users] u ON ua.[UserId] = u.[UserId]
-WHERE ua.[ActivityType] LIKE 'ServiceApplication%'
-ORDER BY ua.[CreatedAt] DESC;
+WHERE ua.[ActivityType] LIKE 'ServiceApplication%';
 GO

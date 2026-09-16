@@ -7,14 +7,6 @@
 				"GITHUB_TOKEN": "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"
 			}
 		},
-		"sqlserver-schema": {
-			"type": "stdio",
-			"command": "sqlserverlocal-mcp",
-			"env": {
-				"SQL_SERVER_CONNECTION_STRING": "Data Source=localhost,1433;Initial Catalog=OrbitTool;User ID=sa;Password=root@1234;Encrypt=True;TrustServerCertificate=True;Command Timeout=30",
-				"SQL_SERVER_READONLY": "true"
-			}
-		},
 		"mssql-mcp": {
             "type": "stdio",
             "command": "npx",

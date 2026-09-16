@@ -26,10 +26,8 @@ SELECT
     CASE ua.ActionType
         WHEN 'Button' THEN 'Clickable button control'
         WHEN 'Link' THEN 'Hyperlink navigation'
-        WHEN 'Menu' THEN 'Menu item action'
+        WHEN 'MenuItem' THEN 'Menu item action'
         WHEN 'Tab' THEN 'Tab selection'
-        WHEN 'Field' THEN 'Form input field'
-        WHEN 'Grid' THEN 'Data grid action'
         ELSE 'Other action type'
     END AS ActionTypeDescription,
     -- Status description

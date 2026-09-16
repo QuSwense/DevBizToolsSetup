@@ -47,7 +47,7 @@ BEGIN
         INNER JOIN [dbo].[ResourcePermissions] res ON rp.[ResourcePermissionId] = res.[Id]
         WHERE rp.[Id] = @RolePermissionId;
 
-        IF @RolePermissionId IS NULL
+        IF @RoleId IS NULL
         BEGIN
             RAISERROR('Role permission with Id %d not found.', 16, 1, @RolePermissionId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

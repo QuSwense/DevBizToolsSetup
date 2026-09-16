@@ -4,7 +4,7 @@
 */
 CREATE VIEW [dbo].[v_BinaryEmbeddingsByFormat]
 AS
-SELECT TOP (100) PERCENT 
+SELECT 
     [ContentFormat],
     COUNT(*) AS EmbeddingCount,
     SUM([UncompressedSizeBytes]) AS TotalSize,
@@ -33,6 +33,5 @@ SELECT TOP (100) PERCENT
 
 FROM [dbo].[BinaryEmbeddingsStore] bes
 WHERE [ContentFormat] IS NOT NULL
-GROUP BY [ContentFormat]
-ORDER BY EmbeddingCount DESC;
+GROUP BY [ContentFormat];
 GO

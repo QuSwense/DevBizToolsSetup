@@ -38,12 +38,12 @@ BEGIN
             @RuleContextObjectId = [RuleContextObjectId],
             @WorkflowName = rs.[WorkflowName],
             @ContextName = rco.[ContextName]
-        FROM [dbo].[RuleSetContextObjectLinks] rl
+        FROM [dbo].[RuleSetContextObjectLinks] rl WITH (UPDLOCK, HOLDLOCK)
         INNER JOIN [dbo].[RuleSets] rs ON rl.[RuleSetId] = rs.[Id]
         INNER JOIN [dbo].[RuleContextObjects] rco ON rl.[RuleContextObjectId] = rco.[Id]
         WHERE rl.[Id] = @LinkId;
 
-        IF @LinkId IS NULL
+        IF @RuleSetId IS NULL
         BEGIN
             RAISERROR('Link with Id %d not found.', 16, 1, @LinkId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

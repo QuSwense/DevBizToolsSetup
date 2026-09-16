@@ -15,7 +15,8 @@ CREATE PROCEDURE [dbo].[usp_UpdateServiceDefinitionSyncs]
     @UncompressedSizeBytes INT = NULL,
     @CompressionAlgorithmType VARCHAR(50) = NULL,
     @UserId NVARCHAR(20) = NULL,
-    @ContentHash VARCHAR(64) = NULL
+    @ContentHash VARCHAR(64) = NULL,
+    @RecordVersion VARCHAR(50) = NULL  -- Optional: for optimistic concurrency control
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -86,13 +87,22 @@ BEGIN
             @ExistingDefinitionUrl = [DefinitionUrl],
             @ExistingUncompressedSizeBytes = [UncompressedSizeBytes],
             @ExistingCompressionAlgorithmType = [CompressionAlgorithmType]
-        FROM [dbo].[ServiceDefinitionSyncs]
+        FROM [dbo].[ServiceDefinitionSyncs] WITH (UPDLOCK, HOLDLOCK)
         WHERE [ServiceApplicationId] = @ServiceAppId
         ORDER BY [Id] DESC;
 
         IF @ExistingSyncId IS NULL
         BEGIN
             RAISERROR('No sync record found for this service application.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Concurrency check (only when caller supplies a RecordVersion)
+        IF @RecordVersion IS NOT NULL AND @ExistingRecordVersion != @RecordVersion
+        BEGIN
+            RAISERROR('Record has been modified by another user. Current version: %s. Please refresh and try again.', 16, 1, @ExistingRecordVersion);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;
@@ -119,7 +129,8 @@ BEGIN
         ELSE
         BEGIN
             SET @CalculatedContentHash = @ExistingContentHash;
-        END
+        -- NULL-safe comparison: avoids UNKNOWN result when either side is NULL
+        IF ISNULL(@DefinitionUrl, '') != ISNULL(@ExistingDefinitionUrl, '')
 
         -- Check if metadata changed
         IF @UncompressedSizeBytes IS NOT NULL AND @UncompressedSizeBytes != @ExistingUncompressedSizeBytes

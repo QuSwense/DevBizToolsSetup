@@ -32,7 +32,7 @@ BEGIN
 
         -- Check if element already exists
         SELECT @ExistingId = [Id]
-        FROM [dbo].[IndexingXmlFileElements]
+        FROM [dbo].[IndexingXmlFileElements] WITH (UPDLOCK, HOLDLOCK)
         WHERE [ElementName] = @ElementName
           AND [XmlPath] = @XmlPath;
 
@@ -98,7 +98,11 @@ BEGIN
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        THROW;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR('Error inserting or getting XML file element: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

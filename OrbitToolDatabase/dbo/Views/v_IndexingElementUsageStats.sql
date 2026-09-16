@@ -62,7 +62,7 @@ SELECT
     RequestFileCount,
     ResponseFileCount,
     TotalMappings,
-    TotalMappings - RequestFileCount - ResponseFileCount AS DuplicateCount,
+    TotalMappings - RequestFileCount - ResponseFileCount AS FileReuseCount,
     RANK() OVER (ORDER BY TotalMappings DESC) AS UsageRank
 FROM ElementUsage;
 GO

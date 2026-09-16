@@ -41,7 +41,7 @@ BEGIN
         INNER JOIN [dbo].[Users] u ON up.[UserId] = u.[UserId]
         WHERE up.[Id] = @UserPermissionId;
 
-        IF @UserPermissionId IS NULL
+        IF @TargetUserId IS NULL
         BEGIN
             RAISERROR('User permission with Id %d not found.', 16, 1, @UserPermissionId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

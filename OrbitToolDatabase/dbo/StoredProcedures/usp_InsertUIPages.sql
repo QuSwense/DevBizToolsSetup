@@ -21,46 +21,54 @@ BEGIN
     DECLARE @NewPublicId     UNIQUEIDENTIFIER = NEWID();
     DECLARE @ParentId        INT = NULL;
 
-    -- Validation: Name must not be empty
-    IF @Name IS NULL OR LTRIM(RTRIM(@Name)) = N''
-    BEGIN
-        RAISERROR('Page name cannot be empty.', 16, 1);
-        RETURN;
-    END
-
-    -- Validation: Name must be unique
-    IF EXISTS (SELECT 1 FROM [dbo].[UIPages] WHERE [Name] = @Name)
-    BEGIN
-        RAISERROR('A page with the name ''%s'' already exists.', 16, 1, @Name);
-        RETURN;
-    END
-
-    -- Validation: ParentPublicId must exist if provided
-    IF @ParentPublicId IS NOT NULL
-    BEGIN
-        SELECT @ParentId = [Id]
-        FROM [dbo].[UIPages]
-        WHERE [PublicId] = @ParentPublicId;
-
-        IF @ParentId IS NULL
-        BEGIN
-            RAISERROR('Parent page not found for the specified PublicId.', 16, 1);
-            RETURN;
-        END
-    END
-
-    -- Validation: ResourcePermissionId must exist
-    IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
-    BEGIN
-        RAISERROR('Resource permission not found for the specified Id.', 16, 1);
-        RETURN;
-    END
-
     BEGIN TRY
         IF @@TRANCOUNT = 0
         BEGIN
             BEGIN TRANSACTION;
             SET @LocalTranStarted = 1;
+        END
+
+        -- Validation: Name must not be empty
+        IF @Name IS NULL OR LTRIM(RTRIM(@Name)) = N''
+        BEGIN
+            RAISERROR('Page name cannot be empty.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: Name must be unique
+        IF EXISTS (SELECT 1 FROM [dbo].[UIPages] WITH (UPDLOCK, HOLDLOCK) WHERE [Name] = @Name)
+        BEGIN
+            RAISERROR('A page with the name ''%s'' already exists.', 16, 1, @Name);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: ParentPublicId must exist if provided
+        IF @ParentPublicId IS NOT NULL
+        BEGIN
+            SELECT @ParentId = [Id]
+            FROM [dbo].[UIPages]
+            WHERE [PublicId] = @ParentPublicId;
+
+            IF @ParentId IS NULL
+            BEGIN
+                RAISERROR('Parent page not found for the specified PublicId.', 16, 1);
+                IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                    ROLLBACK TRANSACTION;
+                RETURN;
+            END
+        END
+
+        -- Validation: ResourcePermissionId must exist
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
+        BEGIN
+            RAISERROR('Resource permission not found for the specified Id.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         INSERT INTO [dbo].[UIPages]

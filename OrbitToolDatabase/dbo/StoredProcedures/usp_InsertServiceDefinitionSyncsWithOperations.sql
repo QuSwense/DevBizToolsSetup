@@ -94,12 +94,15 @@ BEGIN
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
 
-        INSERT INTO [dbo].[UserActivities] (
-            [UserId], [ActivityType], [ActionType], [FeatureActivitiesJson], [CreatedAt]
-        )
-        VALUES (
-            @ResolvedUser, 'ServiceDefinitionSync', 'Create', @FeatureJson, GETDATE()
-        );
+        EXEC [dbo].[usp_InsertUserActivities]
+            @UserId = @ResolvedUser,
+            @ActivityType = 'ServiceDefinitionSync',
+            @ActionType = 'Create',
+            @FeatureActivitiesJson = @FeatureJson,
+            @RelatedEntityType = 'ServiceDefinitionSync',
+            @RelatedEntityId = @ServiceAppPublicId,
+            @Notes = @Notes,
+            @ActivityId = @ActivityId OUTPUT;
 
         -- Return the created sync record
         SELECT
@@ -120,7 +123,8 @@ BEGIN
 
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
-        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        DECLARE @ErrorState INT = ERROR_STATE();
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
     END CATCH
 END;
 GO

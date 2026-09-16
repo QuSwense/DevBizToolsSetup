@@ -59,7 +59,7 @@ BEGIN
         BEGIN
             IF EXISTS (
                 SELECT 1
-                FROM [dbo].[UserSettings]
+                FROM [dbo].[UserSettings] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [UserId] = @TargetUserId
                   AND [GlobalSettingId] = @GlobalSettingId
                   AND [Id] != @UserSettingId

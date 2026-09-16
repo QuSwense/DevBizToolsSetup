@@ -66,7 +66,7 @@ BEGIN
         FROM [dbo].[ServiceOperationSchemas] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @SchemaId;
 
-        IF @SchemaId IS NULL
+        IF @ServiceOperationId IS NULL
         BEGIN
             RAISERROR('Schema with Id %d not found.', 16, 1, @SchemaId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

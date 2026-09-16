@@ -63,13 +63,13 @@ BEGIN
         -- Check for duplicate role permission
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[RolePermissions]
+            FROM [dbo].[RolePermissions] WITH (UPDLOCK, HOLDLOCK)
             WHERE [RoleId] = @RoleId
               AND [ResourcePermissionId] = @ResourcePermissionId
               AND [IsActive] = 1
         )
         BEGIN
-            RAISERROR('Permission "%s" already exists for role "%s".', 16, 1, @PermissionKey, @RoleName);
+            RAISERROR('Permission "%s" already exists for role "%s".', 16, 1, CONVERT(VARCHAR(512), @PermissionKey), CONVERT(VARCHAR(50), @RoleName));
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

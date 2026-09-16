@@ -22,57 +22,69 @@ BEGIN
     DECLARE @NewPublicId     UNIQUEIDENTIFIER = NEWID();
     DECLARE @PageId          INT;
 
-    -- Validation: PagePublicId must exist
-    SELECT @PageId = [Id]
-    FROM [dbo].[UIPages]
-    WHERE [PublicId] = @PagePublicId;
-
-    IF @PageId IS NULL
-    BEGIN
-        RAISERROR('UI page not found for the specified PublicId.', 16, 1);
-        RETURN;
-    END
-
-    -- Validation: ActionName must not be empty
-    IF @ActionName IS NULL OR LTRIM(RTRIM(@ActionName)) = N''
-    BEGIN
-        RAISERROR('Action name cannot be empty.', 16, 1);
-        RETURN;
-    END
-
-    -- Validation: ActionName must be unique per page
-    IF EXISTS (SELECT 1 FROM [dbo].[UIActions] WHERE [PageId] = @PageId AND [ActionName] = @ActionName)
-    BEGIN
-        RAISERROR('An action with the name ''%s'' already exists for this page.', 16, 1, @ActionName);
-        RETURN;
-    END
-
-    -- Validation: DisplayName must not be empty
-    IF @DisplayName IS NULL OR LTRIM(RTRIM(@DisplayName)) = N''
-    BEGIN
-        RAISERROR('Display name cannot be empty.', 16, 1);
-        RETURN;
-    END
-
-    -- Validation: ResourcePermissionId must exist
-    IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
-    BEGIN
-        RAISERROR('Resource permission not found for the specified Id.', 16, 1);
-        RETURN;
-    END
-
-    -- Validation: ActionType must be a valid value
-    IF @ActionType NOT IN ('Button', 'MenuItem', 'Tab', 'Link')
-    BEGIN
-        RAISERROR('Action type must be one of: Button, MenuItem, Tab, Link.', 16, 1);
-        RETURN;
-    END
-
     BEGIN TRY
         IF @@TRANCOUNT = 0
         BEGIN
             BEGIN TRANSACTION;
             SET @LocalTranStarted = 1;
+        END
+
+        -- Validation: PagePublicId must exist
+        SELECT @PageId = [Id]
+        FROM [dbo].[UIPages]
+        WHERE [PublicId] = @PagePublicId;
+
+        IF @PageId IS NULL
+        BEGIN
+            RAISERROR('UI page not found for the specified PublicId.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: ActionName must not be empty
+        IF @ActionName IS NULL OR LTRIM(RTRIM(@ActionName)) = N''
+        BEGIN
+            RAISERROR('Action name cannot be empty.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: ActionName must be unique per page
+        IF EXISTS (SELECT 1 FROM [dbo].[UIActions] WITH (UPDLOCK, HOLDLOCK) WHERE [PageId] = @PageId AND [ActionName] = @ActionName)
+        BEGIN
+            RAISERROR('An action with the name ''%s'' already exists for this page.', 16, 1, @ActionName);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: DisplayName must not be empty
+        IF @DisplayName IS NULL OR LTRIM(RTRIM(@DisplayName)) = N''
+        BEGIN
+            RAISERROR('Display name cannot be empty.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: ResourcePermissionId must exist
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[ResourcePermissions] WHERE [Id] = @ResourcePermissionId)
+        BEGIN
+            RAISERROR('Resource permission not found for the specified Id.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Validation: ActionType must be a valid value
+        IF @ActionType NOT IN ('Button', 'MenuItem', 'Tab', 'Link')
+        BEGIN
+            RAISERROR('Action type must be one of: Button, MenuItem, Tab, Link.', 16, 1);
+            IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         INSERT INTO [dbo].[UIActions]

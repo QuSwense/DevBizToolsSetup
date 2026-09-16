@@ -15,24 +15,24 @@ BEGIN
         @RuleSetId AS RuleSetId,
         rs.[WorkflowName],
         
-        -- Overall statistics
-        COUNT(*) AS TotalExecutions,
-        SUM(CASE WHEN [IsSuccess] = 1 THEN 1 ELSE 0 END) AS SuccessfulExecutions,
-        SUM(CASE WHEN [IsSuccess] = 0 THEN 1 ELSE 0 END) AS FailedExecutions,
-        AVG([ExecutionTimeMs]) AS AvgExecutionTimeMs,
-        MIN([ExecutionTimeMs]) AS MinExecutionTimeMs,
-        MAX([ExecutionTimeMs]) AS MaxExecutionTimeMs,
-        
-        -- Size statistics
-        AVG([InputUncompressedSizeBytes]) AS AvgInputSize,
-        AVG([OutputUncompressedSizeBytes]) AS AvgOutputSize,
-        
-        -- Success rate
-        CASE 
-            WHEN COUNT(*) > 0 THEN
-                CAST((SUM(CASE WHEN [IsSuccess] = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(*) AS DECIMAL(10,2))
-            ELSE 0
-        END AS SuccessRate,
+    -- Overall statistics (ISNULL defaults keep the row present for zero executions)
+    COUNT(rel.[Id]) AS TotalExecutions,
+    ISNULL(SUM(CASE WHEN rel.[IsSuccess] = 1 THEN 1 ELSE 0 END), 0) AS SuccessfulExecutions,
+    ISNULL(SUM(CASE WHEN rel.[IsSuccess] = 0 THEN 1 ELSE 0 END), 0) AS FailedExecutions,
+    AVG(rel.[ExecutionTimeMs]) AS AvgExecutionTimeMs,
+    MIN(rel.[ExecutionTimeMs]) AS MinExecutionTimeMs,
+    MAX(rel.[ExecutionTimeMs]) AS MaxExecutionTimeMs,
+    
+    -- Size statistics
+    AVG(rel.[InputUncompressedSizeBytes]) AS AvgInputSize,
+    AVG(rel.[OutputUncompressedSizeBytes]) AS AvgOutputSize,
+    
+    -- Success rate
+    CASE 
+        WHEN COUNT(rel.[Id]) > 0 THEN
+            CAST((SUM(CASE WHEN rel.[IsSuccess] = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(rel.[Id]) AS DECIMAL(10,2))
+        ELSE 0
+    END AS SuccessRate,
         
         -- Daily breakdown
         (
@@ -63,10 +63,11 @@ BEGIN
             FOR JSON AUTO
         ) AS RecentExecutions
 
-    FROM [dbo].[RuleExecutionLogs] rel
-    INNER JOIN [dbo].[RuleSets] rs ON rel.[RuleSetId] = rs.[Id]
-    WHERE rel.[RuleSetId] = @RuleSetId
-      AND rel.[ExecutedAt] >= @StartDate
+    FROM [dbo].[RuleSets] rs
+    LEFT JOIN [dbo].[RuleExecutionLogs] rel 
+        ON rel.[RuleSetId] = rs.[Id]
+       AND rel.[ExecutedAt] >= @StartDate
+    WHERE rs.[Id] = @RuleSetId
     GROUP BY rs.[WorkflowName];
 END;
 GO

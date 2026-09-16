@@ -40,8 +40,8 @@ BEGIN
 
         IF @Name IS NOT NULL
            AND @Name <> @CurrentName
-           AND EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE [Name] = @Name AND [PublicId] <> @PublicId)
-            RAISERROR('A role with the name ''%s'' already exists.', 16, 1, @Name);
+           AND EXISTS (SELECT 1 FROM [dbo].[Roles] WITH (UPDLOCK, HOLDLOCK) WHERE [Name] = @Name AND [PublicId] <> @PublicId)
+            RAISERROR('A role with the name ''%s'' already exists.', 16, 1, CONVERT(VARCHAR(50), @Name));
 
         /* System roles: only the IsActive flag may be changed */
         IF @IsSystemRole = 1

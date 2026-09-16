@@ -68,7 +68,7 @@ BEGIN
         FROM [dbo].[ServiceResponseFiles] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @ResponseFileId;
 
-        IF @ResponseFileId IS NULL
+        IF @ServiceRequestFileId IS NULL
         BEGIN
             RAISERROR('Service response file with Id %d not found.', 16, 1, @ResponseFileId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

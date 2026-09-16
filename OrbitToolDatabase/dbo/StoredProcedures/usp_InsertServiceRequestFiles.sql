@@ -79,7 +79,7 @@ BEGIN
             IF @ParentDeltaId IS NOT NULL
             BEGIN
                 SELECT @DeltaDepth = [DeltaDepth] + 1
-                FROM [dbo].[ServiceRequestFiles]
+                FROM [dbo].[ServiceRequestFiles] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [Id] = @ParentDeltaId
                   AND [IsActive] = 1;
             END
@@ -106,7 +106,7 @@ BEGIN
             BEGIN
                 IF NOT EXISTS (
                     SELECT 1 
-                    FROM [dbo].[ServiceRequestFiles] 
+                    FROM [dbo].[ServiceRequestFiles] WITH (UPDLOCK, HOLDLOCK)
                     WHERE [Id] = @ParentBaseId 
                       AND [IsBaseSnapshot] = 1 
                       AND [IsActive] = 1
@@ -123,7 +123,7 @@ BEGIN
             BEGIN
                 IF NOT EXISTS (
                     SELECT 1 
-                    FROM [dbo].[ServiceRequestFiles] 
+                    FROM [dbo].[ServiceRequestFiles] WITH (UPDLOCK, HOLDLOCK)
                     WHERE [Id] = @ParentDeltaId 
                       AND [IsBaseSnapshot] = 0 
                       AND [IsActive] = 1

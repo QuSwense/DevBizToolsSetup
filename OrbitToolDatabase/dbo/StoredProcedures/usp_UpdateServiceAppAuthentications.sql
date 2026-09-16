@@ -120,7 +120,7 @@ BEGIN
                   AND [IsActive] = 1
             )
             BEGIN
-                RAISERROR('An active authentication configuration with the name "%s" already exists.', 16, 1, @Name);
+                RAISERROR('An active authentication configuration with the name "%s" already exists.', 16, 1, CONVERT(VARCHAR(200), @Name));
                 IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                     ROLLBACK TRANSACTION;
                 RETURN;

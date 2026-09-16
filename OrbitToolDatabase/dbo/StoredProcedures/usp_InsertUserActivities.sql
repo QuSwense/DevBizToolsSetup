@@ -11,6 +11,11 @@
         @RelatedEntityId UNIQUEIDENTIFIER - Optional: PublicId of the affected entity
         @Notes NVARCHAR(MAX) - Optional: Additional notes about the activity
     
+    Note: @RelatedEntityType and @RelatedEntityId are ONLY persisted when
+    @FeatureActivitiesJson is NULL (they are folded into the auto-built JSON).
+    When the caller supplies @FeatureActivitiesJson, these two parameters are
+    ignored - callers must embed related-entity information in the JSON itself.
+    
     Returns:
         @ActivityId BIGINT - The ID of the newly created activity record
 */

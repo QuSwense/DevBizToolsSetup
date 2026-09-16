@@ -34,7 +34,7 @@ BEGIN
 
         -- Check if element already exists
         SELECT @ExistingId = [Id]
-        FROM [dbo].[IndexingPdfFileElements]
+        FROM [dbo].[IndexingPdfFileElements] WITH (UPDLOCK, HOLDLOCK)
         WHERE [ElementName] = @ElementName
           AND [ElementType] = @ElementType
           AND [PageNumber] = @PageNumber;
@@ -110,7 +110,11 @@ BEGIN
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        THROW;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR('Error inserting or getting PDF file element: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

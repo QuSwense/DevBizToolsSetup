@@ -38,12 +38,12 @@ BEGIN
             @ServiceTestCaseId = [ServiceTestCaseId],
             @SuiteName = sts.[Name],
             @TestCaseName = stc.[Name]
-        FROM [dbo].[ServiceTestSuiteTestCaseLinks] l
+        FROM [dbo].[ServiceTestSuiteTestCaseLinks] l WITH (UPDLOCK, HOLDLOCK)
         INNER JOIN [dbo].[ServiceTestSuites] sts ON l.[ServiceTestSuiteId] = sts.[Id]
         INNER JOIN [dbo].[ServiceTestCases] stc ON l.[ServiceTestCaseId] = stc.[Id]
         WHERE l.[Id] = @LinkId;
 
-        IF @LinkId IS NULL
+        IF @ServiceTestSuiteId IS NULL
         BEGIN
             RAISERROR('Link with Id %d not found.', 16, 1, @LinkId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

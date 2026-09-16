@@ -18,8 +18,8 @@ BEGIN
         IF @Name IS NULL OR LTRIM(RTRIM(@Name)) = N''
             RAISERROR('Role name cannot be empty.', 16, 1);
 
-        IF EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE [Name] = @Name)
-            RAISERROR('A role with the name ''%s'' already exists.', 16, 1, @Name);
+        IF EXISTS (SELECT 1 FROM [dbo].[Roles] WITH (UPDLOCK, HOLDLOCK) WHERE [Name] = @Name)
+            RAISERROR('A role with the name ''%s'' already exists.', 16, 1, CONVERT(VARCHAR(50), @Name));
 
         /* ---------- Transaction ---------- */
         IF @@TRANCOUNT = 0

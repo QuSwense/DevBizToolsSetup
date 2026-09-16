@@ -46,7 +46,7 @@ BEGIN
         FROM [dbo].[ServiceTestSuites] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @TestSuiteId;
 
-        IF @TestSuiteId IS NULL
+        IF @ExistingRecordVersion IS NULL
         BEGIN
             RAISERROR('Service test suite with Id %d not found.', 16, 1, @TestSuiteId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -68,7 +68,7 @@ BEGIN
         BEGIN
             IF EXISTS (
                 SELECT 1 
-                FROM [dbo].[ServiceTestSuites]
+                FROM [dbo].[ServiceTestSuites] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [Name] = @Name
                   AND [Id] != @TestSuiteId
             )

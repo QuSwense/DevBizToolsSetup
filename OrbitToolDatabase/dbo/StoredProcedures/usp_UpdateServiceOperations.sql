@@ -88,13 +88,13 @@ BEGIN
         BEGIN
             IF EXISTS (
                 SELECT 1 
-                FROM [dbo].[ServiceOperations] 
+                FROM [dbo].[ServiceOperations] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [ServiceApplicationId] = @ServiceAppId
                   AND [OperationName] = @OperationName
                   AND [Id] != @OperationId
             )
             BEGIN
-                RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, @OperationName);
+                RAISERROR('An operation with the name "%s" already exists for this service.', 16, 1, CONVERT(VARCHAR(200), @OperationName));
                 IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                     ROLLBACK TRANSACTION;
                 RETURN;

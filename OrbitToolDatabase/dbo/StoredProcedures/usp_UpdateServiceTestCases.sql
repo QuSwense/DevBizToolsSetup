@@ -47,7 +47,7 @@ BEGIN
         FROM [dbo].[ServiceTestCases] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @TestCaseId;
 
-        IF @TestCaseId IS NULL
+        IF @ExistingRecordVersion IS NULL
         BEGIN
             RAISERROR('Service test case with Id %d not found.', 16, 1, @TestCaseId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -86,7 +86,7 @@ BEGIN
         BEGIN
             IF EXISTS (
                 SELECT 1 
-                FROM [dbo].[ServiceTestCases]
+                FROM [dbo].[ServiceTestCases] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [Name] = @Name
                   AND [Id] != @TestCaseId
                   AND [IsActive] = 1
@@ -106,7 +106,7 @@ BEGIN
         UPDATE [dbo].[ServiceTestCases]
         SET
             [Name] = ISNULL(@Name, [Name]),
-            [ServiceRequestFileId] = @ServiceRequestFileId,
+            [ServiceRequestFileId] = ISNULL(@ServiceRequestFileId, [ServiceRequestFileId]),
             [IsActive] = ISNULL(@IsActive, [IsActive]),
             [RecordVersion] = @NewRecordVersion,
             [LastUpdatedAt] = GETDATE(),

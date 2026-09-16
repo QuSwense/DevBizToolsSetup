@@ -56,15 +56,15 @@ BEGIN
             END
         END
 
-        -- Check for duplicate name
+        -- Check for duplicate name (locked to avoid concurrent duplicate inserts)
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[ServiceApplications] 
+            FROM [dbo].[ServiceApplications] WITH (UPDLOCK, HOLDLOCK)
             WHERE [Name] = @Name 
               AND [IsActive] = 1
         )
         BEGIN
-            RAISERROR('An active service application with the name "%s" already exists.', 16, 1, @Name);
+            RAISERROR('An active service application with the name "%s" already exists.', 16, 1, CONVERT(VARCHAR(200), @Name));
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
                 ROLLBACK TRANSACTION;
             RETURN;

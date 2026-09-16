@@ -21,9 +21,9 @@ SELECT
     -- Human-readable data type description
     CASE gs.DataType
         WHEN 'String' THEN 'Text value'
-        WHEN 'Int' THEN 'Whole number'
+        WHEN 'Integer' THEN 'Whole number'
         WHEN 'Decimal' THEN 'Decimal number'
-        WHEN 'Bool' THEN 'True/False flag'
+        WHEN 'Boolean' THEN 'True/False flag'
         WHEN 'Json' THEN 'JSON object'
         WHEN 'DateTime' THEN 'Date and time value'
         ELSE 'Unknown type'

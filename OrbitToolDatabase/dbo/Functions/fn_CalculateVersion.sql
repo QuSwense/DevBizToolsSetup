@@ -30,11 +30,18 @@ BEGIN
         DECLARE @PrevYear VARCHAR(2), @PrevQQ VARCHAR(2), @PrevNN INT;
 
         -- Extract components from format "YY.QQ.NN"
+        -- Validate components: PARSENAME returns NULL if the string has more than 3 dot-separated parts.
+        -- Malformed/invalid input defaults to a fresh version per the documented behavior.
         SET @PrevYear = PARSENAME(@PreviousVersion, 3);
         SET @PrevQQ   = PARSENAME(@PreviousVersion, 2);
-        SET @PrevNN   = CAST(PARSENAME(@PreviousVersion, 1) AS INT);
+        SET @PrevNN   = TRY_CAST(PARSENAME(@PreviousVersion, 1) AS INT);
 
-        IF @PrevYear <> @YearSuffix OR @PrevQQ <> @QQ
+        IF @PrevYear IS NULL OR @PrevQQ IS NULL OR @PrevNN IS NULL
+        BEGIN
+            -- Invalid previous version -> default initial version: YY.QQ.01
+            SET @Result = @YearSuffix + '.' + @QQ + '.01';
+        END
+        ELSE IF @PrevYear <> @YearSuffix OR @PrevQQ <> @QQ
         BEGIN
             -- New year or quarter -> reset NN to 01
             SET @Result = @YearSuffix + '.' + @QQ + '.01';

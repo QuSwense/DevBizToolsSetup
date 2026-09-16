@@ -44,7 +44,7 @@ BEGIN
     -- Validation: Name must be unique if changed
     IF @Name IS NOT NULL AND @Name <> @CurrentName
     BEGIN
-        IF EXISTS (SELECT 1 FROM [dbo].[UIPages] WHERE [Name] = @Name AND [Id] <> @PageId)
+        IF EXISTS (SELECT 1 FROM [dbo].[UIPages] WITH (UPDLOCK, HOLDLOCK) WHERE [Name] = @Name AND [Id] <> @PageId)
         BEGIN
             RAISERROR('A page with the name ''%s'' already exists.', 16, 1, @Name);
             RETURN;

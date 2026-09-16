@@ -5,7 +5,7 @@
 */
 CREATE PROCEDURE [dbo].[usp_InsertIndexingPdfFileElementMappings]
     @IndexingPdfFileElementSearchId BIGINT,
-    @BinaryEmbeddingsStoreId INT = NULL,
+    @BinaryEmbeddingsStoreId INT,
     @UserId NVARCHAR(20) = NULL
 AS
 BEGIN
@@ -50,10 +50,9 @@ BEGIN
 
         -- Check for duplicate mapping
         IF EXISTS (
-            SELECT 1 FROM [dbo].[IndexingPdfFileElementMappings]
+            SELECT 1 FROM [dbo].[IndexingPdfFileElementMappings] WITH (UPDLOCK, HOLDLOCK)
             WHERE [IndexingPdfFileElementSearchId] = @IndexingPdfFileElementSearchId
-              AND ((@BinaryEmbeddingsStoreId IS NOT NULL AND [BinaryEmbeddingsStoreId] = @BinaryEmbeddingsStoreId)
-                   OR (@BinaryEmbeddingsStoreId IS NULL AND [BinaryEmbeddingsStoreId] IS NULL))
+              AND [BinaryEmbeddingsStoreId] = @BinaryEmbeddingsStoreId
         )
         BEGIN
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -67,8 +66,7 @@ BEGIN
                 0 AS IsNew
             FROM [dbo].[IndexingPdfFileElementMappings]
             WHERE [IndexingPdfFileElementSearchId] = @IndexingPdfFileElementSearchId
-              AND ((@BinaryEmbeddingsStoreId IS NOT NULL AND [BinaryEmbeddingsStoreId] = @BinaryEmbeddingsStoreId)
-                   OR (@BinaryEmbeddingsStoreId IS NULL AND [BinaryEmbeddingsStoreId] IS NULL));
+              AND [BinaryEmbeddingsStoreId] = @BinaryEmbeddingsStoreId;
 
             RETURN;
         END
@@ -101,7 +99,11 @@ BEGIN
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        THROW;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR('Error inserting PDF file element mapping: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO

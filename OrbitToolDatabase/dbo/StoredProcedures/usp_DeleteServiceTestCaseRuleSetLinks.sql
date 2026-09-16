@@ -34,12 +34,12 @@ BEGIN
         SELECT TOP 1
             @TestCaseName = stc.[Name],
             @WorkflowName = rs.[WorkflowName]
-        FROM [dbo].[ServiceTestCaseRuleSetLinks] l
+        FROM [dbo].[ServiceTestCaseRuleSetLinks] l WITH (UPDLOCK, HOLDLOCK)
         INNER JOIN [dbo].[ServiceTestCases] stc ON l.[ServiceTestCaseId] = stc.[Id]
         INNER JOIN [dbo].[RuleSets] rs ON l.[RuleSetId] = rs.[Id]
         WHERE l.[Id] = @LinkId;
 
-        IF @LinkId IS NULL
+        IF @TestCaseName IS NULL
         BEGIN
             RAISERROR('Link with Id %d not found.', 16, 1, @LinkId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0

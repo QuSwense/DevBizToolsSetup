@@ -56,7 +56,7 @@ BEGIN
         FROM [dbo].[RuleSets] WITH (UPDLOCK, HOLDLOCK)
         WHERE [Id] = @RuleSetId;
 
-        IF @RuleSetId IS NULL
+        IF @ExistingWorkflowName IS NULL
         BEGIN
             RAISERROR('Rule set with Id %d not found.', 16, 1, @RuleSetId);
             IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
@@ -73,7 +73,8 @@ BEGIN
             RETURN;
         END
 
-        -- Validate OutputType if changed
+        -- Resolve the effective output type context name (for audit JSON)
+        -- Changed: validate new OutputTypeId; unchanged: use the existing OutputTypeId
         IF @OutputTypeId IS NOT NULL AND @OutputTypeId <> @ExistingOutputTypeId
         BEGIN
             SELECT @ContextName = [ContextName]
@@ -96,13 +97,19 @@ BEGIN
             FROM [dbo].[RuleContextObjects]
             WHERE [Id] = @OutputTypeId;
         END
+        ELSE
+        BEGIN
+            SELECT @ContextName = [ContextName]
+            FROM [dbo].[RuleContextObjects]
+            WHERE [Id] = @ExistingOutputTypeId;
+        END
 
         -- Check for duplicate workflow name if changed
         IF @WorkflowName IS NOT NULL AND @WorkflowName <> @ExistingWorkflowName
         BEGIN
             IF EXISTS (
                 SELECT 1 
-                FROM [dbo].[RuleSets]
+                FROM [dbo].[RuleSets] WITH (UPDLOCK, HOLDLOCK)
                 WHERE [WorkflowName] = @WorkflowName
                   AND [Id] != @RuleSetId
             )

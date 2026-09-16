@@ -34,7 +34,7 @@ BEGIN
         -- Check for duplicate name
         IF EXISTS (
             SELECT 1 
-            FROM [dbo].[ServiceTestSuites]
+            FROM [dbo].[ServiceTestSuites] WITH (UPDLOCK, HOLDLOCK)
             WHERE [Name] = @Name
         )
         BEGIN

@@ -40,7 +40,7 @@ BEGIN
 
         -- Check if search entry already exists
         SELECT @ExistingId = [Id]
-        FROM [dbo].[IndexingPdfFileElementSearch]
+        FROM [dbo].[IndexingPdfFileElementSearch] WITH (UPDLOCK, HOLDLOCK)
         WHERE [IndexingPdfFileElementId] = @IndexingPdfFileElementId
           AND [ElementValue] = @ElementValue;
 
@@ -92,7 +92,11 @@ BEGIN
         IF @LocalTranStarted = 1 AND @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        THROW;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR('Error inserting or getting PDF file element search entry: %s', @ErrorSeverity, @ErrorState, @ErrorMessage);
     END CATCH
 END;
 GO
