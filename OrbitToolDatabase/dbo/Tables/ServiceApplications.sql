@@ -39,7 +39,7 @@ CREATE TABLE [dbo].[ServiceApplications] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceApplications PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceApplications_PublicId UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
+    CONSTRAINT UQ_ServiceApplications_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
 
     -- Check constraints
     CONSTRAINT CK_ServiceApplications_ServiceType

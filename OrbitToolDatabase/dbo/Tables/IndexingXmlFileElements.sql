@@ -10,14 +10,13 @@ CREATE TABLE [dbo].[IndexingXmlFileElements]
     [ElementName] NVARCHAR(400) NOT NULL,
     -- XML Path key path, using XPath in C#
     [XmlPath] NVARCHAR(400) NOT NULL,
-    -- XML value type: 'String', 'Number', 'Boolean', 'Array', 'Object'
-    [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
+    -- XML value type: maps to c# type
+    [DataType] NVARCHAR(200) NOT NULL,
     [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
     [LastUpdatedAt] DATETIME2(3) NULL,
 
     CONSTRAINT [PK_IndexingXmlFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
-    CONSTRAINT [UQ_IndexingXmlFileElements_ElementName_XmlPath] UNIQUE ([ElementName] ASC, [XmlPath] ASC),
-    CONSTRAINT [CK_IndexingXmlFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object'))
+    CONSTRAINT [UQ_IndexingXmlFileElements_ElementName_XmlPath] UNIQUE ([ElementName] ASC, [XmlPath] ASC)
 );
 GO
 

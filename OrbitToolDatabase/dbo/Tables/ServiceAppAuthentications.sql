@@ -13,7 +13,7 @@ CREATE TABLE [dbo].[ServiceAppAuthentications] (
         CONSTRAINT DF_ServiceAppAuthentications_PublicId DEFAULT NEWID(),
     -- Name of the authentication configuration, e.g., 'My Basic Auth', 'My OAuth2 Config'
     [Name] NVARCHAR(200) NOT NULL,
-    -- Type of authentication used for the service application, e.g., 'Basic', 'NTLM', 'APIKey', 'OAuth2', 'Bearer', 'Custom'
+    -- Type of authentication used for the service application, e.g., 'Basic', 'NTLM', 'APIKey', 'OAuth2', 'Bearer', 'Custom', 'Database'
     [AuthenticationType] VARCHAR(50) NOT NULL,
     -- Optional encryption algorithm used for encrypting the credentials, e.g., 'AES-GCM', 'RSA', 'None'
     [EncryptionAlgorithmType] VARCHAR(50) NULL,
@@ -31,12 +31,11 @@ CREATE TABLE [dbo].[ServiceAppAuthentications] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceAppAuthentications PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceAppAuthentications_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_ServiceAppAuthentications_Name UNIQUE ([Name] ASC),
+    CONSTRAINT UQ_ServiceAppAuthentications_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
 
     -- Check constraints
     CONSTRAINT CK_ServiceAppAuthentications_Type
-        CHECK ([AuthenticationType] IN ('Basic', 'NTLM', 'APIKey', 'OAuth2', 'Bearer', 'Custom')),
+        CHECK ([AuthenticationType] IN ('Basic', 'NTLM', 'APIKey', 'OAuth2', 'Bearer', 'Custom', 'Database')),
     CONSTRAINT CK_ServiceAppAuthentications_EncryptionAlgorithmType
         CHECK ([EncryptionAlgorithmType] IS NULL OR [EncryptionAlgorithmType] IN ('AES-GCM', 'RSA', 'None')),
     CONSTRAINT CK_ServiceAppAuthentications_EncryptedJson

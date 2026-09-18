@@ -1,9 +1,9 @@
 /*
-    Table: IndexingPdfFileElementSearch
+    Table: IndexingPdfFileElementValues
     Description: Search view specifically for PDF elements.
     Denormalized for faster searching across PDF element types.
 */
-CREATE TABLE [dbo].[IndexingPdfFileElementSearch]
+CREATE TABLE [dbo].[IndexingPdfFileElementValues]
 (
     -- Primary Key
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
@@ -13,13 +13,13 @@ CREATE TABLE [dbo].[IndexingPdfFileElementSearch]
     [ElementValue] NVARCHAR(800) NOT NULL,
     [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
     
-    CONSTRAINT [PK_IndexingPdfFileElementSearch] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
+    CONSTRAINT [PK_IndexingPdfFileElementValues] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
 
-    CONSTRAINT [FK_IndexingPdfFileElementSearch_IndexingPdfFileElements] 
+    CONSTRAINT [FK_IndexingPdfFileElementValues_IndexingPdfFileElements] 
         FOREIGN KEY ([IndexingPdfFileElementId]) REFERENCES [dbo].[IndexingPdfFileElements]([Id])
 );
 GO
 
-CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementSearch_ElementId]
-    ON [dbo].[IndexingPdfFileElementSearch]([IndexingPdfFileElementId] ASC)
+CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementValues_ElementId]
+    ON [dbo].[IndexingPdfFileElementValues]([IndexingPdfFileElementId] ASC)
 GO

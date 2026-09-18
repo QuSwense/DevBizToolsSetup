@@ -10,14 +10,14 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
     -- Foreign Key target for BinaryEmbeddingsStore
     [BinaryEmbeddingsStoreId] INT NOT NULL,
     -- Foreign Key referencing the unique entry in IndexingPdfFileElementSearch.
-    [IndexingPdfFileElementSearchId] BIGINT NOT NULL,
+    [IndexingPdfFileElementValueId] BIGINT NOT NULL,
 
     CONSTRAINT [PK_IndexingPdfFileElementMappings] 
         PRIMARY KEY CLUSTERED ([Id] ASC) 
         WITH (DATA_COMPRESSION = PAGE),
 
-    CONSTRAINT [FK_IndexingPdfFileElementMappings_IndexingPdfFileElementSearch] 
-        FOREIGN KEY ([IndexingPdfFileElementSearchId]) REFERENCES [dbo].[IndexingPdfFileElementSearch]([Id]),
+    CONSTRAINT [FK_IndexingPdfFileElementMappings_IndexingPdfFileElementValues] 
+        FOREIGN KEY ([IndexingPdfFileElementValueId]) REFERENCES [dbo].[IndexingPdfFileElementValues]([Id]),
 
     CONSTRAINT [FK_IndexingPdfFileElementMappings_BinaryEmbeddingsStore] 
         FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id])
@@ -28,6 +28,6 @@ CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementMappings_BinaryEmbeddingsSto
     ON [dbo].[IndexingPdfFileElementMappings]([BinaryEmbeddingsStoreId] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementMappings_SearchId]
-    ON [dbo].[IndexingPdfFileElementMappings]([IndexingPdfFileElementSearchId] ASC)
+CREATE NONCLUSTERED INDEX [IX_IndexingPdfFileElementMappings_ValueId]
+    ON [dbo].[IndexingPdfFileElementMappings]([IndexingPdfFileElementValueId] ASC)
 GO

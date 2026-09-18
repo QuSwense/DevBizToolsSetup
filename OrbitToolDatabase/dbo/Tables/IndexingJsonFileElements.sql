@@ -10,14 +10,12 @@ CREATE TABLE [dbo].[IndexingJsonFileElements]
     [ElementName] NVARCHAR(400) NOT NULL,
     -- JSON Path key path, using JSONPath in C#
     [JsonPath] NVARCHAR(400) NOT NULL,
-    -- JSON value type: 'String', 'Number', 'Boolean', 'Null', 'Array', 'Object'
-    [ValueType] NVARCHAR(20) NOT NULL DEFAULT 'String',
+    -- JSON value types, C# types
+    [DataType] NVARCHAR(200) NOT NULL,
     [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
-    [LastUpdatedAt] DATETIME2(3) NULL,
 
     CONSTRAINT [PK_IndexingJsonFileElements] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (DATA_COMPRESSION = PAGE),
     CONSTRAINT [UQ_IndexingJsonFileElements_ElementName_JsonPath] UNIQUE ([ElementName] ASC, [JsonPath] ASC),
-    CONSTRAINT [CK_IndexingJsonFileElements_ValueType] CHECK ([ValueType] IN ('String', 'Number', 'Boolean', 'Null', 'Array', 'Object'))
 );
 GO
 

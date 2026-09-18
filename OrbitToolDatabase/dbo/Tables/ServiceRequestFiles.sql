@@ -12,24 +12,15 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
     [ServiceOperationId] INT NOT NULL,
     -- File format, e.g., 'XML', 'JSON', 'PDF', 'BINARY'
     [FileFormat] VARCHAR(10) NULL,
-    -- File name, e.g., 'request.xml', 'response.json'
+    -- File name, as uploaded by the user
     [Name] NVARCHAR(250) NOT NULL,
-    -- Flag: 1 = Complete full payload snapshot; 0 = Differential patch/delta.
-    [IsBaseSnapshot] BIT NOT NULL CONSTRAINT [DF_ServiceRequestFiles_IsBase] DEFAULT 1,
-    -- Foreign key pointing to the primary Base Snapshot when IsBaseSnapshot = 0.
-    [ParentBaseId] INT NULL,
-    -- Foreign key pointing to the immediate predecessor record in the delta chain.
-    [ParentDeltaId] INT NULL,
-    -- Depth count in the delta chain (0 for base snapshots, >0 for incremental deltas).
-    [DeltaDepth] INT NOT NULL CONSTRAINT [DF_ServiceRequestFiles_DeltaDepth] DEFAULT 0,
-    -- Compressed file data
+    -- Compressed file data without any embedded binary data Base64 encoded which is stored in [ServiceRequestFileEmbeddings]
     [CompressedData] VARBINARY(MAX) NOT NULL,
-    -- Uncompressed size of the file in bytes
+    -- Uncompressed size of the file in bytes but is formated in a sepcific way like without whitespace,
+    -- comments, and other non-essential characters
     [UncompressedSizeBytes] BIGINT NULL,
     -- Compression algorithm used for the file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
-    -- SHA256 hash of the file data for integrity verification
-    [ContentHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceRequestFiles_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -48,12 +39,8 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
     CONSTRAINT CK_ServiceRequestFiles_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
-    CONSTRAINT CK_ServiceRequestFiles_ContentHash
-        CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceRequestFiles_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
-    CONSTRAINT CK_ServiceRequestFiles_DeltaDepth
-        CHECK ([DeltaDepth] >= 0),
 
     -- Foreign keys
     CONSTRAINT FK_ServiceRequestFiles_ServiceOperations_ServiceOperationId

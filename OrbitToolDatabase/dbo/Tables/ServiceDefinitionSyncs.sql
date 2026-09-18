@@ -12,15 +12,13 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     -- Foreign Key to ServiceApplications table
     [ServiceApplicationId] INT NOT NULL,
     -- URL of the definition file (WSDL, Swagger, OpenAPI)
-    [DefinitionUrl] NVARCHAR(500) NULL,
+    [DefinitionUrl] NVARCHAR(1024) NULL,
     -- compressed content of the definition file (WSDL, Swagger, OpenAPI)
     [CompressedContent] VARBINARY(MAX) NOT NULL,
     -- uncompressed size of the definition file in bytes
     [UncompressedSizeBytes] BIGINT NULL,
     -- compression algorithm used for the definition file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
-    -- SHA256 hash of the definition file content for integrity verification
-    [ContentHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceDefinitionSyncs_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -31,11 +29,9 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceDefinitionSyncs_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceDefinitionSyncs_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
     CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [RecordVersion] ASC),
-    CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_ContentHash
-        UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [ContentHash] ASC),
 
     CONSTRAINT CK_ServiceDefinitionSyncs_DefinitionUrl
         CHECK ([DefinitionUrl] IS NULL
@@ -43,8 +39,6 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
             OR LEFT([DefinitionUrl], 8) = 'https://'),
     CONSTRAINT CK_ServiceDefinitionSyncs_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
-    CONSTRAINT CK_ServiceDefinitionSyncs_ContentHash
-        CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceDefinitionSyncs_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 

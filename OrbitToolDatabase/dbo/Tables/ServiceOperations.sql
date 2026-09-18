@@ -36,7 +36,7 @@ CREATE TABLE [dbo].[ServiceOperations] (
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceOperations_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceOperations_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceOperations_HttpMethod
         CHECK ([HttpMethod] IS NULL OR [HttpMethod] IN ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')),

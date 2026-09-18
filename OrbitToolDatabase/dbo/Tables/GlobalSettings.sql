@@ -14,9 +14,8 @@ CREATE TABLE [dbo].[GlobalSettings] (
     [SettingKey] NVARCHAR(100) NOT NULL,
     -- Value of the setting, stored as NVARCHAR(MAX) to accommodate various data types
     [SettingValue] NVARCHAR(MAX) NOT NULL,
-    -- Data type of the setting value, e.g., 
-    -- 'String', 'Integer', 'Decimal', 'Boolean', 'Json', 'Xml', 'DateTime'
-    [DataType] VARCHAR(20) NOT NULL CONSTRAINT DF_GlobalSettings_DataType DEFAULT 'String',
+    -- Data type of the setting value, using C# types
+    [DataType] VARCHAR(200) NOT NULL,
     -- Optional description for the setting
     [Description] NVARCHAR(500) NULL,
     -- Indicates if the setting can be overridden by users
@@ -32,9 +31,6 @@ CREATE TABLE [dbo].[GlobalSettings] (
     CONSTRAINT PK_GlobalSettings PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_GlobalSettings_SettingKey UNIQUE ([SettingKey] ASC),
     CONSTRAINT UQ_GlobalSettings_PublicId UNIQUE ([PublicId] ASC),
-
-    CONSTRAINT CK_GlobalSettings_DataType
-        CHECK ([DataType] IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'Xml', 'DateTime')),
 
     -- Foreign Key Constraints for auditing
     CONSTRAINT FK_GlobalSettings_Users_CreatedBy FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),

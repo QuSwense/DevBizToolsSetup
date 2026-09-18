@@ -27,8 +27,6 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
     [UncompressedSizeBytes] BIGINT NULL,
     -- compression algorithm used for the definition file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
-    -- SHA256 hash of the definition file content for integrity verification
-    [ContentHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceOperationSchemas_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -41,14 +39,12 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
 
     -- Primary Key
     CONSTRAINT [PK_ServiceOperationSchemas] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceOperationSchemas_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceOperationSchemas_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
     CONSTRAINT UQ_ServiceOperationSchemas_ServiceOperationId_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceOperationId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceOperationSchemas_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
-    CONSTRAINT CK_ServiceOperationSchemas_ContentHash
-        CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceOperationSchemas_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
