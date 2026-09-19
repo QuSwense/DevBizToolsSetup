@@ -9,9 +9,6 @@
 CREATE TABLE [dbo].[ServiceOperations] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
-    -- Public Identifier for UI/Secure Operations (GUID)
-    [PublicId] UNIQUEIDENTIFIER NOT NULL 
-        CONSTRAINT DF_ServiceOperations_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceApplications table, sometimes user may not have wsdl extracted from application
     [ServiceApplicationId] INT NOT NULL,
     -- Foreign Key to ServiceDefinitionSyncs table, sometimes user may want to link the operation to a specific service definition sync
@@ -34,7 +31,6 @@ CREATE TABLE [dbo].[ServiceOperations] (
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceOperations_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
 
     CONSTRAINT CK_ServiceOperations_HttpMethod
         CHECK ([HttpMethod] IS NULL OR [HttpMethod] IN ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')),

@@ -7,8 +7,6 @@
 CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
-    [PublicId] UNIQUEIDENTIFIER NOT NULL 
-        CONSTRAINT DF_ServiceDefinitionSyncs_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceApplications table
     [ServiceApplicationId] INT NOT NULL,
     -- URL of the definition file (WSDL, Swagger, OpenAPI)
@@ -27,7 +25,6 @@ CREATE TABLE [dbo].[ServiceDefinitionSyncs] (
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceDefinitionSyncs PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceDefinitionSyncs_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
     CONSTRAINT UQ_ServiceDefinitionSyncs_ServiceApplicationId_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceApplicationId] ASC, [RecordVersion] ASC),
 

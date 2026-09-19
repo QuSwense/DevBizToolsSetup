@@ -1,61 +1,50 @@
 /*
     Stored Procedure: usp_GetServiceOperations
-    Description: Gets all operations for a service application.
+
+    Returns operations for one application.
+    @IncludePreviousVersions = 0 → latest version of each logical operation
+    @IncludePreviousVersions = 1 → complete history
+    @OperationName (optional) → filter to a single operation
 */
-CREATE PROCEDURE [dbo].[usp_GetServiceOperations]
-    @ServiceApplicationPublicId UNIQUEIDENTIFIER,
-    @IncludeInactive BIT = 0,
-    @OperationName NVARCHAR(200) = NULL
+CREATE OR ALTER PROCEDURE [dbo].[usp_GetServiceOperations]
+    @ServiceApplicationId       INT,
+    @IncludePreviousVersions    BIT = 0,
+    @OperationName              NVARCHAR(200) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @ServiceAppId INT;
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[ServiceApplications] WHERE [Id] = @ServiceApplicationId)
+        RAISERROR('Service application was not found.', 16, 1);
 
-    -- Get the service application internal ID
-    SELECT TOP 1 @ServiceAppId = [Id]
-    FROM [dbo].[ServiceApplications]
-    WHERE [PublicId] = @ServiceApplicationPublicId
-    ORDER BY [Id] DESC;
-
-    IF @ServiceAppId IS NULL
-    BEGIN
-        RAISERROR('Service application not found.', 16, 1);
-        RETURN;
-    END
-
-    SELECT 
-        so.[Id] AS OperationId,
-        so.[ServiceApplicationId],
-        so.[OperationName],
-        so.[EndpointOrAction],
-        so.[HttpMethod],
-        so.[Description],
-        so.[IsActive],
-        so.[RecordVersion],
-        so.[CreatedAt],
-        so.[CreatedBy],
-        so.[LastUpdatedAt],
-        so.[LastUpdatedBy],
-        -- Count of schemas for this operation
-        (
-            SELECT COUNT(*)
-            FROM [dbo].[ServiceOperationSchemas] sos
-            WHERE sos.[ServiceOperationId] = so.[Id]
-        ) AS SchemaCount,
-        -- Check if schema exists
-        CASE 
-            WHEN EXISTS (
-                SELECT 1 
-                FROM [dbo].[ServiceOperationSchemas] sos
-                WHERE sos.[ServiceOperationId] = so.[Id]
-            ) THEN 1
-            ELSE 0
-        END AS HasSchema
-    FROM [dbo].[ServiceOperations] so
-    WHERE so.[ServiceApplicationId] = @ServiceAppId
-      AND (@IncludeInactive = 1 OR so.[IsActive] = 1)
-      AND (@OperationName IS NULL OR so.[OperationName] = @OperationName)
-    ORDER BY so.[OperationName];
+    ;WITH Ranked AS
+    (
+        SELECT
+            o.*,
+            ROW_NUMBER() OVER
+            (
+                PARTITION BY o.[ServiceApplicationId], o.[OperationName]
+                ORDER BY o.[Id] DESC
+            ) AS rn
+        FROM [dbo].[ServiceOperations] o
+        WHERE o.[ServiceApplicationId] = @ServiceApplicationId
+          AND (@OperationName IS NULL OR o.[OperationName] = @OperationName)
+    )
+    SELECT
+        [Id]                        AS ServiceOperationId,
+        [ServiceApplicationId],
+        [ServiceDefinitionSyncId],
+        [OperationName],
+        [EndpointOrAction],
+        [HttpMethod],
+        [Description],
+        [IsActive],
+        [RecordVersion],
+        [CreatedAt],
+        [CreatedBy],
+        CASE WHEN rn = 1 THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsLatest
+    FROM Ranked
+    WHERE @IncludePreviousVersions = 1 OR rn = 1
+    ORDER BY [OperationName], [Id] DESC;
 END;
 GO

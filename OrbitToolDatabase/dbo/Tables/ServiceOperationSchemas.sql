@@ -11,8 +11,6 @@
 CREATE TABLE [dbo].[ServiceOperationSchemas] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
-    [PublicId] UNIQUEIDENTIFIER NOT NULL 
-        CONSTRAINT DF_ServiceOperationSchemas_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceOperations table (optional)
     [ServiceOperationId] INT NOT NULL,
     -- Root element name for the input message of the operation, e.g., 'GetUserRequest', 'CreateOrderRequest'
@@ -37,7 +35,6 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
 
     -- Primary Key
     CONSTRAINT [PK_ServiceOperationSchemas] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceOperationSchemas_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
     CONSTRAINT UQ_ServiceOperationSchemas_ServiceOperationId_RecordVersion
         UNIQUE NONCLUSTERED ([ServiceOperationId] ASC, [RecordVersion] ASC),
 

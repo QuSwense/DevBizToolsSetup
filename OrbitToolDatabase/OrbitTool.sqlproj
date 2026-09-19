@@ -20,9 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dbo" />
+    <Folder Include="dbo\SPs" />
     <Folder Include="dbo\StoredProcedures" />
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Functions" />
+    <Folder Include="dbo\Types" />
     <Folder Include="dbo\Views" />
     <Folder Include="Seeds" />
   </ItemGroup>
