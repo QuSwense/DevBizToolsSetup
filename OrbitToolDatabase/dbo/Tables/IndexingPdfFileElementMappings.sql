@@ -11,6 +11,7 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
     [BinaryEmbeddingsStoreId] INT NOT NULL,
     -- Foreign Key referencing the unique entry in IndexingPdfFileElementSearch.
     [IndexingPdfFileElementValueId] BIGINT NOT NULL,
+    [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [PK_IndexingPdfFileElementMappings] 
         PRIMARY KEY CLUSTERED ([Id] ASC) 

@@ -1,39 +1,39 @@
 /*
-    Table: RuleContextObjects
+    Table: RuleSetContextObjects
     Description: This table stores the context objects for rules, including their names, associated rule types, and descriptions.
     Logic: Each context object is linked to a specific rule type, which is defined by its assembly-qualified name. The table ensures that each context name is unique and provides an active status for managing the lifecycle of context objects.
 */
-CREATE TABLE [dbo].[RuleContextObjects] (
+CREATE TABLE [dbo].[RuleSetContextObjects] (
     -- Primary Key and Identity
     [Id] INT IDENTITY(1,1) NOT NULL,
     -- Public Identifier for UI/Secure Operations (GUID)
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
-        CONSTRAINT DF_RuleContextObjects_PublicId DEFAULT NEWID(),
+        CONSTRAINT DF_RuleSetContextObjects_PublicId DEFAULT NEWID(),
     -- Context Name, must be unique
     [ContextName] NVARCHAR(100) NOT NULL,  -- e.g., "Customer", "Order", "Product"
     -- Rule Type Identifier, linking to the specific rule type in .NET
     [RuleTypeId] NVARCHAR(255) NOT NULL,         -- Full assembly-qualified type name
     -- Optional Description of the Context Object
-    [Description] NVARCHAR(500) NULL,
+    [Description] NVARCHAR(MAX) NULL,
     -- Active Status of the Context Object
-    [IsActive] BIT NOT NULL CONSTRAINT DF_RuleContextObjects_IsActive DEFAULT 1,
+    [IsActive] BIT NOT NULL CONSTRAINT DF_RuleSetContextObjects_IsActive DEFAULT 1,
     -- Timestamps for auditing created and last updated
-    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleContextObjects_CreatedAt DEFAULT GETDATE(),
+    [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleSetContextObjects_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
     [LastUpdatedAt] DATETIME2(3) NULL,
     [LastUpdatedBy] NVARCHAR(20) NULL,
 
-    CONSTRAINT PK_RuleContextObjects PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_RuleContextObjects_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_RuleContextObjects_ContextName UNIQUE ([ContextName] ASC),
+    CONSTRAINT PK_RuleSetContextObjects PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_RuleSetContextObjects_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_RuleSetContextObjects_ContextName UNIQUE ([ContextName] ASC),
     
-    CONSTRAINT FK_RuleContextObjects_Users_CreatedBy
+    CONSTRAINT FK_RuleSetContextObjects_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_RuleContextObjects_Users_LastUpdatedBy
+    CONSTRAINT FK_RuleSetContextObjects_Users_LastUpdatedBy
         FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO
 
-CREATE NONCLUSTERED INDEX IX_RuleContextObjects_IsActive
-    ON [dbo].[RuleContextObjects]([IsActive] ASC)
+CREATE NONCLUSTERED INDEX IX_RuleSetContextObjects_IsActive
+    ON [dbo].[RuleSetContextObjects]([IsActive] ASC)
 GO

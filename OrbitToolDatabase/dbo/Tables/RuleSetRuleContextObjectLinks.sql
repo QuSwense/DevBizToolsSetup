@@ -14,6 +14,7 @@ CREATE TABLE [dbo].[RuleSetContextObjectLinks] (
         CONSTRAINT DF_RuleSetContextObjectLinks_PublicId DEFAULT NEWID(),
     -- Foreign Key References 
     [RuleSetId] INT NOT NULL,
+    [InputOrOutputType] NVARCHAR(50) NOT NULL,
     -- Foreign Key References
     [RuleContextObjectId] INT NOT NULL,
     -- Timestamps for auditing created and last updated
@@ -21,8 +22,10 @@ CREATE TABLE [dbo].[RuleSetContextObjectLinks] (
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_RuleSetContextObjectLinks PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT CK_RuleSetContextObjectLinks_InputOrOutputType CHECK ([InputOrOutputType] IN ('Input', 'Output')),
+
     CONSTRAINT UQ_RuleSetContextObjectLinks_PublicId UNIQUE ([PublicId] ASC),
-    CONSTRAINT UQ_RuleSetContextObjectLinks_RuleSetId_RuleContextObjectId UNIQUE ([RuleSetId] ASC, [RuleContextObjectId] ASC),
+    CONSTRAINT UQ_RuleSetContextObjectLinks_RuleSetId_RuleContextObjectId_InputOrOutputType UNIQUE ([RuleSetId] ASC, [RuleContextObjectId] ASC, [InputOrOutputType] ASC),
 
     CONSTRAINT FK_RuleSetContextObjectLinks_RuleSets FOREIGN KEY ([RuleSetId])
         REFERENCES [dbo].[RuleSets]([Id]),

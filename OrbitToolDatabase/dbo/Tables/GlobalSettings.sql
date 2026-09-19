@@ -17,7 +17,7 @@ CREATE TABLE [dbo].[GlobalSettings] (
     -- Data type of the setting value, using C# types
     [DataType] VARCHAR(200) NOT NULL,
     -- Optional description for the setting
-    [Description] NVARCHAR(500) NULL,
+    [Description] NVARCHAR(MAX) NULL,
     -- Indicates if the setting can be overridden by users
     [IsUserOverridable] BIT NOT NULL CONSTRAINT DF_GlobalSettings_IsUserOverridable DEFAULT 0,
     -- Indicates if the setting is currently active

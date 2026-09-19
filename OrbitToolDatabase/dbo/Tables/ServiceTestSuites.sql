@@ -8,14 +8,12 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_ServiceTestSuites_PublicId DEFAULT NEWID(),
     [Name] NVARCHAR(200) NOT NULL,
-    [Description] NVARCHAR(500) NULL,
+    [Description] NVARCHAR(MAX) NULL,
     [IsActive] BIT NOT NULL CONSTRAINT DF_ServiceTestSuites_IsActive DEFAULT 1,
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceTestSuites_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceTestSuites_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME2(3) NULL,
-    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceTestSuites PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceTestSuites_PublicId UNIQUE ([PublicId] ASC),
@@ -24,8 +22,6 @@ CREATE TABLE [dbo].[ServiceTestSuites] (
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
     CONSTRAINT FK_ServiceTestSuites_Users_CreatedBy
-        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_ServiceTestSuites_Users_LastUpdatedBy
-        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
+        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO

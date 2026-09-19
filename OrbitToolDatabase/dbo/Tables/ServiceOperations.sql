@@ -32,8 +32,6 @@ CREATE TABLE [dbo].[ServiceOperations] (
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceOperations_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME2(3) NULL,
-    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceOperations PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceOperations_PublicId_RecordVersion UNIQUE ([PublicId] ASC, [RecordVersion] ASC),
@@ -49,9 +47,7 @@ CREATE TABLE [dbo].[ServiceOperations] (
     CONSTRAINT FK_ServiceOperations_ServiceDefinitionSyncs_ServiceDefinitionSyncId
         FOREIGN KEY ([ServiceDefinitionSyncId]) REFERENCES [dbo].[ServiceDefinitionSyncs]([Id]),
     CONSTRAINT FK_ServiceOperations_Users_CreatedBy
-        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_ServiceOperations_Users_LastUpdatedBy
-        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
+        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO
 

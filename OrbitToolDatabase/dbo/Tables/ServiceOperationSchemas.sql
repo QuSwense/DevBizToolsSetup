@@ -34,8 +34,6 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
     [CreatedAt] DATETIME2(3) NOT NULL
         CONSTRAINT [DF_ServiceOperationSchemas_CreatedAt] DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME2(3) NULL,
-    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     -- Primary Key
     CONSTRAINT [PK_ServiceOperationSchemas] PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -51,7 +49,10 @@ CREATE TABLE [dbo].[ServiceOperationSchemas] (
     -- Foreign Keys
     CONSTRAINT [FK_ServiceOperationSchemas_ServiceOperations_ServiceOperationId]
         FOREIGN KEY ([ServiceOperationId])
-        REFERENCES [dbo].[ServiceOperations]([Id])
+        REFERENCES [dbo].[ServiceOperations]([Id]),
+    CONSTRAINT FK_ServiceOperationSchemas_ServiceOperations_CreatedBy
+        FOREIGN KEY ([CreatedBy])
+        REFERENCES [dbo].[Users]([UserId])
 );
 GO
 

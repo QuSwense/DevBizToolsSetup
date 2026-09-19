@@ -41,7 +41,7 @@ CREATE TABLE [dbo].[BinaryEmbeddingStores] (
 
     CONSTRAINT [PK_BinaryEmbeddingStores] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [UQ_BinaryEmbeddingStores_PublicId] UNIQUE ([PublicId] ASC),
-    CONSTRAINT [CK_BinaryEmbeddingStores_Format] CHECK ([ContentFormat] IS NULL OR [ContentFormat] IN ('PDF','BINARY')),
+    CONSTRAINT [CK_BinaryEmbeddingStores_Format] CHECK ([ContentFormat] IS NULL OR [ContentFormat] IN ('XML', 'JSON', 'PDF','BINARY')),
     CONSTRAINT [CK_BinaryEmbeddingStores_Compression] CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
     CONSTRAINT [CK_BinaryEmbeddingStores_RecordVersionFormat]
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),

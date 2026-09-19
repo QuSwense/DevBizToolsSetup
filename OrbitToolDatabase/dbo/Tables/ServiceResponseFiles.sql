@@ -14,22 +14,12 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     [FileFormat] VARCHAR(10) NULL,
     -- File name, e.g., 'request.xml', 'response.json'
     [Name] NVARCHAR(250) NOT NULL,
-    -- Flag: 1 = Complete full payload snapshot; 0 = Differential patch/delta.
-    [IsBaseSnapshot] BIT NOT NULL CONSTRAINT [DF_ServiceResponseFiles_IsBase] DEFAULT 1,
-    -- Foreign key pointing to the primary Base Snapshot when IsBaseSnapshot = 0.
-    [ParentBaseId] INT NULL,
-    -- Foreign key pointing to the immediate predecessor record in the delta chain.
-    [ParentDeltaId] INT NULL,
-    -- Depth count in the delta chain (0 for base snapshots, >0 for incremental deltas).
-    [DeltaDepth] INT NOT NULL CONSTRAINT [DF_ServiceResponseFiles_DeltaDepth] DEFAULT 0,
     -- Compressed file data
     [CompressedData] VARBINARY(MAX) NOT NULL,
     -- Uncompressed size of the file in bytes
     [UncompressedSizeBytes] BIGINT NULL,
     -- Compression algorithm used for the file, e.g., 'Zstandard', 'Brotli', 'Gzip', 'none'
     [CompressionAlgorithmType] VARCHAR(50) NULL,
-    -- SHA256 hash of the file data for integrity verification
-    [ContentHash] VARCHAR(64) NULL,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_ServiceResponseFiles_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
@@ -38,8 +28,6 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceResponseFiles_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME2(3) NULL,
-    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_ServiceResponseFiles PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_ServiceResponseFiles_PublicId UNIQUE ([PublicId] ASC),
@@ -48,24 +36,14 @@ CREATE TABLE [dbo].[ServiceResponseFiles] (
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON','PDF','BINARY')),
     CONSTRAINT CK_ServiceResponseFiles_CompressionAlgorithmType
         CHECK ([CompressionAlgorithmType] IS NULL OR [CompressionAlgorithmType] IN ('Zstandard', 'Brotli', 'Gzip', 'none')),
-    CONSTRAINT CK_ServiceResponseFiles_ContentHash
-        CHECK ([ContentHash] IS NULL OR LEN([ContentHash]) = 64 AND [ContentHash] NOT LIKE '%[^0-9a-fA-F]%'),
     CONSTRAINT CK_ServiceResponseFiles_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
-    CONSTRAINT CK_ServiceResponseFiles_DeltaDepth
-        CHECK ([DeltaDepth] >= 0),
 
     -- Foreign Key Constraints
     CONSTRAINT FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
-    CONSTRAINT FK_ServiceResponseFiles_ParentBaseId
-        FOREIGN KEY ([ParentBaseId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
-    CONSTRAINT FK_ServiceResponseFiles_ParentDeltaId
-        FOREIGN KEY ([ParentDeltaId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
     CONSTRAINT FK_ServiceResponseFiles_Users_CreatedBy
-        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_ServiceResponseFiles_Users_LastUpdatedBy
-        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
+        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO
 
@@ -73,26 +51,6 @@ CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ServiceRequestFileId
     ON [dbo].[ServiceResponseFiles]([ServiceRequestFileId] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ParentBaseId
-    ON [dbo].[ServiceResponseFiles]([ParentBaseId] ASC)
-GO
-
-CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_ParentDeltaId
-    ON [dbo].[ServiceResponseFiles]([ParentDeltaId] ASC)
-GO
-
 CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_CreatedAt
     ON [dbo].[ServiceResponseFiles]([CreatedAt] ASC)
-GO
-
-CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_Name
-    ON [dbo].[ServiceResponseFiles]([Name] ASC)
-GO
-
-CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_IsActive
-    ON [dbo].[ServiceResponseFiles]([IsActive] ASC)
-GO
-
-CREATE NONCLUSTERED INDEX IX_ServiceResponseFiles_CreatedBy
-    ON [dbo].[ServiceResponseFiles]([CreatedBy] ASC)
 GO

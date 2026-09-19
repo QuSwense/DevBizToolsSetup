@@ -10,10 +10,12 @@
 
 */
 CREATE TABLE [dbo].[DirectExecutionGroupAudits] (
-    [Id] INT IDENTITY(1,1) NOT NULL,
+    [Id] BIGINT IDENTITY(1,1) NOT NULL,
     -- Public Identifier for UI/Secure Operations (GUID)
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_DirectExecutionGroupAudits_PublicId DEFAULT NEWID(),
+    -- Foreign key to DirectExecutionGroups
+    [DirectExecutionGroupId] INT NOT NULL,
     -- Name of the group operation being executed
     [Name] NVARCHAR(200) NOT NULL,
     -- Timestamp when the execution started
@@ -30,8 +32,11 @@ CREATE TABLE [dbo].[DirectExecutionGroupAudits] (
     CONSTRAINT PK_DirectExecutionGroupAudits PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_DirectExecutionGroupAudits_PublicId UNIQUE ([PublicId] ASC),
     CONSTRAINT UQ_DirectExecutionGroupAudits_Name UNIQUE ([Name] ASC),
+    CONSTRAINT UQ_DirectExecutionGroupAudits_DirectExecutionGroupId_ExecutedAt_ExecutedBy UNIQUE ([DirectExecutionGroupId] ASC, [ExecutedAt] ASC, [ExecutedBy] ASC),
     CONSTRAINT CK_DirectExecutionGroupAudits_ExecutionStatus CHECK ([ExecutionStatus] IN ('Pending', 'InProgress', 'Completed', 'Failed')),
 
+    CONSTRAINT FK_DirectExecutionGroupAudits_DirectExecutionGroups_DirectExecutionGroupId
+        FOREIGN KEY ([DirectExecutionGroupId]) REFERENCES [dbo].[DirectExecutionGroups]([Id]),
     CONSTRAINT FK_DirectExecutionGroupAudits_Users_ExecutedBy
         FOREIGN KEY ([ExecutedBy]) REFERENCES [dbo].[Users]([UserId])
 );

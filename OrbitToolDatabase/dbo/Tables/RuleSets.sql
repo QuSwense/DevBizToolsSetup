@@ -11,22 +11,20 @@ CREATE TABLE [dbo].[RuleSets] (
         CONSTRAINT DF_RuleSets_PublicId DEFAULT NEWID(),
     -- Workflow and Rule Definition Name
     [WorkflowName] NVARCHAR(255) NOT NULL,
-    -- JSON Rule Definition, only one rule set per workflow is allowed
+    -- JSON Rule Definition, 
     [RuleContent] NVARCHAR(MAX) NOT NULL,
     -- Output Type Reference, linking to RuleContextObjects
-    [OutputTypeId] INT NOT NULL,
+    [OutputDataTypeId] INT NOT NULL,
     -- Active Status of the Rule Set
     [IsActive] BIT NOT NULL CONSTRAINT DF_RuleSets_IsActive DEFAULT 1,
     -- Optional Description of the Rule Set
-    [Description] NVARCHAR(500) NULL,
+    [Description] NVARCHAR(MAX) NULL,
     -- Versioning and Audit Fields
     [RecordVersion] VARCHAR(50) NOT NULL
         CONSTRAINT DF_RuleSets_RecordVersion DEFAULT ([dbo].[fn_CalculateVersion](NULL)),
     -- Timestamps for auditing created and last updated
     [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_RuleSets_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
-    [LastUpdatedAt] DATETIME2(3) NULL,
-    [LastUpdatedBy] NVARCHAR(20) NULL,
 
     CONSTRAINT PK_RuleSets PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT UQ_RuleSets_PublicId UNIQUE ([PublicId] ASC),
@@ -36,7 +34,7 @@ CREATE TABLE [dbo].[RuleSets] (
     CONSTRAINT CK_RuleSets_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
-    CONSTRAINT FK_RuleSets_RuleContextObjects FOREIGN KEY ([OutputTypeId])
+    CONSTRAINT FK_RuleSets_RuleContextObjects FOREIGN KEY ([OutputDataTypeId])
         REFERENCES [dbo].[RuleContextObjects]([Id]),
     CONSTRAINT FK_RuleSets_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
@@ -45,8 +43,8 @@ CREATE TABLE [dbo].[RuleSets] (
 );
 GO
 
-CREATE NONCLUSTERED INDEX IX_RuleSets_OutputTypeId
-    ON [dbo].[RuleSets]([OutputTypeId] ASC)
+CREATE NONCLUSTERED INDEX IX_RuleSets_OutputDataTypeId
+    ON [dbo].[RuleSets]([OutputDataTypeId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX IX_RuleSets_IsActive
