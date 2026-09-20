@@ -7,7 +7,7 @@
 */
 CREATE TABLE [dbo].[IndexingServiceResponseFileStatus] (
     -- Primary Key & Foreign Key pointing directly to the ServiceRequestFiles record.
-    [ServiceResponseFileId] INT NOT NULL,
+    [ServiceResponseFileId] BIGINT NOT NULL,
     -- Processing status state ('Pending', 'Processing', 'Completed', 'Failed').
     [IndexingStatus] VARCHAR(20) NOT NULL CONSTRAINT [DF_IndexingServiceResponseFileStatus_Status] DEFAULT 'Pending',
     -- Error message and stack trace detailing failure if IndexingStatus = 'Failed'.

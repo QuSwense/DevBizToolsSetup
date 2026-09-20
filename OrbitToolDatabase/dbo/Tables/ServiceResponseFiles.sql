@@ -4,7 +4,7 @@
 */
 CREATE TABLE [dbo].[ServiceResponseFiles] (
     -- Primary Key, Identity Column and Unique identifier
-    [Id] INT IDENTITY(1,1) NOT NULL,
+    [Id] BIGINT IDENTITY(1,1) NOT NULL,
     -- Public Identifier for UI/Secure Operations (GUID)
     [PublicId] UNIQUEIDENTIFIER NOT NULL 
         CONSTRAINT DF_ServiceResponseFiles_PublicId DEFAULT NEWID(),

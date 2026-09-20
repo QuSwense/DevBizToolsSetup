@@ -7,8 +7,8 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
 (
     -- Primary key.
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
-    -- Foreign Key target for BinaryEmbeddingsStore
-    [BinaryEmbeddingsStoreId] INT NOT NULL,
+    -- Foreign Key target for BinaryEmbeddingStores
+    [BinaryEmbeddingsStoreId] BIGINT NOT NULL,
     -- Foreign Key referencing the unique entry in IndexingPdfFileElementSearch.
     [IndexingPdfFileElementValueId] BIGINT NOT NULL,
     [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),
@@ -20,8 +20,8 @@ CREATE TABLE [dbo].[IndexingPdfFileElementMappings]
     CONSTRAINT [FK_IndexingPdfFileElementMappings_IndexingPdfFileElementValues] 
         FOREIGN KEY ([IndexingPdfFileElementValueId]) REFERENCES [dbo].[IndexingPdfFileElementValues]([Id]),
 
-    CONSTRAINT [FK_IndexingPdfFileElementMappings_BinaryEmbeddingsStore] 
-        FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id])
+    CONSTRAINT [FK_IndexingPdfFileElementMappings_BinaryEmbeddingStores] 
+        FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingStores]([Id])
 );
 GO
 

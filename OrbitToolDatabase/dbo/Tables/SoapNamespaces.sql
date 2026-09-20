@@ -31,7 +31,7 @@ CREATE TABLE [dbo].[SoapNamespaces] (
     CONSTRAINT [FK_SoapNamespaces_ServiceOperationSchemas_ServiceOperationSchemaId]
         FOREIGN KEY ([ServiceOperationSchemaId]) REFERENCES [dbo].[ServiceOperationSchemas]([Id]),
     CONSTRAINT FK_SoapNamespaces_CreatedBy_Users
-        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([Id])
+        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO
 

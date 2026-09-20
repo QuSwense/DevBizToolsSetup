@@ -8,8 +8,8 @@
 */
 CREATE TABLE [dbo].[ServiceResponseFileHttpExecutionDetailLinks] (
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
-    [ServiceResponseFileId] INT NOT NULL,
-    [HttpExecutionDetailAuditId] INT NOT NULL,
+    [ServiceResponseFileId] BIGINT NOT NULL,
+    [HttpExecutionDetailAuditId] BIGINT NOT NULL,
     [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceResponseFileHttpExecutionDetailLinks_CreatedAt DEFAULT GETDATE(),
     [CreatedBy] NVARCHAR(20) NOT NULL,
 

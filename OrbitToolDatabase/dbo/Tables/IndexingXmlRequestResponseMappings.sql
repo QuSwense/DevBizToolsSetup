@@ -10,7 +10,7 @@ CREATE TABLE [dbo].[IndexingXmlRequestResponseMappings]
     -- Foreign Key target for ServiceRequestFiles
     [ServiceRequestFileId] INT NULL,
     -- Foreign Key target for ServiceResponseFiles
-    [ServiceResponseFileId] INT NULL,
+    [ServiceResponseFileId] BIGINT NULL,
     -- Foreign Key referencing the unique entry in IndexingXmlFileElementSearch.
     [IndexingXmlFileElementValueId] BIGINT NOT NULL,
     [CreatedAt] DATETIME2(3) NOT NULL DEFAULT GETDATE(),

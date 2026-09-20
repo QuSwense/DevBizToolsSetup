@@ -27,8 +27,6 @@ CREATE TABLE [dbo].[ServiceTestSuiteTestCaseLinkAudits] (
 
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinkAudits_ServiceTestSuiteTestCaseLinks_ServiceTestSuiteTestCaseLinkId
         FOREIGN KEY ([ServiceTestSuiteTestCaseLinkId]) REFERENCES [dbo].[ServiceTestSuiteTestCaseLinks]([Id]),
-    CONSTRAINT FK_ServiceTestSuiteTestCaseLinkAudits_ServiceTestCases_ServiceResponseFileId
-        FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
     CONSTRAINT FK_ServiceTestSuiteTestCaseLinkAudits_ServiceResponseFiles_ServiceResponseFileId
         FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id])
 );

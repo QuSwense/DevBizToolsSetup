@@ -34,8 +34,8 @@ CREATE TABLE [dbo].[RuleSets] (
     CONSTRAINT CK_RuleSets_RecordVersionFormat
         CHECK ([RecordVersion] LIKE '[0-9][0-9].[0-9][0-9].[0-9][0-9]'),
 
-    CONSTRAINT FK_RuleSets_RuleContextObjects FOREIGN KEY ([OutputDataTypeId])
-        REFERENCES [dbo].[RuleContextObjects]([Id]),
+    CONSTRAINT FK_RuleSets_RuleSetContextObjects FOREIGN KEY ([OutputDataTypeId])
+        REFERENCES [dbo].[RuleSetContextObjects]([Id]),
     CONSTRAINT FK_RuleSets_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
     CONSTRAINT FK_RuleSets_Users_LastUpdatedBy

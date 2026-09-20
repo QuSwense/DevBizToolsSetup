@@ -14,8 +14,8 @@ CREATE TABLE [dbo].[ServiceRequestFileBinaryEmbeddingStoreLinks] (
     [ElementName] NVARCHAR(400) NOT NULL,
     -- XML Path key path, using XPath in C#
     [XmlPath] NVARCHAR(400) NOT NULL,
-    -- Foreign Key to BinaryEmbeddingsStore table
-    [BinaryEmbeddingsStoreId] INT NOT NULL,
+    -- Foreign Key to BinaryEmbeddingStores table
+    [BinaryEmbeddingsStoreId] BIGINT NOT NULL,
     -- File name, e.g., 'response.xml', 'response.json'. Either custom name or original name extracted from the request.
     [Name] NVARCHAR(250) NOT NULL,
     -- Additional file type general metadata if there are any for a binary content
@@ -30,8 +30,8 @@ CREATE TABLE [dbo].[ServiceRequestFileBinaryEmbeddingStoreLinks] (
     
     CONSTRAINT FK_ServiceRequestFileBinaryEmbeddingStoreLinks_ServiceRequestFiles
         FOREIGN KEY ([ServiceRequestFileId]) REFERENCES [dbo].[ServiceRequestFiles]([Id]),
-    CONSTRAINT FK_ServiceRequestFileBinaryEmbeddingStoreLinks_BinaryEmbeddingsStore
-        FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingsStore]([Id]),
+    CONSTRAINT FK_ServiceRequestFileBinaryEmbeddingStoreLinks_BinaryEmbeddingStores
+        FOREIGN KEY ([BinaryEmbeddingsStoreId]) REFERENCES [dbo].[BinaryEmbeddingStores]([Id]),
     CONSTRAINT FK_ServiceRequestFileBinaryEmbeddingStoreLinks_Users_CreatedBy
         FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 );

@@ -7,7 +7,7 @@ CREATE TABLE [dbo].[IndexingJsonRequestResponseMappings]
 (
     -- Primary key.
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
-    [ServiceRequestFileId] BIGINT NULL,
+    [ServiceRequestFileId] INT NULL,
     [ServiceResponseFileId] BIGINT NULL,
     -- Foreign Key referencing the unique entry in IndexingJsonFileElementSearch.
     [IndexingJsonFileElementValueId] BIGINT NOT NULL,

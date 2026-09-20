@@ -12,7 +12,7 @@ CREATE TABLE [dbo].[DirectExecutionGroupServiceRequestFileLinkAudits] (
     [Id] BIGINT IDENTITY(1,1) NOT NULL,
     -- Public Identifier for UI/Secure Operations (GUID)
     [DirectExecutionGroupServiceRequestFileLinkId] INT NOT NULL,
-    [ServiceResponseFileId] INT NOT NULL,
+    [ServiceResponseFileId] BIGINT NOT NULL,
     -- Execution order within the audit
     [ExecutionOrder] INT NOT NULL CONSTRAINT DF_DirectExecutionGroupServiceRequestFileLinkAudits_ExecutionOrder DEFAULT 0,
     -- Timestamp when the execution started
