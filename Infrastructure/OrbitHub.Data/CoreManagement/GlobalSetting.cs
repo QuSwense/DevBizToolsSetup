@@ -30,7 +30,7 @@ public partial class GlobalSetting
 	public Guid PublicId { get; set; } // uniqueidentifier
 
 	/// <summary>
-	/// Category used to group the global setting.
+	/// Category used to group the global setting (e.g., General, UI, Authentication).
 	/// </summary>
 	[Column("Category", CanBeNull = false)]
 	public string Category { get; set; } = null!; // nvarchar(50)
@@ -42,31 +42,31 @@ public partial class GlobalSetting
 	public string SettingKey { get; set; } = null!; // nvarchar(100)
 
 	/// <summary>
-	/// Configured value of the setting.
+	/// Configured value of the setting, stored as text to accommodate various data types.
 	/// </summary>
 	[Column("SettingValue", CanBeNull = false)]
 	public string SettingValue { get; set; } = null!; // nvarchar(max)
 
 	/// <summary>
-	/// Data type used to interpret the setting value.
+	/// C#-mapped data type of the element or setting value.
 	/// </summary>
 	[Column("DataType", CanBeNull = false)]
-	public string DataType { get; set; } = null!; // varchar(20)
+	public string DataType { get; set; } = null!; // varchar(200)
 
 	/// <summary>
 	/// Optional human-readable description of this record.
 	/// </summary>
 	[Column("Description")]
-	public string? Description { get; set; } // nvarchar(500)
+	public string? Description { get; set; } // nvarchar(max)
 
 	/// <summary>
-	/// Indicates whether users may override this global setting.
+	/// Indicates whether users may override this global setting with a user-specific value.
 	/// </summary>
 	[Column("IsUserOverridable")]
 	public bool IsUserOverridable { get; set; } // bit
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
+	/// Indicates whether this record is active and available for use (1) or soft-deleted (0).
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
@@ -75,7 +75,7 @@ public partial class GlobalSetting
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -87,7 +87,7 @@ public partial class GlobalSetting
 	/// Date and time at which this record was last updated.
 	/// </summary>
 	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
+	public DateTime? LastUpdatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.

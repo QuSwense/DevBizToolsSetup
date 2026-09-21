@@ -37,9 +37,7 @@ CREATE TABLE [dbo].[RuleSets] (
     CONSTRAINT FK_RuleSets_RuleSetContextObjects FOREIGN KEY ([OutputDataTypeId])
         REFERENCES [dbo].[RuleSetContextObjects]([Id]),
     CONSTRAINT FK_RuleSets_Users_CreatedBy
-        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId]),
-    CONSTRAINT FK_RuleSets_Users_LastUpdatedBy
-        FOREIGN KEY ([LastUpdatedBy]) REFERENCES [dbo].[Users]([UserId])
+        FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users]([UserId])
 );
 GO
 

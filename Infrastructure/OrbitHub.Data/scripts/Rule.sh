@@ -17,13 +17,18 @@ dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
 CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
 
 # Step 1: Execute scaffolding using CLI parameters
+# Actual SQL tables (dbo):
+#   RuleSetContextObjects  (was: RuleContextObjects)
+#   RuleSets
+#   RuleSetRuleContextObjectLinks  (was: RuleSetContextObjectLinks)
+#   RuleSetExecutionAudits  (was: RuleExecutionLogs)
 dotnet linq2db scaffold \
   --provider SQLServer \
   --connection "$CONNECTION_STRING" \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables RuleContextObjects,RuleSets,RuleSetContextObjectLinks,RuleExecutionLogs \
+  --include-tables RuleSetContextObjects,RuleSets,RuleSetRuleContextObjectLinks,RuleSetExecutionAudits \
   --namespace OrbitHub.Data.RuleManagement \
   --context-name RuleDbContext \
   --add-typed-options-ctor \

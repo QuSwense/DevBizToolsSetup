@@ -3,10 +3,11 @@
     Run from OrbitToolDatabase/scripts with SQLCMD while connected to the OrbitTool server.
 
     This script resets and recreates the FULL schema from the SQL project source in ../dbo.
-    It drops every view, stored procedure, foreign key, table (most-dependent first), the
-    IndexingCatalog full-text catalog, and the fn_CalculateVersion function, then recreates
-    the function, all tables (honoring foreign-key dependencies), all views, all stored
-    procedures, and applies column descriptions.
+    It drops every view, stored procedure, user-defined type, foreign key, table
+    (most-dependent first), the IndexingCatalog full-text catalog (legacy cleanup), and
+    the fn_CalculateVersion function; then recreates the function, all tables (honoring
+    foreign-key dependencies), all user-defined types, all views, all stored procedures,
+    and applies column descriptions.
 
     To keep the previous tables-only behavior, comment out the two marked sections below
     ("Drop views and stored procedures" and "Recreate views and stored procedures").
@@ -119,57 +120,86 @@ CLOSE ProcCursor;
 DEALLOCATE ProcCursor;
 GO
 
+/* Drop user-defined table types (must be dropped after procedures that use them). */
+IF EXISTS (SELECT 1 FROM sys.types WHERE name = N'ServiceOperationSchemaInput' AND is_user_defined = 1)
+    DROP TYPE [dbo].[ServiceOperationSchemaInput];
+GO
+IF EXISTS (SELECT 1 FROM sys.types WHERE name = N'ServiceRequestFileEmbeddingLinkInput' AND is_user_defined = 1)
+    DROP TYPE [dbo].[ServiceRequestFileEmbeddingLinkInput];
+GO
+
 /* Drop tables from most-dependent to least-dependent. */
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElementSearch')) DROP TABLE [dbo].[IndexingPdfFileElementSearch];
+
+/* Indexing mapping / value tables */
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElementMappings')) DROP TABLE [dbo].[IndexingPdfFileElementMappings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElementValues')) DROP TABLE [dbo].[IndexingPdfFileElementValues];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingPdfFileElements')) DROP TABLE [dbo].[IndexingPdfFileElements];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElementSearch')) DROP TABLE [dbo].[IndexingJsonFileElementSearch];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElementMappings')) DROP TABLE [dbo].[IndexingJsonFileElementMappings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonRequestResponseMappings')) DROP TABLE [dbo].[IndexingJsonRequestResponseMappings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElementValues')) DROP TABLE [dbo].[IndexingJsonFileElementValues];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingJsonFileElements')) DROP TABLE [dbo].[IndexingJsonFileElements];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElementSearch')) DROP TABLE [dbo].[IndexingXmlFileElementSearch];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElementMappings')) DROP TABLE [dbo].[IndexingXmlFileElementMappings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlRequestResponseMappings')) DROP TABLE [dbo].[IndexingXmlRequestResponseMappings];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElementValues')) DROP TABLE [dbo].[IndexingXmlFileElementValues];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingXmlFileElements')) DROP TABLE [dbo].[IndexingXmlFileElements];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionAuditResponseFileLinks')) DROP TABLE [dbo].[DirectExecutionAuditResponseFileLinks];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionAudit')) DROP TABLE [dbo].[DirectExecutionAudit];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteExecutionAuditTestCaseLinks')) DROP TABLE [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks];
+
+/* Indexing status tables */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingServiceResponseFileStatus')) DROP TABLE [dbo].[IndexingServiceResponseFileStatus];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.IndexingServiceRequestFileStatus')) DROP TABLE [dbo].[IndexingServiceRequestFileStatus];
+
+/* DirectExecution audit / link tables */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionGroupServiceRequestFileLinkAudits')) DROP TABLE [dbo].[DirectExecutionGroupServiceRequestFileLinkAudits];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionGroupAudits')) DROP TABLE [dbo].[DirectExecutionGroupAudits];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionGroupServiceRequestFileLinks')) DROP TABLE [dbo].[DirectExecutionGroupServiceRequestFileLinks];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.DirectExecutionGroups')) DROP TABLE [dbo].[DirectExecutionGroups];
+
+/* Service App health check links */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceAppHealthHttpExecutionDetailAuditLinks')) DROP TABLE [dbo].[ServiceAppHealthHttpExecutionDetailAuditLinks];
+
+/* Test Suite execution / link tables */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteTestCaseLinkAudits')) DROP TABLE [dbo].[ServiceTestSuiteTestCaseLinkAudits];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteExecutionAudits')) DROP TABLE [dbo].[ServiceTestSuiteExecutionAudits];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuiteTestCaseLinks')) DROP TABLE [dbo].[ServiceTestSuiteTestCaseLinks];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestCaseRuleSetLinks')) DROP TABLE [dbo].[ServiceTestCaseRuleSetLinks];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuitesPermissions')) DROP TABLE [dbo].[ServiceTestSuitesPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestSuites')) DROP TABLE [dbo].[ServiceTestSuites];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestCasesPermissions')) DROP TABLE [dbo].[ServiceTestCasesPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceTestCases')) DROP TABLE [dbo].[ServiceTestCases];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseIndexingStatus')) DROP TABLE [dbo].[ServiceResponseIndexingStatus];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFileEmbeddings')) DROP TABLE [dbo].[ServiceResponseFileEmbeddings];
+
+/* Service Response file tables */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFilesDatabaseAudits')) DROP TABLE [dbo].[ServiceResponseFilesDatabaseAudits];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.HttpExecutionDetailAuditsServiceResponseFilesLinks')) DROP TABLE [dbo].[HttpExecutionDetailAuditsServiceResponseFilesLinks];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFileHttpExecutionDetailLinks')) DROP TABLE [dbo].[ServiceResponseFileHttpExecutionDetailLinks];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFileBinaryEmbeddingStoreLinks')) DROP TABLE [dbo].[ServiceResponseFileBinaryEmbeddingStoreLinks];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceResponseFiles')) DROP TABLE [dbo].[ServiceResponseFiles];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestIndexingStatus')) DROP TABLE [dbo].[ServiceRequestIndexingStatus];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFileEmbeddings')) DROP TABLE [dbo].[ServiceRequestFileEmbeddings];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFilesPermissions')) DROP TABLE [dbo].[ServiceRequestFilesPermissions];
+
+/* HTTP Execution Detail Audits */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.HttpExecutionDetailAudits')) DROP TABLE [dbo].[HttpExecutionDetailAudits];
+
+/* Service Request file tables */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFileBinaryEmbeddingStoreLinks')) DROP TABLE [dbo].[ServiceRequestFileBinaryEmbeddingStoreLinks];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceRequestFiles')) DROP TABLE [dbo].[ServiceRequestFiles];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.BinaryEmbeddingsStore')) DROP TABLE [dbo].[BinaryEmbeddingsStore];
+
+/* Binary embedding store */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.BinaryEmbeddingStores')) DROP TABLE [dbo].[BinaryEmbeddingStores];
+
+/* Service Operation / Schema tables */
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.SoapNamespaces')) DROP TABLE [dbo].[SoapNamespaces];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceOperationSchemas')) DROP TABLE [dbo].[ServiceOperationSchemas];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceOperations')) DROP TABLE [dbo].[ServiceOperations];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceDefinitionSyncs')) DROP TABLE [dbo].[ServiceDefinitionSyncs];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceAppPermissions')) DROP TABLE [dbo].[ServiceAppPermissions];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceApplications')) DROP TABLE [dbo].[ServiceApplications];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ServiceAppAuthentications')) DROP TABLE [dbo].[ServiceAppAuthentications];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleExecutionLogs')) DROP TABLE [dbo].[RuleExecutionLogs];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetContextObjectLinks')) DROP TABLE [dbo].[RuleSetContextObjectLinks];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetsPermissions')) DROP TABLE [dbo].[RuleSetsPermissions];
+
+/* Rule Engine tables */
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetExecutionAudits')) DROP TABLE [dbo].[RuleSetExecutionAudits];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetRuleContextObjectLinks')) DROP TABLE [dbo].[RuleSetRuleContextObjectLinks];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSets')) DROP TABLE [dbo].[RuleSets];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleSetContextObjects')) DROP TABLE [dbo].[RuleSetContextObjects];
+
+/* User Setting and Activity tables */
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserSettings')) DROP TABLE [dbo].[UserSettings];
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserActivities')) DROP TABLE [dbo].[UserActivities];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserPermissions')) DROP TABLE [dbo].[UserPermissions];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RolePermissions')) DROP TABLE [dbo].[RolePermissions];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.PermissionToUIPageMapping')) DROP TABLE [dbo].[PermissionToUIPageMapping];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UIActions')) DROP TABLE [dbo].[UIActions];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UIPages')) DROP TABLE [dbo].[UIPages];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.ResourcePermissions')) DROP TABLE [dbo].[ResourcePermissions];
+
+/* Global Settings */
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.GlobalSettings')) DROP TABLE [dbo].[GlobalSettings];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.RuleContextObjects')) DROP TABLE [dbo].[RuleContextObjects];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.UserRoles')) DROP TABLE [dbo].[UserRoles];
-IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Roles')) DROP TABLE [dbo].[Roles];
+
+/* Users (last — referenced as FK by all other tables) */
 IF EXISTS (SELECT 1 FROM sys.tables WHERE object_id = OBJECT_ID(N'dbo.Users')) DROP TABLE [dbo].[Users];
 GO
 
@@ -178,7 +208,41 @@ IF EXISTS (SELECT 1 FROM sys.fulltext_catalogs WHERE name = N'IndexingCatalog')
     DROP FULLTEXT CATALOG [IndexingCatalog];
 GO
 
-/* Drop functions after tables, then recreate the function before dependent tables. */
+/* Drop any default constraints still referencing fn_CalculateVersion
+   (covers legacy / renamed tables not in the explicit drop list above). */
+DECLARE @DefSchema   sysname;
+DECLARE @DefTable    sysname;
+DECLARE @DefName     sysname;
+DECLARE @DefDropSql  nvarchar(max);
+
+DECLARE DefaultConstraintCursor CURSOR LOCAL FAST_FORWARD FOR
+    SELECT
+        SCHEMA_NAME(tbl.schema_id),
+        tbl.name,
+        dc.name
+    FROM sys.default_constraints AS dc
+    INNER JOIN sys.tables AS tbl
+        ON tbl.object_id = dc.parent_object_id
+    WHERE dc.definition LIKE N'%fn_CalculateVersion%';
+
+OPEN DefaultConstraintCursor;
+FETCH NEXT FROM DefaultConstraintCursor INTO @DefSchema, @DefTable, @DefName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @DefDropSql =
+        N'ALTER TABLE ' + QUOTENAME(@DefSchema) + N'.' + QUOTENAME(@DefTable) +
+        N' DROP CONSTRAINT ' + QUOTENAME(@DefName) + N';';
+    EXEC sys.sp_executesql @DefDropSql;
+
+    FETCH NEXT FROM DefaultConstraintCursor INTO @DefSchema, @DefTable, @DefName;
+END;
+
+CLOSE DefaultConstraintCursor;
+DEALLOCATE DefaultConstraintCursor;
+GO
+
+/* Drop function after tables and any lingering default constraints. */
 IF EXISTS (
     SELECT 1
     FROM sys.objects
@@ -191,64 +255,41 @@ GO
 :r ../dbo/Functions/fn_CalculateVersion.sql
 GO
 
-/* Recreate tables from project source, honoring foreign-key dependencies. */
+/* =====================================================================
+   Recreate tables from project source, honoring foreign-key dependencies.
+   ===================================================================== */
+
+/* Foundation — Users first (self-referencing FK; all other tables point here) */
 :r ../dbo/Tables/Users.sql
 GO
 
-/* Seed the SYSTEM user so the Roles seed (and other seeds) that set
-   CreatedBy = N'SYSTEM' satisfy the FK_*_Users_CreatedBy constraints. */
+/* Seed the SYSTEM user so every subsequent table that sets CreatedBy = N'SYSTEM'
+   satisfies its FK_*_Users_CreatedBy constraint. */
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [UserId] = N'SYSTEM')
     INSERT INTO [dbo].[Users] ([UserId], [Email], [Department], [FirstName], [LastName], [CreatedBy])
-    VALUES (N'SYSTEM', N'system@example.com', N'IT', N'System', N'User', N'SYSTEM');
+    VALUES (N'SYSTEM', N'system@example.com', N'IT', N'System', N'User', NULL);
 GO
 
-:r ../dbo/Tables/Roles.sql
-GO
-
-/* Seed system roles required for foreign-key constraints and defaults */
-IF NOT EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE [Name] = N'Developer')
-    INSERT INTO [dbo].[Roles] ([Name], [Description], [IsSystemRole], [CreatedBy])
-    VALUES 
-        (N'Developer', N'Developer role with full access to all resources including settings', 1, N'SYSTEM'),
-        (N'Admin', N'Administrator role with full access to main resource topics', 1, N'SYSTEM'),
-        (N'Viewer', N'Read-only access to all resources', 1, N'SYSTEM');
-GO
-
-:r ../dbo/Tables/UserRoles.sql
-GO
-:r ../dbo/Tables/RuleContextObjects.sql
-GO
+/* Global Settings and User configuration */
 :r ../dbo/Tables/GlobalSettings.sql
-GO
-:r ../dbo/Tables/ResourcePermissions.sql
-GO
-:r ../dbo/Tables/RolePermissions.sql
-GO
-:r ../dbo/Tables/UIPages.sql
-GO
-:r ../dbo/Tables/UIActions.sql
-GO
-:r ../dbo/Tables/PermissionToUIPageMapping.sql
-GO
-:r ../dbo/Tables/UserPermissions.sql
-GO
-:r ../dbo/Tables/UserActivities.sql
 GO
 :r ../dbo/Tables/UserSettings.sql
 GO
+:r ../dbo/Tables/UserActivities.sql
+GO
+
+/* Rule Engine — context objects before rule sets */
+:r ../dbo/Tables/RuleSetContextObjects.sql
+GO
 :r ../dbo/Tables/RuleSets.sql
 GO
-:r ../dbo/Tables/RuleSetsPermissions.sql
+:r ../dbo/Tables/RuleSetRuleContextObjectLinks.sql
 GO
-:r ../dbo/Tables/RuleSetContextObjectLinks.sql
+:r ../dbo/Tables/RuleSetExecutionAudits.sql
 GO
-:r ../dbo/Tables/RuleExecutionLogs.sql
-GO
-:r ../dbo/Tables/ServiceAppAuthentications.sql
-GO
+
+/* Service Applications (no FK to Users; standalone root) */
 :r ../dbo/Tables/ServiceApplications.sql
-GO
-:r ../dbo/Tables/ServiceAppPermissions.sql
 GO
 :r ../dbo/Tables/ServiceDefinitionSyncs.sql
 GO
@@ -258,361 +299,147 @@ GO
 GO
 :r ../dbo/Tables/SoapNamespaces.sql
 GO
-:r ../dbo/Tables/BinaryEmbeddingsStore.sql
+
+/* Binary Embedding Stores (standalone) */
+:r ../dbo/Tables/BinaryEmbeddingStores.sql
 GO
+
+/* Service Request Files and links */
 :r ../dbo/Tables/ServiceRequestFiles.sql
 GO
-:r ../dbo/Tables/ServiceRequestFilesPermissions.sql
+:r ../dbo/Tables/ServiceRequestFileBinaryEmbeddingStoreLinks.sql
 GO
-:r ../dbo/Tables/ServiceRequestFileEmbeddings.sql
+
+/* HTTP Execution Detail Audits (before ServiceResponseFiles and health links) */
+:r ../dbo/Tables/HttpExecutionDetailAudits.sql
 GO
-:r ../dbo/Tables/ServiceRequestIndexingStatus.sql
-GO
+
+/* Service Response Files and links */
 :r ../dbo/Tables/ServiceResponseFiles.sql
 GO
-:r ../dbo/Tables/ServiceResponseFileEmbeddings.sql
+:r ../dbo/Tables/ServiceResponseFileBinaryEmbeddingStoreLinks.sql
 GO
-:r ../dbo/Tables/ServiceResponseIndexingStatus.sql
+:r ../dbo/Tables/ServiceResponseFileHttpExecutionDetailLinks.sql
 GO
+:r ../dbo/Tables/HttpExecutionDetailAuditsServiceResponseFilesLinks.sql
+GO
+:r ../dbo/Tables/ServiceResponseFilesDatabaseAudits.sql
+GO
+
+/* Service App health check links (depends on ServiceApplications + HttpExecutionDetailAudits) */
+:r ../dbo/Tables/ServiceAppHealthHttpExecutionDetailAuditLinks.sql
+GO
+
+/* Test Suite and Test Case tables */
 :r ../dbo/Tables/ServiceTestCases.sql
-GO
-:r ../dbo/Tables/ServiceTestCasesPermissions.sql
-GO
-:r ../dbo/Tables/ServiceTestSuites.sql
-GO
-:r ../dbo/Tables/ServiceTestSuitesPermissions.sql
 GO
 :r ../dbo/Tables/ServiceTestCaseRuleSetLinks.sql
 GO
+:r ../dbo/Tables/ServiceTestSuites.sql
+GO
 :r ../dbo/Tables/ServiceTestSuiteTestCaseLinks.sql
+GO
+:r ../dbo/Tables/ServiceTestSuiteTestCaseLinkAudits.sql
 GO
 :r ../dbo/Tables/ServiceTestSuiteExecutionAudits.sql
 GO
-:r ../dbo/Tables/ServiceTestSuiteExecutionAuditTestCaseLinks.sql
+
+/* Direct Execution Group tables */
+:r ../dbo/Tables/DirectExecutionGroups.sql
 GO
-:r ../dbo/Tables/DirectExecutionAudit.sql
+:r ../dbo/Tables/DirectExecutionGroupServiceRequestFileLinks.sql
 GO
-:r ../dbo/Tables/DirectExecutionAuditResponseFileLinks.sql
+:r ../dbo/Tables/DirectExecutionGroupAudits.sql
 GO
+:r ../dbo/Tables/DirectExecutionGroupServiceRequestFileLinkAudits.sql
+GO
+
+/* Indexing — XML */
 :r ../dbo/Tables/IndexingXmlFileElements.sql
 GO
-:r ../dbo/Tables/IndexingXmlFileElementSearch.sql
+:r ../dbo/Tables/IndexingXmlFileElementValues.sql
 GO
-:r ../dbo/Tables/IndexingXmlFileElementMappings.sql
+:r ../dbo/Tables/IndexingXmlRequestResponseMappings.sql
 GO
+
+/* Indexing — JSON */
 :r ../dbo/Tables/IndexingJsonFileElements.sql
 GO
-:r ../dbo/Tables/IndexingJsonFileElementSearch.sql
+:r ../dbo/Tables/IndexingJsonFileElementValues.sql
 GO
-:r ../dbo/Tables/IndexingJsonFileElementMappings.sql
+:r ../dbo/Tables/IndexingJsonRequestResponseMappings.sql
 GO
+
+/* Indexing — PDF */
 :r ../dbo/Tables/IndexingPdfFileElements.sql
 GO
-:r ../dbo/Tables/IndexingPdfFileElementSearch.sql
+:r ../dbo/Tables/IndexingPdfFileElementValues.sql
 GO
 :r ../dbo/Tables/IndexingPdfFileElementMappings.sql
 GO
 
+/* Indexing status tables */
+:r ../dbo/Tables/IndexingServiceRequestFileStatus.sql
+GO
+:r ../dbo/Tables/IndexingServiceResponseFileStatus.sql
+GO
+
 /* =====================================================================
-   Recreate views and stored procedures from project source.
+   Recreate user-defined table types from project source.
    ===================================================================== */
-:r ../dbo/Views/v_ActiveServiceOperations.sql
+:r ../dbo/Types/ServiceOperationSchemaInput.sql
 GO
-:r ../dbo/Views/v_ActiveSoapNamespaces.sql
-GO
-:r ../dbo/Views/v_BinaryEmbeddingsByFormat.sql
-GO
-:r ../dbo/Views/v_BinaryEmbeddingsStorageSummary.sql
-GO
-:r ../dbo/Views/v_BinaryEmbeddingsStoreWithUsage.sql
-GO
-:r ../dbo/Views/v_GlobalSettingsWithDetails.sql
-GO
-:r ../dbo/Views/v_IndexingElementUsageStats.sql
-GO
-:r ../dbo/Views/v_IndexingFileElementSearch.sql
-GO
-:r ../dbo/Views/v_IndexingElementSearchByValue.sql
-GO
-:r ../dbo/Views/v_IndexingPendingQueue.sql
-GO
-:r ../dbo/Views/v_LatestServiceAppAuthentications.sql
-GO
-:r ../dbo/Views/v_LatestServiceApplicationsWithAuth.sql
-GO
-:r ../dbo/Views/v_ResourcePermissionsWithDetails.sql
-GO
-:r ../dbo/Views/v_RolePermissionSummary.sql
-GO
-:r ../dbo/Views/v_RolePermissionsWithDetails.sql
-GO
-:r ../dbo/Views/v_RolesWithDetails.sql
-GO
-:r ../dbo/Views/v_RuleContextObjectsWithUsage.sql
-GO
-:r ../dbo/Views/v_RuleExecutionLogsWithDetails.sql
-GO
-:r ../dbo/Views/v_RuleSetContextLinks.sql
-GO
-:r ../dbo/Views/v_RuleSetsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceAppPermissionsSummary.sql
-GO
-:r ../dbo/Views/v_ServiceAppPermissionsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceApplicationAudit.sql
-GO
-:r ../dbo/Views/v_ServiceDefinitionSyncsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceOperationsSummary.sql
-GO
-:r ../dbo/Views/v_ServiceOperationsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceRequestFileDeltaSummary.sql
-GO
-:r ../dbo/Views/v_ServiceRequestFileEmbeddingsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceRequestFilesWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceRequestResponsePairs.sql
-GO
-:r ../dbo/Views/v_ServiceResponseFileDeltaSummary.sql
-GO
-:r ../dbo/Views/v_ServiceResponseFileEmbeddingsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceResponseFilesWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceTestCaseExecutionHistory.sql
-GO
-:r ../dbo/Views/v_ServiceTestCasesWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceTestSuiteExecutionAuditsWithDetails.sql
-GO
-:r ../dbo/Views/v_ServiceTestSuitesWithDetails.sql
-GO
-:r ../dbo/Views/v_SoapNamespacesSummary.sql
-GO
-:r ../dbo/Views/v_SoapNamespacesWithDetails.sql
-GO
-:r ../dbo/Views/v_UIActionsWithDetails.sql
-GO
-:r ../dbo/Views/v_UIPagesWithDetails.sql
-GO
-:r ../dbo/Views/v_UserPermissionsSummary.sql
-GO
-:r ../dbo/Views/v_UserPermissionSummary.sql
-GO
-:r ../dbo/Views/v_UserPermissionsWithDetails.sql
-GO
-:r ../dbo/Views/v_UserSettingsWithDetails.sql
+:r ../dbo/Types/ServiceRequestFileEmbeddingLinkInput.sql
 GO
 
-/* Foundation & Activity Procedures */
-:r ../dbo/StoredProcedures/usp_InsertUserActivities.sql
+/* =====================================================================
+   Recreate views from project source.
+   Comment out this section to keep the tables-only reset behavior.
+   ===================================================================== */
+:r ../dbo/Views/vw_ServiceApplicationLatestDefinition.sql
+GO
+:r ../dbo/Views/vw_ServiceApplicationLatestOperations.sql
+GO
+:r ../dbo/Views/vw_ServiceOperationLatestSchema.sql
+GO
+:r ../dbo/Views/vw_ServiceRequestFileLatest.sql
+GO
+:r ../dbo/Views/vw_ServiceRequestFileWithLinks.sql
 GO
 
-/* Query & Getter Procedures */
-:r ../dbo/StoredProcedures/usp_GetRoles.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetRolePermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetResourcePermissionsAvailable.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetUserPermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetGlobalSettings.sql
+/* =====================================================================
+   Recreate stored procedures from project source.
+   Comment out this section to keep the tables-only reset behavior.
+   ===================================================================== */
+
+/* Query / Getter Procedures */
+:r ../dbo/StoredProcedures/usp_GetServiceDefinitions.sql
 GO
 :r ../dbo/StoredProcedures/usp_GetServiceOperations.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceApplicationsHistory.sql
+:r ../dbo/StoredProcedures/usp_GetServiceOperation.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceAppPermissions.sql
+:r ../dbo/StoredProcedures/usp_GetServiceOperationSchema.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceRequestFilesChain.sql
+:r ../dbo/StoredProcedures/usp_GetServiceRequestFiles.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceRequestFilesConsecutiveDeltaCount.sql
+:r ../dbo/StoredProcedures/usp_GetServiceRequestFile.sql
 GO
-:r ../dbo/StoredProcedures/usp_GetServiceRequestFilesByOperation.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetServiceResponseFileChain.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetServiceResponseFilesByRequest.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetSoapNamespaces.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetServiceTestSuiteExecutionAuditsSummary.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetRuleExecutionLogsStatistics.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetIndexingFileElementsFrequency.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetIndexingFileElementsFiles.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetIndexingFileElementsStatistics.sql
-GO
-:r ../dbo/StoredProcedures/usp_GetBinaryEmbeddingsStore.sql
-GO
-:r ../dbo/StoredProcedures/usp_FindBinaryEmbeddingsStore.sql
-GO
-:r ../dbo/StoredProcedures/usp_FindBinaryEmbeddingsStoreByContentHash.sql
-GO
-:r ../dbo/StoredProcedures/usp_SearchIndexingElements.sql
+:r ../dbo/StoredProcedures/usp_GetServiceApplicationGenerationSnapshot.sql
 GO
 
-/* Insert Procedures */
-:r ../dbo/StoredProcedures/usp_InsertRoles.sql
+/* Save / Upsert Procedures */
+:r ../dbo/StoredProcedures/usp_SaveServiceDefinitionSync.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertRolePermissions.sql
+:r ../dbo/StoredProcedures/usp_SaveServiceDefinitionWithOperations.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertResourcePermissions.sql
+:r ../dbo/StoredProcedures/usp_SaveServiceOperation.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertUserPermissions.sql
+:r ../dbo/StoredProcedures/usp_SaveServiceOperationSchema.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertUIPages.sql
+:r ../dbo/StoredProcedures/usp_SaveServiceRequestFile.sql
 GO
-:r ../dbo/StoredProcedures/usp_InsertUIActions.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertGlobalSettings.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertRuleContextObjects.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertRuleSets.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertRuleSetContextObjectLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertRuleExecutionLogs.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceApplications.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceOperations.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceOperationSchemas.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceOperationWithSchema.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertSoapNamespaces.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceDefinitionSyncs.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceDefinitionSyncsWithOperations.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertBinaryEmbeddingsStore.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceRequestFiles.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceRequestFileEmbeddings.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceResponseFiles.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceResponseFileEmbedding.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceTestCases.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceTestCaseRuleSetLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceTestSuites.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceTestSuiteTestCaseLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceTestSuiteExecutionAudits.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertServiceTestSuiteExecutionAuditTestCaseLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAuditSimple.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAuditWithActivity.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertDirectExecutionAuditResponseFileLink.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingXmlFileElements.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingXmlFileElementSearch.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertIndexingXmlFileElementMappingsSingle.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingJsonFileElements.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingJsonFileElementSearch.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertIndexingJsonFileElementMappings.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingPdfFileElements.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertOrGetIndexingPdfFileElementSearch.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertIndexingPdfFileElementMappings.sql
-GO
-
-/* Update / Delete / Composite Procedures */
-:r ../dbo/StoredProcedures/usp_UpdateRoles.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateRolePermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateResourcePermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateUserPermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_DeleteUserPermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateUIPages.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateUIActions.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateUserSettings.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateGlobalSettings.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateRuleContextObjects.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateRuleSets.sql
-GO
-:r ../dbo/StoredProcedures/usp_DeleteRuleSetContextObjectLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_DeleteServiceTestCaseRuleSetLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_DeleteServiceTestSuiteTestCaseLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceAppAuthentications.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceApplicationsActive.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertAndUpdateServiceApplications.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertAndUpdateServiceAppPermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_DeleteServiceAppPermissions.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceOperations.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceOperationsActivate.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceOperationSchemas.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateSoapNamespaces.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceDefinitionSyncs.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateBinaryEmbeddingsStore.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFiles.sql
-GO
-:r ../dbo/StoredProcedures/usp_InsertAndUpdateServiceRequestFiles.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceRequestFileEmbeddings.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceResponseFiles.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceResponseFileEmbeddings.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceTestCases.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceTestSuites.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateServiceTestSuiteExecutionAuditTestCaseLinks.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAudit.sql
-GO
-:r ../dbo/StoredProcedures/usp_UpdateDirectExecutionAuditResponseFileLinks.sql
+:r ../dbo/StoredProcedures/usp_SaveBinaryEmbeddingStore.sql
 GO
 
 :r ApplyColumnDescriptions.sql

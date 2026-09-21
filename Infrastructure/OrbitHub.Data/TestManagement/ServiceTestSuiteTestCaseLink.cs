@@ -7,6 +7,7 @@
 
 using LinqToDB.Mapping;
 using System;
+using System.Collections.Generic;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -41,13 +42,13 @@ public partial class ServiceTestSuiteTestCaseLink
 	public int ServiceTestCaseId { get; set; } // int
 
 	/// <summary>
-	/// Order in which the test case runs within its test suite.
+	/// Ordinal position that determines the sequence in which this item is executed within its parent group or suite.
 	/// </summary>
 	[Column("ExecutionOrder")]
 	public int ExecutionOrder { get; set; } // int
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
+	/// Indicates whether this record is active and available for use (1) or soft-deleted (0).
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
@@ -56,7 +57,7 @@ public partial class ServiceTestSuiteTestCaseLink
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -65,6 +66,12 @@ public partial class ServiceTestSuiteTestCaseLink
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
 	#region Associations
+	/// <summary>
+	/// FK_ServiceTestSuiteTestCaseLinkAudits_ServiceTestSuiteTestCaseLinks_ServiceTestSuiteTestCaseLinkId backreference
+	/// </summary>
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteTestCaseLinkAudit.ServiceTestSuiteTestCaseLinkId))]
+	public IEnumerable<ServiceTestSuiteTestCaseLinkAudit> ServiceTestSuiteTestCaseLinkAudits { get; set; } = null!;
+
 	/// <summary>
 	/// FK_ServiceTestSuiteTestCaseLinks_ServiceTestCases_ServiceTestCaseId
 	/// </summary>

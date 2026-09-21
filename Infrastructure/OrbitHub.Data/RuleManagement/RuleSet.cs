@@ -42,13 +42,13 @@ public partial class RuleSet
 	public string RuleContent { get; set; } = null!; // nvarchar(max)
 
 	/// <summary>
-	/// Identifier of the related RuleContextObjects record.
+	/// Identifier of the related RuleSetContextObjects record.
 	/// </summary>
-	[Column("OutputTypeId")]
-	public int OutputTypeId { get; set; } // int
+	[Column("OutputDataTypeId")]
+	public int OutputDataTypeId { get; set; } // int
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
+	/// Indicates whether this record is active and available for use (1) or soft-deleted (0).
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
@@ -57,10 +57,10 @@ public partial class RuleSet
 	/// Optional human-readable description of this record.
 	/// </summary>
 	[Column("Description")]
-	public string? Description { get; set; } // nvarchar(500)
+	public string? Description { get; set; } // nvarchar(max)
 
 	/// <summary>
-	/// Application-managed version value used for record change tracking.
+	/// Application-managed version string (format YY.QQ.NN) used for optimistic concurrency control and change tracking.
 	/// </summary>
 	[Column("RecordVersion", CanBeNull = false)]
 	public string RecordVersion { get; set; } = null!; // varchar(50)
@@ -69,7 +69,7 @@ public partial class RuleSet
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -77,35 +77,23 @@ public partial class RuleSet
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the related Users record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
-
 	#region Associations
 	/// <summary>
-	/// FK_RuleExecutionLogs_RuleSets backreference
+	/// FK_RuleSetExecutionAudits_RuleSets backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(RuleExecutionLog.RuleSetId))]
-	public IEnumerable<RuleExecutionLog> RuleExecutionLogs { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(RuleSetExecutionAudit.RuleSetId))]
+	public IEnumerable<RuleSetExecutionAudit> RuleSetExecutionAudits { get; set; } = null!;
 
 	/// <summary>
-	/// FK_RuleSetContextObjectLinks_RuleSets backreference
+	/// FK_RuleSetRuleContextObjectLinks_RuleSets backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(RuleSetContextObjectLink.RuleSetId))]
-	public IEnumerable<RuleSetContextObjectLink> RuleSetContextObjectLinks { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(RuleSetRuleContextObjectLink.RuleSetId))]
+	public IEnumerable<RuleSetRuleContextObjectLink> RuleSetRuleContextObjectLinks { get; set; } = null!;
 
 	/// <summary>
-	/// FK_RuleSets_RuleContextObjects
+	/// FK_RuleSets_RuleSetContextObjects
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(OutputTypeId), OtherKey = nameof(RuleContextObject.Id))]
-	public RuleContextObject OutputType { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(OutputDataTypeId), OtherKey = nameof(RuleSetContextObject.Id))]
+	public RuleSetContextObject OutputDataType { get; set; } = null!;
 	#endregion
 }

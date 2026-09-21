@@ -38,21 +38,17 @@ public partial class TestDbContext : DataConnection
 
 	partial void InitDataContext();
 
-	public ITable<ServiceTestCaseRuleSetLink>                 ServiceTestCaseRuleSetLinks                 => this.GetTable<ServiceTestCaseRuleSetLink>();
+	public ITable<ServiceTestCaseRuleSetLink>        ServiceTestCaseRuleSetLinks        => this.GetTable<ServiceTestCaseRuleSetLink>();
 
-	public ITable<ServiceTestCase>                            ServiceTestCases                            => this.GetTable<ServiceTestCase>();
+	public ITable<ServiceTestCase>                   ServiceTestCases                   => this.GetTable<ServiceTestCase>();
 
-	public ITable<ServiceTestCasesPermission>                 ServiceTestCasesPermissions                 => this.GetTable<ServiceTestCasesPermission>();
+	public ITable<ServiceTestSuiteExecutionAudit>    ServiceTestSuiteExecutionAudits    => this.GetTable<ServiceTestSuiteExecutionAudit>();
 
-	public ITable<ServiceTestSuiteExecutionAuditTestCaseLink> ServiceTestSuiteExecutionAuditTestCaseLinks => this.GetTable<ServiceTestSuiteExecutionAuditTestCaseLink>();
+	public ITable<ServiceTestSuiteTestCaseLinkAudit> ServiceTestSuiteTestCaseLinkAudits => this.GetTable<ServiceTestSuiteTestCaseLinkAudit>();
 
-	public ITable<ServiceTestSuiteExecutionAudit>             ServiceTestSuiteExecutionAudits             => this.GetTable<ServiceTestSuiteExecutionAudit>();
+	public ITable<ServiceTestSuiteTestCaseLink>      ServiceTestSuiteTestCaseLinks      => this.GetTable<ServiceTestSuiteTestCaseLink>();
 
-	public ITable<ServiceTestSuiteTestCaseLink>               ServiceTestSuiteTestCaseLinks               => this.GetTable<ServiceTestSuiteTestCaseLink>();
-
-	public ITable<ServiceTestSuite>                           ServiceTestSuites                           => this.GetTable<ServiceTestSuite>();
-
-	public ITable<ServiceTestSuitesPermission>                ServiceTestSuitesPermissions                => this.GetTable<ServiceTestSuitesPermission>();
+	public ITable<ServiceTestSuite>                  ServiceTestSuites                  => this.GetTable<ServiceTestSuite>();
 }
 
 public static partial class ExtensionMethods
@@ -78,32 +74,22 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static ServiceTestCasesPermission? Find(this ITable<ServiceTestCasesPermission> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceTestCasesPermission?> FindAsync(this ITable<ServiceTestCasesPermission> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceTestSuiteExecutionAuditTestCaseLink? Find(this ITable<ServiceTestSuiteExecutionAuditTestCaseLink> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceTestSuiteExecutionAuditTestCaseLink?> FindAsync(this ITable<ServiceTestSuiteExecutionAuditTestCaseLink> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
 	public static ServiceTestSuiteExecutionAudit? Find(this ITable<ServiceTestSuiteExecutionAudit> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
 	public static Task<ServiceTestSuiteExecutionAudit?> FindAsync(this ITable<ServiceTestSuiteExecutionAudit> table, int id, CancellationToken cancellationToken = default)
+	{
+		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+	}
+
+	public static ServiceTestSuiteTestCaseLinkAudit? Find(this ITable<ServiceTestSuiteTestCaseLinkAudit> table, long id)
+	{
+		return table.FirstOrDefault(e => e.Id == id);
+	}
+
+	public static Task<ServiceTestSuiteTestCaseLinkAudit?> FindAsync(this ITable<ServiceTestSuiteTestCaseLinkAudit> table, long id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
@@ -124,16 +110,6 @@ public static partial class ExtensionMethods
 	}
 
 	public static Task<ServiceTestSuite?> FindAsync(this ITable<ServiceTestSuite> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static ServiceTestSuitesPermission? Find(this ITable<ServiceTestSuitesPermission> table, int id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<ServiceTestSuitesPermission?> FindAsync(this ITable<ServiceTestSuitesPermission> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}

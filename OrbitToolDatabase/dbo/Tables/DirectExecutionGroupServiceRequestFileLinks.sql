@@ -15,7 +15,7 @@ CREATE TABLE [dbo].[DirectExecutionGroupServiceRequestFileLinks] (
     -- Foreign key to ServiceRequestFiles
     [ServiceRequestFileId] INT NOT NULL,
     -- Execution order within the audit
-    [ExecutionOrder] INT NOT NULL CONSTRAINT DF_DirectExecutionGroupServiceRequestFileLinkAudits_ExecutionOrder DEFAULT 0,
+    [ExecutionOrder] INT NOT NULL CONSTRAINT DF_DirectExecutionGroupServiceRequestFileLinks_ExecutionOrder DEFAULT 0,
     -- Indicates if the link record is currently active
     [IsActive] BIT NOT NULL CONSTRAINT DF_DirectExecutionGroupServiceRequestFileLinks_IsActive DEFAULT 1,
     -- Record version for optimistic concurrency control, formatted as 'YY.QQ.NN', e.g., '24.10.01'

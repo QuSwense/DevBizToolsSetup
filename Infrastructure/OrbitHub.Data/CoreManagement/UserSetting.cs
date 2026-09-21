@@ -41,7 +41,7 @@ public partial class UserSetting
 	public string UserId { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// Configured value of the setting.
+	/// Configured value of the setting, stored as text to accommodate various data types.
 	/// </summary>
 	[Column("SettingValue", CanBeNull = false)]
 	public string SettingValue { get; set; } = null!; // nvarchar(max)
@@ -50,7 +50,7 @@ public partial class UserSetting
 	/// Date and time at which this record was last updated.
 	/// </summary>
 	[Column("LastUpdatedAt")]
-	public DateTime LastUpdatedAt { get; set; } // datetime
+	public DateTime LastUpdatedAt { get; set; } // datetime2(3)
 
 	#region Associations
 	/// <summary>

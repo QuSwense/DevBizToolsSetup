@@ -40,7 +40,7 @@ public partial class UserDbContext : DataConnection
 
 	public ITable<UserActivity> UserActivities => this.GetTable<UserActivity>();
 
-	public ITable<UserRole>     UserRoles      => this.GetTable<UserRole>();
+	public ITable<UserSetting>  UserSettings   => this.GetTable<UserSetting>();
 
 	public ITable<User>         Users          => this.GetTable<User>();
 }
@@ -58,12 +58,12 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static UserRole? Find(this ITable<UserRole> table, int id)
+	public static UserSetting? Find(this ITable<UserSetting> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<UserRole?> FindAsync(this ITable<UserRole> table, int id, CancellationToken cancellationToken = default)
+	public static Task<UserSetting?> FindAsync(this ITable<UserSetting> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}

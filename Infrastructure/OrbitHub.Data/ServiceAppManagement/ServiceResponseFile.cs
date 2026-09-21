@@ -21,7 +21,7 @@ public partial class ServiceResponseFile
 	/// Unique identifier for this ServiceResponseFiles record.
 	/// </summary>
 	[Column("Id", IsPrimaryKey = true, IsIdentity = true, SkipOnInsert = true, SkipOnUpdate = true)]
-	public int Id { get; set; } // int
+	public long Id { get; set; } // bigint
 
 	/// <summary>
 	/// Public identifier used by the UI and external systems (GUID).
@@ -48,61 +48,31 @@ public partial class ServiceResponseFile
 	public string Name { get; set; } = null!; // nvarchar(250)
 
 	/// <summary>
-	/// Indicates whether this record is a complete base snapshot (1) or a differential delta (0).
-	/// </summary>
-	[Column("IsBaseSnapshot")]
-	public bool IsBaseSnapshot { get; set; } // bit
-
-	/// <summary>
-	/// Identifier of the related ServiceResponseFiles record.
-	/// </summary>
-	[Column("ParentBaseId")]
-	public int? ParentBaseId { get; set; } // int
-
-	/// <summary>
-	/// Identifier of the related ServiceResponseFiles record.
-	/// </summary>
-	[Column("ParentDeltaId")]
-	public int? ParentDeltaId { get; set; } // int
-
-	/// <summary>
-	/// Depth of this record in the delta chain (0 for base snapshots).
-	/// </summary>
-	[Column("DeltaDepth")]
-	public int DeltaDepth { get; set; } // int
-
-	/// <summary>
 	/// Compressed binary content stored for this record.
 	/// </summary>
 	[Column("CompressedData", CanBeNull = false)]
 	public byte[] CompressedData { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
-	/// Size of the file content before compression, in bytes.
+	/// Size of the content before compression, in bytes.
 	/// </summary>
 	[Column("UncompressedSizeBytes")]
 	public long? UncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
-	/// Algorithm used to compress the stored content.
+	/// Algorithm used to compress the stored content (e.g., Zstandard, Brotli, Gzip, or none).
 	/// </summary>
 	[Column("CompressionAlgorithmType")]
 	public string? CompressionAlgorithmType { get; set; } // varchar(50)
 
 	/// <summary>
-	/// SHA-256 hash of the stored content for integrity verification.
-	/// </summary>
-	[Column("ContentHash")]
-	public string? ContentHash { get; set; } // varchar(64)
-
-	/// <summary>
-	/// Application-managed version value used for record change tracking.
+	/// Application-managed version string (format YY.QQ.NN) used for optimistic concurrency control and change tracking.
 	/// </summary>
 	[Column("RecordVersion", CanBeNull = false)]
 	public string RecordVersion { get; set; } = null!; // varchar(50)
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
+	/// Indicates whether this record is active and available for use (1) or soft-deleted (0).
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
@@ -111,7 +81,7 @@ public partial class ServiceResponseFile
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -119,54 +89,36 @@ public partial class ServiceResponseFile
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
 
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the related Users record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
-
 	#region Associations
 	/// <summary>
-	/// FK_DirectExecutionAuditResponseFileLinks_ServiceResponseFiles_ServiceResponseFileId backreference
+	/// FK_DirectExecutionGroupServiceRequestFileLinkAudits_ServiceResponseFiles_ServiceResponseFileId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(DirectExecutionAuditResponseFileLink.ServiceResponseFileId))]
-	public IEnumerable<DirectExecutionAuditResponseFileLink> DirectExecutionAuditResponseFileLinks { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(DirectExecutionGroupServiceRequestFileLinkAudit.ServiceResponseFileId))]
+	public IEnumerable<DirectExecutionGroupServiceRequestFileLinkAudit> DirectExecutionGroupServiceRequestFileLinkAudits { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceResponseFileEmbeddings_ServiceResponseFiles_ServiceResponseFileId backreference
+	/// FK_HttpExecutionDetailAuditsServiceResponseFilesLinks_ServiceResponseFiles_ServiceResponseFileId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceResponseFileEmbedding.ServiceResponseFileId))]
-	public IEnumerable<ServiceResponseFileEmbedding> ServiceResponseFileEmbeddings { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(HttpExecutionDetailAuditsServiceResponseFilesLink.ServiceResponseFileId))]
+	public IEnumerable<HttpExecutionDetailAuditsServiceResponseFilesLink> HttpExecutionDetailAuditsServiceResponseFilesLinks { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceResponseFiles_ParentBaseId
+	/// FK_ServiceResponseFileBinaryEmbeddingStoreLinks_ServiceResponseFiles backreference
 	/// </summary>
-	[Association(ThisKey = nameof(ParentBaseId), OtherKey = nameof(Id))]
-	public ServiceResponseFile? ParentBase { get; set; }
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceResponseFileBinaryEmbeddingStoreLink.ServiceResponseFileId))]
+	public IEnumerable<ServiceResponseFileBinaryEmbeddingStoreLink> ServiceResponseFileBinaryEmbeddingStoreLinks { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceResponseFiles_ParentBaseId backreference
+	/// FK_ServiceResponseFileHttpExecutionDetailLinks_ServiceResponseFiles_ServiceResponseFileId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ParentBaseId))]
-	public IEnumerable<ServiceResponseFile> ServiceResponseFiles { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceResponseFileHttpExecutionDetailLink.ServiceResponseFileId))]
+	public IEnumerable<ServiceResponseFileHttpExecutionDetailLink> ServiceResponseFileHttpExecutionDetailLinks { get; set; } = null!;
 
 	/// <summary>
-	/// FK_ServiceResponseFiles_ParentDeltaId
+	/// FK_ServiceResponseFilesDatabaseAudits_ServiceResponseFile_ServiceResponseFileId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(ParentDeltaId), OtherKey = nameof(Id))]
-	public ServiceResponseFile? ParentDelta { get; set; }
-
-	/// <summary>
-	/// FK_ServiceResponseFiles_ParentDeltaId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ParentDeltaId))]
-	public IEnumerable<ServiceResponseFile> ServiceResponseFiles1 { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceResponseFilesDatabaseAudit.ServiceResponseFileId))]
+	public IEnumerable<ServiceResponseFilesDatabaseAudit> ServiceResponseFilesDatabaseAudits { get; set; } = null!;
 
 	/// <summary>
 	/// FK_ServiceResponseFiles_ServiceRequestFiles_ServiceRequestFileId

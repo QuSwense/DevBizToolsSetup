@@ -35,7 +35,7 @@ public partial class UserActivity
 	public string UserId { get; set; } = null!; // nvarchar(20)
 
 	/// <summary>
-	/// Type of activity performed by the user, such as Login or FeatureUsage.
+	/// Category of activity performed by the user, such as Login or FeatureUsage.
 	/// </summary>
 	[Column("ActivityType", CanBeNull = false)]
 	public string ActivityType { get; set; } = null!; // nvarchar(100)
@@ -56,7 +56,7 @@ public partial class UserActivity
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	#region Associations
 	/// <summary>

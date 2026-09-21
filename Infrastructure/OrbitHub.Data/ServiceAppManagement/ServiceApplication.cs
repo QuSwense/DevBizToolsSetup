@@ -24,52 +24,10 @@ public partial class ServiceApplication
 	public int Id { get; set; } // int
 
 	/// <summary>
-	/// Public identifier used by the UI and external systems (GUID).
-	/// </summary>
-	[Column("PublicId")]
-	public Guid PublicId { get; set; } // uniqueidentifier
-
-	/// <summary>
-	/// Service protocol category, such as SOAP or REST.
-	/// </summary>
-	[Column("ServiceType", CanBeNull = false)]
-	public string ServiceType { get; set; } = null!; // varchar(10)
-
-	/// <summary>
-	/// Identifier of the related ServiceAppAuthentications record.
-	/// </summary>
-	[Column("ServiceAppAuthenticationId")]
-	public int? ServiceAppAuthenticationId { get; set; } // int
-
-	/// <summary>
 	/// Human-readable name of this record.
 	/// </summary>
 	[Column("Name", CanBeNull = false)]
 	public string Name { get; set; } = null!; // nvarchar(200)
-
-	/// <summary>
-	/// Base HTTP or HTTPS URL for the service application.
-	/// </summary>
-	[Column("BaseUrl", CanBeNull = false)]
-	public string BaseUrl { get; set; } = null!; // nvarchar(500)
-
-	/// <summary>
-	/// Type of service definition, such as WSDL, Swagger, or OpenAPI.
-	/// </summary>
-	[Column("DefinitionType")]
-	public string? DefinitionType { get; set; } // varchar(20)
-
-	/// <summary>
-	/// Path to the service definition relative to the application base URL.
-	/// </summary>
-	[Column("DefinitionRelativeUrl")]
-	public string? DefinitionRelativeUrl { get; set; } // nvarchar(250)
-
-	/// <summary>
-	/// Path to the health-check endpoint relative to the application base URL.
-	/// </summary>
-	[Column("HealthcheckRelativeUrl")]
-	public string? HealthcheckRelativeUrl { get; set; } // nvarchar(250)
 
 	/// <summary>
 	/// Optional human-readable description of this record.
@@ -78,47 +36,17 @@ public partial class ServiceApplication
 	public string? Description { get; set; } // nvarchar(max)
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
-	/// </summary>
-	[Column("IsActive")]
-	public bool IsActive { get; set; } // bit
-
-	/// <summary>
-	/// Application-managed version value used for record change tracking.
-	/// </summary>
-	[Column("RecordVersion", CanBeNull = false)]
-	public string RecordVersion { get; set; } = null!; // varchar(50)
-
-	/// <summary>
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the related Users record.
-	/// </summary>
-	[Column("CreatedBy", CanBeNull = false)]
-	public string CreatedBy { get; set; } = null!; // nvarchar(20)
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the related Users record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	#region Associations
 	/// <summary>
-	/// FK_ServiceApplications_ServiceAppAuthentications_ServiceAppAuthenticationId
+	/// FK_ServiceAppHealthHttpExecutionDetailAuditLinks_ServiceApplications_ServiceApplicationId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(ServiceAppAuthenticationId), OtherKey = nameof(ServiceAppManagement.ServiceAppAuthentication.Id))]
-	public ServiceAppAuthentication? ServiceAppAuthentication { get; set; }
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceAppHealthHttpExecutionDetailAuditLink.ServiceApplicationId))]
+	public IEnumerable<ServiceAppHealthHttpExecutionDetailAuditLink> ServiceAppHealthHttpExecutionDetailAuditLinks { get; set; } = null!;
 
 	/// <summary>
 	/// FK_ServiceDefinitionSyncs_ServiceApplications_ServiceApplicationId backreference

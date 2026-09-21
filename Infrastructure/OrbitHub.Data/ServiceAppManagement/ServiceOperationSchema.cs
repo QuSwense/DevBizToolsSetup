@@ -24,12 +24,6 @@ public partial class ServiceOperationSchema
 	public int Id { get; set; } // int
 
 	/// <summary>
-	/// Public identifier used by the UI and external systems (GUID).
-	/// </summary>
-	[Column("PublicId")]
-	public Guid PublicId { get; set; } // uniqueidentifier
-
-	/// <summary>
 	/// Identifier of the related ServiceOperations record.
 	/// </summary>
 	[Column("ServiceOperationId")]
@@ -60,25 +54,19 @@ public partial class ServiceOperationSchema
 	public byte[] CompressedContent { get; set; } = null!; // varbinary(max)
 
 	/// <summary>
-	/// Size of the file content before compression, in bytes.
+	/// Size of the content before compression, in bytes.
 	/// </summary>
 	[Column("UncompressedSizeBytes")]
 	public long? UncompressedSizeBytes { get; set; } // bigint
 
 	/// <summary>
-	/// Algorithm used to compress the stored content.
+	/// Algorithm used to compress the stored content (e.g., Zstandard, Brotli, Gzip, or none).
 	/// </summary>
 	[Column("CompressionAlgorithmType")]
 	public string? CompressionAlgorithmType { get; set; } // varchar(50)
 
 	/// <summary>
-	/// SHA-256 hash of the stored content for integrity verification.
-	/// </summary>
-	[Column("ContentHash")]
-	public string? ContentHash { get; set; } // varchar(64)
-
-	/// <summary>
-	/// Application-managed version value used for record change tracking.
+	/// Application-managed version string (format YY.QQ.NN) used for optimistic concurrency control and change tracking.
 	/// </summary>
 	[Column("RecordVersion", CanBeNull = false)]
 	public string RecordVersion { get; set; } = null!; // varchar(50)
@@ -87,25 +75,13 @@ public partial class ServiceOperationSchema
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
-	/// Identifier of the user who created this record.
+	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the user who last updated this record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>

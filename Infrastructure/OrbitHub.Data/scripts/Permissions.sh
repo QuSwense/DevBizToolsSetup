@@ -1,40 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LINQ2DB_COMPONENT_PRJ_PATH="$SCRIPT_DIR/../../linq2db-doccomments"
-LINQ2DB_COMPONENT_PATH="$LINQ2DB_COMPONENT_PRJ_PATH/bin/Debug/net10.0/DocIntercept.dll"
-OUTPUT_DIR="../PermissionsManagement"
+# NOTE: No SQL tables for Permissions currently exist in OrbitToolDatabase/dbo.
+# This script is a stub for future permissions tables.
+# When the SQL tables are added, update --include-tables accordingly.
 
-# Read the default connection string from WebApp appsettings.Development.json
-# (ConnectionStrings:DefaultConnection) so scaffolding targets the same DB as the app.
-APPSETTINGS_DEV="$(cd "$SCRIPT_DIR/../../.." && pwd)/WebApp/OrbitHub.Web/appsettings.Development.json"
+echo "WARNING: Permissions.sh — no Permissions tables found in OrbitToolDatabase/dbo. Skipping scaffold."
+echo "Expected future tables: ResourcePermissions, RolePermissions, Roles, RuleSetsPermissions, ServiceAppPermissions,"
+echo "  ServiceRequestFilesPermissions, ServiceTestCasesPermissions, ServiceTestSuitesPermissions, UserPermissions"
+echo "Add those tables to OrbitToolDatabase/dbo/Tables/ first, then uncomment the scaffold block below."
 
-# Step 0: Build the MS_Description -> <summary> doc-comment interceptor + formatter CLI
-# (see linq2db-doccomments/DescriptionInterceptors.cs and linq2db-doccomments/Formatting/*)
-dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
-
-CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
-
-# Step 1: Execute scaffolding using CLI parameters
-dotnet linq2db scaffold \
-  --provider SQLServer \
-  --connection "$CONNECTION_STRING" \
-  --output "$OUTPUT_DIR" \
-  --overwrite \
-  --objects table,foreign-key \
-  --include-tables ResourcePermissions,RolePermissions,Roles,RuleSetsPermissions,ServiceAppPermissions,ServiceRequestFilesPermissions,ServiceTestCasesPermissions,ServiceTestSuitesPermissions,UserPermissions \
-  --namespace OrbitHub.Data.PermissionsManagement \
-  --context-name PermissionsDbContext \
-  --add-typed-options-ctor \
-  --partial-entities \
-  --customize "$LINQ2DB_COMPONENT_PATH"
-
-# Step 2: Post-process scaffold output (replaces format-entities.py): splits
-# "[Column(...)] public ..." one-liners, squeezes alignment padding, converts to
-# a file-scoped namespace and adds blank lines between members. Rules are
-# configured by Formatting/ScaffoldFormatOptions + DocIntercept.settings.json.
-dotnet "$LINQ2DB_COMPONENT_PATH" format "$OUTPUT_DIR"
-
-# Step 3: Normalize whitespace/indentation after the line splitting
-dotnet format whitespace ..
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# LINQ2DB_COMPONENT_PRJ_PATH="$SCRIPT_DIR/../../linq2db-doccomments"
+# LINQ2DB_COMPONENT_PATH="$LINQ2DB_COMPONENT_PRJ_PATH/bin/Debug/net10.0/DocIntercept.dll"
+# OUTPUT_DIR="../PermissionsManagement"
+#
+# APPSETTINGS_DEV="$(cd "$SCRIPT_DIR/../../.." && pwd)/WebApp/OrbitHub.Web/appsettings.Development.json"
+#
+# dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
+#
+# CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
+#
+# dotnet linq2db scaffold \
+#   --provider SQLServer \
+#   --connection "$CONNECTION_STRING" \
+#   --output "$OUTPUT_DIR" \
+#   --overwrite \
+#   --objects table,foreign-key \
+#   --include-tables ResourcePermissions,RolePermissions,Roles,RuleSetsPermissions,ServiceAppPermissions,ServiceRequestFilesPermissions,ServiceTestCasesPermissions,ServiceTestSuitesPermissions,UserPermissions \
+#   --namespace OrbitHub.Data.PermissionsManagement \
+#   --context-name PermissionsDbContext \
+#   --add-typed-options-ctor \
+#   --partial-entities \
+#   --customize "$LINQ2DB_COMPONENT_PATH"
+#
+# dotnet "$LINQ2DB_COMPONENT_PATH" format "$OUTPUT_DIR"
+# dotnet format whitespace ..

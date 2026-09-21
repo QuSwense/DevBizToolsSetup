@@ -2,8 +2,7 @@
     RunSeeds.sql - Execute all seed scripts in the correct FK-dependent order
 
     This script inserts seed data into all reference/lookup tables in the proper
-    order to respect foreign key constraints. Role assignments are seeded through
-    the UserRoles junction table after both Users and Roles exist.
+    order to respect foreign key constraints.
 
     Usage:
         SQLCMDPASSWORD='...' sqlcmd -S localhost,1433 -U sa -C -d OrbitTool -b -i RunSeeds.sql
@@ -26,73 +25,17 @@ PRINT '========================================';
 PRINT '';
 
 -- ============================================
--- Step 1: Seed Users (SYSTEM user with CreatedBy = NULL)
+-- Step 1: Seed Users (SYSTEM user, CreatedBy = NULL)
 -- ============================================
-PRINT 'Step 1/9: Seeding Users...';
+PRINT 'Step 1/2: Seeding Users...';
 :r ../Seeds/UsersSeed.sql
 PRINT '  Users seed completed.';
 PRINT '';
 
 -- ============================================
--- Step 2: Seed Roles (references Users.UserId via CreatedBy)
+-- Step 2: Seed GlobalSettings (references Users.UserId via CreatedBy)
 -- ============================================
-PRINT 'Step 2/9: Seeding Roles...';
-:r ../Seeds/RolesSeed.sql
-PRINT '  Roles seed completed.';
-PRINT '';
-
--- ============================================
--- Step 3: Seed UserRoles (links seeded users to seeded roles)
--- ============================================
-PRINT 'Step 3/9: Seeding UserRoles...';
-:r ../Seeds/UserRolesSeed.sql
-PRINT '  UserRoles seed completed.';
-PRINT '';
-
--- ============================================
--- Step 4: Seed ResourcePermissions (references Users.UserId via CreatedBy)
--- ============================================
-PRINT 'Step 4/9: Seeding ResourcePermissions...';
-:r ../Seeds/ResourcePermissionsSeed.sql
-PRINT '  ResourcePermissions seed completed.';
-PRINT '';
-
--- ============================================
--- Step 5: Seed UIPages (references ResourcePermissions.Id and Users.UserId)
--- ============================================
-PRINT 'Step 5/9: Seeding UIPages...';
-:r ../Seeds/UIPagesSeed.sql
-PRINT '  UIPages seed completed.';
-PRINT '';
-
--- ============================================
--- Step 6: Seed UIActions (references UIPages.Id, ResourcePermissions.Id, Users.UserId)
--- ============================================
-PRINT 'Step 6/9: Seeding UIActions...';
-:r ../Seeds/UIActionsSeed.sql
-PRINT '  UIActions seed completed.';
-PRINT '';
-
--- ============================================
--- Step 7: Seed PermissionToUIPageMapping (references ResourcePermissions.Id, UIPages.Id)
--- ============================================
-PRINT 'Step 7/9: Seeding PermissionToUIPageMapping...';
-:r ../Seeds/PermissionToUIPageMappingSeed.sql
-PRINT '  PermissionToUIPageMapping seed completed.';
-PRINT '';
-
--- ============================================
--- Step 8: Seed RolePermissions (references Roles.Id, ResourcePermissions.Id)
--- ============================================
-PRINT 'Step 8/9: Seeding RolePermissions...';
-:r ../Seeds/RolePermissionsSeed.sql
-PRINT '  RolePermissions seed completed.';
-PRINT '';
-
--- ============================================
--- Step 9: Seed GlobalSettings (references Users.UserId via CreatedBy)
--- ============================================
-PRINT 'Step 9/9: Seeding GlobalSettings...';
+PRINT 'Step 2/2: Seeding GlobalSettings...';
 :r ../Seeds/GlobalSettingsSeed.sql
 PRINT '  GlobalSettings seed completed.';
 PRINT '';

@@ -38,60 +38,38 @@ public partial class IndexingDbContext : DataConnection
 
 	partial void InitDataContext();
 
-	public ITable<BinaryEmbeddingsStore>          BinaryEmbeddingsStores          => this.GetTable<BinaryEmbeddingsStore>();
+	public ITable<IndexingJsonFileElementValue>       IndexingJsonFileElementValues       => this.GetTable<IndexingJsonFileElementValue>();
 
-	public ITable<IndexingJsonFileElementMapping> IndexingJsonFileElementMappings => this.GetTable<IndexingJsonFileElementMapping>();
+	public ITable<IndexingJsonFileElement>            IndexingJsonFileElements            => this.GetTable<IndexingJsonFileElement>();
 
-	public ITable<IndexingJsonFileElementSearch>  IndexingJsonFileElementSearches => this.GetTable<IndexingJsonFileElementSearch>();
+	public ITable<IndexingJsonRequestResponseMapping> IndexingJsonRequestResponseMappings => this.GetTable<IndexingJsonRequestResponseMapping>();
 
-	public ITable<IndexingJsonFileElement>        IndexingJsonFileElements        => this.GetTable<IndexingJsonFileElement>();
+	public ITable<IndexingPdfFileElementMapping>      IndexingPdfFileElementMappings      => this.GetTable<IndexingPdfFileElementMapping>();
 
-	public ITable<IndexingPdfFileElementMapping>  IndexingPdfFileElementMappings  => this.GetTable<IndexingPdfFileElementMapping>();
+	public ITable<IndexingPdfFileElementValue>        IndexingPdfFileElementValues        => this.GetTable<IndexingPdfFileElementValue>();
 
-	public ITable<IndexingPdfFileElementSearch>   IndexingPdfFileElementSearches  => this.GetTable<IndexingPdfFileElementSearch>();
+	public ITable<IndexingPdfFileElement>             IndexingPdfFileElements             => this.GetTable<IndexingPdfFileElement>();
 
-	public ITable<IndexingPdfFileElement>         IndexingPdfFileElements         => this.GetTable<IndexingPdfFileElement>();
+	public ITable<IndexingServiceRequestFileStatus>   IndexingServiceRequestFileStatuses  => this.GetTable<IndexingServiceRequestFileStatus>();
 
-	public ITable<IndexingXmlFileElementMapping>  IndexingXmlFileElementMappings  => this.GetTable<IndexingXmlFileElementMapping>();
+	public ITable<IndexingServiceResponseFileStatus>  IndexingServiceResponseFileStatuses => this.GetTable<IndexingServiceResponseFileStatus>();
 
-	public ITable<IndexingXmlFileElementSearch>   IndexingXmlFileElementSearches  => this.GetTable<IndexingXmlFileElementSearch>();
+	public ITable<IndexingXmlFileElementValue>        IndexingXmlFileElementValues        => this.GetTable<IndexingXmlFileElementValue>();
 
-	public ITable<IndexingXmlFileElement>         IndexingXmlFileElements         => this.GetTable<IndexingXmlFileElement>();
+	public ITable<IndexingXmlFileElement>             IndexingXmlFileElements             => this.GetTable<IndexingXmlFileElement>();
 
-	public ITable<ServiceRequestIndexingStatus>   ServiceRequestIndexingStatuses  => this.GetTable<ServiceRequestIndexingStatus>();
-
-	public ITable<ServiceResponseIndexingStatus>  ServiceResponseIndexingStatuses => this.GetTable<ServiceResponseIndexingStatus>();
+	public ITable<IndexingXmlRequestResponseMapping>  IndexingXmlRequestResponseMappings  => this.GetTable<IndexingXmlRequestResponseMapping>();
 }
 
 public static partial class ExtensionMethods
 {
 	#region Table Extensions
-	public static BinaryEmbeddingsStore? Find(this ITable<BinaryEmbeddingsStore> table, int id)
+	public static IndexingJsonFileElementValue? Find(this ITable<IndexingJsonFileElementValue> table, long id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<BinaryEmbeddingsStore?> FindAsync(this ITable<BinaryEmbeddingsStore> table, int id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static IndexingJsonFileElementMapping? Find(this ITable<IndexingJsonFileElementMapping> table, long id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<IndexingJsonFileElementMapping?> FindAsync(this ITable<IndexingJsonFileElementMapping> table, long id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static IndexingJsonFileElementSearch? Find(this ITable<IndexingJsonFileElementSearch> table, long id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<IndexingJsonFileElementSearch?> FindAsync(this ITable<IndexingJsonFileElementSearch> table, long id, CancellationToken cancellationToken = default)
+	public static Task<IndexingJsonFileElementValue?> FindAsync(this ITable<IndexingJsonFileElementValue> table, long id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
@@ -106,6 +84,16 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
+	public static IndexingJsonRequestResponseMapping? Find(this ITable<IndexingJsonRequestResponseMapping> table, long id)
+	{
+		return table.FirstOrDefault(e => e.Id == id);
+	}
+
+	public static Task<IndexingJsonRequestResponseMapping?> FindAsync(this ITable<IndexingJsonRequestResponseMapping> table, long id, CancellationToken cancellationToken = default)
+	{
+		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+	}
+
 	public static IndexingPdfFileElementMapping? Find(this ITable<IndexingPdfFileElementMapping> table, long id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
@@ -116,12 +104,12 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static IndexingPdfFileElementSearch? Find(this ITable<IndexingPdfFileElementSearch> table, long id)
+	public static IndexingPdfFileElementValue? Find(this ITable<IndexingPdfFileElementValue> table, long id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<IndexingPdfFileElementSearch?> FindAsync(this ITable<IndexingPdfFileElementSearch> table, long id, CancellationToken cancellationToken = default)
+	public static Task<IndexingPdfFileElementValue?> FindAsync(this ITable<IndexingPdfFileElementValue> table, long id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
@@ -136,22 +124,32 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static IndexingXmlFileElementMapping? Find(this ITable<IndexingXmlFileElementMapping> table, long id)
+	public static IndexingServiceRequestFileStatus? Find(this ITable<IndexingServiceRequestFileStatus> table, int serviceRequestFileId)
+	{
+		return table.FirstOrDefault(e => e.ServiceRequestFileId == serviceRequestFileId);
+	}
+
+	public static Task<IndexingServiceRequestFileStatus?> FindAsync(this ITable<IndexingServiceRequestFileStatus> table, int serviceRequestFileId, CancellationToken cancellationToken = default)
+	{
+		return table.FirstOrDefaultAsync(e => e.ServiceRequestFileId == serviceRequestFileId, cancellationToken);
+	}
+
+	public static IndexingServiceResponseFileStatus? Find(this ITable<IndexingServiceResponseFileStatus> table, long serviceResponseFileId)
+	{
+		return table.FirstOrDefault(e => e.ServiceResponseFileId == serviceResponseFileId);
+	}
+
+	public static Task<IndexingServiceResponseFileStatus?> FindAsync(this ITable<IndexingServiceResponseFileStatus> table, long serviceResponseFileId, CancellationToken cancellationToken = default)
+	{
+		return table.FirstOrDefaultAsync(e => e.ServiceResponseFileId == serviceResponseFileId, cancellationToken);
+	}
+
+	public static IndexingXmlFileElementValue? Find(this ITable<IndexingXmlFileElementValue> table, long id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<IndexingXmlFileElementMapping?> FindAsync(this ITable<IndexingXmlFileElementMapping> table, long id, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-	}
-
-	public static IndexingXmlFileElementSearch? Find(this ITable<IndexingXmlFileElementSearch> table, long id)
-	{
-		return table.FirstOrDefault(e => e.Id == id);
-	}
-
-	public static Task<IndexingXmlFileElementSearch?> FindAsync(this ITable<IndexingXmlFileElementSearch> table, long id, CancellationToken cancellationToken = default)
+	public static Task<IndexingXmlFileElementValue?> FindAsync(this ITable<IndexingXmlFileElementValue> table, long id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
@@ -166,24 +164,14 @@ public static partial class ExtensionMethods
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static ServiceRequestIndexingStatus? Find(this ITable<ServiceRequestIndexingStatus> table, int serviceRequestFileId)
+	public static IndexingXmlRequestResponseMapping? Find(this ITable<IndexingXmlRequestResponseMapping> table, long id)
 	{
-		return table.FirstOrDefault(e => e.ServiceRequestFileId == serviceRequestFileId);
+		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<ServiceRequestIndexingStatus?> FindAsync(this ITable<ServiceRequestIndexingStatus> table, int serviceRequestFileId, CancellationToken cancellationToken = default)
+	public static Task<IndexingXmlRequestResponseMapping?> FindAsync(this ITable<IndexingXmlRequestResponseMapping> table, long id, CancellationToken cancellationToken = default)
 	{
-		return table.FirstOrDefaultAsync(e => e.ServiceRequestFileId == serviceRequestFileId, cancellationToken);
-	}
-
-	public static ServiceResponseIndexingStatus? Find(this ITable<ServiceResponseIndexingStatus> table, int serviceResponseFileId)
-	{
-		return table.FirstOrDefault(e => e.ServiceResponseFileId == serviceResponseFileId);
-	}
-
-	public static Task<ServiceResponseIndexingStatus?> FindAsync(this ITable<ServiceResponseIndexingStatus> table, int serviceResponseFileId, CancellationToken cancellationToken = default)
-	{
-		return table.FirstOrDefaultAsync(e => e.ServiceResponseFileId == serviceResponseFileId, cancellationToken);
+		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 	#endregion
 }

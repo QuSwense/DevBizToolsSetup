@@ -6,12 +6,16 @@
 // ---------------------------------------------------------------------------------------------------
 
 using LinqToDB.Mapping;
+using System;
 
 #pragma warning disable 1573, 1591
 #nullable enable
 
 namespace OrbitHub.Data.IndexingManagement;
 
+/// <summary>
+/// Maps PDF binary embedding stores to their associated element values.
+/// </summary>
 [Table("IndexingPdfFileElementMappings")]
 public partial class IndexingPdfFileElementMapping
 {
@@ -22,28 +26,29 @@ public partial class IndexingPdfFileElementMapping
 	public long Id { get; set; } // bigint
 
 	/// <summary>
-	/// Identifier of the related BinaryEmbeddingsStore record.
+	/// Identifier of the related BinaryEmbeddingStores record.
 	/// </summary>
 	[Column("BinaryEmbeddingsStoreId")]
-	public int BinaryEmbeddingsStoreId { get; set; } // int
+	public long BinaryEmbeddingsStoreId { get; set; } // bigint
 
 	/// <summary>
-	/// Identifier of the related IndexingPdfFileElementSearch record.
+	/// Identifier of the related IndexingPdfFileElementValues record.
 	/// </summary>
-	[Column("IndexingPdfFileElementSearchId")]
-	public long IndexingPdfFileElementSearchId { get; set; } // bigint
+	[Column("IndexingPdfFileElementValueId")]
+	public long IndexingPdfFileElementValueId { get; set; } // bigint
+
+	/// <summary>
+	/// Date and time at which this record was created.
+	/// </summary>
+	[Column("CreatedAt")]
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingPdfFileElementMappings_BinaryEmbeddingsStore
+	/// FK_IndexingPdfFileElementMappings_IndexingPdfFileElementValues
 	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(BinaryEmbeddingsStoreId), OtherKey = nameof(IndexingManagement.BinaryEmbeddingsStore.Id))]
-	public BinaryEmbeddingsStore BinaryEmbeddingsStore { get; set; } = null!;
-
-	/// <summary>
-	/// FK_IndexingPdfFileElementMappings_IndexingPdfFileElementSearch
-	/// </summary>
-	[Association(CanBeNull = false, ThisKey = nameof(IndexingPdfFileElementSearchId), OtherKey = nameof(IndexingManagement.IndexingPdfFileElementSearch.Id))]
-	public IndexingPdfFileElementSearch IndexingPdfFileElementSearch { get; set; } = null!;
+	[Association(CanBeNull = false, ThisKey = nameof(IndexingPdfFileElementValueId), OtherKey = nameof(IndexingManagement.IndexingPdfFileElementValue.Id))]
+	public IndexingPdfFileElementValue IndexingPdfFileElementValue { get; set; } = null!;
 	#endregion
 }
+

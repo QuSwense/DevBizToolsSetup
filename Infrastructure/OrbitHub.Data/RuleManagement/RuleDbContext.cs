@@ -38,44 +38,44 @@ public partial class RuleDbContext : DataConnection
 
 	partial void InitDataContext();
 
-	public ITable<RuleContextObject>        RuleContextObjects        => this.GetTable<RuleContextObject>();
+	public ITable<RuleSetContextObject>         RuleSetContextObjects         => this.GetTable<RuleSetContextObject>();
 
-	public ITable<RuleExecutionLog>         RuleExecutionLogs         => this.GetTable<RuleExecutionLog>();
+	public ITable<RuleSetExecutionAudit>        RuleSetExecutionAudits        => this.GetTable<RuleSetExecutionAudit>();
 
-	public ITable<RuleSetContextObjectLink> RuleSetContextObjectLinks => this.GetTable<RuleSetContextObjectLink>();
+	public ITable<RuleSetRuleContextObjectLink> RuleSetRuleContextObjectLinks => this.GetTable<RuleSetRuleContextObjectLink>();
 
-	public ITable<RuleSet>                  RuleSets                  => this.GetTable<RuleSet>();
+	public ITable<RuleSet>                      RuleSets                      => this.GetTable<RuleSet>();
 }
 
 public static partial class ExtensionMethods
 {
 	#region Table Extensions
-	public static RuleContextObject? Find(this ITable<RuleContextObject> table, int id)
+	public static RuleSetContextObject? Find(this ITable<RuleSetContextObject> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<RuleContextObject?> FindAsync(this ITable<RuleContextObject> table, int id, CancellationToken cancellationToken = default)
+	public static Task<RuleSetContextObject?> FindAsync(this ITable<RuleSetContextObject> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static RuleExecutionLog? Find(this ITable<RuleExecutionLog> table, int id)
+	public static RuleSetExecutionAudit? Find(this ITable<RuleSetExecutionAudit> table, long id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<RuleExecutionLog?> FindAsync(this ITable<RuleExecutionLog> table, int id, CancellationToken cancellationToken = default)
+	public static Task<RuleSetExecutionAudit?> FindAsync(this ITable<RuleSetExecutionAudit> table, long id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}
 
-	public static RuleSetContextObjectLink? Find(this ITable<RuleSetContextObjectLink> table, int id)
+	public static RuleSetRuleContextObjectLink? Find(this ITable<RuleSetRuleContextObjectLink> table, int id)
 	{
 		return table.FirstOrDefault(e => e.Id == id);
 	}
 
-	public static Task<RuleSetContextObjectLink?> FindAsync(this ITable<RuleSetContextObjectLink> table, int id, CancellationToken cancellationToken = default)
+	public static Task<RuleSetRuleContextObjectLink?> FindAsync(this ITable<RuleSetRuleContextObjectLink> table, int id, CancellationToken cancellationToken = default)
 	{
 		return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 	}

@@ -24,12 +24,6 @@ public partial class ServiceOperation
 	public int Id { get; set; } // int
 
 	/// <summary>
-	/// Public identifier used by the UI and external systems (GUID).
-	/// </summary>
-	[Column("PublicId")]
-	public Guid PublicId { get; set; } // uniqueidentifier
-
-	/// <summary>
 	/// Identifier of the related ServiceApplications record.
 	/// </summary>
 	[Column("ServiceApplicationId")]
@@ -54,7 +48,7 @@ public partial class ServiceOperation
 	public string? EndpointOrAction { get; set; } // nvarchar(500)
 
 	/// <summary>
-	/// HTTP method used by the REST operation.
+	/// HTTP method used by the REST operation (GET, POST, PUT, DELETE, etc.).
 	/// </summary>
 	[Column("HttpMethod")]
 	public string? HttpMethod { get; set; } // varchar(10)
@@ -66,13 +60,13 @@ public partial class ServiceOperation
 	public string? Description { get; set; } // nvarchar(max)
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
+	/// Indicates whether this record is active and available for use (1) or soft-deleted (0).
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
 
 	/// <summary>
-	/// Application-managed version value used for record change tracking.
+	/// Application-managed version string (format YY.QQ.NN) used for optimistic concurrency control and change tracking.
 	/// </summary>
 	[Column("RecordVersion", CanBeNull = false)]
 	public string RecordVersion { get; set; } = null!; // varchar(50)
@@ -81,25 +75,13 @@ public partial class ServiceOperation
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("CreatedBy", CanBeNull = false)]
 	public string CreatedBy { get; set; } = null!; // nvarchar(20)
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the related Users record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>

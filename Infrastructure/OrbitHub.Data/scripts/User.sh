@@ -17,13 +17,15 @@ dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
 CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
 
 # Step 1: Execute scaffolding using CLI parameters
+# Actual SQL tables (dbo): Users, UserActivities, UserSettings
+# Removed: UserRoles (no such table in OrbitToolDatabase/dbo)
 dotnet linq2db scaffold \
   --provider SQLServer \
   --connection "$CONNECTION_STRING" \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables Users,UserActivities,UserRoles \
+  --include-tables Users,UserActivities,UserSettings \
   --namespace OrbitHub.Data.UserManagement \
   --context-name UserDbContext \
   --add-typed-options-ctor \

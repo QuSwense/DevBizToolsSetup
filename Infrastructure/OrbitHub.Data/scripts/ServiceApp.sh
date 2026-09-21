@@ -17,13 +17,21 @@ dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
 CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
 
 # Step 1: Execute scaffolding using CLI parameters
+# Tables included: ServiceApplications, ServiceDefinitionSyncs, ServiceOperations, ServiceOperationSchemas,
+#   ServiceRequestFiles, ServiceResponseFiles, SoapNamespaces,
+#   BinaryEmbeddingStores, ServiceRequestFileBinaryEmbeddingStoreLinks, ServiceResponseFileBinaryEmbeddingStoreLinks,
+#   DirectExecutionGroups, DirectExecutionGroupAudits,
+#   DirectExecutionGroupServiceRequestFileLinks, DirectExecutionGroupServiceRequestFileLinkAudits,
+#   HttpExecutionDetailAudits, HttpExecutionDetailAuditsServiceResponseFilesLinks,
+#   ServiceAppHealthHttpExecutionDetailAuditLinks,
+#   ServiceResponseFileHttpExecutionDetailLinks, ServiceResponseFilesDatabaseAudits
 dotnet linq2db scaffold \
   --provider SQLServer \
   --connection "$CONNECTION_STRING" \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables DirectExecutionAudit,DirectExecutionAuditResponseFileLinks,ServiceAppAuthentications,ServiceApplications,ServiceDefinitionSyncs,ServiceOperations,ServiceOperationSchemas,ServiceRequestFileEmbeddings,ServiceRequestFiles,ServiceResponseFileEmbeddings,ServiceResponseFiles,SoapNamespaces \
+  --include-tables BinaryEmbeddingStores,DirectExecutionGroups,DirectExecutionGroupAudits,DirectExecutionGroupServiceRequestFileLinks,DirectExecutionGroupServiceRequestFileLinkAudits,HttpExecutionDetailAudits,HttpExecutionDetailAuditsServiceResponseFilesLinks,ServiceAppHealthHttpExecutionDetailAuditLinks,ServiceApplications,ServiceDefinitionSyncs,ServiceOperations,ServiceOperationSchemas,ServiceRequestFileBinaryEmbeddingStoreLinks,ServiceRequestFiles,ServiceResponseFileBinaryEmbeddingStoreLinks,ServiceResponseFileDatabaseAudits,ServiceResponseFileHttpExecutionDetailLinks,ServiceResponseFiles,ServiceResponseFilesDatabaseAudits,SoapNamespaces \
   --namespace OrbitHub.Data.ServiceAppManagement \
   --context-name ServiceAppDbContext \
   --add-typed-options-ctor \

@@ -30,34 +30,28 @@ public partial class IndexingJsonFileElement
 	public string ElementName { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
-	/// JSON path key path of the indexed JSON element.
+	/// JSONPath expression identifying the location of the indexed JSON element.
 	/// </summary>
 	[Column("JsonPath", CanBeNull = false)]
 	public string JsonPath { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
-	/// Data type of the element value.
+	/// C#-mapped data type of the element or setting value.
 	/// </summary>
-	[Column("ValueType", CanBeNull = false)]
-	public string ValueType { get; set; } = null!; // nvarchar(20)
+	[Column("DataType", CanBeNull = false)]
+	public string DataType { get; set; } = null!; // nvarchar(200)
 
 	/// <summary>
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingJsonFileElementSearch_IndexingJsonFileElements backreference
+	/// FK_IndexingJsonFileElementValues_IndexingJsonFileElements backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingJsonFileElementSearch.IndexingJsonFileElementId))]
-	public IEnumerable<IndexingJsonFileElementSearch> IndexingJsonFileElementSearches { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingJsonFileElementValue.IndexingJsonFileElementId))]
+	public IEnumerable<IndexingJsonFileElementValue> IndexingJsonFileElementValues { get; set; } = null!;
 	#endregion
 }

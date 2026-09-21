@@ -48,7 +48,7 @@ public partial class User
 	public string? LastName { get; set; } // nvarchar(100)
 
 	/// <summary>
-	/// Indicates whether this record is active and available for use.
+	/// Indicates whether this record is active and available for use (1) or soft-deleted (0).
 	/// </summary>
 	[Column("IsActive")]
 	public bool IsActive { get; set; } // bit
@@ -57,7 +57,7 @@ public partial class User
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -69,7 +69,7 @@ public partial class User
 	/// Date and time at which this record was last updated.
 	/// </summary>
 	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
+	public DateTime? LastUpdatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Identifier of the related Users record.
@@ -85,16 +85,10 @@ public partial class User
 	public IEnumerable<UserActivity> UserActivities { get; set; } = null!;
 
 	/// <summary>
-	/// FK_UserRoles_Users_CreatedBy backreference
+	/// FK_UserSettings_Users_UserId backreference
 	/// </summary>
-	[Association(ThisKey = nameof(UserId), OtherKey = nameof(UserRole.CreatedBy))]
-	public IEnumerable<UserRole> UserRoles { get; set; } = null!;
-
-	/// <summary>
-	/// FK_UserRoles_Users_UserId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(UserId), OtherKey = nameof(UserRole.UserId))]
-	public IEnumerable<UserRole> UserRoles1 { get; set; } = null!;
+	[Association(ThisKey = nameof(UserId), OtherKey = nameof(UserSetting.UserId))]
+	public IEnumerable<UserSetting> UserSettings { get; set; } = null!;
 
 	/// <summary>
 	/// FK_Users_Users_CreatedBy

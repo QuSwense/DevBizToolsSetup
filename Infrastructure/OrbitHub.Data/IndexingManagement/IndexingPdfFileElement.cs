@@ -30,7 +30,7 @@ public partial class IndexingPdfFileElement
 	public string ElementName { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
-	/// Source type of the element, such as XML, JSON, or PDF.
+	/// Source type of the element, such as Text, Image, Table, or Field (PDF) or XML/JSON.
 	/// </summary>
 	[Column("ElementType", CanBeNull = false)]
 	public string ElementType { get; set; } = null!; // nvarchar(100)
@@ -48,7 +48,7 @@ public partial class IndexingPdfFileElement
 	public string BoundingRectangle { get; set; } = null!; // nvarchar(400)
 
 	/// <summary>
-	/// Data type of the element value.
+	/// Data type of the element value (e.g., String, Number, Boolean, Array, Object, Null).
 	/// </summary>
 	[Column("ValueType", CanBeNull = false)]
 	public string ValueType { get; set; } = null!; // nvarchar(20)
@@ -57,19 +57,13 @@ public partial class IndexingPdfFileElement
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	#region Associations
 	/// <summary>
-	/// FK_IndexingPdfFileElementSearch_IndexingPdfFileElements backreference
+	/// FK_IndexingPdfFileElementValues_IndexingPdfFileElements backreference
 	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingPdfFileElementSearch.IndexingPdfFileElementId))]
-	public IEnumerable<IndexingPdfFileElementSearch> IndexingPdfFileElementSearches { get; set; } = null!;
+	[Association(ThisKey = nameof(Id), OtherKey = nameof(IndexingPdfFileElementValue.IndexingPdfFileElementId))]
+	public IEnumerable<IndexingPdfFileElementValue> IndexingPdfFileElementValues { get; set; } = null!;
 	#endregion
 }

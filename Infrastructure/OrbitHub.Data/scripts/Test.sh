@@ -17,13 +17,19 @@ dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
 CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
 
 # Step 1: Execute scaffolding using CLI parameters
+# Actual SQL tables (dbo):
+#   ServiceTestCases, ServiceTestCaseRuleSetLinks
+#   ServiceTestSuites, ServiceTestSuiteTestCaseLinks
+#   ServiceTestSuiteExecutionAudits
+#   ServiceTestSuiteTestCaseLinkAudits  (was: ServiceTestSuiteExecutionAuditTestCaseLinks)
+# Removed (no such SQL tables): ServiceTestCasesPermissions, ServiceTestSuitesPermissions
 dotnet linq2db scaffold \
   --provider SQLServer \
   --connection "$CONNECTION_STRING" \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables ServiceTestCaseRuleSetLinks,ServiceTestCases,ServiceTestCasesPermissions,ServiceTestSuiteExecutionAuditTestCaseLinks,ServiceTestSuiteExecutionAudits,ServiceTestSuiteTestCaseLinks,ServiceTestSuites,ServiceTestSuitesPermissions \
+  --include-tables ServiceTestCaseRuleSetLinks,ServiceTestCases,ServiceTestSuiteExecutionAudits,ServiceTestSuiteTestCaseLinkAudits,ServiceTestSuiteTestCaseLinks,ServiceTestSuites \
   --namespace OrbitHub.Data.TestManagement \
   --context-name TestDbContext \
   --add-typed-options-ctor \

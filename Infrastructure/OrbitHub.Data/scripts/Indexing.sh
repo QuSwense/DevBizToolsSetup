@@ -17,13 +17,18 @@ dotnet build "$LINQ2DB_COMPONENT_PRJ_PATH/DocIntercept.csproj" -v q -nologo
 CONNECTION_STRING="$(dotnet "$LINQ2DB_COMPONENT_PATH" connection-string "$APPSETTINGS_DEV")"
 
 # Step 1: Execute scaffolding using CLI parameters
+# Tables included:
+#   JSON: IndexingJsonFileElements, IndexingJsonFileElementValues, IndexingJsonRequestResponseMappings
+#   PDF:  IndexingPdfFileElements, IndexingPdfFileElementValues, IndexingPdfFileElementMappings
+#   XML:  IndexingXmlFileElements, IndexingXmlFileElementValues, IndexingXmlRequestResponseMappings
+#   Status: IndexingServiceRequestFileStatus, IndexingServiceResponseFileStatus
 dotnet linq2db scaffold \
   --provider SQLServer \
   --connection "$CONNECTION_STRING" \
   --output "$OUTPUT_DIR" \
   --overwrite \
   --objects table,foreign-key \
-  --include-tables BinaryEmbeddingsStore,IndexingJsonFileElementMappings,IndexingJsonFileElements,IndexingJsonFileElementSearch,IndexingPdfFileElementMappings,IndexingPdfFileElements,IndexingPdfFileElementSearch,IndexingXmlFileElementMappings,IndexingXmlFileElements,IndexingXmlFileElementSearch,ServiceRequestIndexingStatus,ServiceResponseIndexingStatus \
+  --include-tables IndexingJsonFileElements,IndexingJsonFileElementValues,IndexingJsonRequestResponseMappings,IndexingPdfFileElements,IndexingPdfFileElementValues,IndexingPdfFileElementMappings,IndexingServiceRequestFileStatus,IndexingServiceResponseFileStatus,IndexingXmlFileElements,IndexingXmlFileElementValues,IndexingXmlRequestResponseMappings \
   --namespace OrbitHub.Data.IndexingManagement \
   --context-name IndexingDbContext \
   --add-typed-options-ctor \

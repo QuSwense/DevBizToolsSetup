@@ -27,63 +27,71 @@ PRINT '';
 
 -- Delete from most-dependent tables first (reverse FK order)
 
-PRINT 'Clearing Indexing tables...';
+PRINT 'Clearing Indexing mapping/value tables...';
 DELETE FROM [dbo].[IndexingPdfFileElementMappings];
-DELETE FROM [dbo].[IndexingPdfFileElementSearch];
+DELETE FROM [dbo].[IndexingPdfFileElementValues];
 DELETE FROM [dbo].[IndexingPdfFileElements];
-DELETE FROM [dbo].[IndexingJsonFileElementMappings];
-DELETE FROM [dbo].[IndexingJsonFileElementSearch];
+DELETE FROM [dbo].[IndexingJsonRequestResponseMappings];
+DELETE FROM [dbo].[IndexingJsonFileElementValues];
 DELETE FROM [dbo].[IndexingJsonFileElements];
-DELETE FROM [dbo].[IndexingXmlFileElementMappings];
-DELETE FROM [dbo].[IndexingXmlFileElementSearch];
+DELETE FROM [dbo].[IndexingXmlRequestResponseMappings];
+DELETE FROM [dbo].[IndexingXmlFileElementValues];
 DELETE FROM [dbo].[IndexingXmlFileElements];
-PRINT '  Indexing tables cleared.';
+PRINT '  Indexing mapping/value tables cleared.';
 GO
 
-PRINT 'Clearing DirectExecution tables...';
-DELETE FROM [dbo].[DirectExecutionAuditResponseFileLinks];
-DELETE FROM [dbo].[DirectExecutionAudit];
-PRINT '  DirectExecution tables cleared.';
+PRINT 'Clearing Indexing status tables...';
+DELETE FROM [dbo].[IndexingServiceResponseFileStatus];
+DELETE FROM [dbo].[IndexingServiceRequestFileStatus];
+PRINT '  Indexing status tables cleared.';
 GO
 
-PRINT 'Clearing Test Suite execution tables...';
-DELETE FROM [dbo].[ServiceTestSuiteExecutionAuditTestCaseLinks];
+PRINT 'Clearing DirectExecution audit/link tables...';
+DELETE FROM [dbo].[DirectExecutionGroupServiceRequestFileLinkAudits];
+DELETE FROM [dbo].[DirectExecutionGroupAudits];
+DELETE FROM [dbo].[DirectExecutionGroupServiceRequestFileLinks];
+DELETE FROM [dbo].[DirectExecutionGroups];
+PRINT '  DirectExecution audit/link tables cleared.';
+GO
+
+PRINT 'Clearing Service App health check links...';
+DELETE FROM [dbo].[ServiceAppHealthHttpExecutionDetailAuditLinks];
+PRINT '  ServiceAppHealthHttpExecutionDetailAuditLinks cleared.';
+GO
+
+PRINT 'Clearing Test Suite execution/link tables...';
+DELETE FROM [dbo].[ServiceTestSuiteTestCaseLinkAudits];
 DELETE FROM [dbo].[ServiceTestSuiteExecutionAudits];
 DELETE FROM [dbo].[ServiceTestSuiteTestCaseLinks];
 DELETE FROM [dbo].[ServiceTestCaseRuleSetLinks];
-PRINT '  Test Suite execution tables cleared.';
-GO
-
-PRINT 'Clearing Test Suite/Case permission tables...';
-DELETE FROM [dbo].[ServiceTestSuitesPermissions];
-DELETE FROM [dbo].[ServiceTestCasesPermissions];
-PRINT '  Test Suite/Case permission tables cleared.';
-GO
-
-PRINT 'Clearing Test Suite/Case tables...';
 DELETE FROM [dbo].[ServiceTestSuites];
 DELETE FROM [dbo].[ServiceTestCases];
-PRINT '  Test Suite/Case tables cleared.';
+PRINT '  Test Suite execution/link tables cleared.';
 GO
 
-PRINT 'Clearing Service Response tables...';
-DELETE FROM [dbo].[ServiceResponseIndexingStatus];
-DELETE FROM [dbo].[ServiceResponseFileEmbeddings];
+PRINT 'Clearing Service Response file tables...';
+DELETE FROM [dbo].[ServiceResponseFilesDatabaseAudits];
+DELETE FROM [dbo].[HttpExecutionDetailAuditsServiceResponseFilesLinks];
+DELETE FROM [dbo].[ServiceResponseFileHttpExecutionDetailLinks];
+DELETE FROM [dbo].[ServiceResponseFileBinaryEmbeddingStoreLinks];
 DELETE FROM [dbo].[ServiceResponseFiles];
-PRINT '  Service Response tables cleared.';
+PRINT '  Service Response file tables cleared.';
 GO
 
-PRINT 'Clearing Service Request tables...';
-DELETE FROM [dbo].[ServiceRequestIndexingStatus];
-DELETE FROM [dbo].[ServiceRequestFileEmbeddings];
-DELETE FROM [dbo].[ServiceRequestFilesPermissions];
+PRINT 'Clearing HTTP Execution Detail Audits...';
+DELETE FROM [dbo].[HttpExecutionDetailAudits];
+PRINT '  HttpExecutionDetailAudits cleared.';
+GO
+
+PRINT 'Clearing Service Request file tables...';
+DELETE FROM [dbo].[ServiceRequestFileBinaryEmbeddingStoreLinks];
 DELETE FROM [dbo].[ServiceRequestFiles];
-PRINT '  Service Request tables cleared.';
+PRINT '  Service Request file tables cleared.';
 GO
 
-PRINT 'Clearing BinaryEmbeddingsStore...';
-DELETE FROM [dbo].[BinaryEmbeddingsStore];
-PRINT '  BinaryEmbeddingsStore cleared.';
+PRINT 'Clearing BinaryEmbeddingStores...';
+DELETE FROM [dbo].[BinaryEmbeddingStores];
+PRINT '  BinaryEmbeddingStores cleared.';
 GO
 
 PRINT 'Clearing Service Operation/Schema tables...';
@@ -91,82 +99,27 @@ DELETE FROM [dbo].[SoapNamespaces];
 DELETE FROM [dbo].[ServiceOperationSchemas];
 DELETE FROM [dbo].[ServiceOperations];
 DELETE FROM [dbo].[ServiceDefinitionSyncs];
+DELETE FROM [dbo].[ServiceApplications];
 PRINT '  Service Operation/Schema tables cleared.';
 GO
 
-PRINT 'Clearing Service Application permission tables...';
-DELETE FROM [dbo].[ServiceAppPermissions];
-PRINT '  Service Application permission tables cleared.';
-GO
-
-PRINT 'Clearing Service Applications...';
-DELETE FROM [dbo].[ServiceApplications];
-PRINT '  Service Applications cleared.';
-GO
-
-PRINT 'Clearing ServiceAppAuthentications...';
-DELETE FROM [dbo].[ServiceAppAuthentications];
-PRINT '  ServiceAppAuthentications cleared.';
-GO
-
 PRINT 'Clearing Rule Engine tables...';
-DELETE FROM [dbo].[RuleExecutionLogs];
-DELETE FROM [dbo].[RuleSetContextObjectLinks];
-DELETE FROM [dbo].[RuleSetsPermissions];
+DELETE FROM [dbo].[RuleSetExecutionAudits];
+DELETE FROM [dbo].[RuleSetRuleContextObjectLinks];
 DELETE FROM [dbo].[RuleSets];
+DELETE FROM [dbo].[RuleSetContextObjects];
 PRINT '  Rule Engine tables cleared.';
 GO
 
 PRINT 'Clearing User Settings and Activities...';
 DELETE FROM [dbo].[UserSettings];
 DELETE FROM [dbo].[UserActivities];
-DELETE FROM [dbo].[UserPermissions];
 PRINT '  User Settings and Activities cleared.';
-GO
-
-PRINT 'Clearing RolePermissions...';
-DELETE FROM [dbo].[RolePermissions];
-PRINT '  RolePermissions cleared.';
-GO
-
-PRINT 'Clearing PermissionToUIPageMapping...';
-DELETE FROM [dbo].[PermissionToUIPageMapping];
-PRINT '  PermissionToUIPageMapping cleared.';
-GO
-
-PRINT 'Clearing UIActions...';
-DELETE FROM [dbo].[UIActions];
-PRINT '  UIActions cleared.';
-GO
-
-PRINT 'Clearing UIPages...';
-DELETE FROM [dbo].[UIPages];
-PRINT '  UIPages cleared.';
-GO
-
-PRINT 'Clearing ResourcePermissions...';
-DELETE FROM [dbo].[ResourcePermissions];
-PRINT '  ResourcePermissions cleared.';
 GO
 
 PRINT 'Clearing GlobalSettings...';
 DELETE FROM [dbo].[GlobalSettings];
 PRINT '  GlobalSettings cleared.';
-GO
-
-PRINT 'Clearing RuleContextObjects...';
-DELETE FROM [dbo].[RuleContextObjects];
-PRINT '  RuleContextObjects cleared.';
-GO
-
-PRINT 'Clearing UserRoles...';
-DELETE FROM [dbo].[UserRoles];
-PRINT '  UserRoles cleared.';
-GO
-
-PRINT 'Clearing Roles...';
-DELETE FROM [dbo].[Roles];
-PRINT '  Roles cleared.';
 GO
 
 PRINT 'Clearing Users...';

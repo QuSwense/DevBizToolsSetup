@@ -7,7 +7,6 @@
 
 using LinqToDB.Mapping;
 using System;
-using System.Collections.Generic;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -39,22 +38,22 @@ public partial class ServiceTestSuiteExecutionAudit
 	/// Date and time at which execution started.
 	/// </summary>
 	[Column("ExecutedAt")]
-	public DateTime ExecutedAt { get; set; } // datetime
+	public DateTime ExecutedAt { get; set; } // datetime2(3)
 
 	/// <summary>
 	/// Date and time at which execution completed.
 	/// </summary>
 	[Column("ExecutionCompletedAt")]
-	public DateTime? ExecutionCompletedAt { get; set; } // datetime
+	public DateTime? ExecutionCompletedAt { get; set; } // datetime2(3)
 
 	/// <summary>
-	/// Final status of the execution.
+	/// Current or final status of the execution: Pending, InProgress, Completed, or Failed.
 	/// </summary>
 	[Column("ExecutionStatus", CanBeNull = false)]
 	public string ExecutionStatus { get; set; } = null!; // nvarchar(50)
 
 	/// <summary>
-	/// JSON or text details captured during execution, including errors when applicable.
+	/// JSON or text details captured during execution, including logs and error messages when applicable.
 	/// </summary>
 	[Column("ExecutionDetails")]
 	public string? ExecutionDetails { get; set; } // nvarchar(max)
@@ -66,12 +65,6 @@ public partial class ServiceTestSuiteExecutionAudit
 	public string ExecutedBy { get; set; } = null!; // nvarchar(20)
 
 	#region Associations
-	/// <summary>
-	/// FK_ServiceTestSuiteExecutionAuditTestCaseLinks_ServiceTestSuiteExecutionAudits_ServiceTestSuiteExecutionAuditId backreference
-	/// </summary>
-	[Association(ThisKey = nameof(Id), OtherKey = nameof(ServiceTestSuiteExecutionAuditTestCaseLink.ServiceTestSuiteExecutionAuditId))]
-	public IEnumerable<ServiceTestSuiteExecutionAuditTestCaseLink> ServiceTestSuiteExecutionAuditTestCaseLinks { get; set; } = null!;
-
 	/// <summary>
 	/// FK_ServiceTestSuiteExecutionAudits_ServiceTestSuites_ServiceTestSuiteId
 	/// </summary>

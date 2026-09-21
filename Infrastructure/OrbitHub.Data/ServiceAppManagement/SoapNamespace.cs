@@ -35,31 +35,13 @@ public partial class SoapNamespace
 	public int ServiceOperationSchemaId { get; set; } // int
 
 	/// <summary>
-	/// Compressed binary content stored for this record.
+	/// JSON array of namespace prefix and URI pairs declared by the SOAP operation schema.
 	/// </summary>
-	[Column("CompressedContent", CanBeNull = false)]
-	public byte[] CompressedContent { get; set; } = null!; // varbinary(max)
+	[Column("DetailContent", CanBeNull = false)]
+	public string DetailContent { get; set; } = null!; // nvarchar(max)
 
 	/// <summary>
-	/// Size of the file content before compression, in bytes.
-	/// </summary>
-	[Column("UncompressedSizeBytes")]
-	public long? UncompressedSizeBytes { get; set; } // bigint
-
-	/// <summary>
-	/// Algorithm used to compress the stored content.
-	/// </summary>
-	[Column("CompressionAlgorithmType")]
-	public string? CompressionAlgorithmType { get; set; } // varchar(50)
-
-	/// <summary>
-	/// SHA-256 hash of the stored content for integrity verification.
-	/// </summary>
-	[Column("ContentHash")]
-	public string? ContentHash { get; set; } // varchar(64)
-
-	/// <summary>
-	/// Application-managed version value used for record change tracking.
+	/// Application-managed version string (format YY.QQ.NN) used for optimistic concurrency control and change tracking.
 	/// </summary>
 	[Column("RecordVersion", CanBeNull = false)]
 	public string RecordVersion { get; set; } = null!; // varchar(50)
@@ -68,25 +50,13 @@ public partial class SoapNamespace
 	/// Date and time at which this record was created.
 	/// </summary>
 	[Column("CreatedAt")]
-	public DateTime CreatedAt { get; set; } // datetime
+	public DateTime CreatedAt { get; set; } // datetime2(3)
 
 	/// <summary>
-	/// Identifier of the user who created this record.
+	/// Identifier of the related Users record.
 	/// </summary>
 	[Column("CreatedBy")]
 	public string? CreatedBy { get; set; } // nvarchar(20)
-
-	/// <summary>
-	/// Date and time at which this record was last updated.
-	/// </summary>
-	[Column("LastUpdatedAt")]
-	public DateTime? LastUpdatedAt { get; set; } // datetime
-
-	/// <summary>
-	/// Identifier of the user who last updated this record.
-	/// </summary>
-	[Column("LastUpdatedBy")]
-	public string? LastUpdatedBy { get; set; } // nvarchar(20)
 
 	#region Associations
 	/// <summary>

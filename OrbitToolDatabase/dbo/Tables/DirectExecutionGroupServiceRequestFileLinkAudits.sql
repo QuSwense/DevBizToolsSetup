@@ -16,7 +16,7 @@ CREATE TABLE [dbo].[DirectExecutionGroupServiceRequestFileLinkAudits] (
     -- Execution order within the audit
     [ExecutionOrder] INT NOT NULL CONSTRAINT DF_DirectExecutionGroupServiceRequestFileLinkAudits_ExecutionOrder DEFAULT 0,
     -- Timestamp when the execution started
-    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_DirectExecutionGroupAudits_ExecutedAt DEFAULT GETDATE(),
+    [ExecutedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_DirectExecutionGroupServiceRequestFileLinkAudits_ExecutedAt DEFAULT GETDATE(),
     -- Timestamp when the execution completed
     [ExecutionCompletedAt] DATETIME2(3) NULL,
     -- Status of the execution (Pending, InProgress, Completed, Failed)
@@ -30,7 +30,7 @@ CREATE TABLE [dbo].[DirectExecutionGroupServiceRequestFileLinkAudits] (
         UNIQUE ([DirectExecutionGroupServiceRequestFileLinkId] ASC),
     CONSTRAINT PK_DirectExecutionGroupServiceRequestFileLinkAudits PRIMARY KEY CLUSTERED ([Id] ASC),
 
-    CONSTRAINT FK_DirectExecutionGroupServiceRequestFileLinkAudits_DirectExecutionGroupServiceRequestFileLinks_DirectExecutionGroupServiceRequestFileLinkId
+    CONSTRAINT FK_DirectExecutionGroupServiceRequestFileLinkAudits_DirectExecutionGroupServiceRequestFileLinkId
         FOREIGN KEY ([DirectExecutionGroupServiceRequestFileLinkId]) REFERENCES [dbo].[DirectExecutionGroupServiceRequestFileLinks]([Id]),
     CONSTRAINT FK_DirectExecutionGroupServiceRequestFileLinkAudits_ServiceResponseFiles_ServiceResponseFileId
         FOREIGN KEY ([ServiceResponseFileId]) REFERENCES [dbo].[ServiceResponseFiles]([Id]),
