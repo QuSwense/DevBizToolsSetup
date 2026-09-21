@@ -5,9 +5,6 @@
 CREATE TABLE [dbo].[ServiceRequestFiles] (
     -- Primary Key, Identity Column and Unique identifier
     [Id] INT IDENTITY(1,1) NOT NULL,
-    -- Public Identifier for UI/Secure Operations (GUID)
-    [PublicId] UNIQUEIDENTIFIER NOT NULL 
-        CONSTRAINT DF_ServiceRequestFiles_PublicId DEFAULT NEWID(),
     -- Foreign Key to ServiceOperations table
     [ServiceOperationId] INT NOT NULL,
     -- File format, e.g., 'XML', 'JSON'
@@ -31,7 +28,7 @@ CREATE TABLE [dbo].[ServiceRequestFiles] (
     [CreatedBy] NVARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_ServiceRequestFiles PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT UQ_ServiceRequestFiles_PublicId UNIQUE ([PublicId] ASC),
+    CONSTRAINT UQ_ServiceRequestFiles_Name UNIQUE ([Name] ASC),
 
     CONSTRAINT CK_ServiceRequestFiles_Format
         CHECK ([FileFormat] IS NULL OR [FileFormat] IN ('XML','JSON')),

@@ -452,7 +452,7 @@ public class SimulatedSoapExecutionEngine(
 
     // ── Helpers ──
 
-    private static SoapExecutionLogModel CreateLog(string type, string message) => new SoapExecutionLogModel()
+    private static SoapExecutionLogModel CreateLog(string type, string message) => new()
     {
         Id = $"log-{Guid.NewGuid():N}"[..10],
         Timestamp = FormatTimestamp(DateTime.Now),

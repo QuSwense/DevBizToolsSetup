@@ -11,10 +11,4 @@ public abstract class AuditableEntityModel
 
     /// <summary>User ID who created the record.</summary>
     public string? CreatedBy { get; init; }
-
-    /// <summary>Timestamp when the record was last updated, or null if never updated.</summary>
-    public DateTime? LastUpdatedAt { get; set; }
-
-    /// <summary>User ID who last updated the record, or null if never updated.</summary>
-    public string? LastUpdatedBy { get; set; }
 }

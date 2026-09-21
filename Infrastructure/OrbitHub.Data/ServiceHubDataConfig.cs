@@ -5,11 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrbitHub.Data.CoreManagement;
 using OrbitHub.Data.IndexingManagement;
-using OrbitHub.Data.PermissionsManagement;
+// using OrbitHub.Data.PermissionsManagement;
 using OrbitHub.Data.RuleManagement;
 using OrbitHub.Data.ServiceAppManagement;
 using OrbitHub.Data.TestManagement;
-using OrbitHub.Data.UIManagement;
+// using OrbitHub.Data.UIManagement;
 using OrbitHub.Data.UserManagement;
 
 namespace OrbitHub.Data;
@@ -40,11 +40,11 @@ public static class ServiceHubDataConfig
     {
         services.AddLinqToDBContext<CoreDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<IndexingDbContext>((_, options) => UseSqlServer(options, connectionString));
-        services.AddLinqToDBContext<PermissionsDbContext>((_, options) => UseSqlServer(options, connectionString));
+        // services.AddLinqToDBContext<PermissionsDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<RuleDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<ServiceAppDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<TestDbContext>((_, options) => UseSqlServer(options, connectionString));
-        services.AddLinqToDBContext<UiDbContext>((_, options) => UseSqlServer(options, connectionString));
+        // services.AddLinqToDBContext<UiDbContext>((_, options) => UseSqlServer(options, connectionString));
         services.AddLinqToDBContext<UserDbContext>((_, options) => UseSqlServer(options, connectionString));
 
         services.AddRepositories();

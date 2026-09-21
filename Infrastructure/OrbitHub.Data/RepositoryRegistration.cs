@@ -7,16 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using LinqToDB.Data;
 using OrbitHub.Data.TestManagement;
 using OrbitHub.Data.CoreManagement.Repositories;
-using OrbitHub.Data.IndexingManagement.Repositories;
-using OrbitHub.Data.PermissionsManagement.Repositories;
-using OrbitHub.Data.RuleManagement.Repositories;
-using OrbitHub.Data.TestManagement.Repositories;
+using OrbitHub.Data.ServiceAppManagement.Repositories;
 using OrbitHub.Data.Common;
-using OrbitHub.Data.ServiceAppManagement.Views;
-using OrbitHub.Data.IndexingManagement.Views;
-using OrbitHub.Data.PermissionsManagement.Views;
-using OrbitHub.Data.RuleManagement.Views;
-using OrbitHub.Data.TestManagement.Views;
 
 namespace OrbitHub.Data;
 
@@ -28,118 +20,10 @@ public static class RepositoryRegistration
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         // CoreManagement
-        services.AddScoped<InsertUserActivityRepository>();
-        services.AddScoped<UpdateGlobalSettingRepository>();
         services.AddScoped<UpdateUserSettingRepository>();
 
-        // IndexingManagement
-        services.AddScoped<BinaryEmbeddingExistsRepository>();
-        services.AddScoped<GetBinaryEmbeddingByIdRepository>();
-        services.AddScoped<GetElementFrequencyRepository>();
-        services.AddScoped<GetFilesByElementRepository>();
-        services.AddScoped<GetIndexingStatisticsRepository>();
-        services.AddScoped<InsertBinaryEmbeddingRepository>();
-        services.AddScoped<InsertJsonFileElementMappingRepository>();
-        services.AddScoped<InsertOrGetJsonFileElementRepository>();
-        services.AddScoped<InsertOrGetJsonFileElementSearchRepository>();
-        services.AddScoped<InsertOrGetPdfFileElementRepository>();
-        services.AddScoped<InsertOrGetPdfFileElementSearchRepository>();
-        services.AddScoped<InsertOrGetXmlFileElementRepository>();
-        services.AddScoped<InsertOrGetXmlFileElementSearchRepository>();
-        services.AddScoped<InsertPdfFileElementMappingRepository>();
-        services.AddScoped<InsertXmlFileElementMappingRepository>();
-        services.AddScoped<SearchElementsRepository>();
-
-        // PermissionsManagement
-        services.AddScoped<CreateRolePermissionRepository>();
-        services.AddScoped<CreateUserPermissionRepository>();
-        services.AddScoped<DeleteUserPermissionRepository>();
-        services.AddScoped<GetAvailablePermissionsRepository>();
-        services.AddScoped<GetRolePermissionsRepository>();
-        services.AddScoped<GetServiceAppPermissionsRepository>();
-        services.AddScoped<GetUserPermissionsRepository>();
-        services.AddScoped<RemoveServiceAppPermissionsRepository>();
-        services.AddScoped<UpdateRolePermissionRepository>();
-        services.AddScoped<UpdateUserPermissionRepository>();
-        services.AddScoped<UpsertServiceAppPermissionsRepository>();
-
-        // RuleManagement
-        services.AddScoped<CreateRuleContextObjectRepository>();
-        services.AddScoped<CreateRuleSetRepository>();
-        services.AddScoped<GetRuleExecutionStatisticsRepository>();
-        services.AddScoped<GetRuleSetsByContextRepository>();
-        services.AddScoped<LinkRuleSetToContextObjectRepository>();
-        services.AddScoped<LogRuleExecutionRepository>();
-        services.AddScoped<UnlinkRuleSetFromContextObjectRepository>();
-        services.AddScoped<UpdateRuleContextObjectRepository>();
-        services.AddScoped<UpdateRuleSetRepository>();
-
-        // TestManagement
-        services.AddScoped<ActivateServiceOperationRepository>();
-        services.AddScoped<CreateServiceApplicationRepository>();
-        services.AddScoped<CreateServiceOperationRepository>();
-        services.AddScoped<CreateServiceOperationSchemaRepository>();
-        services.AddScoped<CreateServiceTestCaseRepository>();
-        services.AddScoped<CreateServiceTestSuiteRepository>();
-        services.AddScoped<CreateSoapNamespaceRepository>();
-        services.AddScoped<CreateTestSuiteExecutionAuditRepository>();
-        services.AddScoped<GetServiceApplicationHistoryRepository>();
-        services.AddScoped<GetServiceDefinitionSyncRepository>();
-        services.AddScoped<GetServiceOperationsRepository>();
-        services.AddScoped<GetServiceOperationSchemasRepository>();
-        services.AddScoped<GetServiceRequestFileChainRepository>();
-        services.AddScoped<GetServiceRequestFilesByOperationRepository>();
-        services.AddScoped<GetServiceResponseFileChainRepository>();
-        services.AddScoped<GetServiceResponseFilesByRequestRepository>();
-        services.AddScoped<GetSoapNamespacesRepository>();
-        services.AddScoped<GetSoapNamespacesByServiceRepository>();
-        services.AddScoped<GetTestSuiteExecutionSummaryRepository>();
-        services.AddScoped<InsertServiceDefinitionSyncRepository>();
-        services.AddScoped<InsertServiceRequestFileRepository>();
-        services.AddScoped<InsertServiceRequestFileEmbeddingRepository>();
-        services.AddScoped<InsertServiceResponseFileRepository>();
-        services.AddScoped<InsertServiceResponseFileEmbeddingRepository>();
-        services.AddScoped<LinkRuleSetToTestCaseRepository>();
-        services.AddScoped<LinkTestCaseToSuiteRepository>();
-        services.AddScoped<LogTestCaseExecutionRepository>();
-        services.AddScoped<ToggleServiceApplicationActiveRepository>();
-        services.AddScoped<UnlinkRuleSetFromTestCaseRepository>();
-        services.AddScoped<UnlinkTestCaseFromSuiteRepository>();
-        services.AddScoped<UpdateServiceAppAuthenticationRepository>();
-        services.AddScoped<UpdateServiceDefinitionSyncRepository>();
-        services.AddScoped<UpdateServiceOperationRepository>();
-        services.AddScoped<UpdateServiceOperationSchemaRepository>();
-        services.AddScoped<UpdateServiceRequestFileRepository>();
-        services.AddScoped<UpdateServiceRequestFileEmbeddingRepository>();
-        services.AddScoped<UpdateServiceResponseFileRepository>();
-        services.AddScoped<UpdateServiceResponseFileEmbeddingRepository>();
-        services.AddScoped<UpdateServiceTestCaseRepository>();
-        services.AddScoped<UpdateServiceTestSuiteRepository>();
-        services.AddScoped<UpdateSoapNamespaceRepository>();
-        services.AddScoped<UpdateTestCaseExecutionRepository>();
-        services.AddScoped<UpsertServiceApplicationRepository>();
-
-        // TestManagement - Execution Audit
-        services.AddScoped<CreateDirectExecutionAuditRepository>();
-        services.AddScoped<CompleteDirectExecutionAuditRepository>();
-        services.AddScoped<GetDirectExecutionAuditByIdRepository>();
-        services.AddScoped<CreateDirectExecutionAuditResponseFileLinkRepository>();
-        services.AddScoped<UpdateDirectExecutionAuditResponseFileLinkStatusRepository>();
-        services.AddScoped<GetDirectExecutionAuditResponseFileLinksByAuditIdRepository>();
-
-        // TestManagement - Lookup SPs
-        services.AddScoped<GetServiceApplicationByIdRepository>();
-        services.AddScoped<GetServiceOperationByIdRepository>();
-        services.AddScoped<GetServiceRequestFileByIdRepository>();
-        services.AddScoped<GetServiceRequestFileByOperationAndNameRepository>();
-        services.AddScoped<GetServiceRequestFileConsecutiveDeltaCountRepository>();
-        services.AddScoped<GetServiceDefinitionSyncLatestVersionRepository>();
-        services.AddScoped<GetServiceAppAuthenticationByAppIdRepository>();
-
-        // TestManagement - Composite SPs
-        services.AddScoped<CreateServiceOperationWithSchemaRepository>();
-        services.AddScoped<SaveServiceDefinitionSyncWithOperationsRepository>();
-        services.AddScoped<UpdateServiceRequestFileWithDeltaChainRepository>();
+        // ServiceAppManagement
+        services.AddScoped<SaveServiceRequestFileRepository>();
 
         // UnitOfWork
         services.AddScoped<IUnitOfWork>(sp =>
@@ -148,55 +32,6 @@ public static class RepositoryRegistration
             var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<UnitOfWork>>();
             return new UnitOfWork((DataConnection)ctx, logger);
         });
-
-        // Views - ServiceAppManagement
-        services.AddScoped<ServiceApplicationAuditViewRepository>();
-
-        // Views - IndexingManagement
-        services.AddScoped<BinaryEmbeddingsByFormatViewRepository>();
-        services.AddScoped<BinaryEmbeddingsStorageSummaryViewRepository>();
-        services.AddScoped<BinaryEmbeddingsStoreWithUsageViewRepository>();
-        services.AddScoped<IndexingElementSearchByValueViewRepository>();
-        services.AddScoped<IndexingElementUsageStatsViewRepository>();
-        services.AddScoped<IndexingFileElementSearchViewRepository>();
-        services.AddScoped<IndexingPendingQueueViewRepository>();
-
-        // Views - PermissionsManagement
-        services.AddScoped<RolePermissionSummaryViewRepository>();
-        services.AddScoped<RolePermissionsWithDetailsViewRepository>();
-        services.AddScoped<ServiceAppPermissionsSummaryViewRepository>();
-        services.AddScoped<ServiceAppPermissionsWithDetailsViewRepository>();
-        services.AddScoped<UserPermissionSummaryViewRepository>();
-        services.AddScoped<UserPermissionsSummaryViewRepository>();
-        services.AddScoped<UserPermissionsWithDetailsViewRepository>();
-
-        // Views - RuleManagement
-        services.AddScoped<RuleContextObjectWithUsageViewRepository>();
-        services.AddScoped<RuleExecutionLogWithDetailsViewRepository>();
-        services.AddScoped<RuleSetContextLinkViewRepository>();
-        services.AddScoped<RuleSetWithDetailsViewRepository>();
-
-        // Views - TestManagement
-        services.AddScoped<ActiveServiceOperationViewRepository>();
-        services.AddScoped<ActiveSoapNamespaceViewRepository>();
-        services.AddScoped<LatestServiceAppAuthenticationViewRepository>();
-        services.AddScoped<LatestServiceApplicationWithAuthViewRepository>();
-        services.AddScoped<ServiceDefinitionSyncWithDetailsViewRepository>();
-        services.AddScoped<ServiceOperationsSummaryViewRepository>();
-        services.AddScoped<ServiceOperationsWithDetailsViewRepository>();
-        services.AddScoped<ServiceRequestFileDeltaSummaryViewRepository>();
-        services.AddScoped<ServiceRequestFileEmbeddingWithDetailsViewRepository>();
-        services.AddScoped<ServiceRequestFileWithDetailsViewRepository>();
-        services.AddScoped<ServiceRequestResponsePairViewRepository>();
-        services.AddScoped<ServiceResponseFileDeltaSummaryViewRepository>();
-        services.AddScoped<ServiceResponseFileEmbeddingWithDetailsViewRepository>();
-        services.AddScoped<ServiceResponseFileWithDetailsViewRepository>();
-        services.AddScoped<ServiceTestCaseExecutionHistoryViewRepository>();
-        services.AddScoped<ServiceTestCaseWithDetailsViewRepository>();
-        services.AddScoped<ServiceTestSuiteExecutionAuditWithDetailsViewRepository>();
-        services.AddScoped<ServiceTestSuiteWithDetailsViewRepository>();
-        services.AddScoped<SoapNamespacesSummaryViewRepository>();
-        services.AddScoped<SoapNamespacesWithDetailsViewRepository>();
 
         return services;
     }

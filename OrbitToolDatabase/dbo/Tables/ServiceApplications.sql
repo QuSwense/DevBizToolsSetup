@@ -15,6 +15,7 @@ CREATE TABLE [dbo].[ServiceApplications] (
     -- Timestamps for auditing created and last updated (static information, should not change frequently)
     [CreatedAt] DATETIME2(3) NOT NULL CONSTRAINT DF_ServiceApplications_CreatedAt DEFAULT GETDATE(),
 
-    CONSTRAINT PK_ServiceApplications PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT PK_ServiceApplications PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT UQ_ServiceApplications_Name UNIQUE ([Name])
 );
 GO

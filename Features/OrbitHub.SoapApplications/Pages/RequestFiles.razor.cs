@@ -431,7 +431,7 @@ public partial class RequestFiles : IDisposable
         _showTestCaseModal = true;
     }
 
-    private static SoapExtractorModel NewExtractor() => new SoapExtractorModel()
+    private static SoapExtractorModel NewExtractor() => new()
     {
         Id = $"ex-{Guid.NewGuid():N}"[..10],
         Name = "",
